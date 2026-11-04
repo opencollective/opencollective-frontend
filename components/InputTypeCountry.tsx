@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { getEmojiByCountryCode } from 'country-currency-emoji-flags';
 import { isUndefined, orderBy } from 'lodash-es';
 import memoizeOne from 'memoize-one';
+import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 
 import fetchGeoLocation from '../lib/geolocation_api';
@@ -14,41 +14,41 @@ import { Flex } from './Grid';
 import StyledSelect from './StyledSelect';
 import { Span } from './Text';
 
+type CountryOption = {
+  label?: React.ReactNode;
+  value?: string;
+};
+
+type InputTypeCountryProps = {
+  /** The id of the search input */
+  inputId: string;
+  onChange: (country: string) => void;
+  name?: string;
+  /** To force a specific locale */
+  locale?: string;
+  fontSize?: string;
+  defaultValue?: string;
+  /** Use this to control the component state */
+  value?: string;
+  /** Switch between display modes */
+  mode?: 'select' | 'underlined';
+  /** If true, we'll try to autodetect country form the IP */
+  autoDetect?: boolean;
+  /** From injectIntl */
+  intl?: IntlShape;
+  /** Is this input required? */
+  required?: boolean;
+  /** Custom options **/
+  customOptions?: CountryOption[];
+};
+
 /**
  * @deprecated Use InputCountry instead
  */
-class InputTypeCountry extends Component {
-  static propTypes = {
-    /** The id of the search input */
-    inputId: PropTypes.string.isRequired,
-    onChange: PropTypes.func.isRequired,
-    name: PropTypes.string,
-    /** To force a specific locale */
-    locale: PropTypes.string,
-    fontSize: PropTypes.string,
-    defaultValue: PropTypes.string,
-    /** Use this to control the component state */
-    value: PropTypes.string,
-    /** Switch between display modes */
-    mode: PropTypes.oneOf(['select', 'underlined']),
-    /** If true, we'll try to autodetect country form the IP */
-    autoDetect: PropTypes.bool,
-    /** From injectIntl */
-    intl: PropTypes.object.isRequired,
-    /** Is this input required? */
-    required: PropTypes.bool,
-    /** Custom options **/
-    customOptions: PropTypes.arrayOf(
-      PropTypes.shape({
-        label: PropTypes.node,
-        value: PropTypes.any,
-      }),
-    ),
-  };
-
+class InputTypeCountry extends Component<InputTypeCountryProps> {
   static defaultProps = { name: 'country', customOptions: [], fontSize: '14px' };
 
-  constructor(props) {
+  constructor(props: InputTypeCountryProps) {
     super(props);
     this.countryNames = getIntlDisplayNames(props.intl.locale, 'region');
   }
@@ -63,6 +63,8 @@ class InputTypeCountry extends Component {
       }
     }
   }
+
+  countryNames: ReturnType<typeof getIntlDisplayNames>;
 
   generateCountryLabel(locale, countryCode) {
     const countryName = this.countryNames.of(countryCode);
@@ -115,12 +117,13 @@ class InputTypeCountry extends Component {
 
   render() {
     const { defaultValue, value, intl, onChange, locale, name, inputId, ...props } = this.props;
+    // `getOptions` only takes the locale; the `defaultValue` argument it used to receive was ignored
     return (
       <StyledSelect
         name={name}
         inputId={inputId}
         minWidth={150}
-        options={this.getOptions(locale || intl.locale, defaultValue)}
+        options={this.getOptions(locale || intl.locale)}
         filterOption={this.filterOptions}
         onChange={({ value }) => onChange(value)}
         value={!isUndefined(value) ? this.getSelectedOption(locale || intl.locale, value) : undefined}
@@ -133,4 +136,5 @@ class InputTypeCountry extends Component {
   }
 }
 
-export default injectIntl(InputTypeCountry);
+// `injectIntl` only types the injected `intl` prop; the class' own props (and `defaultProps`) are kept as-is
+export default injectIntl(InputTypeCountry as React.ComponentType<{ intl?: IntlShape }>);

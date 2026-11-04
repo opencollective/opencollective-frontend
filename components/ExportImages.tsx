@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -18,12 +17,27 @@ const ParameterColumnHeader = styled.th`
   padding: 0.05rem 0.65rem 0.05rem 0;
 `;
 
-class ExportImages extends React.Component {
-  static propTypes = {
-    collective: PropTypes.object.isRequired,
-  };
+type ExportImagesTier = {
+  id: number;
+  name: string;
+  slug: string;
+};
 
-  constructor(props) {
+type ExportImagesProps = {
+  collective: {
+    id?: number | string;
+    slug?: string;
+    name?: string;
+    tiers?: ExportImagesTier[];
+  };
+};
+
+type ExportImagesState = {
+  tierIndex: number;
+};
+
+class ExportImages extends React.Component<ExportImagesProps, ExportImagesState> {
+  constructor(props: ExportImagesProps) {
     super(props);
     this.state = { tierIndex: 0 };
   }

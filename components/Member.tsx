@@ -1,10 +1,11 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { get } from 'lodash-es';
+import type { IntlShape } from 'react-intl';
 import { defineMessages } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { formatCurrency } from '../lib/currency-utils';
+import type { Currency } from '../lib/graphql/types/v2/graphql';
 import { capitalize, firstSentence, formatDate, singular } from '../lib/utils';
 import injectIntl from '@/lib/injectIntl';
 
@@ -38,16 +39,43 @@ const MemberContainer = styled.div`
   }
 `;
 
-class Member extends React.Component {
-  static propTypes = {
-    member: PropTypes.object.isRequired,
-    collective: PropTypes.object.isRequired,
-    viewMode: PropTypes.string,
-    intl: PropTypes.object.isRequired,
-    className: PropTypes.string,
-  };
+type MemberAccount = {
+  id?: number | string;
+  type?: string;
+  slug?: string;
+  name?: string;
+  description?: string;
+  company?: string;
+  user?: { email?: string };
+  /** Present on member entries: the account of the member */
+  member?: MemberAccount;
+};
 
-  constructor(props) {
+type MemberMembership = MemberAccount & {
+  collective?: MemberProps['collective'];
+  member?: MemberAccount;
+  tier?: { name?: string };
+  role?: string;
+  createdAt?: string;
+  stats?: { totalDonations?: number };
+};
+
+type MemberProps = {
+  member: MemberAccount;
+  collective: {
+    id?: number | string;
+    slug?: string;
+    name?: string;
+    type?: string;
+    currency?: Currency;
+  };
+  viewMode?: string;
+  intl?: IntlShape;
+  className?: string;
+};
+
+class Member extends React.Component<MemberProps> {
+  constructor(props: MemberProps) {
     super(props);
 
     this.messages = defineMessages({
@@ -63,9 +91,11 @@ class Member extends React.Component {
     });
   }
 
+  messages: Record<string, { id: string; defaultMessage: string }>;
+
   render() {
     const { collective, intl } = this.props;
-    const membership = { ...this.props.member };
+    const membership: MemberMembership = { ...this.props.member };
     membership.collective = collective;
     const { member, description } = membership;
     const viewMode = this.props.viewMode || (get(member, 'type') === 'USER' ? 'USER' : 'ORGANIZATION');

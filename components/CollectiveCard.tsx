@@ -1,11 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { get } from 'lodash-es';
+import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedDate, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 import { width } from 'styled-system';
 
 import { defaultBackgroundImage } from '../lib/constants/collectives';
+import type { Currency as GraphQLCurrency } from '../lib/graphql/types/v2/graphql';
 import { imagePreview } from '../lib/image-utils';
 import { firstSentence } from '../lib/utils';
 import injectIntl from '@/lib/injectIntl';
@@ -96,16 +97,39 @@ const CommaList = styled.ul`
   }
 `;
 
-class CollectiveCard extends React.Component {
-  static propTypes = {
-    collective: PropTypes.object.isRequired,
-    membership: PropTypes.object,
-    memberships: PropTypes.array,
-    intl: PropTypes.object.isRequired,
-    hideRoles: PropTypes.bool,
-  };
+type CollectiveMembership = {
+  id?: string;
+  role?: string;
+  createdAt?: string;
+  tier?: { name?: string };
+  stats?: { totalDonations?: number };
+  collective?: { currency?: GraphQLCurrency };
+};
 
-  constructor(props) {
+type CollectiveCardProps = {
+  collective: {
+    id?: number | string;
+    type?: string;
+    slug?: string;
+    name?: string;
+    description?: string;
+    backgroundImage?: string;
+    parentCollective?: { slug?: string; backgroundImage?: string };
+    stats?: {
+      backers?: { all?: number };
+      yearlyBudget?: { valueInCents?: number; currency?: GraphQLCurrency };
+      totalAmountSpent?: { valueInCents?: number; currency?: GraphQLCurrency };
+    };
+    memberOf?: { totalCount?: number };
+  };
+  membership?: CollectiveMembership;
+  memberships?: CollectiveMembership[];
+  intl?: IntlShape;
+  hideRoles?: boolean;
+};
+
+class CollectiveCard extends React.Component<CollectiveCardProps> {
+  constructor(props: CollectiveCardProps) {
     super(props);
 
     this.messages = defineMessages({
@@ -132,12 +156,14 @@ class CollectiveCard extends React.Component {
     });
   }
 
+  messages: Record<string, { id: string; defaultMessage: string }>;
+
   render() {
     const { intl, collective, membership, hideRoles } = this.props;
     let { memberships } = this.props;
     memberships = memberships || (membership ? [membership] : []);
 
-    const getTierName = membership => {
+    const getTierName = (membership: CollectiveMembership): string => {
       const tierName = get(membership, 'tier.name');
       const role = get(membership, 'role');
       if (!tierName) {
@@ -160,14 +186,16 @@ class CollectiveCard extends React.Component {
     };
 
     const membershipDates = memberships.map(m => m.createdAt);
+    // TODO: `createdAt` is an ISO string, so `b - a` is always NaN and the sort is a no-op.
+    // Preserved with the same numeric coercion (see PLAN.md).
     membershipDates.sort((a, b) => {
-      return b - a;
+      return Number(b) - Number(a);
     });
 
     const oldestMembershipDate = membershipDates.length ? membershipDates[0] : null;
     const roles = new Set(memberships.map(m => getTierName(m)));
 
-    const coverStyle = {};
+    const coverStyle: React.CSSProperties = {};
     const backgroundImage = imagePreview(
       collective.backgroundImage || get(collective, 'parentCollective.backgroundImage'),
       defaultBackgroundImage['COLLECTIVE'],
@@ -299,7 +327,8 @@ class CollectiveCard extends React.Component {
                   fontWeight="700"
                   letterSpacing="3px"
                   color="#75cc1f"
-                  textTransform="uppercase"
+                  // `textTransform` is not part of `Container`'s props; forwarded as-is
+                  {...({ textTransform: 'uppercase' } as React.ComponentProps<typeof Container>)}
                 >
                   <CommaList>
                     {Array.from(roles).map(role => (
@@ -315,7 +344,7 @@ class CollectiveCard extends React.Component {
                     lineHeight="1.5"
                     textAlign="center"
                     color="#aab0b3"
-                    textTransform="capitalize"
+                    {...({ textTransform: 'capitalize' } as React.ComponentProps<typeof Container>)}
                   >
                     <FormattedMessage
                       id="membership.since"

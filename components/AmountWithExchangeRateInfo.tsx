@@ -1,14 +1,38 @@
 import React from 'react';
 import { InfoCircle } from '@styled-icons/boxicons-regular/InfoCircle';
 import { round } from 'lodash-es';
+import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import type { CurrencyExchangeRate, CurrencyExchangeRateInput } from '../lib/graphql/types/v2/graphql';
 import { cn } from '../lib/utils';
 
 import DateTime from './DateTime';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
 import { Flex } from './Grid';
 import StyledTooltip from './StyledTooltip';
+
+type AmountWithExchangeRateInfoProps = {
+  amount: {
+    exchangeRate?: CurrencyExchangeRate | null;
+    currency?: string | null;
+    value?: number | null;
+    valueInCents?: number | null;
+  };
+  amountClassName?: string;
+  showCurrencyCode?: boolean;
+  invertIconPosition?: boolean;
+  warning?: React.ReactNode;
+  error?: React.ReactNode;
+  amountWrapperClassName?: string;
+  currencyCodeClassName?: string;
+};
+
+type FxRateInfoOptions = {
+  approximateCustomMessage?: React.ReactNode;
+  warning?: React.ReactNode;
+  error?: React.ReactNode;
+};
 
 const I18N_FX_RATE_SOURCE_LABEL = defineMessages({
   USER: {
@@ -23,8 +47,14 @@ const FX_RATE_SOURCE_LABEL = {
   WISE: 'Wise',
 };
 
-export const formatFxRateInfo = (intl, exchangeRate, { approximateCustomMessage, warning, error } = {}) => {
-  const { value, date, source, isApproximate, fromCurrency, toCurrency } = exchangeRate;
+export const formatFxRateInfo = (
+  intl: IntlShape,
+  exchangeRate: CurrencyExchangeRate | CurrencyExchangeRateInput,
+  { approximateCustomMessage, warning, error }: FxRateInfoOptions = {},
+) => {
+  const { value, date, source, fromCurrency, toCurrency } = exchangeRate;
+  // `CurrencyExchangeRateInput` has no `isApproximate` field: keep the union and read it only when present
+  const isApproximate = 'isApproximate' in exchangeRate ? exchangeRate.isApproximate : undefined;
   return (
     <Flex flexDirection="column" data-cy="exchange-rate-info">
       <FormattedMessage
@@ -83,7 +113,7 @@ const AmountWithExchangeRateInfo = ({
   error = null,
   amountWrapperClassName = undefined,
   currencyCodeClassName = undefined,
-}) => {
+}: AmountWithExchangeRateInfoProps) => {
   const intl = useIntl();
   return (
     <StyledTooltip
@@ -92,7 +122,13 @@ const AmountWithExchangeRateInfo = ({
       noTooltip={!exchangeRate}
       content={() => formatFxRateInfo(intl, exchangeRate, { warning, error })}
     >
-      <Flex flexWrap="noWrap" alignItems="center" flexDirection={invertIconPosition ? 'row-reverse' : 'row'} gap="4px">
+      {/* `noWrap` is not a valid `flex-wrap` value (browsers ignore it); preserved for behaviour parity - see PLAN.md */}
+      <Flex
+        flexWrap={'noWrap' as React.ComponentProps<typeof Flex>['flexWrap']}
+        alignItems="center"
+        flexDirection={invertIconPosition ? 'row-reverse' : 'row'}
+        gap="4px"
+      >
         <div className={cn('flex flex-row gap-1 whitespace-nowrap', amountWrapperClassName)}>
           <FormattedMoneyAmount
             amount={valueInCents ?? Math.round(value * 100)}

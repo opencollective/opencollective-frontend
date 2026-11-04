@@ -1,8 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import copy from 'copy-to-clipboard';
 import { get } from 'lodash-es';
 import { CircleHelp, RefreshCw } from 'lucide-react';
+import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -19,29 +19,40 @@ import MessageBox from './MessageBox';
 import NotFound from './NotFound';
 import { withUser } from './UserProvider';
 
+type ErrorPageProps = {
+  /** Customize the error type. Check `createError.*` functions for more info */
+  error?: {
+    type?: (typeof ERROR)[keyof typeof ERROR];
+    payload?: { searchTerm?: string };
+    message?: string;
+    networkError?: unknown;
+  };
+  /** If true, a loading indicator will be displayed instead of an error */
+  loading?: boolean;
+  /** Define if error should be logged to console. Default: true */
+  log?: boolean;
+  /** @ignore from withUser */
+  LoggedInUser?: Record<string, unknown>;
+  /** @deprecated please generate errors with the `createError` helper  */
+  message?: string;
+  /** @deprecated please generate errors with the `createError` helper */
+  // We can pass the data object of Apollo to detect and handle GraphQL errors
+  data?: {
+    error?: { message?: string; stack?: string; networkError?: unknown };
+    loading?: boolean;
+    variables?: { slug?: string };
+  };
+  router: Router;
+};
+
+type ErrorPageState = {
+  copiedErrorMessage: boolean;
+};
+
 /**
  * A flexible error page
  */
-class ErrorPage extends React.Component {
-  static propTypes = {
-    /** Customize the error type. Check `createError.*` functions for more info */
-    error: PropTypes.shape({
-      type: PropTypes.oneOf(Object.values(ERROR)),
-      payload: PropTypes.object,
-    }),
-    /** If true, a loading indicator will be displayed instead of an error */
-    loading: PropTypes.bool,
-    /** Define if error should be logged to console. Default: true */
-    log: PropTypes.bool,
-    /** @ignore from withUser */
-    LoggedInUser: PropTypes.object,
-    /** @deprecated please generate errors with the `createError` helper  */
-    message: PropTypes.string,
-    /** @deprecated please generate errors with the `createError` helper */
-    data: PropTypes.object, // we can pass the data object of Apollo to detect and handle GraphQL errors
-    router: PropTypes.object,
-  };
-
+class ErrorPage extends React.Component<ErrorPageProps, ErrorPageState> {
   state = { copiedErrorMessage: false };
 
   getErrorComponent() {
@@ -90,7 +101,7 @@ class ErrorPage extends React.Component {
     return this.unknownError();
   }
 
-  renderErrorMessage(message) {
+  renderErrorMessage(message: React.ReactNode) {
     return (
       <div className="flex w-full flex-col items-center justify-center px-4 py-8">
         <div className="mb-8">
@@ -143,7 +154,7 @@ class ErrorPage extends React.Component {
     const stackTrace = get(this.props, 'data.error.stack');
     const expandError = process.env.OC_ENV !== 'production';
     const fontSize = ['ci', 'e2e', 'test'].includes(process.env.OC_ENV) ? 22 : 13;
-    const toBase64 = str => Buffer.from(str).toString('base64');
+    const toBase64 = (str: string) => Buffer.from(str).toString('base64');
     const formatStacktrace = () => (process.env.OC_ENV === 'production' ? toBase64(stackTrace) : stackTrace);
     return (
       <div className="flex w-full flex-col items-center justify-center px-4 py-8" data-cy="not-found">

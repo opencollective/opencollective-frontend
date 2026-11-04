@@ -1,12 +1,14 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, pick } from 'lodash-es';
+import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 
 import { formatCurrency } from '../lib/currency-utils';
 import { gql } from '../lib/graphql/helpers';
+import type { Currency } from '../lib/graphql/types/v2/graphql';
 import { collectiveBalanceFragment } from '../lib/graphql/v1/fragments';
+import type LoggedInUser from '../lib/LoggedInUser';
 import { compose } from '../lib/utils';
 import injectIntl from '@/lib/injectIntl';
 
@@ -14,29 +16,46 @@ import { Button } from './ui/Button';
 import { toast } from './ui/useToast';
 import { Flex } from './Grid';
 
-class SendMoneyToCollectiveBtn extends React.Component {
-  static propTypes = {
-    amount: PropTypes.number.isRequired,
-    currency: PropTypes.string.isRequired,
-    description: PropTypes.string,
-    fromCollective: PropTypes.object.isRequired,
-    toCollective: PropTypes.object.isRequired,
-    LoggedInUser: PropTypes.object.isRequired,
-    intl: PropTypes.object.isRequired,
-    data: PropTypes.object,
-    sendMoneyToCollective: PropTypes.func,
-    confirmTransfer: PropTypes.func,
-    isTransferApproved: PropTypes.bool,
-    customButton: PropTypes.function,
-  };
+type SendMoneyCollective = Parameters<LoggedInUser['isAdminOfCollectiveOrHost']>[0] & {
+  id?: number | string;
+  name?: string;
+};
 
-  constructor(props) {
+type SendMoneyToCollectiveBtnProps = {
+  amount: number;
+  currency: Currency;
+  description?: string;
+  fromCollective: SendMoneyCollective;
+  toCollective: SendMoneyCollective;
+  LoggedInUser: LoggedInUser;
+  /** Injected by `injectIntl` */
+  intl?: IntlShape;
+  data?: {
+    account?: {
+      id?: string;
+      paymentMethods?: Array<{ id: string; service?: string; name?: string }>;
+    };
+  };
+  sendMoneyToCollective?: (
+    options: Record<string, unknown>,
+  ) => Promise<{ data?: { createOrder?: { order?: unknown } } }>;
+  confirmTransfer?: () => void;
+  isTransferApproved?: boolean;
+  customButton?: (props: { onClick: () => void; children: React.ReactNode }) => React.ReactNode;
+};
+
+type SendMoneyToCollectiveBtnState = {
+  loading?: boolean;
+};
+
+class SendMoneyToCollectiveBtn extends React.Component<SendMoneyToCollectiveBtnProps, SendMoneyToCollectiveBtnState> {
+  constructor(props: SendMoneyToCollectiveBtnProps) {
     super(props);
     this.onClick = this.onClick.bind(this);
     this.state = {};
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: SendMoneyToCollectiveBtnProps) {
     if (this.props.isTransferApproved !== prevProps.isTransferApproved) {
       this.onClick();
     }
@@ -101,8 +120,7 @@ class SendMoneyToCollectiveBtn extends React.Component {
   }
 
   render() {
-    const { amount, currency, toCollective, intl, customButton } = this.props;
-    const { locale } = intl;
+    const { amount, currency, toCollective, customButton } = this.props;
     return (
       <div className="SendMoneyToCollectiveBtn">
         <Flex justifyContent="center" mb={1}>
@@ -117,7 +135,8 @@ class SendMoneyToCollectiveBtn extends React.Component {
                       id="SendMoneyToCollective.btn"
                       defaultMessage="Send {amount} to {collective}"
                       values={{
-                        amount: formatCurrency(amount, currency, locale),
+                        // TODO: the `locale` string was passed where `formatCurrency` expects options, so it was ignored
+                        amount: formatCurrency(amount, currency),
                         collective: toCollective.name,
                       }}
                     />
@@ -133,7 +152,8 @@ class SendMoneyToCollectiveBtn extends React.Component {
                   id="SendMoneyToCollective.btn"
                   defaultMessage="Send {amount} to {collective}"
                   values={{
-                    amount: formatCurrency(amount, currency, locale),
+                    // TODO: the `locale` string was passed where `formatCurrency` expects options, so it was ignored
+                    amount: formatCurrency(amount, currency),
                     collective: toCollective.name,
                   }}
                 />
@@ -159,13 +179,18 @@ const paymentMethodsQuery = gql`
   }
 `;
 
+type PaymentMethodsQueryProps = {
+  fromCollective?: { slug?: string };
+  LoggedInUser?: LoggedInUser;
+};
+
 const addPaymentMethodsData = graphql(paymentMethodsQuery, {
-  options: props => ({
+  options: (props: PaymentMethodsQueryProps) => ({
     variables: {
       slug: get(props, 'fromCollective.slug'),
     },
   }),
-  skip: props => {
+  skip: (props: PaymentMethodsQueryProps) => {
     return !props.LoggedInUser;
   },
 });

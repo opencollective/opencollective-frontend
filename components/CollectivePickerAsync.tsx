@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLazyQuery } from '@apollo/client';
 import { debounce } from 'lodash-es';
+import type { IntlShape } from 'react-intl';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../lib/constants/collectives';
@@ -112,7 +113,11 @@ const Messages = defineMessages({
  * If a single type is selected, will return a label like: `Search for users`
  * Otherwise it just returns `Search`
  */
-const getPlaceholder = (intl, types, { useBeneficiaryForVendor } = {}) => {
+const getPlaceholder = (
+  intl: IntlShape,
+  types: string[],
+  { useBeneficiaryForVendor }: { useBeneficiaryForVendor?: boolean } = {},
+) => {
   const nbTypes = types ? types.length : 0;
   if (nbTypes === 0 || nbTypes > 3) {
     return intl.formatMessage(Messages.search);
@@ -120,15 +125,16 @@ const getPlaceholder = (intl, types, { useBeneficiaryForVendor } = {}) => {
     if (types[0] === CollectiveType.USER) {
       return intl.formatMessage(Messages.searchForUsers);
     } else {
+      // Rich-text message descriptors do not type their values; see the `as never` idiom in `lib/errors`
       return intl.formatMessage(Messages.searchForType, {
         entity: formatCollectiveType(intl, types[0], 100, { useBeneficiaryForVendor }),
-      });
+      } as never);
     }
   } else {
     // Format by passing a map of entities like { entity1: 'Collectives' }
     return intl.formatMessage(
       Messages[`searchForType_${nbTypes}`],
-      types.reduce((i18nParams, type, index) => {
+      types.reduce<Record<string, string>>((i18nParams, type, index) => {
         i18nParams[`entity${index + 1}`] = formatCollectiveType(intl, type, 100, { useBeneficiaryForVendor });
         return i18nParams;
       }, {}),

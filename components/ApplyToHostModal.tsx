@@ -179,11 +179,21 @@ const getAccountInput = collective => {
   return typeof collective.id === 'number' ? { legacyId: collective.id } : { id: collective.id };
 };
 
-const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit, isOSCHost }) => {
+type ConfirmButtonsProps = {
+  onClose?: () => void;
+  onBack?: (() => void) | null;
+  onSubmit: () => void;
+  isSubmitting: boolean;
+  canSubmit: boolean;
+  isOSCHost: boolean;
+};
+
+const ConfirmButtons = ({ onClose, onBack, onSubmit, isSubmitting, canSubmit, isOSCHost }: ConfirmButtonsProps) => {
   return (
     <Flex justifyContent="flex-end" width="100%">
+      {/* `buttonType` is not a StyledButton prop (it was forwarded to the DOM); kept for behaviour parity */}
       <StyledButton
-        buttonType="button"
+        {...({ buttonType: 'button' } as React.ComponentProps<typeof StyledButton>)}
         onClick={onBack || onClose}
         disabled={isSubmitting}
         buttonStyle="standard"
@@ -319,11 +329,12 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
               } else {
                 toast({
                   variant: 'success',
+                  // Rich-text message descriptors do not type their values; see the `as never` idiom in `lib/errors`
                   message: intl.formatMessage(messages.SUCCESS, {
                     hostName: host.name,
                     collectiveName: values.collective.name,
                     type: result.data.applyToHost.isApproved ? 'APPROVED' : 'SENT',
-                  }),
+                  } as never),
                 });
                 onClose();
               }
@@ -569,6 +580,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                               <StyledInputFormikField name="areTosChecked">
                                 {({ form, field }) => (
                                   <Flex flexDirection="column" mx={1} mt={18}>
+                                    {/* `required` is not a StyledCheckbox prop (it reaches the wrapper div); kept for behaviour parity */}
                                     <StyledCheckbox
                                       name="tos"
                                       label={
@@ -585,7 +597,7 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
                                           }}
                                         />
                                       }
-                                      required
+                                      {...({ required: true } as React.ComponentProps<typeof StyledCheckbox>)}
                                       checked={field.value}
                                       onChange={({ checked }) => form.setFieldValue('areTosChecked', checked)}
                                       error={field.error}
@@ -599,7 +611,8 @@ const ApplyToHostModal = ({ hostSlug, collective, onClose, onSuccess, router, ..
 
                         {error && (
                           <MessageBox type="error" withIcon my={[1, 3]}>
-                            {error}
+                            {/* TODO: `error` is an ApolloError object, which React cannot render - preserved as-is (see PLAN.md) */}
+                            {error as never}
                           </MessageBox>
                         )}
                       </React.Fragment>

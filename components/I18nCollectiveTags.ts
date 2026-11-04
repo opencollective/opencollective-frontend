@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import type { IntlShape } from 'react-intl';
 import { defineMessages } from 'react-intl';
 
 import { CollectiveCategory } from '../lib/constants/collectives';
@@ -72,19 +72,24 @@ const TranslatedTags = defineMessages({
   },
 });
 
-/** Translates a list of tags */
-class I18nCollectiveTags extends React.Component {
-  static propTypes = {
-    /** A tag or a list of tags */
-    tags: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]).isRequired,
-    /** A function used to render the tag */
-    children: PropTypes.func.isRequired,
-    /** Ignore tags if translation is missing */
-    ignoreUntranslated: PropTypes.bool,
-    /** @ignore */
-    intl: PropTypes.object,
-  };
+type TranslatedTag = {
+  value: string;
+  isTranslated: boolean;
+};
 
+type I18nCollectiveTagsProps = {
+  /** A tag or a list of tags */
+  tags: string | string[];
+  /** A function used to render the tag */
+  children?: (tags: TranslatedTag[]) => React.ReactNode;
+  /** Ignore tags if translation is missing */
+  ignoreUntranslated?: boolean;
+  /** @ignore */
+  intl?: IntlShape;
+};
+
+/** Translates a list of tags */
+class I18nCollectiveTags extends React.Component<I18nCollectiveTagsProps> {
   static defaultProps = {
     ignoreUntranslated: false,
     /** Default renderer, will render a string list */
@@ -114,4 +119,5 @@ class I18nCollectiveTags extends React.Component {
   }
 }
 
-export default injectIntl(I18nCollectiveTags);
+// `injectIntl` only types the injected `intl` prop; the class' own props (and `defaultProps`) are kept as-is
+export default injectIntl(I18nCollectiveTags as React.ComponentType<{ intl?: IntlShape }>);

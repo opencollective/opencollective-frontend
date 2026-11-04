@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { clamp, get, throttle } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import { darken, getContrast, getLuminance, setLightness } from 'polished';
@@ -11,22 +10,29 @@ import defaultColors from '../lib/theme/colors';
 
 import DefaultPaletteStyle from './DefaultPaletteStyle';
 
+type CollectiveThemeProviderProps = {
+  children?: React.ReactNode | ((props: { onPrimaryColorChange: (color: string) => void }) => React.ReactNode);
+  collective?: {
+    settings?: {
+      collectivePage?: {
+        primaryColor?: string;
+      };
+    };
+  };
+};
+
+type CollectiveThemeProviderState = {
+  newPrimaryColor: string;
+};
+
 /**
  * A special `ThemeProvider` that plugs the custom collective theme, defined by the color
  * from `collective.settings.collectivePage.primaryColor`.
  */
-export default class CollectiveThemeProvider extends React.PureComponent {
-  static propTypes = {
-    children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-    collective: PropTypes.shape({
-      settings: PropTypes.shape({
-        collectivePage: PropTypes.shape({
-          primaryColor: PropTypes.string,
-        }),
-      }),
-    }),
-  };
-
+export default class CollectiveThemeProvider extends React.PureComponent<
+  CollectiveThemeProviderProps,
+  CollectiveThemeProviderState
+> {
   state = { newPrimaryColor: null };
 
   /**

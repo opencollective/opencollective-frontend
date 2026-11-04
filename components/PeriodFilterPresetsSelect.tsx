@@ -85,13 +85,14 @@ const PeriodFilterPresetsSelect = ({
     }));
   }, [intl]);
 
+  // `selectTheme` is read by `StyledSelect` but missing from its public props type; forwarded as-is
   return (
     <SelectComponent
       {...selectProps}
       inputId={inputId}
       value={selectedOption}
       options={options}
-      selectTheme={periodSelectThemeBuilder}
+      {...({ selectTheme: periodSelectThemeBuilder } as React.ComponentProps<typeof SelectComponent>)}
       styles={styles}
       onChange={({ value }) => {
         if (value === 'custom') {

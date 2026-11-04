@@ -11,62 +11,33 @@ import StyledSelect from './StyledSelect';
 import StyledTag from './StyledTag';
 import { Span } from './Text';
 
-const ordersSearchQuery = gql`
-  query OrdersPickerSearch(
-    $account: AccountReferenceInput
-    $includeIncognito: Boolean
-    $filter: AccountOrdersFilter
-    $searchTerm: String
-  ) {
-    orders(
-      account: $account
-      filter: $filter
-      limit: 100
-      includeIncognito: $includeIncognito
-      searchTerm: $searchTerm
-    ) {
+const expensesSearchQuery = gql`
+  query ExpensesPickerSearch($account: AccountReferenceInput, $searchTerm: String, $status: [ExpenseStatusFilter]) {
+    expenses(account: $account, limit: 100, searchTerm: $searchTerm, status: $status) {
       nodes {
         id
         legacyId
         description
         createdAt
-        amount {
-          valueInCents
-          currency
-        }
-        fromAccount {
+        account {
           id
           name
           slug
           isIncognito
           imageUrl(height: 48)
-          ... on Individual {
-            isGuest
-          }
-        }
-        toAccount {
-          id
-          slug
-          name
-        }
-        tier {
-          id
-          legacyId
-          slug
-          name
         }
       }
     }
   }
 `;
 
-const getOptionsFromOrders = orders => {
-  if (!orders?.length) {
+const getOptionsFromExpenses = expenses => {
+  if (!expenses?.length) {
     return [];
   } else {
-    return orders.map(order => ({
-      value: order,
-      label: `#${order.legacyId} - ${order.description}`,
+    return expenses.map(expense => ({
+      value: expense,
+      label: `#${expense.legacyId} - ${expense.description}`,
     }));
   }
 };
@@ -105,20 +76,20 @@ const formatOptionLabel = option => {
 };
 
 /**
- * A specialization of `CollectivePicker` that fetches the data based on user search.
+ * Fetches expenses based on user search input.
  */
-const OrdersPickerAsync = ({ inputId, noCache, account, filter, includeIncognito, ...props }) => {
-  const fetchPolicy = noCache ? 'network-only' : undefined;
-  const variables = { includeIncognito, filter, account: getAccountInput(account) };
+const ExpensesPickerAsync = ({ inputId, noCache, account, status, ...props }) => {
+  const fetchPolicy: 'network-only' | undefined = noCache ? 'network-only' : undefined;
+  const variables = { account: getAccountInput(account), status };
   const queryParameters = { fetchPolicy, variables };
-  const [searchOrders, { loading, data }] = useLazyQuery(ordersSearchQuery, queryParameters);
+  const [searchExpenses, { loading, data }] = useLazyQuery(expensesSearchQuery, queryParameters);
   const [searchTerm, setSearchTerm] = React.useState('');
-  const options = React.useMemo(() => getOptionsFromOrders(data?.orders?.nodes), [data?.orders?.nodes]);
+  const options = React.useMemo(() => getOptionsFromExpenses(data?.expenses?.nodes), [data?.expenses?.nodes]);
 
   // If preload is true, trigger a first query on mount or when one of the query param changes
   React.useEffect(() => {
     if (account) {
-      throttledSearch(searchOrders, { searchTerm });
+      throttledSearch(searchExpenses, { searchTerm });
     }
   }, [account, searchTerm]);
 
@@ -136,4 +107,4 @@ const OrdersPickerAsync = ({ inputId, noCache, account, filter, includeIncognito
   );
 };
 
-export default OrdersPickerAsync;
+export default ExpensesPickerAsync;

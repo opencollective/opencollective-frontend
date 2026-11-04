@@ -113,7 +113,8 @@ const CollectiveContactForm = ({ collective, isModal = false, onClose = undefine
         <FormattedMessage defaultMessage="Message needs to be at least 10 characters long" id="322m9e" />
       </p>
       {isModal && <hr className="my-5" />}
-      <Box textAlign={isModal ? 'right' : ''}>
+      {/* `''` is not a valid `text-align` value (browsers ignore it); kept as-is for behaviour parity */}
+      <Box textAlign={(isModal ? 'right' : '') as React.ComponentProps<typeof Box>['textAlign']}>
         <StyledButton
           mt={isModal ? 0 : 4}
           minWidth={200}

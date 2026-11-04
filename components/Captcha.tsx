@@ -19,6 +19,21 @@ const PROVIDERS = {
   TURNSTILE: 'TURNSTILE',
 };
 
+declare global {
+  interface Window {
+    turnstile?: {
+      reset?: () => void;
+    };
+  }
+}
+
+type CaptchaResult = { token?: string; provider?: string };
+
+type CaptchaProps = {
+  onVerify: (result: CaptchaResult | null) => void;
+  provider?: string;
+};
+
 const CAPTCHA_PROVIDER = PROVIDERS[toUpper(getEnvVar('CAPTCHA_PROVIDER'))] || PROVIDERS.HCAPTCHA;
 
 export const isCaptchaEnabled = () => {
@@ -73,54 +88,56 @@ export const resetCaptcha = () => {
 /**
  * @type {React.ForwardRefExoticComponent<{ onVerify: (result) => void;}>}
  */
-const Captcha = React.forwardRef(({ onVerify, provider = CAPTCHA_PROVIDER, ...props }, captchaRef) => {
-  const HCAPTCHA_SITEKEY = getEnvVar('HCAPTCHA_SITEKEY');
-  const RECAPTCHA_SITE_KEY = getEnvVar('RECAPTCHA_SITE_KEY');
-  const TURNSTILE_SITE_KEY = getEnvVar('TURNSTILE_SITEKEY');
-  const handleVerify = obj => {
-    onVerify({ ...obj, provider });
-  };
-  const handleError = err => {
-    Sentry.captureException(err);
-  };
+const Captcha = React.forwardRef<HCaptcha, CaptchaProps>(
+  ({ onVerify, provider = CAPTCHA_PROVIDER, ...props }, captchaRef) => {
+    const HCAPTCHA_SITEKEY = getEnvVar('HCAPTCHA_SITEKEY');
+    const RECAPTCHA_SITE_KEY = getEnvVar('RECAPTCHA_SITE_KEY');
+    const TURNSTILE_SITE_KEY = getEnvVar('TURNSTILE_SITEKEY');
+    const handleVerify = obj => {
+      onVerify({ ...obj, provider });
+    };
+    const handleError = err => {
+      Sentry.captureException(err);
+    };
 
-  React.useEffect(() => {
-    onVerify(null);
-  }, []);
+    React.useEffect(() => {
+      onVerify(null);
+    }, []);
 
-  if (!isCaptchaEnabled()) {
-    return null;
-  }
+    if (!isCaptchaEnabled()) {
+      return null;
+    }
 
-  let captcha = null;
+    let captcha = null;
 
-  if (provider === PROVIDERS.HCAPTCHA && HCAPTCHA_SITEKEY) {
-    captcha = (
-      <HCaptcha
-        ref={captchaRef}
-        sitekey={HCAPTCHA_SITEKEY}
-        onVerify={token => handleVerify({ provider, token })}
-        onError={handleError}
-      />
-    );
-  } else if (provider === PROVIDERS.RECAPTCHA && RECAPTCHA_SITE_KEY) {
-    captcha = <ReCaptcha onVerify={handleVerify} onError={handleError} {...props} />;
-  } else if (provider === PROVIDERS.TURNSTILE) {
-    captcha = (
-      <Turnstile
-        sitekey={TURNSTILE_SITE_KEY}
-        onVerify={token => handleVerify({ provider, token })}
-        onError={handleError}
-        appearance="execute"
-        refreshExpired="auto"
-        theme="light"
-        {...props}
-      />
-    );
-  }
+    if (provider === PROVIDERS.HCAPTCHA && HCAPTCHA_SITEKEY) {
+      captcha = (
+        <HCaptcha
+          ref={captchaRef}
+          sitekey={HCAPTCHA_SITEKEY}
+          onVerify={token => handleVerify({ provider, token })}
+          onError={handleError}
+        />
+      );
+    } else if (provider === PROVIDERS.RECAPTCHA && RECAPTCHA_SITE_KEY) {
+      captcha = <ReCaptcha onVerify={handleVerify} onError={handleError} {...props} />;
+    } else if (provider === PROVIDERS.TURNSTILE) {
+      captcha = (
+        <Turnstile
+          sitekey={TURNSTILE_SITE_KEY}
+          onVerify={token => handleVerify({ provider, token })}
+          onError={handleError}
+          appearance="execute"
+          refreshExpired="auto"
+          theme="light"
+          {...props}
+        />
+      );
+    }
 
-  return <Box data-cy="captcha">{captcha}</Box>;
-});
+    return <Box data-cy="captcha">{captcha}</Box>;
+  },
+);
 
 Captcha.displayName = 'Captcha';
 

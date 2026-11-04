@@ -1,9 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import type { DataValue } from '@apollo/client/react/hoc';
 import { graphql } from '@apollo/client/react/hoc';
 import { FormattedMessage } from 'react-intl';
 
 import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
+import type LoggedInUser from '../lib/LoggedInUser';
 
 import Container from './Container';
 import Error from './Error';
@@ -12,19 +13,69 @@ import StyledButton from './StyledButton';
 
 const MEMBERSHIPS_PER_PAGE = 10;
 
-class MembershipsWithData extends React.Component {
-  static propTypes = {
-    memberCollectiveSlug: PropTypes.string,
-    orderBy: PropTypes.string,
-    limit: PropTypes.number,
-    onChange: PropTypes.func,
-    LoggedInUser: PropTypes.object,
-    fetchMore: PropTypes.func,
-    refetch: PropTypes.func,
-    data: PropTypes.object,
+/** Hand-written shape for the V1 memberships query (V1 is not covered by codegen, see #4054) */
+type MembershipNode = {
+  id?: string;
+  role?: string;
+  createdAt?: string;
+  stats?: { totalDonations?: number };
+  tier?: { id?: string; name?: string };
+  collective?: {
+    id?: number | string;
+    type?: string;
+    name?: string;
+    currency?: string;
+    description?: string;
+    slug?: string;
+    imageUrl?: string;
+    backgroundImage?: string;
+    stats?: { backers?: { all?: number }; yearlyBudget?: number };
+    parentCollective?: { id?: number | string; slug?: string };
   };
+};
 
-  constructor(props) {
+type MembershipsQueryVariables = {
+  memberCollectiveSlug?: string;
+  role?: string;
+  limit?: number;
+  offset?: number;
+  orderBy?: string;
+};
+
+type MembershipsQueryData = {
+  allMembers?: MembershipNode[];
+  error?: { message?: string };
+  fetchMore: (options: {
+    variables: { offset: number; limit: number };
+    updateQuery: (
+      previousResult: MembershipsQueryData,
+      options: { fetchMoreResult?: MembershipsQueryData },
+    ) => MembershipsQueryData;
+  }) => Promise<unknown>;
+};
+
+type OwnProps = {
+  memberCollectiveSlug?: string;
+  orderBy?: string;
+  limit?: number;
+  role?: string;
+  onChange?: (info: { height: number }) => void;
+  LoggedInUser?: LoggedInUser;
+};
+
+type Props = OwnProps & {
+  data?: DataValue<MembershipsQueryData, MembershipsQueryVariables>;
+  fetchMore?: () => Promise<unknown>;
+  refetch?: (variables?: Partial<MembershipsQueryVariables>) => void;
+};
+
+type State = {
+  role?: string;
+  loading: boolean;
+};
+
+class MembershipsWithData extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props);
     this.fetchMore = this.fetchMore.bind(this);
     this.refetch = this.refetch.bind(this);
@@ -43,9 +94,13 @@ class MembershipsWithData extends React.Component {
     this.onChange();
   }
 
+  node: HTMLElement;
+
   onChange() {
     const { onChange } = this.props;
-    onChange && this.node && onChange({ height: this.node.offsetHeight });
+    if (onChange && this.node) {
+      onChange({ height: this.node.offsetHeight });
+    }
   }
 
   fetchMore(e) {
@@ -76,9 +131,9 @@ class MembershipsWithData extends React.Component {
       return <div />;
     }
 
-    const collectiveIds = [];
+    const collectiveIds: Array<number | string> = [];
 
-    const groupedMemberships = memberships.reduce((_memberships, m) => {
+    const groupedMemberships = memberships.reduce<Record<number | string, MembershipNode[]>>((_memberships, m) => {
       (_memberships[m.collective.id] = _memberships[m.collective.id] || []).push(m);
       if (collectiveIds.length === 0 || collectiveIds[collectiveIds.length - 1] !== m.collective.id) {
         collectiveIds.push(m.collective.id);
@@ -88,7 +143,11 @@ class MembershipsWithData extends React.Component {
 
     const limit = this.props.limit || MEMBERSHIPS_PER_PAGE * 2;
     return (
-      <Container ref={node => (this.node = node)}>
+      <Container
+        ref={node => {
+          this.node = node;
+        }}
+      >
         <Container
           className="cardsList"
           display="flex"
@@ -161,7 +220,7 @@ const membershipsQuery = gqlV1 /* GraphQL */ `
   }
 `;
 
-const addMembershipsData = graphql(membershipsQuery, {
+const addMembershipsData = graphql<OwnProps, MembershipsQueryData, MembershipsQueryVariables>(membershipsQuery, {
   options: props => ({
     context: API_V1_CONTEXT,
     variables: {

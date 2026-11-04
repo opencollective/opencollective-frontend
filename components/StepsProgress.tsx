@@ -11,7 +11,13 @@ import { Box, Flex } from './Grid';
 import Spinner from './Spinner';
 import { P } from './Text';
 
-const Circle = styled.svg`
+type StepVisualProps = {
+  disabled?: boolean;
+  checked?: boolean;
+  focus?: boolean;
+};
+
+const Circle = styled.svg<StepVisualProps>`
   circle {
     fill: ${themeGet('colors.white.full')};
     stroke: #c4c7cc;
@@ -56,7 +62,7 @@ const Circle = styled.svg`
       `}
   }
 `;
-const Bubble = styled(Flex)`
+const Bubble = styled(Flex)<StepVisualProps>`
   justify-content: center;
   align-items: center;
   flex: 0 0 34px;
@@ -111,7 +117,12 @@ const Bubble = styled(Flex)`
  * Border generated with https://gigacore.github.io/demos/svg-stroke-dasharray-generator/
  * to have a consistent result across browsers.
  */
-const SeparatorLine = styled(props => (
+type SeparatorLineProps = {
+  active?: boolean;
+  transparent?: boolean;
+};
+
+const SeparatorLine = styled((props: SeparatorLineProps & React.ComponentProps<typeof Flex>) => (
   <Flex alignItems="center" {...props}>
     <svg width="100%" height="2" version="1.1" xmlns="http://www.w3.org/2000/svg">
       <line strokeDasharray="5%" x1="0" y1="0" x2="100%" y2="0" />
@@ -180,7 +191,12 @@ const PieProgressWrapper = styled.div`
   z-index: 0;
 `;
 
-const PieProgress = styled(Box)`
+type PieProps = {
+  pieSize?: number;
+  progress?: number;
+};
+
+const PieProgress = styled(Box)<PieProps>`
   left: 0;
   position: absolute;
   top: 0;
@@ -199,7 +215,7 @@ const PieProgress = styled(Box)`
     `}
 `;
 
-const PieShadow = styled(Box)`
+const PieShadow = styled(Box)<PieProps & { bgColor?: string }>`
   width: 100%;
   height: 100%;
   ${props => css`
@@ -208,7 +224,7 @@ const PieShadow = styled(Box)`
   border-radius: 50%;
 `;
 
-const PieHalfCircle = styled(Box)`
+const PieHalfCircle = styled(Box)<PieProps>`
   width: 100%;
   height: 100%;
   position: absolute;
@@ -246,9 +262,15 @@ const PieHalfCircleRight = styled(PieHalfCircle)`
         `}
 `;
 
-const getBubbleContent = (idx, checked, disabled, focused, loading) => {
+const getBubbleContent = (idx: number, checked: boolean, disabled: boolean, focused: boolean, loading: boolean) => {
   if (loading) {
-    return <Spinner color={checked ? '#FFFFFF' : 'primary.700'} size={14} />;
+    // `color` is not declared by `SpinnerProps` but is forwarded to the underlying icon at runtime
+    return (
+      <Spinner
+        {...({ color: checked ? '#FFFFFF' : 'primary.700' } as React.ComponentProps<typeof Spinner>)}
+        size={14}
+      />
+    );
   } else if (checked) {
     return <Check color="white" size={14} />;
   }
@@ -261,6 +283,25 @@ const getBubbleContent = (idx, checked, disabled, focused, loading) => {
       </text>
     </Circle>
   );
+};
+
+type Step = {
+  name: string;
+  label?: React.ReactNode;
+};
+
+type StepsProgressProps = {
+  steps: Step[];
+  disabledStepNames?: string[];
+  children?: (props: { step: Step; checked: boolean; focused: boolean }) => React.ReactNode;
+  focus?: Step | null;
+  loadingStep?: Step | null;
+  onStepSelect?: (step: Step) => void;
+  allCompleted?: boolean;
+  /** Width of a single step, applied as `flexBasis` */
+  stepWidth?: string;
+  /** Injected by `withViewport` */
+  viewport?: VIEWPORTS;
 };
 
 /**
@@ -276,7 +317,7 @@ const StepsProgress = ({
   allCompleted,
   stepWidth = '100%',
   viewport,
-}) => {
+}: StepsProgressProps) => {
   const focusIdx = focus ? steps.findIndex(step => step.name === focus.name) : -1;
   const mobileStepIdx = allCompleted ? steps.length - 1 : focusIdx > -1 ? focusIdx : 0;
   const mobileNextStepName = mobileStepIdx < steps.length - 1 ? steps[mobileStepIdx + 1].name : null;
@@ -284,7 +325,7 @@ const StepsProgress = ({
   const mobileNextStep = mobileNextStepIdx !== -1 && steps[mobileNextStepIdx];
   const progress = allCompleted ? 100 : (100 / steps.length) * (mobileStepIdx + 1);
   const bgColor = '#D9DBDD';
-  const pieSize = '56';
+  const pieSize = 56;
 
   return (
     <StepsOuter data-cy="steps-progress">
@@ -328,7 +369,8 @@ const StepsProgress = ({
         </Container>
       )}
 
-      {(viewport !== VIEWPORTS.XSMALL || viewport === VIEWPORTS.UNKNOWN) && (
+      {/* `viewport !== XSMALL` already covers `UNKNOWN`; the dropped disjunct was unreachable (see PLAN.md) */}
+      {viewport !== VIEWPORTS.XSMALL && (
         <Container display={['none', null, 'flex']} data-cy="progress-destkop">
           {steps.map((step, idx) => {
             const stepName = step.name;

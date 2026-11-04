@@ -1,9 +1,10 @@
 import React, { createRef, Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { Clear } from '@styled-icons/material/Clear';
 import { themeGet } from '@styled-system/theme-get';
+import type { Fixture as GeosuggestFixture } from '@ubilabs/react-geosuggest';
 import Geosuggest from '@ubilabs/react-geosuggest';
 import { get, isNil, omitBy } from 'lodash-es';
+import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 import { isURL } from 'validator';
@@ -114,17 +115,31 @@ const GeoSuggestItem = styled(Geosuggest)`
   }
 `;
 
-class InputTypeLocation extends React.Component {
-  static propTypes = {
-    value: PropTypes.object,
-    intl: PropTypes.object,
-    className: PropTypes.string,
-    onChange: PropTypes.func.isRequired,
-    options: PropTypes.object,
-    placeholder: PropTypes.string,
-  };
+type InputTypeLocationValue = {
+  name?: string;
+  address?: string;
+  country?: string;
+  lat?: number;
+  long?: number;
+  structured?: Record<string, string>;
+};
 
-  constructor(props) {
+type InputTypeLocationProps = {
+  value?: InputTypeLocationValue;
+  intl?: IntlShape;
+  className?: string;
+  onChange: (location: InputTypeLocationValue | null) => void;
+  options?: Record<string, unknown>;
+  placeholder?: string;
+};
+
+type InputTypeLocationState = {
+  value: InputTypeLocationValue;
+  eventUrlError: boolean;
+};
+
+class InputTypeLocation extends React.Component<InputTypeLocationProps, InputTypeLocationState> {
+  constructor(props: InputTypeLocationProps) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
     this.state = { value: props.value || {}, eventUrlError: false };
@@ -134,14 +149,18 @@ class InputTypeLocation extends React.Component {
         defaultMessage: 'Online',
       },
     });
-    this.geoSuggestRef = createRef();
+    this.geoSuggestRef = createRef<Geosuggest>();
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: InputTypeLocationProps) {
     if (this.props.value !== prevProps.value) {
       this.setState({ value: this.props.value });
     }
   }
+
+  geoSuggestRef: React.RefObject<Geosuggest>;
+
+  messages: Record<string, { id: string; defaultMessage: string }>;
 
   removeCountryFromAddress(address) {
     return address.split(', ').slice(0, -1).join(', ');
@@ -212,11 +231,12 @@ class InputTypeLocation extends React.Component {
                 placeholder={this.props.placeholder}
                 initialValue={this.props.value?.name}
                 fixtures={[
+                  // `isOnline` is read back from the selected suggest; the library fixture type does not declare it
                   {
                     label: this.props.intl.formatMessage(this.messages.online),
                     location: { lat: 0, lng: 0 },
                     isOnline: true,
-                  },
+                  } as GeosuggestFixture & { isOnline: boolean },
                 ]}
                 {...options}
                 ref={this.geoSuggestRef}

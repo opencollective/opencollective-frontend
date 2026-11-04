@@ -6,7 +6,13 @@ import Container from './Container';
 import { Box, Flex } from './Grid';
 import StyledRoundButton from './StyledRoundButton';
 
-const CarouselContainer = styled(Container)`
+type CarouselContainerProps = {
+  sliding?: boolean;
+  direction?: string;
+  numSlides?: number;
+};
+
+const CarouselContainer = styled(Container)<CarouselContainerProps>`
   display: flex;
   transition: ${props => (props.sliding ? 'none' : 'transform 1s ease')};
   transform: ${props => {
@@ -41,13 +47,13 @@ const CarouselContainer = styled(Container)`
   }};
 `;
 
-const CarouselSlot = styled(Container)`
+const CarouselSlot = styled(Container)<{ order?: number }>`
   flex: 1 0 100%;
   flex-basis: 100%;
   order: ${props => props.order};
 `;
 
-const Indicator = styled(Box)`
+const Indicator = styled(Box)<{ active?: boolean }>`
   cursor: pointer;
   width: 8px;
   height: 8px;
@@ -65,6 +71,15 @@ const ControllerButton = styled(StyledRoundButton)`
   }
 `;
 
+type StyledCarouselProps = {
+  /** Uses `.length` to compute the number of slides, so arrays and single elements are accepted */
+  children: React.ReactNode & { length?: number };
+  onChange?: (index: number) => void;
+  showArrowController?: boolean;
+  controllerPosition?: 'side' | 'bottom';
+  contentPosition?: string;
+};
+
 const StyledCarousel = ({
   children,
   onChange,
@@ -72,7 +87,7 @@ const StyledCarousel = ({
   controllerPosition = 'bottom',
   contentPosition = 'center',
   ...props
-}) => {
+}: StyledCarouselProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [direction, setDirection] = useState('');
   const [sliding, setSliding] = useState(false);
@@ -117,7 +132,7 @@ const StyledCarousel = ({
     }, 50);
   };
 
-  const handleSwipe = isNext => {
+  const handleSwipe = (isNext?: boolean) => {
     if (isNext) {
       nextSlide();
     } else {

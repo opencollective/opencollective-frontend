@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import type { DocumentNode } from '@apollo/client';
 import { Mutation } from '@apollo/client/react/components';
 import { Times } from '@styled-icons/fa-solid/Times';
 import { createPortal } from 'react-dom';
+import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { Popper } from 'react-popper';
 import { styled } from 'styled-components';
@@ -127,7 +129,26 @@ const REACT_POPPER_MODIFIERS = [
   },
 ];
 
-function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef, onClose, message = '', intl }) {
+type EditPublicMessagePopupProps = {
+  /** Injected by `withViewport` */
+  width?: number;
+  fromCollectiveId: number;
+  collectiveId: number;
+  cardRef: React.RefObject<HTMLElement>;
+  onClose: () => void;
+  message?: string;
+  intl?: IntlShape;
+};
+
+function EditPublicMessagePopup({
+  width,
+  fromCollectiveId,
+  collectiveId,
+  cardRef,
+  onClose,
+  message = '',
+  intl,
+}: EditPublicMessagePopupProps) {
   const [messageDraft, setMessageDraft] = useState(message || '');
 
   // Can't be rendered SSR
@@ -198,7 +219,11 @@ function EditPublicMessagePopup({ width, fromCollectiveId, collectiveId, cardRef
                           const [member] = editPublicMessage;
                           const collectiveSlug = member.collective.slug;
                           const tier = member.tier;
-                          const queries = [
+                          const queries: Array<{
+                            query: DocumentNode;
+                            context: typeof API_V1_CONTEXT;
+                            variables: Record<string, unknown>;
+                          }> = [
                             {
                               query: collectivePageQuery,
                               context: API_V1_CONTEXT,

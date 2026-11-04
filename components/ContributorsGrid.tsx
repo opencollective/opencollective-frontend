@@ -86,6 +86,21 @@ const computePaddingLeft = (width, rowWidth, nbRows, maxWidthWhenNotFull) => {
   }
 };
 
+type ContributorCellProps = {
+  columnIndex: number;
+  rowIndex: number;
+  style: React.CSSProperties;
+  // Injected through `cellProps`; react-window does not know about them
+  contributors?: Array<{ id: number | string; collectiveId?: number | string }>;
+  nbRows?: number;
+  nbCols?: number;
+  hasScroll?: boolean;
+  paddingLeft?: number;
+  currency?: string;
+  collectiveId?: number | string;
+  loggedUserCollectiveId?: number | string;
+};
+
 const ContributorCell = ({
   columnIndex,
   rowIndex,
@@ -98,7 +113,7 @@ const ContributorCell = ({
   currency,
   collectiveId,
   loggedUserCollectiveId,
-}) => {
+}: ContributorCellProps) => {
   const idx = getContributorIdx(columnIndex, rowIndex, nbRows, nbCols, hasScroll);
   const contributor = contributors[idx];
   return !contributor ? null : (

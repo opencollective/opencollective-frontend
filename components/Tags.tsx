@@ -79,7 +79,7 @@ const Tags = ({
   const intl = useIntl();
   const tagList = expense?.tags || order?.tags;
 
-  const renderTag = ({ tag, label }) => {
+  const renderTag = ({ tag, label }: { tag: string; label?: React.ReactNode }) => {
     const extraTagProps = getTagProps?.(tag) || {};
 
     const renderedTag = (

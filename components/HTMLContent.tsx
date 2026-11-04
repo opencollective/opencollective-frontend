@@ -36,9 +36,14 @@ export const isEmptyHTMLValue = value => {
 /** Returns '' for empty rich-text scaffold HTML (e.g. Trix/React-Quill), otherwise the original value. */
 export const normalizeRichTextContent = value => (isEmptyHTMLValue(value) ? '' : value);
 
+type DisplayBoxProps = {
+  maxHeight?: number;
+  maxCollapsedHeight?: number;
+};
+
 const InlineDisplayBox = styled.div.withConfig({
   shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target),
-})`
+})<DisplayBoxProps>`
   overflow-y: hidden;
   p {
     margin: 1em 0;
@@ -48,7 +53,7 @@ const InlineDisplayBox = styled.div.withConfig({
 
 const CollapsedDisplayBox = styled.div.withConfig({
   shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target),
-})`
+})<DisplayBoxProps>`
   overflow-y: hidden;
   ${props => props.maxCollapsedHeight && `max-height: ${props.maxCollapsedHeight + 20}px;`}
   -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);

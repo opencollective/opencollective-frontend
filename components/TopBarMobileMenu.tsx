@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import { ChevronDown } from '@styled-icons/boxicons-regular/ChevronDown';
+import type { MessageDescriptor } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -35,7 +36,14 @@ const SubListItem = styled(ListItem)`
   padding-bottom: 10px;
 `;
 
-const TopBarMobileMenu = ({ closeMenu }) => {
+/** The render below supports both grouped items (`items`) and plain link items (`href`) */
+type MobileMenuItem = {
+  label: MessageDescriptor;
+  items?: Array<{ label: MessageDescriptor; href: string; target?: string }>;
+  href?: string;
+};
+
+const TopBarMobileMenu = ({ closeMenu }: { closeMenu: () => void }) => {
   const innerRef = React.useRef(undefined);
   const { LoggedInUser } = useLoggedInUser();
   useGlobalBlur(innerRef, isOutside => {
@@ -44,7 +52,9 @@ const TopBarMobileMenu = ({ closeMenu }) => {
     }
   });
 
-  const menuItems = parseToBoolean(getEnvVar('NEW_PRICING')) ? newMarketingTopbarItems : legacyTopBarItems;
+  const menuItems: MobileMenuItem[] = parseToBoolean(getEnvVar('NEW_PRICING'))
+    ? newMarketingTopbarItems
+    : legacyTopBarItems;
 
   return (
     <React.Fragment>

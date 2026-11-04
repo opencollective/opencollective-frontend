@@ -32,7 +32,14 @@ const messages = defineMessages({
   },
 });
 
-const SecondaryAction = ({ children, loading, onSecondaryAction, asLink }) => {
+type SecondaryActionProps = {
+  children: React.ReactNode;
+  loading?: boolean;
+  onSecondaryAction: (() => void) | string;
+  asLink?: boolean;
+};
+
+const SecondaryAction = ({ children, loading, onSecondaryAction, asLink }: SecondaryActionProps) => {
   const Button = asLink ? StyledLinkButton : StyledButton;
   return typeof onSecondaryAction === 'string' ? (
     <Button as={Link} mt="24px" mr="16px" width="120px" href={onSecondaryAction} disabled={loading} fontSize="14px">
@@ -80,7 +87,21 @@ const TOSCheckBox = ({ onChange, checked }) => {
   );
 };
 
-const useForm = ({ onEmailChange, onFieldChange, name, newsletterOptIn, tosOptIn, errors }) => {
+const useForm = ({
+  onEmailChange,
+  onFieldChange,
+  name,
+  newsletterOptIn,
+  tosOptIn,
+  errors,
+}: {
+  onEmailChange: (email: string) => void;
+  onFieldChange: (name: string, value: string) => void;
+  name?: string;
+  newsletterOptIn?: boolean;
+  tosOptIn?: boolean;
+  errors?: Record<string, string>;
+}) => {
   const [state, setState] = useState({ errors, name, newsletterOptIn, tosOptIn });
 
   return {
@@ -141,7 +162,7 @@ const CreateProfile = ({
   ...props
 }) => {
   const { formatMessage } = useIntl();
-  const [captchaResult, setCaptchaResult] = React.useState(null);
+  const [captchaResult, setCaptchaResult] = React.useState<{ token?: string; provider?: string }>(null);
   const { getFieldError, getFieldProps, state } = useForm({
     onEmailChange,
     onFieldChange,
@@ -149,7 +170,6 @@ const CreateProfile = ({
     newsletterOptIn,
     tosOptIn,
     errors,
-    formatMessage,
   });
   const isValid = isEmpty(compact(values(state.errors)));
 
@@ -160,7 +180,8 @@ const CreateProfile = ({
           <React.Fragment>
             <Flex justifyContent="center" mb={40}>
               <Box minWidth={104}>
-                <Image src="/static/images/oc-logo-oauth.png" height={104} width={104} />
+                {/* `alt` is required by `next/image` types but was never provided; kept as-is (see PLAN.md) */}
+                <Image src="/static/images/oc-logo-oauth.png" height={104} width={104} alt={undefined} />
               </Box>
               <Box ml={24} mr={24} mt={32} minWidth={40}>
                 <Image src="/static/images/oauth-flow-connect.png" alt="OAuth Connect" height={40} width={40} />
@@ -171,7 +192,7 @@ const CreateProfile = ({
             </Flex>
           </React.Fragment>
         ) : (
-          <Image src="/static/images/oc-logo-watercolor-256.png" height={96} width={96} />
+          <Image src="/static/images/oc-logo-watercolor-256.png" height={96} width={96} alt={undefined} />
         )}
         <Box pt="48px" fontSize="32px" fontWeight="700" color="black.900" lineHeight="40px">
           {isOAuth ? (
@@ -239,7 +260,7 @@ const CreateProfile = ({
               <StyledInputField
                 htmlFor="name"
                 labelFontSize="16px"
-                labelFontWeight={700}
+                labelFontWeight="700"
                 labelColor="black.800"
                 label={formatMessage(messages.nameLabel)}
                 error={getFieldError('name')}
@@ -260,7 +281,7 @@ const CreateProfile = ({
               <StyledInputField
                 labelColor="black.800"
                 labelFontSize="16px"
-                labelFontWeight={700}
+                labelFontWeight="700"
                 htmlFor="email"
                 label={formatMessage(messages.email)}
                 error={getFieldError('email')}
