@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 
 import StyledRoundButton from '../StyledRoundButton';
 
-const MainContainer = styled.div`
+const MainContainer = styled.div<{ isDragging?: boolean; isDragOverlay?: boolean }>`
   position: relative;
   display: flex;
   height: 100%;
@@ -30,7 +30,7 @@ const MainContainer = styled.div`
     `}
 `;
 
-const DragHandle = React.forwardRef((props, ref) => (
+const DragHandle = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof StyledRoundButton>>((props, ref) => (
   <StyledRoundButton size={32} {...props} ref={ref}>
     <MoveIcon size={10} />
   </StyledRoundButton>
@@ -54,7 +54,17 @@ const StyledDragHandle = styled(DragHandle)`
   }
 `;
 
-export const ContributeCardWithDragHandle = ({ Component, componentProps, dragHandleProps, isDragOverlay }) => {
+export const ContributeCardWithDragHandle = ({
+  Component,
+  componentProps,
+  dragHandleProps,
+  isDragOverlay,
+}: {
+  Component: React.ComponentType<Record<string, unknown>>;
+  componentProps?: Record<string, unknown>;
+  dragHandleProps?: Record<string, unknown>;
+  isDragOverlay?: boolean;
+}) => {
   return (
     <MainContainer isDragOverlay={isDragOverlay}>
       <Component {...componentProps} />

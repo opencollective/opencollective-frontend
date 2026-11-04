@@ -2,6 +2,7 @@ import React from 'react';
 import { getApplicableTaxes } from '@opencollective/taxes';
 import { truncate } from 'lodash-es';
 import { TriangleAlert } from 'lucide-react';
+import type { MessageValue } from 'react-intl';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import { ContributionTypes } from '../../lib/constants/contribution-types';
@@ -25,7 +26,14 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
 
 import Contribute from './Contribute';
 
-const messages = defineMessages({
+const messages = defineMessages<{
+  fallbackDescription: {
+    tierName: MessageValue;
+    minAmount: MessageValue;
+    minAmountWithCurrency: MessageValue;
+    interval: MessageValue;
+  };
+}>({
   fallbackDescription: {
     id: 'TierCard.DefaultDescription',
     defaultMessage:
@@ -176,7 +184,7 @@ const ContributeTier = ({ collective, tier, isPreview, supportedTierTypes = unde
                 {truncate(description, { length: 150 })}{' '}
                 <StyledLink
                   as={Link}
-                  whiteSpace="nowrap"
+                  {...({ whiteSpace: 'nowrap' } as Record<string, unknown>)}
                   href={
                     isPreview ? '#' : `${getCollectivePageRoute(collective)}/contribute/${tier.slug}-${tierLegacyId}`
                   }

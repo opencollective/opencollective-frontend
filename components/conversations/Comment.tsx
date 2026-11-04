@@ -57,7 +57,11 @@ const Comment = ({
         )}
       </Flex>
 
-      <Box position="relative" maxHeight={maxCommentHeight} css={{ overflowY: 'auto' }}>
+      <Box
+        {...({ position: 'relative' } as Record<string, unknown>)}
+        maxHeight={maxCommentHeight}
+        css={{ overflowY: 'auto' }}
+      >
         <InlineEditField
           mutation={editCommentMutation}
           values={comment}
@@ -90,7 +94,8 @@ const Comment = ({
         {(reactions || canReply) && (
           <Flex mt={3} flexWrap="wrap" data-cy="comment-reactions">
             {reactions && <CommentReactions reactions={reactions} />}
-            {canReply && <EmojiReactionPicker comment={comment} reactions={reactions} />}
+            {/* `reactions` is not a prop of `EmojiReactionPicker` (dead prop, see PLAN.md findings) */}
+            {canReply && <EmojiReactionPicker comment={comment} {...({ reactions } as Record<string, unknown>)} />}
           </Flex>
         )}
       </Box>

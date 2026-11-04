@@ -24,7 +24,7 @@ const YourInitiativeIsNearlyThere = () => (
         display="flex"
         alignItems="center"
         justifyContent="center"
-        width={['288px', '360px']}
+        {...({ width: ['288px', '360px'] } as Record<string, unknown>)}
         height="160px"
         mb="24px"
       >
@@ -74,7 +74,7 @@ const YourInitiativeIsNearlyThere = () => (
         alignItems="center"
         justifyContent={['flex-start', 'center']}
         mt={4}
-        width={['288px', '672px']}
+        {...({ width: ['288px', '672px'] } as Record<string, unknown>)}
         overflow="auto"
       >
         <Container

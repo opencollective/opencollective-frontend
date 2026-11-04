@@ -77,7 +77,9 @@ const FollowConversationButton = ({ conversationId, onChange, isCompact, LoggedI
           update: (client, { data }) => {
             const isFollowing = get(data, 'followConversation');
             const queryParams = { query: isUserFollowingConversationQuery, variables: { id: conversationId } };
-            const cacheData = client.readQuery(queryParams);
+            const cacheData = client.readQuery<{ loggedInAccount?: { isFollowingConversation?: boolean } }>(
+              queryParams,
+            );
             client.writeQuery({
               query: isUserFollowingConversationQuery,
               variables: { id: conversationId },

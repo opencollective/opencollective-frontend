@@ -67,7 +67,7 @@ const AdminContributeCardsContainer = ({
     setDraggingId(null);
   }
 
-  const [showTierModal, setShowTierModal] = React.useState(false);
+  const [showTierModal, setShowTierModal] = React.useState<null | 'new' | boolean | Record<string, unknown>>(false);
   const closeTierModal = React.useCallback(() => setShowTierModal(false), [setShowTierModal]);
 
   const addNewMessage =

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import type { Height } from 'react-animate-height';
 import AnimateHeight from 'react-animate-height';
 import { FormattedMessage } from 'react-intl';
 
@@ -36,7 +37,7 @@ const CollapseSection = ({ title, isExpanded, toggleExpanded, subtitle, children
           <p className="text-sm leading-5 text-muted-foreground">{subtitle}</p>
         </div>
       </div>
-      <AnimateHeight duration={500} height={height}>
+      <AnimateHeight duration={500} height={height as Height}>
         <div className={`mt-2 transition-opacity duration-500 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
           {children}
         </div>

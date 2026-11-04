@@ -31,7 +31,16 @@ const CreateNewCard = styled(Link)`
 /**
  * A special card dedicated to admins to show them a `Create new ...` card (ex: Create new tier).
  */
-const CreateNew = ({ route, children, ...props }) => {
+type CreateNewProps = {
+  /** Target of the card link. Optional when rendered as another element (e.g. `as="div"`) */
+  route?: string;
+  children?: React.ReactNode;
+  as?: React.ElementType;
+  'data-cy'?: string;
+  onClick?: () => void;
+};
+
+const CreateNew = ({ route, children, ...props }: CreateNewProps) => {
   return (
     <CreateNewCard {...props} href={route}>
       <Flex alignItems="center" justifyContent="center" height="100%">

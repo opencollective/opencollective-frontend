@@ -45,7 +45,7 @@ const StyledContributeCard = styled.div`
 `;
 
 /** Tier card banner */
-const CoverImage = styled.div`
+const CoverImage = styled.div<{ image?: string; isDisabled?: boolean; contributionType?: string }>`
   height: 104px;
   background-repeat: no-repeat;
   background-size: cover;
@@ -299,7 +299,11 @@ const ContributeCard = ({
                             <ContributorAvatar contributor={contributor} radius={32} />
                           </Link>
                         ) : (
-                          <ContributorAvatar contributor={contributor} radius={32} title={contributor.name} />
+                          <ContributorAvatar
+                            contributor={contributor}
+                            radius={32}
+                            {...({ title: contributor.name } as Record<string, unknown>)}
+                          />
                         )}
                       </Box>
                     ))}

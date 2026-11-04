@@ -1,6 +1,7 @@
 import React from 'react';
 import { Markup } from 'interweave';
 import { size } from 'lodash-es';
+import type { MessageValue } from 'react-intl';
 import { defineMessages, FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import Avatar from '../Avatar';
@@ -14,7 +15,7 @@ import { H5, P } from '../Text';
 
 import FollowersAvatars from './FollowersAvatars';
 
-const messages = defineMessages({
+const messages = defineMessages<{ commentsCount: { n: MessageValue } }>({
   commentsCount: {
     id: 'comments.count',
     defaultMessage: '{n, plural, one {# comment} other {# comments}}',

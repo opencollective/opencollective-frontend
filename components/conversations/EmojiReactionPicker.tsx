@@ -50,7 +50,10 @@ const Emoji = styled.div`
   font-size: 15px;
 `;
 
-const ReactionButton = styled(StyledRoundButton).attrs({ isBorderless: true, buttonSize: 'small' })`
+const ReactionButton = styled(StyledRoundButton).attrs<{ isSelected?: boolean }>({
+  isBorderless: true,
+  buttonSize: 'small',
+})<{ isSelected?: boolean }>`
   margin: 4px;
   background: white !important;
 

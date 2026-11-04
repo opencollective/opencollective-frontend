@@ -3,7 +3,13 @@ import { FormattedMessage } from 'react-intl';
 
 import FAQ, { Content, Entry, Title } from './FAQ';
 
-const CreateConversationFAQ = ({ defaultOpen, ...props }) => (
+type CreateConversationFAQProps = {
+  defaultOpen?: boolean;
+  title?: string;
+  withBorderLeft?: boolean;
+};
+
+const CreateConversationFAQ = ({ defaultOpen, ...props }: CreateConversationFAQProps) => (
   <FAQ {...props}>
     <Entry open={defaultOpen}>
       <Title>

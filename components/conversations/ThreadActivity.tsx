@@ -11,7 +11,7 @@ import { Span } from '../Text';
 
 import { ACTIVITIES_INFO, getActivityColors } from './activity-helpers';
 
-const ActivityParagraph = styled(Container)`
+const ActivityParagraph = styled(Container)<{ activityColor?: string }>`
   padding: 10px 12px;
   border-left: 4px solid ${props => props.activityColor};
   border-radius: 0;
@@ -78,7 +78,12 @@ const ThreadActivity = ({ activity }) => {
         </Flex>
       )}
       {message && (
-        <ActivityParagraph activityColor={activityColors.border} my={1} fontSize="12px" whiteSpace="pre-line">
+        <ActivityParagraph
+          activityColor={activityColors.border}
+          my={1}
+          fontSize="12px"
+          {...({ whiteSpace: 'pre-line' } as Record<string, unknown>)}
+        >
           <ActivityMessage color={activityColors.text}>
             {intl.formatMessage(message, {
               movedFromCollective: activity.data?.movedFromCollective?.name || 'collective',

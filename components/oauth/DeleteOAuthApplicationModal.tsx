@@ -20,7 +20,13 @@ const deleteApplicationMutation = gql`
   }
 `;
 
-const DeleteOAuthApplicationModal = ({ application, onDelete, ...props }) => {
+type DeleteOAuthApplicationModalProps = {
+  application: { id: number | string; name?: string };
+  onDelete: (application: { id: number | string; name?: string }) => unknown;
+  onClose: () => void;
+};
+
+const DeleteOAuthApplicationModal = ({ application, onDelete, ...props }: DeleteOAuthApplicationModalProps) => {
   const { toast } = useToast();
   const intl = useIntl();
   const [deleteApplication] = useMutation(deleteApplicationMutation, {

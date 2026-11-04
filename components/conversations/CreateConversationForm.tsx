@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect } from 'react';
 import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
-import { pick } from 'lodash-es';
+import { get, pick } from 'lodash-es';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
+import type { OCError } from '../../lib/errors';
 import { createError, ERROR, i18nGraphqlException } from '../../lib/errors';
 import FormPersister from '../../lib/form-persister';
 import { formatFormErrorMessage } from '../../lib/form-utils';
@@ -43,8 +44,14 @@ const messages = defineMessages({
   },
 });
 
-const validate = values => {
-  const errors = {};
+type CreateConversationValues = {
+  title: string;
+  html: string;
+  tags: string[];
+};
+
+const validate = (values: CreateConversationValues) => {
+  const errors: Record<string, OCError> = {};
   const { title, html } = values;
 
   if (!title) {
@@ -131,7 +138,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
               {...getFieldProps('title')}
               bare
               data-cy="conversation-title-input"
-              error={touched.title && errors.title}
+              error={Boolean(touched.title && errors.title)}
               withOutline
               width="100%"
               fontSize="24px"
@@ -168,7 +175,8 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
           </Box>
           {errors.html && touched.html && (
             <P color="red.500" mt={3}>
-              {errors.html.type === ERROR.FORM_FIELD_REQUIRED && (
+              {/* Formik's `errors` values are typed loosely although `validate` returns `OCError`s */}
+              {touched.html && get(errors, 'html.type') === ERROR.FORM_FIELD_REQUIRED && (
                 <FormattedMessage id="Error.FieldRequired" defaultMessage="This field is required" />
               )}
             </P>
@@ -196,7 +204,7 @@ const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuc
             <H4 fontWeight="normal" mb={2}>
               <FormattedMessage id="FAQ" defaultMessage="FAQ" />
             </H4>
-            <CreateConversationFAQ title={null} withBorderLeft />
+            <CreateConversationFAQ title={null} withBorderLeft defaultOpen={undefined} />
           </Box>
         </Box>
       </Flex>

@@ -49,7 +49,7 @@ const TermsOfFiscalSponsorship = ({ checked, onChecked }) => {
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   const router = useRouter();
-  const [error, setError] = useState();
+  const [error, setError] = useState<string | null>();
 
   const { collectiveSlug, redirectToGithub } = router.query;
 

@@ -6,6 +6,7 @@ import { withRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import commentTypes from '../../lib/constants/commentTypes';
+import type { OCError } from '../../lib/errors';
 import { createError, ERROR, formatErrorMessage, getErrorFromGraphqlException } from '../../lib/errors';
 import { formatFormErrorMessage } from '../../lib/form-utils';
 import { gql } from '../../lib/graphql/helpers';
@@ -63,8 +64,17 @@ const isAutoFocused = id => {
 };
 
 /** A small helper to make the form work with params from both API V1 & V2 */
+type CommentParams = {
+  html: string;
+  type?: string;
+  ConversationId?: number | string;
+  expense?: { id?: string; legacyId?: number };
+  update?: { id?: string; legacyId?: number };
+  hostApplication?: { id: string };
+};
+
 const prepareCommentParams = (html, conversationId, expenseId, updateId, hostApplicationId) => {
-  const comment = { html };
+  const comment: CommentParams = { html };
   if (conversationId) {
     comment.ConversationId = conversationId;
   } else if (expenseId) {
@@ -112,9 +122,9 @@ const CommentForm = ({
   const [createComment, { loading, error }] = useMutation(createCommentMutation);
   const intl = useIntl();
   const [html, setHtml] = useState('');
-  const [resetValue, setResetValue] = useState();
+  const [resetValue, setResetValue] = useState<number | string>();
   const [asPrivateNote, setPrivateNote] = useState(defaultType === commentTypes.PRIVATE_NOTE);
-  const [validationError, setValidationError] = useState();
+  const [validationError, setValidationError] = useState<OCError | null>();
   const [uploading, setUploading] = useState(false);
   const { formatMessage } = intl;
   const isRichTextDisabled = isDisabled || !LoggedInUser || loading;
@@ -218,7 +228,7 @@ const CommentForm = ({
         )}
         <Flex mt={3} alignItems="center" justifyContent={submitButtonJustify} gap={12}>
           <Button
-            minWidth={150}
+            {...({ minWidth: 150 } as Record<string, unknown>)}
             variant={submitButtonVariant}
             disabled={isDisabled || !LoggedInUser || uploading}
             loading={loading}

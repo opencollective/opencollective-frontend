@@ -1,4 +1,5 @@
 import React from 'react';
+import type { MessageValue } from 'react-intl';
 import { defineMessages, useIntl } from 'react-intl';
 
 import Avatar from '../Avatar';
@@ -8,7 +9,7 @@ import LinkCollective from '../LinkCollective';
 import { Span } from '../Text';
 import { withUser } from '../UserProvider';
 
-const messages = defineMessages({
+const messages = defineMessages<{ andXOthers: { count: MessageValue; usersList: MessageValue } }>({
   andXOthers: {
     id: 'conversation.followers.rest',
     defaultMessage: '{usersList} and {count, plural, one {one other} other {# others}}',

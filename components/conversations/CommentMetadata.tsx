@@ -23,7 +23,7 @@ export const CommentMetadata = ({
   comment,
   withoutAvatar = false,
 }: {
-  withoutAvatar: boolean;
+  withoutAvatar?: boolean;
   comment: Pick<Comment, 'createdAt' | 'type'> & {
     account?: { slug: string };
     fromAccount?: React.ComponentProps<typeof Avatar>['collective'];
