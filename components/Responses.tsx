@@ -1,15 +1,16 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { get } from 'lodash-es';
 
 import Container from './Container';
 import Response from './Response';
 
-class Responses extends React.Component {
-  static propTypes = {
-    responses: PropTypes.arrayOf(PropTypes.object).isRequired,
-  };
+type ResponseItem = React.ComponentProps<typeof Response>['response'] & { createdAt?: string };
 
+type Props = {
+  responses: ResponseItem[];
+};
+
+class Responses extends React.Component<Props> {
   render() {
     const { responses } = this.props;
     if (!responses || responses.length === 0) {

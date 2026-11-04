@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import type { IntlShape, MessageDescriptor } from 'react-intl';
 import { defineMessages } from 'react-intl';
 
 import injectIntl from '@/lib/injectIntl';
@@ -11,13 +11,13 @@ import { Flex } from './Grid';
 import Header from './Header';
 import { H1 } from './Text';
 
-class IncognitoUserCollective extends React.Component {
-  static propTypes = {
-    collective: PropTypes.object,
-    intl: PropTypes.object.isRequired,
-  };
+type Props = {
+  collective?: { slug?: string; name?: string };
+  intl?: IntlShape;
+};
 
-  constructor(props) {
+class IncognitoUserCollective extends React.Component<Props> {
+  constructor(props: Props) {
     super(props);
     this.messages = defineMessages({
       'incognito.title': { id: 'UserCollective.incognito.title', defaultMessage: 'Incognito user' },
@@ -27,6 +27,8 @@ class IncognitoUserCollective extends React.Component {
       },
     });
   }
+
+  private messages: Record<string, MessageDescriptor>;
 
   render() {
     const { intl, collective } = this.props;

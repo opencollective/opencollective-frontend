@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Placement } from '@popperjs/core';
 import { Popper } from 'react-popper';
 import { styled } from 'styled-components';
 
@@ -6,7 +7,7 @@ import useGlobalBlur from '../lib/hooks/useGlobalBlur';
 
 import { Box } from './Grid';
 
-const Popup = styled(Box)`
+const Popup = styled(Box)<{ zIndex?: number }>`
   position: absolute;
   padding: 8px;
   border: 1px solid #f3f3f3;
@@ -16,6 +17,16 @@ const Popup = styled(Box)`
   z-index: ${props => props.zIndex ?? 1000};
 `;
 
+type PopupMenuProps = {
+  Button: React.ElementType;
+  children: React.ReactNode | ((args: { setOpen: React.Dispatch<React.SetStateAction<boolean>> }) => React.ReactNode);
+  placement?: Placement;
+  onClose?: () => void;
+  closingEvents?: Parameters<typeof useGlobalBlur>[2];
+  zIndex?: number;
+  popupMarginTop?: number | string;
+};
+
 const PopupMenu = ({
   Button,
   children,
@@ -24,7 +35,7 @@ const PopupMenu = ({
   closingEvents = undefined,
   zIndex = undefined,
   popupMarginTop = undefined,
-}) => {
+}: PopupMenuProps) => {
   const [isOpen, setOpen] = React.useState(false);
   const ref = React.useRef(undefined);
   useGlobalBlur(

@@ -5,9 +5,16 @@ import { border, color, layout } from 'styled-system';
 
 import { defaultShouldForwardProp } from '../lib/styled_components_utils';
 
+type BarProps = {
+  bg?: string;
+  width?: string;
+  height?: number;
+  borderRadius?: number;
+};
+
 const BackgroundBar = styled.div.withConfig({
   shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target),
-})`
+})<BarProps>`
   position: relative;
 
   ${layout}
@@ -17,13 +24,21 @@ const BackgroundBar = styled.div.withConfig({
 
 const ProgressBar = styled.div.withConfig({
   shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target),
-})`
+})<BarProps>`
   position: absolute;
 
   ${layout}
   ${color}
   ${border}
 `;
+
+type Props = {
+  percentage: number;
+  color?: string;
+  backgroundColor?: string;
+  height?: number;
+  borderRadius?: number;
+};
 
 /**
  * A progress bar that displays the current advancement.
@@ -35,7 +50,7 @@ const StyledProgressBar = ({
   backgroundColor = 'rgba(9, 10, 10, 0.04)',
   height = 4,
   borderRadius = 16,
-}) => {
+}: Props) => {
   return (
     <BackgroundBar bg={backgroundColor} height={height} borderRadius={borderRadius}>
       <ProgressBar width={`${clamp(percentage, 0, 1) * 100}%`} bg={color} height={height} borderRadius={borderRadius} />

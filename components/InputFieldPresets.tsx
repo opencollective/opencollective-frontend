@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { styled } from 'styled-components';
 
 import InputAmount from './InputAmount';
@@ -16,15 +15,19 @@ const InputFieldPresetsContainer = styled.div`
   }
 `;
 
-class InputFieldPresets extends React.Component {
-  static propTypes = {
-    defaultValue: PropTypes.arrayOf(PropTypes.number),
-    onChange: PropTypes.func,
-    min: PropTypes.number,
-    currency: PropTypes.currency,
-  };
+type Props = {
+  defaultValue?: number[];
+  onChange?: (values: Array<number | null>) => void;
+  min?: number;
+  currency?: string;
+};
 
-  constructor(props) {
+type State = {
+  values: Array<number | null>;
+};
+
+class InputFieldPresets extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props);
     this.maxLength = 5;
     const values = props.defaultValue ? [...props.defaultValue] : [1000];
@@ -34,7 +37,9 @@ class InputFieldPresets extends React.Component {
     this.renderSingleInput = this.renderSingleInput.bind(this);
   }
 
-  handleChange(index, val) {
+  maxLength: number;
+
+  handleChange(index: number, val: number | null) {
     let { values } = this.state;
     values[index] = val;
     values = values.filter(v => v !== null);
@@ -45,7 +50,7 @@ class InputFieldPresets extends React.Component {
     this.props.onChange(this.state.values);
   }
 
-  renderSingleInput(defaultValue, index) {
+  renderSingleInput(defaultValue: number | null, index: number) {
     return (
       <InputAmount
         key={`currency${index}`}

@@ -15,7 +15,7 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
-const Main = styled.main`
+const Main = styled.main<{ backgroundColor?: string }>`
   margin: 0;
   padding: 0;
   height: 100%;

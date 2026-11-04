@@ -8,6 +8,19 @@ import { getCollectiveImage } from '../lib/image-utils';
 import Container from './Container';
 import { P } from './Text';
 
+export type EventSponsor = {
+  id?: string;
+  slug?: string;
+  name?: string;
+  createdAt?: string;
+  tier?: { name?: string } | null;
+};
+
+type Props = {
+  sponsor: EventSponsor;
+  type?: string;
+};
+
 const EventSponsorCardContainer = styled.div`
   display: inline-block;
   cursor: pointer;
@@ -31,7 +44,7 @@ const CollectiveImage = styled.img`
   margin-right: auto;
 `;
 
-const EventSponsorCard = ({ sponsor }) => (
+const EventSponsorCard = ({ sponsor }: Props) => (
   <a href={`/${sponsor.slug}`}>
     <EventSponsorCardContainer>
       <CollectiveImage alt="" className="logo" src={getCollectiveImage(sponsor, { name: 'logo' })} />
@@ -45,7 +58,7 @@ const EventSponsorCard = ({ sponsor }) => (
           textTransform="uppercase"
           color="#75cc1f"
           whiteSpace="nowrap"
-          textOverflow="ellipsis"
+          {...({ textOverflow: 'ellipsis' } as React.ComponentProps<typeof P>)}
           letterSpacing="1.47px"
           marginBottom="0.2rem"
         >

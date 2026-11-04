@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import { cn } from '../lib/utils';
@@ -8,27 +7,28 @@ import Image from './Image';
 import Link from './Link';
 import Spinner from './Spinner';
 import { withUser } from './UserProvider';
+
+type Props = {
+  /**
+   * Login button label. Default: "Sign In"
+   */
+  children?: React.ReactNode;
+  loadingLoggedInUser?: boolean;
+  asLink?: boolean;
+  className?: string;
+  whitelabel?: { domain?: string };
+};
+
 /**
  * A user login button with proper redirect function.
  * If user is currently loggin in, button will be disabled and will show a spinner.
  */
-class LoginBtn extends React.Component {
-  static propTypes = {
-    /**
-     * Login button label. Default: "Sign In"
-     */
-    children: PropTypes.node,
-    loadingLoggedInUser: PropTypes.bool,
-    asLink: PropTypes.bool,
-    className: PropTypes.string,
-    whitelabel: PropTypes.object,
-  };
-
+class LoginBtn extends React.Component<Props> {
   static defaultProps = {
     children: null,
   };
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
     this.redirectAfterSignin = '/';
   }
@@ -38,6 +38,8 @@ class LoginBtn extends React.Component {
       this.redirectAfterSignin = window.location.href.replace(/^https?:\/\/[^/]+/, '');
     }
   }
+
+  redirectAfterSignin: string;
 
   render() {
     const label = this.props.children || <FormattedMessage id="signIn" defaultMessage="Sign In" />;

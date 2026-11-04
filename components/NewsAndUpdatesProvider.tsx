@@ -1,6 +1,11 @@
 import React, { useContext, useState } from 'react';
 
-const NewsAndUpdatesContext = React.createContext({
+type NewsAndUpdatesContextValue = {
+  showNewsAndUpdates?: boolean;
+  setShowNewsAndUpdates: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const NewsAndUpdatesContext = React.createContext<NewsAndUpdatesContextValue>({
   setShowNewsAndUpdates: () => {},
 });
 

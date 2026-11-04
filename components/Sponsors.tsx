@@ -1,15 +1,15 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import Container from './Container';
+import type { EventSponsor } from './EventSponsorCard';
 import EventSponsorCard from './EventSponsorCard';
 
-class Sponsors extends React.Component {
-  static propTypes = {
-    sponsors: PropTypes.arrayOf(PropTypes.object).isRequired,
-  };
+type Props = {
+  sponsors: EventSponsor[];
+};
 
-  constructor(props) {
+class Sponsors extends React.Component<Props> {
+  constructor(props: Props) {
     super(props);
   }
 

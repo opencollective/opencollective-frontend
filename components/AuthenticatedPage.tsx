@@ -1,6 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
+
+import type LoggedInUser from '@/lib/LoggedInUser';
 
 import Container from './Container';
 import { Flex } from './Grid';
@@ -9,6 +10,19 @@ import MessageBox from './MessageBox';
 import Page from './Page';
 import SignInOrJoinFree from './SignInOrJoinFree';
 import { withUser } from './UserProvider';
+
+type Props = {
+  /** A child renderer to call when user is properly authenticated */
+  children?: React.ReactNode | ((LoggedInUser: LoggedInUser) => React.ReactNode);
+  /** Whether user can signup on this page */
+  disableSignup?: boolean;
+  /** Whether this page is limited to root users */
+  rootOnly?: boolean;
+  /** @ignore from withUser */
+  loadingLoggedInUser?: boolean;
+  /** @ignore from withUser */
+  LoggedInUser?: LoggedInUser;
+};
 
 /**
  * A wrapper around `Page` that will display a spinner while user is loading.
@@ -30,21 +44,8 @@ import { withUser } from './UserProvider';
  * </AuthenticatedPage>
  * ```
  */
-class AuthenticatedPage extends React.Component {
-  static propTypes = {
-    /** A child renderer to call when user is properly authenticated */
-    children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
-    /** Whether user can signup on this page */
-    disableSignup: PropTypes.bool,
-    /** Whether this page is limited to root users */
-    rootOnly: PropTypes.bool,
-    /** @ignore from withUser */
-    loadingLoggedInUser: PropTypes.bool,
-    /** @ignore from withUser */
-    LoggedInUser: PropTypes.object,
-  };
-
-  renderContent(loadingLoggedInUser, LoggedInUser) {
+class AuthenticatedPage extends React.Component<Props> {
+  renderContent(loadingLoggedInUser: boolean, LoggedInUser?: LoggedInUser) {
     if (!LoggedInUser) {
       return (
         <Container display="flex" justifyContent="center" py={[5, null, 6]} px={2}>

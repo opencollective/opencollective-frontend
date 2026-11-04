@@ -1,10 +1,16 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import Router from 'next/router';
+import type { IntlShape, MessageDescriptor } from 'react-intl';
 import { defineMessages } from 'react-intl';
 
 import { IgnorableError } from '../lib/errors';
 import injectIntl from '@/lib/injectIntl';
+
+type Props = {
+  hasUnsavedChanges?: boolean;
+  children?: React.ReactNode;
+  intl?: IntlShape;
+};
 
 /**
  * A component to warn users if they try to leave with unsaved data. Just set
@@ -13,13 +19,7 @@ import injectIntl from '@/lib/injectIntl';
  *
  * See `lib/hooks/warnIfUnsavedChanges.ts` for the hook version of this component.
  */
-class WarnIfUnsavedChanges extends React.Component {
-  static propTypes = {
-    hasUnsavedChanges: PropTypes.bool,
-    children: PropTypes.node,
-    intl: PropTypes.object,
-  };
-
+class WarnIfUnsavedChanges extends React.Component<Props> {
   componentDidMount() {
     window.addEventListener('beforeunload', this.beforeunload);
     Router.router.events.on('routeChangeStart', this.routeChangeStart);
@@ -30,7 +30,7 @@ class WarnIfUnsavedChanges extends React.Component {
     Router.router.events.off('routeChangeStart', this.routeChangeStart);
   }
 
-  messages = defineMessages({
+  messages: Record<string, MessageDescriptor> = defineMessages({
     warning: {
       id: 'WarningUnsavedChanges',
       defaultMessage: 'You have unsaved changes. Are you sure you want to leave this page?',
@@ -50,7 +50,7 @@ class WarnIfUnsavedChanges extends React.Component {
   };
 
   /** Triggered when closing tabs */
-  beforeunload = e => {
+  beforeunload = (e: BeforeUnloadEvent) => {
     const { hasUnsavedChanges, intl } = this.props;
     if (hasUnsavedChanges) {
       e.preventDefault();

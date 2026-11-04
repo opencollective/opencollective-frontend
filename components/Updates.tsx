@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 
 import Container from './Container';
@@ -8,14 +7,14 @@ import LoadingPlaceholder from './LoadingPlaceholder';
 import StyledUpdate from './StyledUpdate';
 import { P } from './Text';
 
-class Updates extends React.Component {
-  static propTypes = {
-    collective: PropTypes.object,
-    updates: PropTypes.object,
-    loading: PropTypes.bool,
-    nbLoadingPlaceholders: PropTypes.number,
-  };
+type Props = {
+  collective?: { slug?: string; name?: string };
+  updates?: { nodes?: Array<{ id: string; [key: string]: unknown }> };
+  loading?: boolean;
+  nbLoadingPlaceholders?: number;
+};
 
+class Updates extends React.Component<Props> {
   render() {
     const { collective, updates, loading, nbLoadingPlaceholders } = this.props;
     return (

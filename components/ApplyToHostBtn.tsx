@@ -1,24 +1,29 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { CheckCircle } from '@styled-icons/boxicons-regular/CheckCircle';
+import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
 import ApplyToHostModal from './ApplyToHostModal';
+import type { StyledButtonProps } from './StyledButton';
 import StyledButton from './StyledButton';
 
-class ApplyToHostBtn extends React.Component {
-  static propTypes = {
-    hostSlug: PropTypes.string.isRequired,
-    minWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    withoutIcon: PropTypes.bool,
-    buttonProps: PropTypes.object,
-    buttonRenderer: PropTypes.func,
-    router: PropTypes.object,
-    isHidden: PropTypes.bool,
-  };
+type Props = {
+  hostSlug: string;
+  minWidth?: number | string;
+  withoutIcon?: boolean;
+  buttonProps?: Partial<StyledButtonProps>;
+  buttonRenderer?: (props: React.ComponentProps<typeof StyledButton>) => React.ReactNode;
+  router: Router;
+  isHidden?: boolean;
+};
 
-  constructor(props) {
+type State = {
+  showModal: boolean;
+};
+
+class ApplyToHostBtn extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props);
     this.state = { showModal: false };
   }
@@ -31,7 +36,7 @@ class ApplyToHostBtn extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: Props) {
     const { router } = this.props;
 
     if (router.query.action !== 'apply' && prevProps.router.query.action === 'apply') {

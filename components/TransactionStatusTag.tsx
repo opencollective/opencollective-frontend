@@ -1,4 +1,5 @@
 import React from 'react';
+import type { MessageDescriptor } from 'react-intl';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { ORDER_STATUS } from '../lib/constants/order-status';
@@ -54,7 +55,7 @@ const formatStatus = (intl, transaction) => {
   }
 };
 
-const tooltipMessages = defineMessages({
+const tooltipMessages: Record<string, MessageDescriptor> = defineMessages({
   [ORDER_STATUS.PENDING]: {
     id: 'Order.Status.Pending',
     defaultMessage: 'Please follow the payment instructions in the confirmation email to complete your transaction.',

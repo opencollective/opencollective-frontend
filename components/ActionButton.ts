@@ -11,7 +11,7 @@ const ActionButton = styled(StyledButton).attrs({
   buttonSize: 'tiny',
   padding: '7px 16px',
   borderRadius: '8px',
-})`
+})<{ isSecondary?: boolean }>`
   font-weight: 500;
   font-size: 14px;
   line-height: 16px;

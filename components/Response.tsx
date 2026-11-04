@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import type { IntlShape, MessageDescriptor } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
 import injectIntl from '@/lib/injectIntl';
@@ -8,18 +8,31 @@ import Avatar from './Avatar';
 import Container from './Container';
 import LinkCollective from './LinkCollective';
 
-class Response extends React.Component {
-  static propTypes = {
-    response: PropTypes.object.isRequired,
-    intl: PropTypes.object.isRequired,
+type Props = {
+  response: {
+    user?: {
+      name?: string;
+      email?: string;
+      isIncognito?: boolean;
+      description?: string;
+      slug?: string;
+    };
+    description?: string;
+    status?: string;
+    count?: number;
   };
+  intl?: IntlShape;
+};
 
-  constructor(props) {
+class Response extends React.Component<Props> {
+  constructor(props: Props) {
     super(props);
     this.messages = defineMessages({
       YES: { id: 'response.status.yes', defaultMessage: '{name} is going' },
     });
   }
+
+  private messages: Record<string, MessageDescriptor>;
 
   render() {
     const { intl, response } = this.props;

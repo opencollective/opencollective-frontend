@@ -1,16 +1,17 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+
+import type LoggedInUser from '@/lib/LoggedInUser';
 
 import CollectiveCard from './CollectiveCard';
 import Container from './Container';
 
-class Membership extends React.Component {
-  static propTypes = {
-    memberships: PropTypes.array.isRequired,
-    LoggedInUser: PropTypes.object,
-  };
+type Props = {
+  memberships: Array<{ collective?: { slug?: string; name?: string } }>;
+  LoggedInUser?: LoggedInUser;
+};
 
-  constructor(props) {
+class Membership extends React.Component<Props> {
+  constructor(props: Props) {
     super(props);
   }
 
