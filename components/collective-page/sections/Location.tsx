@@ -37,11 +37,7 @@ const Location = ({ collective: event, refetch }) => {
         <SectionTitle textAlign="center">
           <FormattedMessage id="SectionLocation.Title" defaultMessage="Location" />
         </SectionTitle>
-        <LocationComponent
-          location={event.location}
-          privateInstructions={event.privateInstructions}
-          showTitle={false}
-        />
+        <LocationComponent location={event.location} showTitle={false} />
         {event.privateInstructions && (
           <Container maxWidth={700} mx="auto" mt={4}>
             <P fontWeight="bold" fontSize="18px">

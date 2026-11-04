@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import memoizeOne from 'memoize-one';
 import dynamic from 'next/dynamic';
@@ -41,53 +40,43 @@ const AdminContributeCardsContainer = dynamic(() => import('../../contribute-car
   ssr: false,
 });
 
+type ContributeProps = {
+  tiers?: Array<Record<string, unknown>>;
+  events?: Array<{ id: number; contributors?: unknown[] }>;
+  connectedCollectives?: Array<{ id: number; collective: { id: number } }>;
+  collective?: {
+    id: number;
+    slug: string;
+    type: string;
+    isActive?: boolean;
+    isHost?: boolean;
+    host?: unknown;
+    currency?: string;
+    settings?: Record<string, unknown>;
+    parentCollective?: { slug: string };
+    name?: string;
+  };
+  contributorsStats?: Record<string, unknown>;
+  contributors?: Array<{ type?: string; isBacker?: boolean; tiersIds?: number[] }>;
+  isAdmin?: boolean;
+  editAccountSettings?: (options: unknown) => Promise<unknown>;
+};
+
+type ContributeState = {
+  showTiersAdmin: boolean;
+  showTicketsAdmin: boolean;
+  isSaving: boolean;
+  isSavingTickets: boolean;
+  draggingId: number | string;
+  draggingTicketId: number | string;
+  error?: unknown;
+};
+
 /**
  * The contribute section, implemented as a pure component to avoid unnecessary
  * re-renders when scrolling.
  */
-class SectionContribute extends React.PureComponent {
-  static propTypes = {
-    tiers: PropTypes.arrayOf(PropTypes.object),
-    events: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        contributors: PropTypes.arrayOf(PropTypes.object),
-      }),
-    ),
-    connectedCollectives: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        collective: PropTypes.shape({
-          id: PropTypes.number.isRequired,
-        }),
-      }),
-    ),
-    collective: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      slug: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      isActive: PropTypes.bool,
-      isHost: PropTypes.bool,
-      host: PropTypes.object,
-      currency: PropTypes.string,
-      settings: PropTypes.object,
-      parentCollective: PropTypes.shape({
-        slug: PropTypes.string.isRequired,
-      }),
-      name: PropTypes.string,
-    }),
-    contributorsStats: PropTypes.object,
-    contributors: PropTypes.arrayOf(
-      PropTypes.shape({
-        type: PropTypes.oneOf(Object.values(CollectiveType)).isRequired,
-        isBacker: PropTypes.bool,
-        tiersIds: PropTypes.arrayOf(PropTypes.number),
-      }),
-    ),
-    isAdmin: PropTypes.bool,
-    editAccountSettings: PropTypes.func.isRequired,
-  };
-
+class SectionContribute extends React.PureComponent<ContributeProps, ContributeState> {
   state = {
     showTiersAdmin: false,
     showTicketsAdmin: false,
@@ -283,11 +272,14 @@ class SectionContribute extends React.PureComponent {
                   >
                     <React.Fragment>
                       {!(isAdmin && showTiersAdmin) &&
-                        contributeCards.map(({ key, Component, componentProps }) => (
-                          <ContributeCardContainer key={key}>
-                            <Component {...componentProps} />
-                          </ContributeCardContainer>
-                        ))}
+                        contributeCards.map(({ key, Component, componentProps }) => {
+                          const CardComponent: React.ElementType = Component;
+                          return (
+                            <ContributeCardContainer key={key}>
+                              <CardComponent {...componentProps} />
+                            </ContributeCardContainer>
+                          );
+                        })}
                       {isAdmin && (
                         <Container display={showTiersAdmin ? 'block' : 'none'} data-cy="admin-contribute-cards">
                           <AdminContributeCardsContainer
@@ -372,7 +364,12 @@ class SectionContribute extends React.PureComponent {
   }
 }
 
-const addEditAccountSettingMutation = graphql(editAccountSettingMutation, {
+const addEditAccountSettingMutation = graphql<
+  ContributeProps,
+  { editAccountSetting: { id: string; settings: Record<string, unknown> } },
+  Record<string, unknown>,
+  { editAccountSettings?: (options: unknown) => Promise<unknown> }
+>(editAccountSettingMutation, {
   name: 'editAccountSettings',
 });
 

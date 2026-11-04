@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get, isEmpty } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
@@ -31,28 +30,34 @@ export const conversationsSectionQuery = gql`
 /**
  * Conversations section.
  */
-class SectionConversations extends React.PureComponent {
-  static propTypes = {
-    /** Collective */
-    collective: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-    }).isRequired,
+type SectionConversationsProps = {
+  /** Collective */
+  collective?: { slug: string; name: string };
 
-    /** Conversations */
-    data: PropTypes.shape({
-      account: PropTypes.shape({
-        conversations: PropTypes.shape({
-          totalCount: PropTypes.number,
-          nodes: PropTypes.arrayOf(PropTypes.object),
-        }),
-      }),
-    }),
+  /** Conversations */
+  data?: {
+    account?: {
+      conversations?: {
+        totalCount?: number;
+        nodes?: unknown[];
+      };
+    };
   };
+};
 
+type ConversationsSectionData = {
+  account?: {
+    conversations?: {
+      totalCount?: number;
+      nodes?: unknown[];
+    };
+  };
+};
+
+class SectionConversations extends React.PureComponent<SectionConversationsProps> {
   render() {
     const { collective, data } = this.props;
-    const conversations = get(data, 'account.conversations', {});
+    const conversations = get(data, 'account.conversations', { totalCount: 0, nodes: [] });
 
     return (
       <ContainerSectionContent pb={4}>
@@ -101,13 +106,18 @@ class SectionConversations extends React.PureComponent {
   }
 }
 
-const addConversationsSectionData = graphql(conversationsSectionQuery, {
-  options: props => ({
+const addConversationsSectionData = graphql<
+  SectionConversationsProps,
+  ConversationsSectionData,
+  { collectiveSlug: string },
+  { data?: ConversationsSectionData }
+>(conversationsSectionQuery, {
+  options: (props: SectionConversationsProps) => ({
     variables: getConversationsSectionQueryVariables(props.collective.slug),
   }),
 });
 
-export const getConversationsSectionQueryVariables = slug => {
+export const getConversationsSectionQueryVariables = (slug: string): { collectiveSlug: string } => {
   return { collectiveSlug: slug };
 };
 

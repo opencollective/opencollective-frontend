@@ -1,9 +1,9 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import dynamic from 'next/dynamic';
+import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 
 import { CONNECTED_COLLECTIVES_ORDER_KEY } from '../../../lib/constants/collectives';
@@ -30,27 +30,30 @@ const AdminContributeCardsContainer = dynamic(() => import('../../contribute-car
   ssr: false,
 });
 
-class ConnectedCollectives extends React.PureComponent {
-  static propTypes = {
-    /** Collective */
-    collective: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      isActive: PropTypes.bool,
-      settings: PropTypes.object,
-    }).isRequired,
-    connectedCollectives: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        contributors: PropTypes.arrayOf(PropTypes.object),
-        collective: PropTypes.object.isRequired,
-      }),
-    ),
-    isAdmin: PropTypes.bool,
-    editAccountSettings: PropTypes.func.isRequired,
-  };
+type ConnectedCollectiveItem = {
+  id: number;
+  contributors?: unknown[];
+  collective: { id: number; slug: string; name: string; type: string };
+};
 
+type ConnectedCollectivesProps = {
+  /** Collective */
+  collective?: { id: number; slug: string; name: string; isActive?: boolean; settings?: Record<string, unknown> };
+  connectedCollectives?: ConnectedCollectiveItem[];
+  isAdmin?: boolean;
+  editAccountSettings?: (options: unknown) => Promise<unknown>;
+  /** @ignore from injectIntl */
+  intl?: IntlShape;
+};
+
+type ConnectedCollectivesState = {
+  showConnectedCollectivesAdmin: boolean;
+  isSaving: boolean;
+  draggingId: number | string;
+  error?: unknown;
+};
+
+class ConnectedCollectives extends React.PureComponent<ConnectedCollectivesProps, ConnectedCollectivesState> {
   state = {
     showConnectedCollectivesAdmin: false,
     isSaving: false,
@@ -175,7 +178,12 @@ class ConnectedCollectives extends React.PureComponent {
   }
 }
 
-const addEditAccountSettingMutation = graphql(editAccountSettingMutation, {
+const addEditAccountSettingMutation = graphql<
+  ConnectedCollectivesProps,
+  { editAccountSetting: { id: string; settings: Record<string, unknown> } },
+  Record<string, unknown>,
+  { editAccountSettings?: (options: unknown) => Promise<unknown> }
+>(editAccountSettingMutation, {
   name: 'editAccountSettings',
 });
 

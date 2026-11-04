@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components';
 
-const SectionContainer = styled.section`
+const SectionContainer = styled.section<{ withPaddingBottom?: boolean }>`
   margin: 0;
   ${props =>
     props.withPaddingBottom &&

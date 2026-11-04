@@ -1,7 +1,8 @@
 import React from 'react';
 import { css, styled } from 'styled-components';
-import type { FlexGrowProps, FlexWrapProps } from 'styled-system';
+import type { FlexGrowProps, FlexWrapProps, SpaceProps } from 'styled-system';
 
+import type { FlexProps } from './Grid';
 import { Flex } from './Grid';
 import StyledButton from './StyledButton';
 import { Span } from './Text';
@@ -53,13 +54,17 @@ const ButtonContainer = styled.span<{ flexGrow: FlexGrowProps['flexGrow'] }>`
 
 type StyledFiltersProps = {
   filters: string[];
-  getLabel?: (filter: string) => string;
+  getLabel?: (filter: string) => React.ReactNode;
   disabled?: boolean;
   buttonGrow?: FlexGrowProps['flexGrow'];
   minButtonWidth?: number | string;
   buttonHeight?: number | string;
   buttonPadding?: number | string;
   flexWrap?: FlexWrapProps['flexWrap'];
+  /** Forwarded to the flex container */
+  px?: SpaceProps['px'];
+  /** Forwarded to the flex container */
+  justifyContent?: FlexProps['justifyContent'];
 } & (
   | {
       multiSelect?: false;

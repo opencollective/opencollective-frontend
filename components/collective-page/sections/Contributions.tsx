@@ -7,6 +7,7 @@ import { styled } from 'styled-components';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import CollectiveRoles from '../../../lib/constants/roles';
 import { gql } from '../../../lib/graphql/helpers';
+import type { ContributionsSectionQueryVariables } from '../../../lib/graphql/types/v2/graphql';
 
 import Container from '../../Container';
 import { Box, Flex, Grid } from '../../Grid';
@@ -32,7 +33,19 @@ const FILTERS = {
   EVENTS: 'EVENTS',
 };
 
-const FILTER_PROPS = [
+type ContributionsFilterArgs = {
+  role: string[];
+  accountType: string[] | null;
+  orderBy: { field: string; direction: string };
+};
+
+type ContributionsFilterConfig = {
+  id: string;
+  args: ContributionsFilterArgs;
+  isActive: (roles: Array<{ role: string; type?: string }>, account?: { type?: string }) => boolean;
+};
+
+const FILTER_PROPS: ContributionsFilterConfig[] = [
   {
     id: FILTERS.ALL,
     args: {
@@ -312,7 +325,7 @@ const SectionContributions = ({ collective }) => {
     const offset = memberOf.nodes.length;
     const selectedFilter = FILTER_PROPS.find(f => f.id === filter);
     await fetchMore({
-      variables: { offset, ...selectedFilter.args },
+      variables: { offset, ...selectedFilter.args } as ContributionsSectionQueryVariables,
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) {
           return prev;
@@ -335,7 +348,7 @@ const SectionContributions = ({ collective }) => {
     setFilter(id);
     const selectedFilter = FILTER_PROPS.find(f => f.id === id);
     fetchMore({
-      variables: { offset: 0, ...selectedFilter.args },
+      variables: { offset: 0, ...selectedFilter.args } as ContributionsSectionQueryVariables,
       updateQuery: (prev, { fetchMoreResult }) => {
         return fetchMoreResult ? fetchMoreResult : prev;
       },
@@ -381,7 +394,7 @@ const SectionContributions = ({ collective }) => {
         >
           <Grid gridGap={24} gridTemplateColumns={GRID_TEMPLATE_COLUMNS}>
             {(!loading || (isLoadingMore && loading)) &&
-              uniqWith(
+              uniqWith<{ id?: string; role?: string; account?: { id?: string } }>(
                 memberOf?.nodes,
                 (member1, member2) => member1?.role === member2?.role && member1?.account?.id === member2?.account?.id,
               ).map(membership => (

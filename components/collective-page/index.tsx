@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { compact, concat, isEmpty, throttle } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 
@@ -9,7 +8,7 @@ import CollectiveNavbar from '../collective-navbar';
 import Container from '../Container';
 import { Box } from '../Grid';
 
-import Hero from './hero/Hero';
+import Hero, { type HeroCollective, type HeroHost } from './hero/Hero';
 import SectionAbout from './sections/About';
 import SectionBudget from './sections/Budget';
 import SectionConnectedCollectives from './sections/ConnectedCollectives';
@@ -33,43 +32,47 @@ import CategoryHeader from './CategoryHeader';
 import SectionContainer from './SectionContainer';
 import sectionsWithoutPaddingBottom from './SectionsWithoutPaddingBottom';
 
+type CollectivePageProps = {
+  collective: HeroCollective;
+  host?: HeroHost;
+  financialContributors?: React.ComponentProps<typeof SectionContributors>['financialContributors'];
+  coreContributors?: React.ComponentProps<typeof SectionContributors>['coreContributors'];
+  topOrganizations?: unknown[];
+  topIndividuals?: unknown[];
+  tiers?: Array<Record<string, unknown>>;
+  transactions?: unknown[];
+  conversations?: unknown;
+  expenses?: unknown[];
+  updates?: unknown[];
+  events?: Array<{ id: number; contributors?: unknown[] }>;
+  projects?: Array<{ id: number; isArchived?: boolean; isActive?: boolean; contributors?: object[] }>;
+  connectedCollectives?: Array<{ id: number; collective: { id: number } }>;
+  LoggedInUser?: {
+    isAdminOfCollective?: (collective: unknown) => boolean;
+    isHostAdmin?: (collective: unknown) => boolean;
+  };
+  isAdmin: boolean;
+  isHostAdmin: boolean;
+  isRoot: boolean;
+  onPrimaryColorChange: (color: string | null) => void;
+  stats: { backers?: { all?: number } };
+  status?: 'collectiveCreated' | 'collectiveArchived';
+  step?: string;
+  mode?: string;
+  action?: string;
+  refetch?: (...args: unknown[]) => Promise<unknown>;
+};
+
+type CollectivePageState = { isFixed: boolean; selectedCategory: string };
+
 /**
  * This is the collective page main layout, holding different blocks together
  * and watching scroll to synchronise the view for children properly.
  *
  * See design: https://www.figma.com/file/e71tBo0Sr8J7R5n6iMkqI42d/09.-Collectives?node-id=2338%3A36062
  */
-class CollectivePage extends Component {
-  static propTypes = {
-    collective: PropTypes.object.isRequired,
-    host: PropTypes.object,
-    financialContributors: PropTypes.arrayOf(PropTypes.object),
-    coreContributors: PropTypes.arrayOf(PropTypes.object),
-    topOrganizations: PropTypes.arrayOf(PropTypes.object),
-    topIndividuals: PropTypes.arrayOf(PropTypes.object),
-    tiers: PropTypes.arrayOf(PropTypes.object),
-    transactions: PropTypes.arrayOf(PropTypes.object),
-    conversations: PropTypes.object,
-    expenses: PropTypes.arrayOf(PropTypes.object),
-    updates: PropTypes.arrayOf(PropTypes.object),
-    events: PropTypes.arrayOf(PropTypes.object),
-    projects: PropTypes.arrayOf(PropTypes.object),
-    connectedCollectives: PropTypes.arrayOf(PropTypes.object),
-    LoggedInUser: PropTypes.object,
-    isAdmin: PropTypes.bool.isRequired,
-    isHostAdmin: PropTypes.bool.isRequired,
-    isRoot: PropTypes.bool.isRequired,
-    onPrimaryColorChange: PropTypes.func.isRequired,
-    stats: PropTypes.shape({
-      backers: PropTypes.shape({
-        all: PropTypes.number,
-      }),
-    }).isRequired,
-    status: PropTypes.oneOf(['collectiveCreated', 'collectiveArchived']),
-    refetch: PropTypes.func,
-  };
-
-  constructor(props) {
+class CollectivePage extends Component<CollectivePageProps, CollectivePageState> {
+  constructor(props: CollectivePageProps) {
     super(props);
     this.sectionCategoriesRefs = {}; // This will store a map of category => ref
     this.sectionsContainerRef = React.createRef();
@@ -84,6 +87,9 @@ class CollectivePage extends Component {
   componentWillUnmount() {
     window.removeEventListener('scroll', this.onScroll);
   }
+
+  sectionCategoriesRefs: Record<string, HTMLElement> = {};
+  sectionsContainerRef = React.createRef<HTMLDivElement>();
 
   getSections = memoizeOne((collective, isAdmin, isHostAdmin) => {
     return getFilteredSectionsForCollective(collective, isAdmin, isHostAdmin);
@@ -132,18 +138,12 @@ class CollectivePage extends Component {
     window.scrollTo(0, 0);
   };
 
-  renderSection(section, version) {
+  renderSection(section, version = undefined) {
     switch (section) {
       case Sections.UPDATES:
-        return (
-          <SectionUpdates
-            collective={this.props.collective}
-            isAdmin={this.props.isAdmin}
-            isLoggedIn={Boolean(this.props.LoggedInUser)}
-          />
-        );
+        return <SectionUpdates collective={this.props.collective} isAdmin={this.props.isAdmin} />;
       case Sections.CONVERSATIONS:
-        return <SectionConversations collective={this.props.collective} conversations={this.props.conversations} />;
+        return <SectionConversations collective={this.props.collective} />;
 
       case Sections.LOCATION:
         return <SectionLocation collective={this.props.collective} refetch={this.props.refetch} />;
@@ -152,7 +152,6 @@ class CollectivePage extends Component {
       case Sections.CONTRIBUTE:
         return (
           <SectionContribute
-            status={this.props.status}
             collective={this.props.collective}
             tiers={this.props.tiers}
             events={this.props.events}
@@ -163,7 +162,7 @@ class CollectivePage extends Component {
           />
         );
       case Sections.CONTRIBUTIONS:
-        return <SectionContributions collective={this.props.collective} LoggedInUser={this.props.LoggedInUser} />;
+        return <SectionContributions collective={this.props.collective} />;
       case Sections.EVENTS:
         return (
           <SectionEvents collective={this.props.collective} events={this.props.events} isAdmin={this.props.isAdmin} />
@@ -265,7 +264,6 @@ class CollectivePage extends Component {
           isAdmin={isAdmin}
           selectedCategory={selectedCategory}
           onCollectiveClick={this.onCollectiveClick}
-          isFullWidth
           useAnchorsForCategories
           isInHero={!isFixed}
           showSelectedCategoryOnMobile
@@ -280,7 +278,9 @@ class CollectivePage extends Component {
                 <Fragment key={`category-${entry.name}`}>
                   <CategoryHeader
                     id={`category-${entry.name}`}
-                    ref={categoryRef => (this.sectionCategoriesRefs[entry.name] = categoryRef)}
+                    ref={categoryRef => {
+                      this.sectionCategoriesRefs[entry.name] = categoryRef;
+                    }}
                     collective={collective}
                     category={entry.name}
                   />
@@ -295,7 +295,7 @@ class CollectivePage extends Component {
                         !sectionsWithoutPaddingBottom[section.name]
                       }
                     >
-                      {this.renderSection(section.name, section.version)}
+                      {this.renderSection(section.name, 'version' in section ? section.version : undefined)}
                     </SectionContainer>
                   ))}
                 </Fragment>

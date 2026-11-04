@@ -9,7 +9,6 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
-import type { GraphQLV1Collective } from '../../../lib/custom_typings/GraphQLV1';
 import type { SocialLink } from '../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import { twitterProfileUrl } from '../../../lib/url-helpers';
@@ -101,7 +100,20 @@ const HiddenTagItem = styled(StyledLink)`
   }
 `;
 
-type HeroCollective = GraphQLV1Collective & {
+export type HeroCollective = {
+  id: number;
+  slug: string;
+  name: string;
+  type: string;
+  description?: string;
+  currency?: string;
+  isHost?: boolean;
+  isApproved?: boolean;
+  isArchived?: boolean;
+  isFirstPartyHost?: boolean;
+  isVerified?: boolean;
+  settings?: Record<string, unknown>;
+  parentCollective?: { id: number; name: string; slug: string; type?: string; coreContributors?: unknown[] };
   backgroundImageUrl?: string;
   twitterHandle?: string;
   repositoryUrl?: string;
@@ -111,17 +123,24 @@ type HeroCollective = GraphQLV1Collective & {
   company?: string;
   connectedTo?: Array<{ collective: { id: number; name: string; slug: string } }>;
   hasHosting?: boolean;
-  isApproved?: boolean;
-  isHost?: boolean;
   canContact?: boolean;
   location?: { name?: string; country?: string };
-  description?: string;
-  slug: string;
-  name: string;
-  type: string;
+  image?: string;
+  imageUrl?: string;
+  coreContributors?: unknown[];
+  financialContributors?: unknown[];
+  tiers?: unknown[];
+  events?: unknown[];
+  projects?: unknown[];
 };
 
-type HeroHost = GraphQLV1Collective & { hasHosting?: boolean };
+export type HeroHost = {
+  id: number;
+  name: string;
+  slug: string;
+  type?: string;
+  hasHosting?: boolean;
+};
 
 type HeroProps = {
   collective: HeroCollective;

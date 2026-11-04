@@ -5,10 +5,16 @@ import { CustomScrollbarCSS } from '../../lib/styled-components-shared-styles';
 
 import { Dimensions } from './_constants';
 
+type ContributeCardsContainerProps = {
+  display?: string;
+  disableScroll?: boolean;
+  disableScrollSnapping?: boolean;
+};
+
 /** An horizontally scrollable container to display contribute cards */
-const ContributeCardsContainer = styled.div.attrs(props => ({
+const ContributeCardsContainer = styled.div.attrs<ContributeCardsContainerProps>(props => ({
   display: props.display ?? 'flex',
-}))`
+}))<ContributeCardsContainerProps>`
   ${display}
   padding: 16px 0;
   overflow-x: auto;

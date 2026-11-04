@@ -36,7 +36,7 @@ const StatAmount = ({ amount, ...props }) => (
   </P>
 );
 
-const StatContainer = styled.div`
+const StatContainer = styled.div<{ $isMain?: boolean; borderTop?: unknown }>`
   flex: 1;
   padding: 16px 32px;
 
@@ -55,7 +55,7 @@ const StatContainer = styled.div`
   ${border}
 `;
 
-const BudgetStats = ({ collective, stats, horizontal }) => {
+const BudgetStats = ({ collective, stats, horizontal = false }) => {
   const { locale } = useIntl();
 
   if (!stats) {

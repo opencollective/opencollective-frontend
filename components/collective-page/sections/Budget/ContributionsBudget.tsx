@@ -33,30 +33,18 @@ import {
   TagMarker,
 } from './common';
 
-const makeLabel = (intl, label) => {
-  return label === 'OTHERS_COMBINED'
-    ? intl.formatMessage({ id: 'Tags.OthersCombined', defaultMessage: 'Others Combined' })
-    : label;
-};
-
-export const budgetSectionExpenseQuery = gql`
-  query BudgetSectionExpense($slug: String!, $from: DateTime, $to: DateTime) {
+export const budgetSectionContributionsQuery = gql`
+  query BudgetSectionContributions($slug: String!, $from: DateTime, $to: DateTime) {
     account(slug: $slug) {
       id
       currency
       stats {
         id
-        totalAmountDisbursed: totalAmountSpent(
-          dateFrom: $from
-          dateTo: $to
-          includeChildren: false
-          kind: EXPENSE
-          net: false
-        ) {
+        totalAmountReceived(dateFrom: $from, dateTo: $to, includeChildren: false, kind: [CONTRIBUTION, ADDED_FUNDS]) {
           value
           currency
         }
-        expensesTags(dateFrom: $from, dateTo: $to, includeChildren: false) {
+        contributionsAmount(dateFrom: $from, dateTo: $to, includeChildren: false, kind: [CONTRIBUTION, ADDED_FUNDS]) {
           label
           count
           amount {
@@ -65,7 +53,12 @@ export const budgetSectionExpenseQuery = gql`
             currency
           }
         }
-        expensesTagsTimeSeries(dateFrom: $from, dateTo: $to, includeChildren: false) {
+        contributionsAmountTimeSeries(
+          dateFrom: $from
+          dateTo: $to
+          includeChildren: false
+          kind: [CONTRIBUTION, ADDED_FUNDS]
+        ) {
           timeUnit
           nodes {
             date
@@ -80,21 +73,20 @@ export const budgetSectionExpenseQuery = gql`
     }
   }
 `;
-
-const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
+const ContributionsBudget = ({ collective, defaultTimeInterval, ...props }) => {
   const [tmpDateInterval, setTmpDateInterval] = React.useState(defaultTimeInterval);
   const [graphType, setGraphType] = React.useState(GRAPH_TYPES.LIST);
-  const { data, loading } = useQuery(budgetSectionExpenseQuery, {
+  const { data, loading } = useQuery(budgetSectionContributionsQuery, {
     variables: { slug: collective.slug, ...tmpDateInterval },
   });
   const intl = useIntl();
 
-  const timeUnit = data?.account?.stats.expensesTagsTimeSeries.timeUnit;
-  const { series } = extractSeriesFromTimeSeries(data?.account?.stats.expensesTagsTimeSeries.nodes, {
+  const timeUnit = data?.account?.stats.contributionsAmountTimeSeries.timeUnit;
+  const { series } = extractSeriesFromTimeSeries(data?.account?.stats.contributionsAmountTimeSeries.nodes, {
     x: 'date',
     y: 'amount.value',
     group: 'label',
-    groupNameTransformer: capitalize,
+    groupNameTransformer: value => capitalize(value as string),
   });
 
   const defaultApexOptions = makeApexOptions(collective.currency, timeUnit, intl);
@@ -103,7 +95,7 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
     <Flex {...props}>
       <Flex justifyContent="space-between" alignItems="center" flexGrow={1} gap="8px" flexWrap="wrap">
         <P fontSize="20px" lineHeight="20px" fontWeight="500">
-          <FormattedMessage id="Expenses" defaultMessage="Expenses" />
+          <FormattedMessage id="Contributions" defaultMessage="Contributions" />
         </P>
         <Flex gap="8px" alignItems="center">
           <PeriodFilterPresetsSelect
@@ -133,18 +125,18 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
           <StatsCardContent>
             <Box width="50%">
               <P fontSize="12px" lineHeight="16px" fontWeight="500" textTransform="uppercase" color="black.700">
-                <FormattedMessage id="ExpensesPaid" defaultMessage="Expenses paid" />
+                <FormattedMessage id="ContributionsReceived" defaultMessage="Contributions received" />
               </P>
               <P fontSize="16px" lineHeight="24px" fontWeight="500" mt="4px">
-                {sumBy(data?.account?.stats.expensesTags, 'count')}
+                {sumBy(data?.account?.stats.contributionsAmount, 'count')}
               </P>
             </Box>
             <Box width="50%">
               <P fontSize="12px" lineHeight="16px" fontWeight="500" textTransform="uppercase" color="black.700">
-                <FormattedMessage id="AmountDisbursed" defaultMessage="Amount disbursed" />
+                <FormattedMessage id="Label.AmountCollected" defaultMessage="Amount collected" />
               </P>
               <P fontSize="16px" lineHeight="24px" fontWeight="500" mt="4px">
-                {formatValueAsCurrency(data?.account?.stats.totalAmountDisbursed, { absolute: true })}
+                {formatValueAsCurrency(data?.account?.stats.totalAmountReceived)}
               </P>
             </Box>
           </StatsCardContent>
@@ -160,18 +152,18 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
               mt={4}
               cellPadding="10px"
               headers={[
-                <FormattedMessage key={1} id="Tags" defaultMessage="Tags" />,
-                <FormattedMessage key={2} id="Label.NumberOfExpenses" defaultMessage="# of Expenses" />,
+                <FormattedMessage key={1} id="Tiers" defaultMessage="Tiers" />,
+                <FormattedMessage key={2} id="Label.NumberOfContributions" defaultMessage="# of Contributions" />,
                 <FormattedMessage key={3} id="Fields.amount" defaultMessage="Amount" />,
               ]}
-              rows={data?.account?.stats.expensesTags.map((expenseTag, i) =>
-                makeBudgetTableRow(expenseTag.label + expenseTag.count, [
-                  <React.Fragment key={expenseTag.label}>
+              rows={data?.account?.stats.contributionsAmount.map((contribution, i) =>
+                makeBudgetTableRow(contribution.label + contribution.count, [
+                  <React.Fragment key={contribution.label}>
                     <TagMarker color={COLORS[i % COLORS.length]} />
-                    {makeLabel(intl, expenseTag.label)}
+                    {contribution.label}
                   </React.Fragment>,
-                  expenseTag.count,
-                  formatCurrency(expenseTag.amount.valueInCents, expenseTag.amount.currency),
+                  contribution.count,
+                  formatCurrency(contribution.amount.valueInCents, contribution.amount.currency),
                 ]),
               )}
             />
@@ -185,7 +177,7 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
                 options={{
                   ...defaultApexOptions,
                   chart: {
-                    id: 'chart-budget-expenses-time-series',
+                    id: 'chart-budget-contributions-overview',
                   },
                 }}
                 series={alignSeries(series)}
@@ -216,9 +208,7 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
                 width="100%"
                 height="300px"
                 options={{
-                  labels: data?.account?.stats.expensesTags.map(expenseTag =>
-                    capitalize(makeLabel(intl, expenseTag.label)),
-                  ),
+                  labels: data?.account?.stats.contributionsAmount.map(contribution => capitalize(contribution.label)),
                   colors: COLORS,
                   chart: {
                     id: 'chart-budget-expenses-pie',
@@ -227,19 +217,26 @@ const ExpenseBudget = ({ collective, defaultTimeInterval, ...props }) => {
                   xaxis: defaultApexOptions.xaxis,
                   yaxis: defaultApexOptions.yaxis,
                 }}
-                series={data?.account?.stats.expensesTags.map(expenseTag => expenseTag.amount.value)}
+                series={data?.account?.stats.contributionsAmount.map(contribution => contribution.amount.value)}
               />
             </Box>
           )}
         </React.Fragment>
       )}
       <P mt={3} textAlign="right">
-        <Link href={`${getCollectivePageRoute(collective)}/transactions?kind=EXPENSE`} data-cy="view-all-expenses-link">
-          <FormattedMessage id="umVJL7" defaultMessage="View all paid expenses" /> &rarr;
+        <Link
+          href={`${getCollectivePageRoute(collective)}/transactions?kind=ADDED_FUNDS&kind=CONTRIBUTION`}
+          data-cy="view-all-contributions-link"
+        >
+          <FormattedMessage
+            id="CollectivePage.SectionBudget.ViewAllContributions"
+            defaultMessage="View all contributions"
+          />{' '}
+          &rarr;
         </Link>
       </P>
     </Flex>
   );
 };
 
-export default ExpenseBudget;
+export default ContributionsBudget;

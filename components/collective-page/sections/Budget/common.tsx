@@ -1,4 +1,5 @@
 import React from 'react';
+import type { ApexOptions } from 'apexcharts';
 import dayjs from 'dayjs';
 import { styled } from 'styled-components';
 import { margin } from 'styled-system';
@@ -6,7 +7,7 @@ import { margin } from 'styled-system';
 import { formatAmountForLegend } from '../../../../lib/charts';
 
 import { Flex } from '../../../Grid';
-const Table = styled.table`
+const Table = styled.table<{ mt?: number | string }>`
   ${margin}
   thead th {
     font-weight: 500;
@@ -39,7 +40,7 @@ export const makeBudgetTableRow = (key, values) => {
   return values;
 };
 
-export const BudgetTable = ({ headers, rows, truncate, ...props }) => {
+export const BudgetTable = ({ headers, rows, truncate = undefined, ...props }) => {
   if (truncate) {
     rows = rows.slice(0, truncate);
   }
@@ -96,7 +97,7 @@ export const GRAPH_TYPES = {
   PIE: 'PIE',
 };
 
-export const GraphTypeButton = styled.button`
+export const GraphTypeButton = styled.button<{ active?: boolean }>`
   border-radius: 100%;
   height: 32px;
   width: 32px;
@@ -118,7 +119,7 @@ export const GraphTypeButton = styled.button`
       : ''}
 `;
 
-export const makeApexOptions = (currency, timeUnit, intl) => ({
+export const makeApexOptions = (currency, timeUnit, intl): ApexOptions => ({
   legend: {
     show: true,
     horizontalAlign: 'left',
@@ -126,11 +127,11 @@ export const makeApexOptions = (currency, timeUnit, intl) => ({
     fontFamily: 'inherit',
     fontWeight: 500,
     markers: {
-      width: 6,
       height: 24,
       radius: 8,
       offsetY: 0,
-    },
+      width: 6,
+    } as ApexOptions['legend']['markers'],
   },
   colors: COLORS,
   grid: {
@@ -149,7 +150,7 @@ export const makeApexOptions = (currency, timeUnit, intl) => ({
       formatter: function (value) {
         // Show data aggregated yearly
         if (timeUnit === 'YEAR') {
-          return dayjs(value).utc().year();
+          return String(dayjs(value).utc().year());
           // Show data aggregated monthly
         } else if (timeUnit === 'MONTH') {
           return dayjs(value).utc().format('MMM-YYYY');

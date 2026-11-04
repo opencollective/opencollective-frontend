@@ -1,10 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
 import Container from '../../Container';
+import type { ContributorsFilter as ContributorsFilterValue } from '../../ContributorsFilter';
 import * as ContributorsFilter from '../../ContributorsFilter';
 import ContributorsGrid from '../../ContributorsGrid';
 import { H3, P, Span } from '../../Text';
@@ -25,48 +25,48 @@ const MainContainer = styled(Container)`
       rgba(255, 255, 255, 0) calc(100% - 125px),
       rgba(255, 255, 255, 1) 100%
     ),
-    center -900px repeat-y url(${ContributorsGridBackgroundSVG});
+    center -900px repeat-y url(${ContributorsGridBackgroundSVG as string});
 `;
 
-const ExpectedContributorsPropTypes = PropTypes.shape({
-  id: PropTypes.string.isRequired,
-  since: PropTypes.string.isRequired,
-  roles: PropTypes.arrayOf(PropTypes.string.isRequired),
-  isCore: PropTypes.bool.isRequired,
-  isBacker: PropTypes.bool.isRequired,
-  totalAmountDonated: PropTypes.number.isRequired,
-});
+type Contributor = {
+  id: string;
+  since: string;
+  roles?: string[];
+  isCore: boolean;
+  isBacker: boolean;
+  totalAmountDonated: number;
+  type?: string;
+  tiersIds?: number[];
+};
+
+type SectionContributorsProps = {
+  collective?: { id: number; name: string; type: string; currency?: string };
+  stats: { backers?: { all?: number } };
+  coreContributors?: Contributor[];
+  financialContributors?: Contributor[];
+};
 
 /**
  * Section that displays all the contributors to the collective (financial, admins...etc)
  */
-export default class SectionContributors extends React.PureComponent {
-  static propTypes = {
-    collective: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      currency: PropTypes.string.isRequired,
-    }),
-    stats: PropTypes.shape({
-      backers: PropTypes.shape({
-        all: PropTypes.number,
-      }),
-    }).isRequired,
-    coreContributors: PropTypes.arrayOf(ExpectedContributorsPropTypes),
-    financialContributors: PropTypes.arrayOf(ExpectedContributorsPropTypes),
-  };
-
-  constructor(props) {
+export default class SectionContributors extends React.PureComponent<
+  SectionContributorsProps,
+  { filter: ContributorsFilterValue }
+> {
+  constructor(props: SectionContributorsProps) {
     super(props);
     this.state = { filter: ContributorsFilter.CONTRIBUTOR_FILTERS.ALL };
     /* reference to the ContributorsGrid element */
     this.contributorsGridRef = React.createRef();
   }
 
+  contributorsGridRef = React.createRef<{
+    scrollToCell: (options: { columnIndex: number; rowIndex: number }) => void;
+  }>();
+
   static MIN_CONTRIBUTORS_TO_SHOW_FILTERS = 2;
 
-  setFilter = filter => {
+  setFilter = (filter: ContributorsFilterValue) => {
     this.setState({ filter });
 
     // whenever the filter is changed, scroll is set to point to the initial item
@@ -151,7 +151,6 @@ export default class SectionContributors extends React.PureComponent {
               selected={filter}
               onChange={this.setFilter}
               filters={filters}
-              selectedButtonStyle="primary"
               px={Dimensions.PADDING_X}
             />
           </Container>

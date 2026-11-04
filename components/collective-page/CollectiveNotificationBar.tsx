@@ -97,7 +97,9 @@ const messages = defineMessages({
   },
 });
 
-const getNotification = (intl, status, collective, host, LoggedInUser, refetch) => {
+type Notification = React.ComponentProps<typeof NotificationBar>;
+
+const getNotification = (intl, status, collective, host, LoggedInUser, refetch): Notification | null => {
   const numberOfAdmins = collective.parentCollective
     ? collective.parentCollective.coreContributors?.filter(c => c.isAdmin)?.length + collective.admins.length
     : collective.admins.length;

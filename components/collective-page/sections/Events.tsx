@@ -1,6 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
+import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 
 import { sortEvents } from '../../../lib/events';
@@ -18,23 +18,16 @@ import { H3, P } from '../../Text';
 import ContainerSectionContent from '../ContainerSectionContent';
 import ContributeCardsContainer from '../ContributeCardsContainer';
 
-class SectionEvents extends React.PureComponent {
-  static propTypes = {
-    /** Collective */
-    collective: PropTypes.shape({
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      isActive: PropTypes.bool,
-    }).isRequired,
-    events: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        contributors: PropTypes.arrayOf(PropTypes.object),
-      }),
-    ),
-    isAdmin: PropTypes.bool.isRequired,
-  };
+type SectionEventsProps = {
+  /** Collective */
+  collective?: { slug: string; name: string; isActive?: boolean };
+  events?: Array<{ id: number; contributors?: unknown[] }>;
+  isAdmin?: boolean;
+  /** @ignore from injectIntl */
+  intl?: IntlShape;
+};
 
+class SectionEvents extends React.PureComponent<SectionEventsProps> {
   sortEvents = memoizeOne(sortEvents);
 
   getContributeCardsScrollDistance = width => {
