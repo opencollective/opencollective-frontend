@@ -229,4 +229,5 @@ const StyledCollectiveCard = ({
   );
 };
 
-export default injectIntl(StyledCollectiveCard);
+// `injectIntl` expects a component declaring the optional `intl` prop; the component reads it as an implicit prop.
+export default injectIntl(StyledCollectiveCard as React.ComponentType<{ intl?: import('react-intl').IntlShape }>);

@@ -41,7 +41,16 @@ const CustomCheckbox = styled.span`
   }
 `;
 
-const CheckboxContainer = styled.div`
+type CheckboxContainerProps = {
+  alignItems?: string;
+  width?: string;
+  error?: boolean;
+  $checked?: boolean;
+  fontSize?: number | string;
+  size?: number | string;
+};
+
+const CheckboxContainer = styled.div<CheckboxContainerProps>`
   position: relative;
   display: flex;
   align-items: ${props => props.alignItems};
@@ -121,13 +130,46 @@ const CheckboxContainer = styled.div`
         `}
 `;
 
-class StyledCheckbox extends React.Component {
-  constructor(props) {
+type Props = {
+  name?: string;
+  checked?: boolean;
+  defaultChecked?: boolean;
+  onChange?: (event: {
+    name?: string;
+    checked: boolean;
+    type: 'checkbox';
+    target: { name?: string; value: boolean; checked: boolean };
+  }) => void;
+  disabled?: boolean;
+  isLoading?: boolean;
+  loading?: boolean;
+  label?: React.ReactNode;
+  size?: number | string;
+  inputId?: string;
+  width?: string;
+  alignItems?: string;
+  fontSize?: number | string;
+  error?: boolean;
+};
+
+type State = {
+  checked?: boolean;
+};
+
+class StyledCheckbox extends React.Component<Props, State> {
+  static defaultProps = {
+    size: '14px',
+    defaultChecked: false,
+    width: 'auto',
+    alignItems: 'center',
+  };
+
+  constructor(props: Props) {
     super(props);
     this.state = { checked: props.defaultChecked };
   }
 
-  onChange(newValue) {
+  onChange(newValue: boolean) {
     const { name, checked, onChange, disabled, isLoading } = this.props;
 
     if (disabled || isLoading) {
@@ -177,7 +219,7 @@ class StyledCheckbox extends React.Component {
           checked={realChecked}
           disabled={disabled}
           readOnly
-          tabIndex="-1" // Prevents the checkbox from being focused, since we're using the container as the focusable element
+          tabIndex={-1} // Prevents the checkbox from being focused, since we're using the container as the focusable element
         />
         <CustomCheckbox data-cy="custom-checkbox">
           {isLoading ? <Spinner size={size} /> : <IconCheckmark />}
@@ -187,13 +229,6 @@ class StyledCheckbox extends React.Component {
     );
   }
 }
-
-StyledCheckbox.defaultProps = {
-  size: '14px',
-  defaultChecked: false,
-  width: 'auto',
-  alignItems: 'center',
-};
 
 /**
  * @deprecated Use `ui/Checkbox` instead

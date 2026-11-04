@@ -110,10 +110,10 @@ export const Dropdown = styled(({ children, trigger, ...props }) => {
       onBlur={() => setTimeout(closeDropdown, 50)}
       onClick={e => {
         if (isDisplayed) {
-          if (document.activeElement?.contains(e.target)) {
-            document.activeElement.blur();
+          if (document.activeElement?.contains(e.target as Node)) {
+            (document.activeElement as HTMLElement).blur();
           } else {
-            e.target.blur();
+            (e.target as HTMLElement).blur();
           }
         }
       }}

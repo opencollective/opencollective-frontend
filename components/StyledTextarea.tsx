@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { themeGet } from '@styled-system/theme-get';
 import styled, { css } from 'styled-components';
 import { border, color, layout, space, typography } from 'styled-system';
@@ -10,9 +9,44 @@ import { overflow, resize } from '../lib/styled-system-custom-properties';
 import Container from './Container';
 import StyledTag from './StyledTag';
 
+type StyledSystemProps = {
+  m?: number | string;
+  mt?: number | string;
+  mb?: number | string;
+  ml?: number | string;
+  mr?: number | string;
+  mx?: number | string;
+  my?: number | string;
+  p?: number | string;
+  pt?: number | string;
+  pb?: number | string;
+  pl?: number | string;
+  pr?: number | string;
+  px?: number | string;
+  py?: number | string;
+  width?: number | string;
+  height?: number | string;
+  minHeight?: number | string;
+  maxHeight?: number | string;
+  minWidth?: number | string;
+  maxWidth?: number | string;
+  border?: number | string;
+  borderColor?: number | string;
+  borderRadius?: number | string;
+  fontSize?: number | string;
+  color?: string;
+};
+
+type TextAreaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> &
+  StyledSystemProps & {
+    withOutline?: boolean;
+    error?: unknown;
+    resize?: 'vertical' | 'horizontal' | 'both' | 'none';
+  };
+
 const TextArea = styled.textarea.withConfig({
   shouldForwardProp: (prop, target) => defaultShouldForwardProp(prop, target),
-})`
+})<TextAreaProps>`
   outline: none;
 
   /** Size */
@@ -68,31 +102,23 @@ const TextArea = styled.textarea.withConfig({
  *
  * @deprecated Use `ui/Textarea` instead
  */
-export default class StyledTextarea extends React.PureComponent {
-  static propTypes = {
-    onChange: PropTypes.func,
+type Props = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'value' | 'defaultValue'> &
+  StyledSystemProps & {
+    value?: string;
+    defaultValue?: string;
     /** If true, the component will update its size based on its content */
-    autoSize: PropTypes.bool,
-    /** styled-system prop: accepts any css 'border' value */
-    border: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-    /** styled-system prop: accepts any css 'border-color' value */
-    borderColor: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-    /** styled-system prop: accepts any css 'border-radius' value */
-    borderRadius: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+    autoSize?: boolean;
     /** If not provided, the value will be set to `none` if `autoSize` is true, `vertical` otherwise */
-    resize: PropTypes.oneOf(['vertical', 'horizontal', 'both', 'none']),
+    resize?: 'vertical' | 'horizontal' | 'both' | 'none';
     /** If true, max text length will be displayed at the bottom right */
-    showCount: PropTypes.bool,
+    showCount?: boolean;
     /** if true, a default outline will be displayed when focused */
-    withOutline: PropTypes.bool,
+    withOutline?: boolean;
     /** If truthy, the outline will be red */
-    error: PropTypes.any,
-    /** @ignore */
-    px: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
-    /** @ignore */
-    py: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.array]),
+    error?: unknown;
   };
 
+export default class StyledTextarea extends React.PureComponent<Props> {
   static defaultProps = {
     border: '1px solid',
     borderColor: 'black.300',
@@ -102,7 +128,7 @@ export default class StyledTextarea extends React.PureComponent {
     py: 12,
   };
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
     this.textareaRef = React.createRef();
   }
@@ -113,16 +139,18 @@ export default class StyledTextarea extends React.PureComponent {
     }
   }
 
-  _adjustHeight(target) {
+  textareaRef: React.RefObject<HTMLTextAreaElement>;
+
+  _adjustHeight(target: HTMLTextAreaElement) {
     // Reset height to 0 so component will auto-size
-    target.style.height = 0;
+    target.style.height = '0';
     // Use the scroll height to define size
-    const isBorderless = [`0`, '0px'].includes(this.props.border);
+    const isBorderless = [`0`, '0px'].includes(this.props.border as string);
     const borderSpace = isBorderless ? 0 : 2;
     target.style.height = `${target.scrollHeight + borderSpace}px`;
   }
 
-  onChange = e => {
+  onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { onChange, autoSize } = this.props;
 
     if (onChange) {

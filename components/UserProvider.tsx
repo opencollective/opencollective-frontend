@@ -1,9 +1,11 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { withApollo } from '@apollo/client/react/hoc';
 import { decodeJwt } from 'jose';
 import { get, isEqual } from 'lodash-es';
+import type { NextRouter } from 'next/router';
 import Router, { withRouter } from 'next/router';
+import type { IntlShape } from 'react-intl';
 
 import * as auth from '../lib/auth';
 import { createError, ERROR, formatErrorMessage } from '../lib/errors';
@@ -12,12 +14,23 @@ import { loggedInUserQuery } from '../lib/graphql/v1/queries';
 import withLoggedInUser from '../lib/hooks/withLoggedInUser';
 import { getFromLocalStorage, LOCAL_STORAGE_KEYS, removeFromLocalStorage } from '../lib/local-storage';
 import UserClass from '../lib/LoggedInUser';
+import type { TwoFactorAuthContextValue } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 import { withTwoFactorAuthenticationPrompt } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 import injectIntl from '@/lib/injectIntl';
 
 import { toast } from './ui/useToast';
 
-export const UserContext = React.createContext({
+type UserContextValue = {
+  loadingLoggedInUser: boolean;
+  errorLoggedInUser: Error | null;
+  LoggedInUser: UserClass | null;
+  logout: (arg?: { redirect?: string; skipQueryRefetch?: boolean }) => Promise<void>;
+  login: (token?: string) => Promise<UserClass | null>;
+  refetchLoggedInUser: () => Promise<unknown>;
+  updateLoggedInUserFromCache: () => void;
+};
+
+export const UserContext = React.createContext<UserContextValue>({
   loadingLoggedInUser: true,
   errorLoggedInUser: null,
   LoggedInUser: null,
@@ -27,17 +40,28 @@ export const UserContext = React.createContext({
   updateLoggedInUserFromCache: () => {},
 });
 
-class UserProvider extends React.Component {
-  static propTypes = {
-    getLoggedInUser: PropTypes.func.isRequired,
-    twoFactorAuthPrompt: PropTypes.object,
-    router: PropTypes.object,
-    client: PropTypes.object,
-    children: PropTypes.node,
-    intl: PropTypes.object,
-    initialLoggedInUser: PropTypes.object,
-  };
+type Props = {
+  getLoggedInUser: (options?: {
+    token?: string;
+    twoFactorAuthenticatorCode?: string;
+    twoFactorAuthenticationType?: string;
+  }) => Promise<UserClass | null>;
+  getLoggedInUserFromCache: () => UserClass | null;
+  twoFactorAuthPrompt?: TwoFactorAuthContextValue['prompt'];
+  router?: NextRouter;
+  client?: ApolloClient<NormalizedCacheObject>;
+  children?: React.ReactNode;
+  intl?: IntlShape;
+  initialLoggedInUser?: UserClass | null;
+};
 
+type State = {
+  loadingLoggedInUser: boolean;
+  LoggedInUser: UserClass | null;
+  errorLoggedInUser: Error | null;
+};
+
+class UserProvider extends React.Component<Props, State> {
   state = {
     loadingLoggedInUser: this.props.initialLoggedInUser ? false : true,
     LoggedInUser: this.props.initialLoggedInUser,
@@ -76,7 +100,7 @@ class UserProvider extends React.Component {
     }
   };
 
-  logout = async ({ redirect, skipQueryRefetch } = {}) => {
+  logout = async ({ redirect, skipQueryRefetch }: { redirect?: string; skipQueryRefetch?: boolean } = {}) => {
     auth.logout();
 
     this.setState({ LoggedInUser: null, errorLoggedInUser: null });
@@ -98,7 +122,7 @@ class UserProvider extends React.Component {
     }
   };
 
-  login = async token => {
+  login = async (token?: string): Promise<UserClass | null> => {
     const { getLoggedInUser, twoFactorAuthPrompt, intl } = this.props;
 
     try {
@@ -131,7 +155,11 @@ class UserProvider extends React.Component {
         while (true) {
           try {
             const token = getFromLocalStorage(LOCAL_STORAGE_KEYS.TWO_FACTOR_AUTH_TOKEN);
-            const decodedToken = decodeJwt(token);
+            type PromptOptions = Parameters<TwoFactorAuthContextValue['prompt']['open']>[0];
+            const decodedToken = decodeJwt(token) as {
+              supported2FAMethods?: PromptOptions['supportedMethods'];
+              authenticationOptions?: PromptOptions['authenticationOptions'];
+            };
 
             const result = await twoFactorAuthPrompt.open({
               supportedMethods: decodedToken.supported2FAMethods,

@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import type { Placement } from '@popperjs/core';
 import ReactDOM from 'react-dom';
 import { Manager, Popper, Reference } from 'react-popper';
 import { styled } from 'styled-components';
@@ -88,7 +88,14 @@ const Arrow = styled('div')`
   }
 `;
 
-const ChildrenContainer = styled.div`
+type ChildrenContainerProps = {
+  display?: string;
+  verticalAlign?: string;
+  lineHeight?: string;
+  cursor?: string;
+};
+
+const ChildrenContainer = styled.div<ChildrenContainerProps>`
   display: ${props => props.display};
   ${verticalAlign}
   ${cursor}
@@ -124,7 +131,15 @@ const REACT_POPPER_MODIFIERS = [
   },
 ];
 
-const TooltipContent = ({ place, content, onMouseEnter, onMouseLeave, noArrow }) => {
+type TooltipContentProps = {
+  place?: Placement;
+  content?: (() => React.ReactNode) | React.ReactNode;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+  noArrow?: boolean;
+};
+
+const TooltipContent = ({ place, content, onMouseEnter, onMouseLeave, noArrow }: TooltipContentProps) => {
   return ReactDOM.createPortal(
     <Popper placement={place} modifiers={REACT_POPPER_MODIFIERS}>
       {({ ref, style, placement, arrowProps }) => (
@@ -152,32 +167,39 @@ const TooltipContent = ({ place, content, onMouseEnter, onMouseLeave, noArrow })
  *
  * @deprecated Use `ui/Tooltip` instead
  */
-class StyledTooltip extends React.Component {
-  static propTypes = {
-    /** Tooltip place */
-    place: PropTypes.oneOf(['top', 'right', 'bottom', 'left']),
-    /** The popup content */
-    content: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
-    /** If using a node children, this defines the parent display type */
-    display: PropTypes.string,
-    /** Vertical alignment of the container */
-    containerVerticalAlign: PropTypes.string,
-    containerLineHeight: PropTypes.string,
-    containerCursor: PropTypes.string,
-    delayHide: PropTypes.number,
-    /** If true, children will be rendered directly, without any tooltip. Useful to build conditional tooltips */
-    noTooltip: PropTypes.bool,
-    /** If true, the arrow will be hidden */
-    noArrow: PropTypes.bool,
-    /** The component that will be used as a container for the children */
-    childrenContainer: PropTypes.any,
-    /** The trigger. Either:
-     *  - A render func, that gets passed props to set on the trigger
-     *  - A React node, rendered inside an div
-     */
-    children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
-  };
+type StyledTooltipProps = {
+  /** Tooltip place */
+  place?: Placement;
+  /** The popup content */
+  content?: (() => React.ReactNode) | React.ReactNode;
+  /** If using a node children, this defines the parent display type */
+  display?: string;
+  /** Vertical alignment of the container */
+  containerVerticalAlign?: string;
+  containerLineHeight?: string;
+  containerCursor?: string;
+  delayHide?: number;
+  /** If true, children will be rendered directly, without any tooltip. Useful to build conditional tooltips */
+  noTooltip?: boolean;
+  /** If true, the arrow will be hidden */
+  noArrow?: boolean;
+  /** The component that will be used as a container for the children */
+  childrenContainer?: React.ElementType;
+  /** The trigger. Either:
+   *  - A render func, that gets passed props to set on the trigger
+   *  - A React node, rendered inside an div
+   */
+  children?:
+    ((args: { ref: unknown; onMouseEnter: () => void; onMouseLeave: () => void }) => React.ReactNode) | React.ReactNode;
+};
 
+type StyledTooltipState = {
+  id: string | null;
+  isHovered: boolean;
+  showPopup: boolean;
+};
+
+class StyledTooltip extends React.Component<StyledTooltipProps, StyledTooltipState> {
   static defaultProps = {
     type: 'dark',
     place: 'top',
@@ -192,7 +214,7 @@ class StyledTooltip extends React.Component {
     this.setState({ id: `tooltip-${uuid()}` });
   }
 
-  componentDidUpdate(_, oldState) {
+  componentDidUpdate(_prevProps: StyledTooltipProps, oldState: StyledTooltipState) {
     if (!oldState.isHovered && this.state.isHovered) {
       if (this.closeTimeout) {
         clearTimeout(this.closeTimeout);
@@ -205,6 +227,8 @@ class StyledTooltip extends React.Component {
     }
   }
 
+  closeTimeout: ReturnType<typeof setTimeout> | null;
+
   onMouseEnter = () => {
     this.setState({ isHovered: true });
   };
@@ -213,7 +237,7 @@ class StyledTooltip extends React.Component {
     this.setState({ isHovered: false });
   };
 
-  renderChildren(ref) {
+  renderChildren(ref?: unknown) {
     return typeof this.props.children === 'function' ? (
       this.props.children({
         ref: ref,
