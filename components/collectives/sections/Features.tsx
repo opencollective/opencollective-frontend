@@ -12,7 +12,7 @@ import StyledLink from '../../StyledLink';
 import { H4, P, Span } from '../../Text';
 import NextIllustration from '../HomeNextIllustration';
 
-const SelectFeatureButton = styled.button`
+const SelectFeatureButton = styled.button<{ active?: boolean }>`
   width: 100%;
   cursor: pointer;
   color: #1869f5;
@@ -177,7 +177,7 @@ const FeatureTitle = ({ id, intl, activeFeature, ...props }) => {
         </Box>
         <Span
           color={['black.800', 'black.900']}
-          active={id === activeFeature}
+          {...({ active: id === activeFeature } as Record<string, unknown>)}
           fontWeight="500"
           textAlign={['center', 'left']}
           fontSize={['20px', '16px', null, null, '18px']}
@@ -196,8 +196,8 @@ const FeatureDescription = ({ intl, id, learnMoreLink, ...props }) => (
     <P
       fontSize={['16px', null, null, null, '18px']}
       lineHeight={['24px', null, null, null, '27px']}
-      color={['black.600', 'black.700']}
-      letterSpacing={['-0.04px', '-0.16px']}
+      {...({ color: ['black.600', 'black.700'] } as Record<string, unknown>)}
+      {...({ letterSpacing: ['-0.04px', '-0.16px'] } as Record<string, unknown>)}
       textAlign={['center', 'left']}
     >
       {intl.formatMessage(messages[`home.feature.${id}.description`])}{' '}
@@ -221,7 +221,12 @@ const FeatureDescription = ({ intl, id, learnMoreLink, ...props }) => (
 const Feature = ({ id, learnMoreLink, intl }) => (
   <Container width={1} display="flex" mr={2} flexDirection="column">
     <FeatureTitle intl={intl} id={id} activeFeature={id} display={[null, 'none']} />
-    <Container mb={[2, 3, 5]} ml={[null, null, 4]} width={[null, null, '400px', null, '624px']} textAlign="left">
+    <Container
+      mb={[2, 3, 5]}
+      ml={[null, null, 4]}
+      {...({ width: [null, null, '400px', null, '624px'] } as Record<string, unknown>)}
+      textAlign="left"
+    >
       <H4
         fontSize="24px"
         display={['none', 'block']}
@@ -234,7 +239,7 @@ const Feature = ({ id, learnMoreLink, intl }) => (
       </H4>
       <FeatureDescription learnMoreLink={learnMoreLink} intl={intl} id={id} display={['none', 'block']} />
     </Container>
-    <Container width={[null, '392px', '466px', null, '756px']}>
+    <Container {...({ width: [null, '392px', '466px', null, '756px'] } as Record<string, unknown>)}>
       <NextIllustration
         loading="eager"
         width={756}
@@ -273,7 +278,7 @@ const Features = ({ sectionTitle, sectionSubtitle }) => {
           {features.map(feature => (
             <FeatureList ml={[null, 4, null, 6]} mr={[null, null, null, null, 2]} as="li" key={feature.id}>
               <SelectFeatureButton
-                width={1}
+                {...({ width: 1 } as Record<string, unknown>)}
                 onClick={() => setActiveFeature(feature)}
                 active={activeFeature.id === feature.id}
               >
@@ -282,7 +287,7 @@ const Features = ({ sectionTitle, sectionSubtitle }) => {
             </FeatureList>
           ))}
         </FeatureListWrapper>
-        <StyledCarousel display={[null, 'none']} width={1}>
+        <StyledCarousel {...({ display: [null, 'none'], width: 1 } as Record<string, unknown>)}>
           {features.map(feature => (
             <Fragment key={feature.id}>
               <Feature id={feature.id} learnMoreLink={feature.learnMoreLink} intl={intl} />

@@ -3,7 +3,7 @@ import { display, space } from 'styled-system';
 
 import { rotateMixin } from '../../lib/constants/animations';
 
-const Illustration = styled.img`
+const Illustration = styled.img<{ animate?: boolean }>`
   max-width: 100%;
   max-height: 100%;
   ${space}

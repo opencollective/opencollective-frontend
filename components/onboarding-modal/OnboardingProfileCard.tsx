@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -11,13 +10,13 @@ import StyledTooltip from '../StyledTooltip';
 
 const Admin = styled(StyledTag).attrs({ variant: 'rounded-right' })``;
 
-class OnboardingProfileCard extends React.Component {
-  static propTypes = {
-    collective: PropTypes.object,
-    removeAdmin: PropTypes.func,
-    isPending: PropTypes.bool,
-  };
+type OnboardingProfileCardProps = {
+  collective: { id?: number | string; name?: string; imageUrl?: string; slug?: string; type?: string };
+  removeAdmin?: (collective: OnboardingProfileCardProps['collective']) => void;
+  isPending?: boolean;
+};
 
+class OnboardingProfileCard extends React.Component<OnboardingProfileCardProps> {
   render() {
     const { collective, removeAdmin, isPending } = this.props;
     const { name } = collective;

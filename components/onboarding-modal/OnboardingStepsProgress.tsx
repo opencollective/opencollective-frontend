@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
+import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
@@ -25,14 +25,14 @@ const params = {
   2: 'contact-info',
 };
 
-class OnboardingStepsProgress extends React.Component {
-  static propTypes = {
-    step: PropTypes.number,
-    mode: PropTypes.string,
-    slug: PropTypes.string,
-    router: PropTypes.object,
-  };
+type OnboardingStepsProgressProps = {
+  step: number;
+  mode?: string;
+  slug?: string;
+  router: Router;
+};
 
+class OnboardingStepsProgress extends React.Component<OnboardingStepsProgressProps> {
   render() {
     const { slug, mode } = this.props;
 

@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { omit, pick } from 'lodash-es';
+import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
+import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 
 import { i18nGraphqlException } from '../../lib/errors';
@@ -17,17 +18,41 @@ import { withUser } from '../UserProvider';
 import CategoryPicker from './CategoryPicker';
 import Form from './Form';
 
-class CreateFund extends Component {
-  static propTypes = {
-    host: PropTypes.object,
-    intl: PropTypes.object,
-    LoggedInUser: PropTypes.object, // from withUser
-    refetchLoggedInUser: PropTypes.func.isRequired, // from withUser
-    router: PropTypes.object.isRequired, // from withRouter
-    createFund: PropTypes.func.isRequired, // addCreateFundMutation
-  };
+type CreateFundFormValues = {
+  name: string;
+  description: string;
+  slug: string;
+};
 
-  constructor(props) {
+type CreateFundHost = {
+  slug: string;
+  name: string;
+  termsUrl: string;
+};
+
+type CreateFundProps = {
+  host?: CreateFundHost;
+  /** @ignore from injectIntl */
+  intl?: IntlShape;
+  /** from withUser */
+  LoggedInUser?: Record<string, unknown>;
+  /** from withUser */
+  refetchLoggedInUser?: () => Promise<unknown>;
+  /** from withRouter */
+  router: Router;
+  /** addCreateFundMutation */
+  createFund?: (options: {
+    variables: { fund: Partial<CreateFundFormValues>; host: Partial<CreateFundHost> };
+  }) => Promise<{ data: { createFund: { slug: string } } }>;
+};
+
+type CreateFundState = {
+  error: string | null;
+  creating: boolean;
+};
+
+class CreateFund extends Component<CreateFundProps, CreateFundState> {
+  constructor(props: CreateFundProps) {
     super(props);
 
     this.state = {
@@ -38,7 +63,7 @@ class CreateFund extends Component {
     this.createFund = this.createFund.bind(this);
   }
 
-  getHost() {
+  getHost(): CreateFundHost {
     if (this.props.router.query.category === 'opensource') {
       return {
         slug: 'opensource',
@@ -63,7 +88,7 @@ class CreateFund extends Component {
     }
   }
 
-  async createFund(fund) {
+  async createFund(fund: CreateFundFormValues) {
     const host = this.getHost();
 
     // set state to loading

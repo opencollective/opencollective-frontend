@@ -20,7 +20,13 @@ const deletePersonalTokenMutation = gql`
   }
 `;
 
-const DeletePersonalTokenModal = ({ personalToken, onDelete, ...props }) => {
+type DeletePersonalTokenModalProps = {
+  personalToken: { id: number | string; name?: string };
+  onDelete: (personalToken: { id: number | string; name?: string }) => unknown;
+  onClose: () => void;
+};
+
+const DeletePersonalTokenModal = ({ personalToken, onDelete, ...props }: DeletePersonalTokenModalProps) => {
   const { toast } = useToast();
   const intl = useIntl();
   const [deleteToken] = useMutation(deletePersonalTokenMutation, {

@@ -65,7 +65,8 @@ const ProcessOrderButtons = ({ order, permissions, onSuccess }) => {
     }
   };
 
-  const getButtonProps = action => {
+  // `data-cy` is not part of `ButtonProps`
+  const getButtonProps = (action: string): Record<string, unknown> => {
     const isSelectedAction = selectedAction === action;
     return {
       'data-cy': `${action}-button`,

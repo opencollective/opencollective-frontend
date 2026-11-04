@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { gql } from '@apollo/client';
 import { themeGet } from '@styled-system/theme-get';
+import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
@@ -42,7 +42,7 @@ const generateBackground = (theme, image) => {
 };
 
 /** The blured background image displayed under the tier description */
-const TierCover = styled.div`
+const TierCover = styled.div<{ backgroundImage?: string }>`
   width: 100%;
   height: ${Dimensions.COVER_HEIGHT}px;
   background: ${props => generateBackground(props.theme, props.backgroundImage)};
@@ -54,8 +54,9 @@ const TierCover = styled.div`
 `;
 
 /** The little bubbles displayed above the tier's description */
+// `*.svg` is declared as `unknown` (see `lib/custom_typings/images.d.ts`)
 const Bubbles = styled.div`
-  background: url(${BubblesSVG}) no-repeat;
+  background: url(${BubblesSVG as string}) no-repeat;
   height: 112px;
   background-size: 75% auto;
   background-position-x: right;
@@ -101,65 +102,70 @@ const editTierMutation = gql`
   }
 `;
 
+type TierPageCollective = {
+  id: number;
+  slug: string;
+  name: string;
+  currency?: string;
+  type?: string;
+  image?: string;
+  backgroundImage?: string;
+  features: Record<string, string>;
+};
+
+type TierPageTier = {
+  id: number;
+  idV2: string;
+  name: string;
+  type: string;
+  slug: string;
+  interval?: (typeof INTERVALS)[keyof typeof INTERVALS];
+  currency?: string;
+  endsAt?: string;
+  button?: string;
+  goal?: number;
+  description?: string;
+  longDescription?: string;
+  videoUrl?: string;
+  stats?: {
+    totalRecurringDonations?: number;
+    totalDonated?: number;
+  };
+};
+
+type TierPageProps = {
+  /** The collective the tier belongs to */
+  collective: TierPageCollective;
+  /** The actual tier */
+  tier: TierPageTier;
+  /** The contributors for this tier */
+  contributors?: Array<{
+    id: number | string;
+    roles?: string[];
+    isCore?: boolean;
+    isBacker?: boolean;
+    isAdmin?: boolean;
+  }>;
+  /** Some statistics about this tier */
+  contributorsStats: {
+    all: number;
+    collectives: number;
+    organizations: number;
+    users: number;
+  };
+  redirect?: string;
+  /** The logged in user */
+  LoggedInUser?: { isAdminOfCollective: (collective: { slug?: string }) => boolean };
+  /** @ignore from `withRouter` */
+  router: Router;
+};
+
 /**
  * This is the tier page main layout.
  *
  * See design: https://www.figma.com/file/e71tBo0Sr8J7R5n6iMkqI42d/OC.COM-07-%2F-Collectives?node-id=2587%3A39809
  */
-class TierPage extends Component {
-  static propTypes = {
-    /** The collective the tier belongs to */
-    collective: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      slug: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      currency: PropTypes.string,
-      type: PropTypes.string.isRequired,
-      image: PropTypes.string,
-      backgroundImage: PropTypes.string,
-    }).isRequired,
-
-    /** The actual tier */
-    tier: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      idV2: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      slug: PropTypes.string.isRequired,
-      interval: PropTypes.string,
-      currency: PropTypes.string,
-      endsAt: PropTypes.string,
-      button: PropTypes.string,
-      goal: PropTypes.number,
-      description: PropTypes.string,
-      longDescription: PropTypes.string,
-      videoUrl: PropTypes.string,
-      stats: PropTypes.shape({
-        totalRecurringDonations: PropTypes.number,
-        totalDonated: PropTypes.number,
-      }),
-    }).isRequired,
-
-    /** The contributors for this tier */
-    contributors: PropTypes.arrayOf(PropTypes.object),
-
-    /** Some statistics about this tier */
-    contributorsStats: PropTypes.shape({
-      all: PropTypes.number.isRequired,
-      collectives: PropTypes.number.isRequired,
-      organizations: PropTypes.number.isRequired,
-      users: PropTypes.number.isRequired,
-    }).isRequired,
-
-    redirect: PropTypes.string,
-
-    /** The logged in user */
-    LoggedInUser: PropTypes.object,
-
-    /** @ignore from `withRouter` */
-    router: PropTypes.object,
-  };
-
+class TierPage extends Component<TierPageProps> {
   renderShareBlock() {
     const pageUrl = `${getWebsiteUrl()}${this.props.router.asPath}`;
     return (
@@ -293,7 +299,8 @@ class TierPage extends Component {
             </Container>
 
             {/** ---- Contribute desktop ---- */}
-            <Hide xs sm md flex="0 1 416px" position="relative" pt={112}>
+            {/* `position` is applied by `Hide`'s styled-system functions but missing from its props type */}
+            <Hide {...({ position: 'relative' } as Record<string, unknown>)} xs sm md flex="0 1 416px" pt={112}>
               <Container width="100%" position="sticky" top={80} pb={32}>
                 <Container
                   width={1}
@@ -327,7 +334,7 @@ class TierPage extends Component {
                       )}
                       {tier.goal && (
                         <Box mt={1} mb={2}>
-                          <StyledProgressBar percentage={amountRaised / tier.goal} height="8px" />
+                          <StyledProgressBar percentage={amountRaised / tier.goal} height={8} />
                         </Box>
                       )}
                       {amountRaised > 0 && (
@@ -400,7 +407,7 @@ class TierPage extends Component {
                           >
                             <StyledButton
                               buttonStyle="primary"
-                              buttonSize={['small', 'medium']}
+                              {...({ buttonSize: ['small', 'medium'] } as Record<string, unknown>)}
                               width={1}
                               minWidth={128}
                               data-cy="ContributeBtn"
@@ -434,8 +441,9 @@ class TierPage extends Component {
           </Flex>
         </Flex>
         {contributors && contributors.length > 0 && (
+          // `collectiveName` is not a prop of `TierContributors` (dead prop, see PLAN.md findings)
           <TierContributors
-            collectiveName={collective.name}
+            {...({ collectiveName: collective.name } as Record<string, unknown>)}
             contributors={contributors}
             contributorsStats={contributorsStats}
             currency={tier.currency || collective.currency}
@@ -451,7 +459,7 @@ class TierPage extends Component {
           flexDirection="row"
           justifyContent={tier.goal || amountRaised ? 'space-between' : 'center'}
           background="white"
-          height={[72, null, 82]}
+          {...({ height: [72, null, 82] } as Record<string, unknown>)}
           zIndex={9}
           flex="0 1 385px"
           p={['0 16px', '0 24px', null]}
@@ -499,8 +507,9 @@ class TierPage extends Component {
                     defaultMessage="{amountWithInterval} raised"
                     values={{
                       amountWithInterval: (
+                        // `color` is not a prop of `FormattedMoneyAmount` (dead prop, see PLAN.md findings)
                         <FormattedMoneyAmount
-                          color="black.700"
+                          {...({ color: 'black.700' } as Record<string, unknown>)}
                           amount={amountRaised}
                           currency={tier.currency}
                           interval={tier.interval !== INTERVALS.flexible ? tier.interval : null}
@@ -548,7 +557,7 @@ class TierPage extends Component {
                   >
                     <StyledButton
                       buttonStyle="primary"
-                      buttonSize={['small', 'medium']}
+                      {...({ buttonSize: ['small', 'medium'] } as Record<string, unknown>)}
                       width={1}
                       my={4}
                       minWidth={128}

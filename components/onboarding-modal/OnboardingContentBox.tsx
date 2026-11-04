@@ -1,7 +1,8 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
+import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 
+import type { SocialLink } from '../../lib/graphql/types/v2/graphql';
 import injectIntl from '@/lib/injectIntl';
 
 import CollectivePickerAsync from '../../components/CollectivePickerAsync';
@@ -15,23 +16,40 @@ import { H1, P } from '../Text';
 import OnboardingProfileCard from './OnboardingProfileCard';
 import OnboardingSkipButton from './OnboardingSkipButton';
 
-class OnboardingContentBox extends React.Component {
-  static propTypes = {
-    slug: PropTypes.string,
-    step: PropTypes.number,
-    collective: PropTypes.object,
-    memberInvitations: PropTypes.object,
-    LoggedInUser: PropTypes.object,
-    updateAdmins: PropTypes.func,
-    intl: PropTypes.object.isRequired,
-    values: PropTypes.object,
-    errors: PropTypes.object,
-    touched: PropTypes.object,
-    setFieldValue: PropTypes.func,
-    setFieldTouched: PropTypes.func,
-  };
+type OnboardingAdmin = {
+  id?: number;
+  role: string;
+  member: { id: number; name?: string; imageUrl?: string; slug?: string };
+};
 
-  constructor(props) {
+type OnboardingContentBoxProps = {
+  slug?: string;
+  step: number;
+  collective: { id: number; name?: string };
+  memberInvitations?: Array<{
+    role?: string;
+    memberAccount: { id: number; name?: string; imageUrl?: string; slug?: string };
+  }>;
+  LoggedInUser: {
+    collective: OnboardingAdmin['member'];
+    memberOf: Array<{ id: number; role?: string; collective: { id: number } }>;
+  };
+  updateAdmins?: (admins: OnboardingAdmin[]) => void;
+  /** @ignore from injectIntl */
+  intl?: IntlShape;
+  values?: { socialLinks?: SocialLink[] };
+  errors?: { socialLinks?: string };
+  touched?: { socialLinks?: boolean };
+  setFieldValue?: (field: string, value: unknown) => void;
+  setFieldTouched?: (field: string, isTouched?: boolean) => void;
+};
+
+type OnboardingContentBoxState = {
+  admins: OnboardingAdmin[];
+};
+
+class OnboardingContentBox extends React.Component<OnboardingContentBoxProps, OnboardingContentBoxState> {
+  constructor(props: OnboardingContentBoxProps) {
     super(props);
 
     this.state = {
@@ -46,7 +64,7 @@ class OnboardingContentBox extends React.Component {
     });
   }
 
-  removeAdmin = collective => {
+  removeAdmin = (collective: { id: number }) => {
     const filteredAdmins = this.state.admins.filter(admin => admin.member.id !== collective.id);
     this.setState(
       {
@@ -61,7 +79,12 @@ class OnboardingContentBox extends React.Component {
     const { admins } = this.state;
 
     return (
-      <Container display="flex" flexDirection="column" width={['90%', '80%']} alignItems="center">
+      <Container
+        {...({ width: ['90%', '80%'] } as React.ComponentProps<typeof Container>)}
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+      >
         {step === 0 && (
           <Flex flexDirection="column" alignItems="center" maxWidth="336px">
             <H1

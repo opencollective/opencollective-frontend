@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 import OrderBudgetItem from '../budget/OrderBudgetItem';
 import StyledCard from '../StyledCard';
 
-const OrderContainer = styled.div`
+const OrderContainer = styled.div<{ isFirst?: boolean }>`
   ${props =>
     !props.isFirst &&
     css`
@@ -12,7 +12,23 @@ const OrderContainer = styled.div`
     `}
 `;
 
-const OrdersList = ({ orders, isLoading, nbPlaceholders = 10, showPlatformTip, showAmountSign, host }) => {
+type OrdersListProps = {
+  orders?: Array<{ id?: number | string; status?: string } & Record<string, unknown>>;
+  isLoading?: boolean;
+  nbPlaceholders?: number;
+  showPlatformTip?: boolean;
+  showAmountSign?: boolean;
+  host?: Record<string, unknown>;
+};
+
+const OrdersList = ({
+  orders,
+  isLoading,
+  nbPlaceholders = 10,
+  showPlatformTip,
+  showAmountSign,
+  host,
+}: OrdersListProps) => {
   orders = !isLoading ? orders : [...new Array(nbPlaceholders)];
   if (!orders?.length) {
     return null;

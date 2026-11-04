@@ -57,12 +57,22 @@ const ContactUsSuccess = () => (
     </Box>
     <Flex mt="32px" flexDirection="column" alignItems="center">
       <StyledLink href="https://discord.opencollective.com/" openInNewTab>
-        <Wrapper color="black.900" className="linkWrapper" my={[3, null, 4]} width={['288px', '520px']}>
+        <Wrapper
+          color="black.900"
+          className="linkWrapper"
+          my={[3, null, 4]}
+          {...({ width: ['288px', '520px'] } as Record<string, unknown>)}
+        >
           <Box width={['184px', 1]}>
             <H3 fontSize="24px" textAlign="left" lineHeight="32px" letterSpacing="-0.008em" mb={2} color="black.800">
               <FormattedMessage id="helpAndSupport.joinCommunity" defaultMessage="Join our Discord community" />
             </H3>
-            <P fontSize="15px" color="black.700" lineHeight="22px" textDecoration="underline">
+            <P
+              fontSize="15px"
+              color="black.700"
+              lineHeight="22px"
+              {...({ textDecoration: 'underline' } as Record<string, unknown>)}
+            >
               https://discord.opencollective.com
             </P>
           </Box>
@@ -73,12 +83,22 @@ const ContactUsSuccess = () => (
       </StyledLink>
 
       <StyledLink href="https://github.com/opencollective" openInNewTab>
-        <Wrapper color="black.900" className="linkWrapper" my={[3, null, 4]} width={['288px', '520px']}>
+        <Wrapper
+          color="black.900"
+          className="linkWrapper"
+          my={[3, null, 4]}
+          {...({ width: ['288px', '520px'] } as Record<string, unknown>)}
+        >
           <Box width={['184px', 1]}>
             <H3 fontSize="24px" textAlign="left" lineHeight="32px" letterSpacing="-0.008em" mb={2} color="black.800">
               <FormattedMessage id="helpAndSupport.bugs" defaultMessage="Bugs & feature requests" />
             </H3>
-            <P fontSize="15px" color="black.700" lineHeight="22px" textDecoration="underline">
+            <P
+              fontSize="15px"
+              color="black.700"
+              lineHeight="22px"
+              {...({ textDecoration: 'underline' } as Record<string, unknown>)}
+            >
               https://github.com/opencollective
             </P>
           </Box>
@@ -88,7 +108,11 @@ const ContactUsSuccess = () => (
         </Wrapper>
       </StyledLink>
 
-      <Wrapper color="black.900" width={['288px', '520px']} className="newsletterWrapper">
+      <Wrapper
+        color="black.900"
+        {...({ width: ['288px', '520px'] } as Record<string, unknown>)}
+        className="newsletterWrapper"
+      >
         <Container>
           <H3 fontSize="24px" textAlign="left" lineHeight="32px" letterSpacing="-0.008em" mb={2} color="black.800">
             <FormattedMessage id="home.joinUsSection.newsletter" defaultMessage="Subscribe to our newsletter" />

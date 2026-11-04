@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
+import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
 
@@ -26,18 +26,19 @@ const params = {
   },
 };
 
-class OnboardingNavButtons extends React.Component {
-  static propTypes = {
-    step: PropTypes.number,
-    slug: PropTypes.string,
-    mode: PropTypes.string,
-    loading: PropTypes.bool,
-    viewport: PropTypes.object,
-    handleSubmit: PropTypes.func,
-    router: PropTypes.object,
-  };
+type OnboardingNavButtonsProps = {
+  step: number;
+  slug?: string;
+  mode?: string;
+  loading?: boolean;
+  /** Injected by `withViewport` */
+  viewport?: VIEWPORTS;
+  handleSubmit?: () => void;
+  router: Router;
+};
 
-  getStepParams = (step, param) => {
+class OnboardingNavButtons extends React.Component<OnboardingNavButtonsProps> {
+  getStepParams = (step: number, param: 'disabled' | 'routerStepBack' | 'routerStepForward') => {
     return params[step][param];
   };
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { omitBy } from 'lodash-es';
+import type { NextRouter } from 'next/router';
 import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
@@ -118,11 +119,11 @@ const accountOrdersQuery = gql`
 
 const ORDERS_PER_PAGE = 15;
 
-const isValidStatus = status => {
+const isValidStatus = (status: string) => {
   return Boolean(ORDER_STATUS[status]);
 };
 
-const getVariablesFromQuery = (query, forcedStatus) => {
+const getVariablesFromQuery = (query: Record<string, string>, forcedStatus?: string) => {
   const amountRange = parseAmountRange(query.amount);
   const { from: dateFrom, to: dateTo } = parseDateInterval(query.period);
   const searchTerm = query.searchTerm || null;
@@ -145,7 +146,7 @@ const messages = defineMessages({
   },
 });
 
-const hasParams = query => {
+const hasParams = (query: Record<string, string>) => {
   return Object.entries(query).some(([key, value]) => {
     return (
       ![
@@ -164,18 +165,34 @@ const hasParams = query => {
 
 const ROUTE_PARAMS = ['hostCollectiveSlug', 'collectiveSlug', 'view', 'slug', 'section'];
 
-const updateQuery = (router, newParams) => {
+const updateQuery = (router: NextRouter, newParams: Record<string, unknown>) => {
   const query = omitBy({ ...router.query, ...newParams }, (value, key) => !value || ROUTE_PARAMS.includes(key));
   const pathname = router.asPath.split('?')[0];
-  return router.push({ pathname, query });
+  return router.push({ pathname, query: query as Record<string, string> });
 };
 
-const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreatePendingOrder }) => {
-  const router = useRouter() || { query: {} };
+type OrdersWithDataProps = {
+  accountSlug?: string;
+  title?: React.ReactNode;
+  status?: string;
+  showPlatformTip?: boolean;
+  canCreatePendingOrder?: boolean;
+};
+
+const OrdersWithData = ({
+  accountSlug,
+  title,
+  status,
+  showPlatformTip,
+  canCreatePendingOrder,
+}: OrdersWithDataProps) => {
+  const router = useRouter() || ({ query: {} } as NextRouter);
+  // Route params are read as single string values throughout this component
+  const query = router.query as Record<string, string>;
   const intl = useIntl();
-  const hasFilters = React.useMemo(() => hasParams(router.query), [router.query]);
+  const hasFilters = React.useMemo(() => hasParams(query), [query]);
   const [showCreatePendingOrderModal, setShowCreatePendingOrderModal] = React.useState(false);
-  const queryVariables = { accountSlug, ...getVariablesFromQuery(router.query, status) };
+  const queryVariables = { accountSlug, ...getVariablesFromQuery(query, status) };
   const queryParams = { variables: queryVariables };
   const { data, error, loading, variables, refetch } = useQuery(accountOrdersQuery, queryParams);
 
@@ -199,7 +216,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
         <div className="w-[276px]">
           <SearchBar
             height="40px"
-            defaultValue={router.query.searchTerm}
+            defaultValue={query.searchTerm}
             onSubmit={searchTerm => updateQuery(router, { searchTerm, offset: null })}
             placeholder={intl.formatMessage(messages.searchPlaceholder)}
           />
@@ -211,7 +228,7 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
           {data?.account ? (
             <OrdersFilters
               currency={data.account.currency}
-              filters={router.query}
+              filters={query}
               onChange={queryParams => updateQuery(router, { ...queryParams, offset: null })}
               hasStatus={!status}
             />
@@ -234,9 +251,13 @@ const OrdersWithData = ({ accountSlug, title, status, showPlatformTip, canCreate
               &nbsp;+
             </StyledButton>
             {showCreatePendingOrderModal && (
+              // This modal requires `open`/`setOpen`; `OrdersWithData` never passed them, so it never opens
+              // (see PLAN.md findings). `open={false}` matches the previous `undefined`; the unused `onClose`
+              // prop is dropped.
               <CreatePendingOrderModal
+                open={false}
+                setOpen={() => undefined}
                 hostSlug={data.account.slug}
-                onClose={() => setShowCreatePendingOrderModal(false)}
                 onSuccess={() => refetch()}
               />
             )}

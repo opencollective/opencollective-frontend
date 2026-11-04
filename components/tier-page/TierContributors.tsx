@@ -1,47 +1,57 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
 
-import ContributorsFilter, { filterContributors, getContributorsFilters } from '../ContributorsFilter';
+import ContributorsFilter, {
+  CONTRIBUTOR_FILTERS,
+  filterContributors,
+  getContributorsFilters,
+} from '../ContributorsFilter';
 import ContributorsGrid from '../ContributorsGrid';
 import { Box } from '../Grid';
 import { H2, P } from '../Text';
 
 const CONTENT_WIDTH = 1440;
 
-export default class TierContributors extends React.Component {
-  static propTypes = {
-    /** Contributors */
-    contributors: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        roles: PropTypes.arrayOf(PropTypes.string.isRequired),
-        isCore: PropTypes.bool.isRequired,
-        isBacker: PropTypes.bool.isRequired,
-      }),
-    ),
-    /** Some statistics about this tier */
-    contributorsStats: PropTypes.shape({
-      all: PropTypes.number.isRequired,
-      collectives: PropTypes.number.isRequired,
-      organizations: PropTypes.number.isRequired,
-      users: PropTypes.number.isRequired,
-    }).isRequired,
-    /** Currency for contributions */
-    currency: PropTypes.string.isRequired,
-    // Collective id
-    collectiveId: PropTypes.number,
-  };
+type TierContributor = {
+  id: number | string;
+  roles?: string[];
+  isCore?: boolean;
+  isBacker?: boolean;
+  isAdmin?: boolean;
+};
 
-  constructor(props) {
+type ContributorFilter = (typeof CONTRIBUTOR_FILTERS)[keyof typeof CONTRIBUTOR_FILTERS];
+
+type TierContributorsProps = {
+  /** Contributors */
+  contributors: TierContributor[];
+  /** Some statistics about this tier */
+  contributorsStats: {
+    all: number;
+    collectives: number;
+    organizations: number;
+    users: number;
+  };
+  /** Currency for contributions */
+  currency: string;
+  // Collective id
+  collectiveId?: number;
+};
+
+type TierContributorsState = {
+  filter: ContributorFilter | null;
+};
+
+export default class TierContributors extends React.Component<TierContributorsProps, TierContributorsState> {
+  constructor(props: TierContributorsProps) {
     super(props);
     this.state = { filter: null };
   }
 
   static MIN_CONTRIBUTORS_TO_SHOW_FILTERS = 2;
 
-  setFilter = filter => {
+  setFilter = (filter: ContributorFilter) => {
     this.setState({ filter });
   };
 

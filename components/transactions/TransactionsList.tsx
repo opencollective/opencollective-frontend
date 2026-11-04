@@ -5,7 +5,7 @@ import StyledCard from '../StyledCard';
 
 import TransactionItem from './TransactionItem';
 
-const Container = styled.div`
+const Container = styled.div<{ isFirst?: boolean }>`
   ${props =>
     !props.isFirst &&
     css`

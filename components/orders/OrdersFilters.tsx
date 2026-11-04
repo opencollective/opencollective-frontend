@@ -3,6 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { encodeDateInterval } from '../../lib/date-utils';
+import type { Currency } from '../../lib/graphql/types/v2/graphql';
 
 import AmountFilter from '../budget/filters/AmountFilter';
 import PeriodFilter from '../filters/PeriodFilter';
@@ -27,8 +28,15 @@ const FilterLabel = styled.label`
   color: #9d9fa3;
 `;
 
-const OrdersFilters = ({ currency, filters, hasStatus, onChange }) => {
-  const getFilterProps = (name, valueModifier) => ({
+type OrdersFiltersProps = {
+  currency?: Currency;
+  filters?: Record<string, string>;
+  hasStatus?: boolean;
+  onChange: (filters: Record<string, string>) => void;
+};
+
+const OrdersFilters = ({ currency, filters, hasStatus, onChange }: OrdersFiltersProps) => {
+  const getFilterProps = (name: string, valueModifier?: (value: unknown) => unknown) => ({
     inputId: `orders-filter-${name}`,
     value: filters?.[name],
     onChange: value => {

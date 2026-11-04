@@ -29,7 +29,10 @@ const HowCanWeHelp = () => {
         ml={[null, null, null, null, '34px']}
       >
         <Box mb={[3, '24px']} width={['288px', '576px', '685px']}>
-          <MainTitle textAlign={['center', null, null, null, 'left']} whiteSpace={[null, null, 'pre-line']}>
+          <MainTitle
+            textAlign={['center', null, null, null, 'left']}
+            {...({ whiteSpace: [null, null, 'pre-line'] } as Record<string, unknown>)}
+          >
             <FormattedMessage id="helpAndSupport.title" defaultMessage="Hi, How can we help?" />
           </MainTitle>
         </Box>

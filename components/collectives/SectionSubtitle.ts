@@ -1,14 +1,17 @@
 import { styled } from 'styled-components';
+import type { ColorProps, SpaceProps, TypographyProps } from 'styled-system';
 import { color, display, space, typography } from 'styled-system';
 
-const SectionTitle = styled.p.attrs(props => ({
+type SectionTitleProps = TypographyProps & SpaceProps & ColorProps;
+
+const SectionTitle = styled.p.attrs<SectionTitleProps>(props => ({
   fontSize: props.fontSize ?? '16px',
   fontWeight: props.fontWeight ?? 700,
   lineHeight: props.lineHeight ?? '24px',
   color: props.color ?? 'black.700',
   mb: props.mb ?? 3,
   mt: props.mt ?? 0,
-}))`
+}))<SectionTitleProps>`
   word-break: break-word;
   letter-spacing: -0.016px;
   ${color}

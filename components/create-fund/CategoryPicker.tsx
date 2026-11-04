@@ -53,7 +53,7 @@ const CreateFundCategoryPicker = () => {
             <Container
               borderTop={['1px solid #E6E8EB', 'none']}
               alignItems="center"
-              width={[null, 280, 312]}
+              {...({ width: [null, 280, 312] } as Record<string, unknown>)}
               mb={[4, 0]}
             >
               <Flex flexDirection="column" justifyContent="center" alignItems="center">
@@ -82,7 +82,7 @@ const CreateFundCategoryPicker = () => {
               borderLeft={['none', '1px solid #E6E8EB']}
               borderTop={['1px solid #E6E8EB', 'none']}
               alignItems="center"
-              width={[null, 280, 312]}
+              {...({ width: [null, 280, 312] } as Record<string, unknown>)}
               mb={[4, 0]}
             >
               <Flex flexDirection="column" justifyContent="center" alignItems="center">

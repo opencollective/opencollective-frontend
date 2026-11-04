@@ -10,7 +10,11 @@ import StyledButton from '../StyledButton';
 import StyledInput from '../StyledInput';
 import { Span } from '../Text';
 
-const Newsletter = ({ defaultEmail }) => {
+type NewsletterProps = {
+  defaultEmail?: string;
+};
+
+const Newsletter = ({ defaultEmail }: NewsletterProps) => {
   const { LoggedInUser } = useLoggedInUser();
   return (
     <Container>
@@ -23,14 +27,14 @@ const Newsletter = ({ defaultEmail }) => {
           target="_blank"
         >
           <Container
-            borderRadius={10}
+            borderRadius="10px"
             border="1px solid #9D9FA3"
             bg="white.full"
             display="flex"
             justifyContent="space-between"
             alignItems="center"
             overflow="hidden"
-            width={[1, null, '400px']}
+            {...({ width: [1, null, '400px'] } as Record<string, unknown>)}
             pl={3}
           >
             <Span color="#5F617D">
@@ -59,7 +63,7 @@ const Newsletter = ({ defaultEmail }) => {
               borderRadius="0 10px 10px 0"
               border="none"
               borderLeft="1px solid #9D9FA3"
-              outline="none"
+              {...({ outline: 'none' } as Record<string, unknown>)}
             >
               <FormattedMessage id="newsletter.subscribe" defaultMessage="Subscribe" />
             </StyledButton>

@@ -25,6 +25,16 @@ import StyledInputField from '../StyledInputField';
 import StyledInputGroup from '../StyledInputGroup';
 import { P, Span } from '../Text';
 
+type ContactFormValues = {
+  name: string;
+  email: string;
+  topic: string | string[];
+  message: string;
+  link: string;
+  captcha: string | null;
+  relatedCollectives: string[];
+};
+
 const ContactForm = () => {
   const intl = useIntl();
   const router = useRouter();
@@ -43,8 +53,8 @@ const ContactForm = () => {
       captcha: null,
       relatedCollectives: [],
     },
-    validate: values => {
-      const errors = {};
+    validate: (values: ContactFormValues) => {
+      const errors: Record<string, { type: string }> = {};
       const { name, topic, email, message, link, captcha } = values;
 
       if (!name?.length) {
@@ -75,7 +85,7 @@ const ContactForm = () => {
 
       return errors;
     },
-    onSubmit: values => {
+    onSubmit: (values: ContactFormValues) => {
       setIsSubmitting(true);
       if (values.relatedCollectives.length === 0 && LoggedInUser) {
         setFieldValue(
@@ -309,7 +319,7 @@ const ContactForm = () => {
             >
               <StyledButton
                 type="submit"
-                width={['288px', '151px']}
+                {...({ width: ['288px', '151px'] } as Record<string, unknown>)}
                 buttonSize="medium"
                 buttonStyle="marketing"
                 mb={['24px', 0]}

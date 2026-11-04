@@ -178,7 +178,7 @@ const SearchTopics = () => {
                 <Container
                   display="flex"
                   justifyContent={'center'}
-                  align="center"
+                  {...({ align: 'center' } as Record<string, unknown>)}
                   py={'16px'}
                   backgroundColor={searchQuery && 'red.100'}
                 >

@@ -10,7 +10,7 @@ import { H3, P } from '../Text';
 
 const WeAreHereIfYouWantToTalk = () => (
   <Flex flexDirection="column" px={3} alignItems="center" my="58px">
-    <Box textAlign="center" mb="40px" width={['256px', '660px', '768px']}>
+    <Box textAlign="center" mb="40px" {...({ width: ['256px', '660px', '768px'] } as Record<string, unknown>)}>
       <SectionTitle mb={3}>
         <FormattedMessage id="helpAndSupport.weAreHere" defaultMessage="We’re here if you want to talk!" />
       </SectionTitle>
@@ -25,7 +25,7 @@ const WeAreHereIfYouWantToTalk = () => (
         openInNewTab
         mb={['40px', 0]}
         textAlign="center"
-        width={['288px', '296px']}
+        {...({ width: ['288px', '296px'] } as Record<string, unknown>)}
       >
         <H3 fontSize="24px" lineHeight="32px" color="black.800" letterSpacing="-0.008em" mb="6px">
           <FormattedMessage id="helpAndSupport.joinCommunity" defaultMessage="Join our Discord community" />
@@ -43,7 +43,7 @@ const WeAreHereIfYouWantToTalk = () => (
         padding={['16px', 0]}
         openInNewTab
         textAlign="center"
-        width={['288px', '296px']}
+        {...({ width: ['288px', '296px'] } as Record<string, unknown>)}
       >
         <H3 fontSize="24px" lineHeight="32px" color="black.800" letterSpacing="-0.008em">
           <FormattedMessage id="helpAndSupport.bugs" defaultMessage="Bugs & feature requests" />

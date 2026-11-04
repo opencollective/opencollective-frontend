@@ -1,15 +1,17 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { Form, Formik } from 'formik';
 import { map, omit } from 'lodash-es';
+import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
+import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { confettiFireworks } from '../../lib/confettis';
 import { getErrorFromGraphqlException } from '../../lib/errors';
 import { API_V1_CONTEXT, gql } from '../../lib/graphql/helpers';
+import type { SocialLink, SocialLinkInput } from '../../lib/graphql/types/v2/graphql';
 import { editCollectiveContactMutation, editCollectiveMembersMutation } from '../../lib/graphql/v1/mutations';
 import { compose, isValidUrl } from '../../lib/utils';
 
@@ -104,22 +106,67 @@ const params = {
   },
 };
 
-class OnboardingModal extends React.Component {
-  static propTypes = {
-    step: PropTypes.string,
-    mode: PropTypes.string,
-    collective: PropTypes.object,
-    LoggedInUser: PropTypes.object,
-    editCollectiveMembers: PropTypes.func,
-    editCollectiveContact: PropTypes.func,
-    showOnboardingModal: PropTypes.bool,
-    data: PropTypes.object,
-    setShowOnboardingModal: PropTypes.func,
-    intl: PropTypes.object.isRequired,
-    router: PropTypes.object,
-  };
+const messages = defineMessages({
+  websiteError: { id: 'onboarding.error.website', defaultMessage: 'Please enter a valid URL.' },
+});
 
-  constructor(props) {
+type OnboardingCollective = {
+  id: number;
+  slug: string;
+  name?: string;
+  socialLinks?: SocialLink[];
+};
+
+type OnboardingMember = {
+  id: number;
+  role?: string;
+  member: { id: number; name?: string; imageUrl?: string; slug?: string };
+};
+
+type OnboardingMemberInvitation = {
+  id: number;
+  role?: string;
+  memberAccount: { id: number; name?: string; imageUrl?: string; slug?: string };
+};
+
+type OnboardingFormValues = {
+  socialLinks?: SocialLinkInput[];
+};
+
+type OnboardingModalProps = {
+  step?: string;
+  mode?: string;
+  collective: OnboardingCollective;
+  LoggedInUser?: {
+    collective: OnboardingMember['member'];
+    memberOf?: Array<{ id: number; role?: string; collective: { id: number } }>;
+  };
+  editCollectiveMembers?: (options: {
+    variables: {
+      collectiveId: number;
+      members: Array<{ id: number; role?: string; member: OnboardingMember['member'] }>;
+    };
+  }) => Promise<unknown>;
+  editCollectiveContact?: (options: {
+    variables: { collective: OnboardingFormValues & { id: number } };
+  }) => Promise<unknown>;
+  showOnboardingModal?: boolean;
+  data?: { memberInvitations?: OnboardingMemberInvitation[] };
+  setShowOnboardingModal?: (show: boolean) => void;
+  /** @ignore from injectIntl */
+  intl?: IntlShape;
+  router: Router;
+};
+
+type OnboardingModalState = {
+  step: number;
+  members: OnboardingMember[];
+  error: Error | null;
+  isSubmitting?: boolean;
+};
+
+class OnboardingModal extends React.Component<OnboardingModalProps, OnboardingModalState> {
+  constructor(props: OnboardingModalProps) {
     super(props);
 
     this.state = {
@@ -127,23 +174,19 @@ class OnboardingModal extends React.Component {
       members: [],
       error: null,
     };
-
-    this.messages = defineMessages({
-      websiteError: { id: 'onboarding.error.website', defaultMessage: 'Please enter a valid URL.' },
-    });
   }
 
   componentDidMount() {
     this.setStep(this.props.step);
   }
 
-  componentDidUpdate(oldProps) {
+  componentDidUpdate(oldProps: OnboardingModalProps) {
     if (oldProps.step !== this.props.step) {
       this.setStep(this.props.step);
     }
   }
 
-  setStep = queryStep => {
+  setStep = (queryStep?: string) => {
     if (queryStep === undefined) {
       this.setState({ step: 0 });
     } else if (queryStep === 'administrators') {
@@ -155,7 +198,7 @@ class OnboardingModal extends React.Component {
     }
   };
 
-  updateAdmins = members => {
+  updateAdmins = (members: OnboardingMember[]) => {
     this.setState({ members });
   };
 
@@ -181,7 +224,7 @@ class OnboardingModal extends React.Component {
     }
   };
 
-  submitContact = async values => {
+  submitContact = async (values: OnboardingFormValues) => {
     const collective = {
       ...values,
       id: this.props.collective.id,
@@ -195,7 +238,7 @@ class OnboardingModal extends React.Component {
     }
   };
 
-  submitCollectiveInfo = async values => {
+  submitCollectiveInfo = async (values: OnboardingFormValues) => {
     try {
       await this.submitContact(values);
       await this.submitAdmins();
@@ -207,7 +250,7 @@ class OnboardingModal extends React.Component {
     }
   };
 
-  getStepParams = (step, param) => {
+  getStepParams = (step: number, param: 'height' | 'src') => {
     return params[step][param];
   };
 
@@ -216,13 +259,13 @@ class OnboardingModal extends React.Component {
     this.props.router.push(`/${this.props.collective.slug}`);
   };
 
-  validateFormik = values => {
-    const errors = {};
+  validateFormik = (values: OnboardingFormValues) => {
+    const errors: { socialLinks?: string } = {};
 
     const isValidSocialLinks = values.socialLinks?.filter(l => !isValidUrl(l.url))?.length === 0;
 
     if (!isValidSocialLinks) {
-      errors.socialLinks = this.props.intl.formatMessage(this.messages.websiteError);
+      errors.socialLinks = this.props.intl.formatMessage(messages.websiteError);
     }
 
     return errors;
@@ -237,7 +280,12 @@ class OnboardingModal extends React.Component {
         {step === 3 ? (
           <React.Fragment>
             {showOnboardingModal && (
-              <ModalWithImage usePortal={false} width="576px" minHeight="456px" onClose={this.onClose}>
+              // `usePortal`/`minHeight` are legacy props that `StyledModal` no longer declares (see PLAN.md findings)
+              <ModalWithImage
+                {...({ usePortal: false, minHeight: '456px' } as Record<string, unknown>)}
+                width="576px"
+                onClose={this.onClose}
+              >
                 <ModalBody>
                   <Flex flexDirection="column" alignItems="center">
                     <Container display="flex" flexDirection="column" alignItems="center">
@@ -283,14 +331,20 @@ class OnboardingModal extends React.Component {
         ) : (
           <React.Fragment>
             {showOnboardingModal && (
-              <ResponsiveModal usePortal={false} width="576px" minHeight="456px" onClose={this.onClose} trapFocus>
+              // `usePortal`/`minHeight`/`trapFocus` are legacy props that `StyledModal` no longer declares (see PLAN.md)
+              <ResponsiveModal
+                {...({ usePortal: false, minHeight: '456px', trapFocus: true } as Record<string, unknown>)}
+                width="576px"
+                onClose={this.onClose}
+              >
                 <ResponsiveModalHeader onClose={this.onClose}>
                   <Flex flexDirection="column" alignItems="center" width="100%">
                     <StepsProgressBox ml={[0, '15px']} mb={[3, null, 4]} width={[1.0, 0.8]}>
+                      {/* `handleStep` is not a prop of `OnboardingStepsProgress` (dead prop, see PLAN.md findings) */}
                       <OnboardingStepsProgress
+                        {...({ handleStep: (step: number) => this.setState({ step }) } as Record<string, unknown>)}
                         step={step}
                         mode={mode}
-                        handleStep={step => this.setState({ step })}
                         slug={collective.slug}
                       />
                     </StepsProgressBox>
@@ -389,7 +443,7 @@ const addMemberInvitationQuery = graphql(
     }
   `,
   {
-    options: props => ({
+    options: (props: { collective: { slug?: string } }) => ({
       variables: { slug: props.collective.slug },
     }),
   },

@@ -46,7 +46,7 @@ const DetailDescription = styled.div`
   letter-spacing: -0.04px;
 `;
 
-const DetailsContainer = styled(Flex)`
+const DetailsContainer = styled(Flex)<{ isCompact?: boolean }>`
   background: #f7f8fa;
   font-size: 12px;
   padding: 16px 24px;
@@ -133,7 +133,7 @@ const TransactionDetails = ({ displayActions, transaction }) => {
               paymentProcessorFee,
               netAmount,
               isCredit,
-              isRefunded,
+              // TODO: `renderDetailsString` does not accept `isRefunded` (see PLAN.md findings)
               hasOrder,
               toAccount,
               fromAccount,
@@ -299,7 +299,11 @@ const TransactionDetails = ({ displayActions, transaction }) => {
                     <FormattedMessage id="PaidWith" defaultMessage="Paid With" />
                   </DetailTitle>
                   <DetailDescription>
-                    <PaymentMethodTypeWithIcon type={paymentMethod.type} fontSize={11} iconSize={16} />
+                    <PaymentMethodTypeWithIcon
+                      type={paymentMethod.type}
+                      {...({ fontSize: 11 } as Record<string, unknown>)}
+                      iconSize={16}
+                    />
                   </DetailDescription>
                 </Box>
               )}

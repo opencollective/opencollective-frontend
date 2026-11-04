@@ -19,7 +19,7 @@ module.exports = {
         'components/MembershipsWithData.tsx',
         'components/MembersWithData.tsx',
         'components/SignInOrJoinFree.tsx',
-        'components/tier-page/graphql/queries.js',
+        'components/tier-page/graphql/queries.ts',
         'lib/graphql/v1/fragments.ts',
         'lib/graphql/v1/mutations.ts',
         'lib/graphql/v1/queries.ts',

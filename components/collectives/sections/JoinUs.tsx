@@ -10,7 +10,7 @@ import { H1, H3, P } from '../../Text';
 import Newsletter from '../Newsletter';
 import SectionSubtitle from '../SectionSubtitle';
 
-const JoinUsWrapper = styled(Container)`
+const JoinUsWrapper = styled(Container)<{ page?: string }>`
   background: ${props =>
     props.page && props.page === 'becomeAHost'
       ? `url('/static/images/home/joinus-green-bg-sm.png')`
@@ -65,14 +65,20 @@ const Wrapper = styled(Container)`
   }
 `;
 
-const JoinUsActionContainer = ({ title, description, link }) => {
+type JoinUsActionContainerProps = {
+  title: React.ReactNode;
+  description: React.ReactNode;
+  link: string;
+};
+
+const JoinUsActionContainer = ({ title, description, link }: JoinUsActionContainerProps) => {
   return (
     <Link href={link}>
       <Wrapper
         color="black.900"
         className="linkWrapper"
         my={[1, 3, 4]}
-        width={['288px', '436px', '569px', null, '594px']}
+        {...({ width: ['288px', '436px', '569px', null, '594px'] } as Record<string, unknown>)}
       >
         <Box width={['192px', 1]}>
           <H3
@@ -98,7 +104,11 @@ const JoinUsActionContainer = ({ title, description, link }) => {
   );
 };
 
-const JoinUs = ({ page = undefined }) => (
+type JoinUsProps = {
+  page?: string;
+};
+
+const JoinUs = ({ page = undefined }: JoinUsProps) => (
   <JoinUsWrapper py={[5, null, null, 4]} width={1} page={page}>
     <Flex
       mx={[3, 4]}
@@ -124,7 +134,7 @@ const JoinUs = ({ page = undefined }) => (
             fontSize={['20px', null, null, '24px']}
             lineHeight={['28px', null, null, '32px']}
             letterSpacing={['-0.6px', null, null, '-0.8px']}
-            color={['black.800', null, null, 'black.900']}
+            {...({ color: ['black.800', null, null, 'black.900'] } as Record<string, unknown>)}
             textAlign={['center', null, 'left']}
           >
             {page === 'becomeAHost' ? (
@@ -164,7 +174,11 @@ const JoinUs = ({ page = undefined }) => (
             />
           }
         />
-        <Wrapper color="black.900" width={['288px', '436px', '569px', null, '594px']} className="newsletterWrapper">
+        <Wrapper
+          color="black.900"
+          {...({ width: ['288px', '436px', '569px', null, '594px'] } as Record<string, unknown>)}
+          className="newsletterWrapper"
+        >
           <Container>
             <H3
               fontSize={['24px', null, '32px']}

@@ -1,7 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Field, Form, Formik } from 'formik';
+import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
+import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
@@ -63,18 +64,25 @@ const messages = defineMessages({
   },
 });
 
-class CreateFundForm extends React.Component {
-  static propTypes = {
-    error: PropTypes.string,
-    host: PropTypes.object,
-    loading: PropTypes.bool,
-    onSubmit: PropTypes.func,
-    intl: PropTypes.object.isRequired,
-    onChange: PropTypes.func,
-    github: PropTypes.object,
-    router: PropTypes.object.isRequired,
-  };
+type CreateFundFormValues = {
+  name: string;
+  description: string;
+  slug: string;
+};
 
+type CreateFundFormProps = {
+  error?: string;
+  host?: { faqUrl?: string; name?: string; termsUrl?: string };
+  loading?: boolean;
+  onSubmit?: (values: CreateFundFormValues) => void;
+  /** @ignore from injectIntl */
+  intl?: IntlShape;
+  onChange?: () => void;
+  github?: Record<string, unknown>;
+  router: Router;
+};
+
+class CreateFundForm extends React.Component<CreateFundFormProps> {
   render() {
     const { intl, error, host, loading } = this.props;
 
@@ -84,8 +92,8 @@ class CreateFundForm extends React.Component {
       slug: '',
     };
 
-    const validate = values => {
-      const errors = {};
+    const validate = (values: CreateFundFormValues) => {
+      const errors: Record<string, string> = {};
 
       if (values.name.length > 50) {
         errors.name = intl.formatMessage(messages.errorName);
@@ -102,7 +110,7 @@ class CreateFundForm extends React.Component {
       return errors;
     };
 
-    const submit = values => {
+    const submit = (values: CreateFundFormValues) => {
       const { description, name, slug } = values;
       this.props.onSubmit({ name, description, slug });
     };
@@ -148,9 +156,9 @@ class CreateFundForm extends React.Component {
         <Flex alignItems="center" justifyContent="center">
           <ContainerWithImage
             mb={[1, 5]}
-            width={[320, 512, 576]}
-            border={['none', '1px solid #E6E8EB']}
-            borderRadius={['none', '8px']}
+            {...({ width: [320, 512, 576] } as Record<string, unknown>)}
+            {...({ border: ['none', '1px solid #E6E8EB'] } as Record<string, unknown>)}
+            {...({ borderRadius: ['none', '8px'] } as Record<string, unknown>)}
             px={[1, 4]}
           >
             <Formik validate={validate} initialValues={initialValues} onSubmit={submit} validateOnChange={true}>
@@ -268,7 +276,7 @@ class CreateFundForm extends React.Component {
                         buttonStyle="primary"
                         type="submit"
                         loading={loading}
-                        onSubmit={handleSubmit}
+                        {...({ onSubmit: handleSubmit } as Record<string, unknown>)}
                         data-cy="ccf-form-submit"
                       >
                         <FormattedMessage id="createFund.button" defaultMessage="Create Fund" />
@@ -280,10 +288,11 @@ class CreateFundForm extends React.Component {
             </Formik>
             <Flex justifyContent="center" mb={4} display={['flex', 'none']}>
               <NextIllustration
-                display={['block', 'none']}
+                {...({ display: ['block', 'none'] } as Record<string, unknown>)}
                 src="/static/images/create-collective/mobileForm.png"
                 width={320}
                 height={200}
+                alt={undefined}
               />
             </Flex>
           </ContainerWithImage>
