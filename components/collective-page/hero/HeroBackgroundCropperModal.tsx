@@ -38,6 +38,8 @@ import {
 
 const KEY_IMG_REMOVE = '__REMOVE__';
 
+type UploadedImage = (File & { preview: string }) | typeof KEY_IMG_REMOVE;
+
 const EmptyDropzoneContainer = styled.div`
   border: 2px dashed #c3c6cb;
   cursor: pointer;
@@ -67,18 +69,18 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
   const { toast } = useToast();
   const [editBackground] = useMutation(editCollectiveBackgroundMutation, { context: API_V1_CONTEXT });
   const containerSize = useElementSize({ defaultWidth: 600 });
-  const [mediaSize, setMediaSize] = React.useState();
+  const [mediaSize, setMediaSize] = React.useState<{ width: number; height: number }>();
   const [crop, onCropChange] = React.useState(getCrop(collective));
   const [zoom, onZoomChange] = React.useState(getZoom(collective));
   const [isAlignedRight, setAlignedRight] = React.useState(getAlignedRight(collective));
-  const [uploadedImage, setUploadedImage] = React.useState();
+  const [uploadedImage, setUploadedImage] = React.useState<UploadedImage>();
   const scale = containerSize.width / BASE_HERO_WIDTH;
   const transform = scale ? `scale(${scale})` : undefined;
   const minZoom = 0.25;
   const maxZoom = 5;
   const hasImage = Boolean(collective.backgroundImage ? uploadedImage !== KEY_IMG_REMOVE : uploadedImage);
 
-  const onDrop = ([file]) => {
+  const onDrop = ([file]: File[]) => {
     onZoomChange(1);
     onCropChange(DEFAULT_BACKGROUND_CROP);
     setAlignedRight(true);
@@ -142,7 +144,11 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                           isEditing={hasImage}
                         >
                           <Cropper
-                            image={uploadedImage ? uploadedImage.preview : collective.backgroundImageUrl}
+                            image={
+                              typeof uploadedImage === 'string'
+                                ? undefined
+                                : uploadedImage?.preview || collective.backgroundImageUrl
+                            }
                             cropSize={{ width: BASE_HERO_WIDTH, height: BASE_HERO_HEIGHT }}
                             crop={crop}
                             zoom={zoom}
@@ -156,7 +162,6 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                               setMediaSize({ width: mediaSize.naturalWidth, height: mediaSize.naturalHeight })
                             }
                             style={{
-                              imageStyle: { minHeight: '0', minWidth: '0', maxHeight: 'none', maxWidth: 'none' },
                               containerStyle: { cursor: 'move' },
                             }}
                           />
@@ -182,7 +187,7 @@ const HeroBackgroundCropperModal = ({ onClose, collective }) => {
                       max={maxZoom}
                       value={zoom}
                       step="0.01"
-                      onChange={e => onZoomChange(e.target.value)}
+                      onChange={e => onZoomChange(Number(e.target.value))}
                       mx={2}
                       width="200px"
                       disabled={!hasImage}

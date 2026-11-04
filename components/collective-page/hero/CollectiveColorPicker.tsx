@@ -42,14 +42,14 @@ const PRESET_COLORS = [
 ];
 
 /** Ensure the color is formatted like #123456 */
-const validateColor = value => isHexColor(value) && value.length === 7;
+const validateColor = (value: string): boolean => isHexColor(value) && value.length === 7;
 
 const CollectiveColorPicker = ({ collective, onChange, onClose, theme }) => {
   const color = theme.colors.primary.base || theme.colors.primary[500];
   const [textValue, setTextValue] = React.useState(color.replace('#', ''));
   const [showError, setShowError] = React.useState(false);
   const hasError = !validateColor(`#${textValue}`);
-  const dispatchValue = v => {
+  const dispatchValue = (v: string) => {
     setTextValue(v.replace('#', ''));
     onChange(v);
   };

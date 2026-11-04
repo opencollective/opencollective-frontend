@@ -22,7 +22,7 @@ export const totalCollectiveContributionsQuery = gqlV1 /* GraphQL */ `
   }
 `;
 
-export const getTotalCollectiveContributionsQueryVariables = slug => {
+export const getTotalCollectiveContributionsQueryVariables = (slug: string): { slug: string } => {
   return { slug };
 };
 

@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { Clock } from '@styled-icons/feather/Clock';
 import { MapPin } from '@styled-icons/feather/MapPin';
 import { FormattedDate, FormattedMessage, FormattedTime } from 'react-intl';
@@ -17,7 +16,10 @@ import TruncatedTextWithTooltip from '../../TruncatedTextWithTooltip';
 
 import HeroNote from './HeroNote';
 
-const FormattedDateProps = (value, timeZone) => ({
+const FormattedDateProps = (
+  value: string,
+  timeZone: string,
+): { value: string; weekday: 'long'; day: 'numeric'; month: 'long'; year: 'numeric'; timeZone: string } => ({
   value,
   weekday: 'long',
   day: 'numeric',
@@ -26,12 +28,19 @@ const FormattedDateProps = (value, timeZone) => ({
   timeZone,
 });
 
-const FormattedTimeProps = (value, timeZone) => ({
+const FormattedTimeProps = (value: string, timeZone: string): { value: string; timeZone: string } => ({
   value,
   timeZone,
 });
 
-const Timerange = ({ startsAt, endsAt, timezone, isSameDay }) => {
+type TimerangeProps = {
+  startsAt?: string;
+  endsAt?: string;
+  timezone: string;
+  isSameDay?: boolean;
+};
+
+const Timerange = ({ startsAt, endsAt, timezone, isSameDay }: TimerangeProps) => {
   return (
     <Fragment>
       <FormattedDate {...FormattedDateProps(startsAt, timezone)} />
@@ -52,29 +61,22 @@ const Timerange = ({ startsAt, endsAt, timezone, isSameDay }) => {
   );
 };
 
-Timerange.propTypes = {
-  startsAt: PropTypes.string,
-  endsAt: PropTypes.string,
-  timezone: PropTypes.string.isRequired,
-  isSameDay: PropTypes.bool,
+type HeroEventDetailsProps = {
+  host?: { id: number; name: string };
+  displayedConnectedAccount?: { collective: { id: number; name: string; slug: string } };
+  collective: {
+    id: number;
+    startsAt?: string;
+    endsAt?: string;
+    timezone?: string;
+    location?: { name?: string };
+    parentCollective?: { id: number; name: string; slug: string };
+    isApproved?: boolean;
+    isHost?: boolean;
+  };
 };
 
-class HeroEventDetails extends React.Component {
-  static propTypes = {
-    host: PropTypes.object,
-    displayedConnectedAccount: PropTypes.object,
-    collective: PropTypes.shape({
-      id: PropTypes.number,
-      startsAt: PropTypes.string,
-      endsAt: PropTypes.string,
-      timezone: PropTypes.string.isRequired,
-      location: PropTypes.object,
-      parentCollective: PropTypes.object,
-      isApproved: PropTypes.bool,
-      isHost: PropTypes.bool,
-    }).isRequired,
-  };
-
+class HeroEventDetails extends React.Component<HeroEventDetailsProps> {
   isNotLocalTimeZone() {
     if (this.props.collective.timezone) {
       const eventTimezone = dayjs().tz(this.props.collective.timezone).format('Z');
@@ -118,7 +120,7 @@ class HeroEventDetails extends React.Component {
                   )}
                 >
                   {props => (
-                    <div {...props}>
+                    <div {...(props as React.ComponentPropsWithRef<'div'>)}>
                       <Timerange
                         startsAt={startsAt}
                         endsAt={endsAt}
@@ -166,7 +168,7 @@ class HeroEventDetails extends React.Component {
             </span>
           </HeroNote>
         )}
-        <Flex alignItemt>
+        <Flex>
           {host && collective.isApproved && host.id !== collective.id && !collective.isHost && (
             <Container mr={1} color="black.700" my={2}>
               <FormattedMessage

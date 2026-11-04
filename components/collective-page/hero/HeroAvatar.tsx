@@ -27,6 +27,8 @@ import { useToast } from '../../ui/useToast';
 
 const AVATAR_SIZE = 128;
 
+type UploadedImage = File & { preview: string };
+
 // Dynamically import components for admins
 const DropzoneLoadingPlaceholder = () => (
   <LoadingPlaceholder height={AVATAR_SIZE} width={AVATAR_SIZE} color="primary.500" borderRadius="25%" />
@@ -36,7 +38,7 @@ const ReactDropzone = dynamic(() => import(/* webpackChunkName: 'react-dropzone'
   ssr: false,
 });
 
-const EditOverlay = styled.div`
+const EditOverlay = styled.div<{ borderRadius?: string }>`
   position: absolute;
   width: 128px;
   height: 128px;
@@ -51,7 +53,7 @@ const EditOverlay = styled.div`
   border-radius: ${props => props.borderRadius};
 `;
 
-const EditableAvatarContainer = styled.div`
+const EditableAvatarContainer = styled.div<{ isDragActive?: boolean }>`
   position: relative;
   width: 128px;
 
@@ -64,7 +66,7 @@ const EditableAvatarContainer = styled.div`
     `}
 `;
 
-const EditingAvatarContainer = styled.div`
+const EditingAvatarContainer = styled.div<{ borderRadius?: string }>`
   width: 128px;
   height: 128px;
   border: 2px dashed lightgrey;
@@ -89,23 +91,23 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
   const [editing, setEditing] = React.useState(false);
   const [showModal, setshowModal] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
-  const [uploadedImage, setUploadedImage] = React.useState(null);
+  const [uploadedImage, setUploadedImage] = React.useState<UploadedImage>(null);
   const borderRadius = getAvatarBorderRadius(collective.type);
   const [editImage] = useMutation(editCollectiveAvatarMutation, { context: API_V1_CONTEXT });
   const { toast, dismissToasts } = useToast();
 
-  const onDropImage = async ([image]) => {
+  const onDropImage = async ([image]: File[]) => {
     if (image) {
-      Object.assign(image, { preview: URL.createObjectURL(image) });
-      const isValid = await validateImage(image);
+      const uploadedImage = Object.assign(image, { preview: URL.createObjectURL(image) });
+      const isValid = await validateImage(uploadedImage);
       if (isValid) {
-        setUploadedImage(image);
+        setUploadedImage(uploadedImage);
         setEditing(true);
       }
     }
   };
 
-  const validateImage = image => {
+  const validateImage = (image: UploadedImage) => {
     return new Promise(resolve => {
       const img = new Image();
       img.onload = () => {
@@ -114,8 +116,8 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
           !inRange(img.height, ...AVATAR_HEIGHT_RANGE) ||
           image.size >= 5000000
         ) {
-          toast({
-            variant: 'error',
+          const uploadErrorToast = {
+            variant: 'error' as const,
             __isAvatarUploadError: true, // Flag to allow for easy removal of toast when a valid image is uploaded
             message: intl.formatMessage(
               {
@@ -129,12 +131,13 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
                 maxFileSize: '5MB',
               },
             ),
-          });
+          };
+          toast(uploadErrorToast);
 
           resolve(false);
         } else {
           resolve(true);
-          dismissToasts(toast => Boolean(toast.__isAvatarUploadError));
+          dismissToasts(toast => '__isAvatarUploadError' in toast && Boolean(toast.__isAvatarUploadError));
         }
       };
       img.src = image.preview;
@@ -147,14 +150,7 @@ const HeroAvatar = ({ collective, isAdmin, intl }) => {
     const imgType = isIndividualAccount(collective) ? 'AVATAR' : 'LOGO';
     return (
       <Fragment>
-        <ReactDropzone
-          style={{}}
-          multiple={false}
-          accept={DROPZONE_ACCEPT_IMAGES}
-          disabled={submitting}
-          inputProps={{ style: { width: 1 } }}
-          onDrop={onDropImage}
-        >
+        <ReactDropzone multiple={false} accept={DROPZONE_ACCEPT_IMAGES} disabled={submitting} onDrop={onDropImage}>
           {({ isDragActive, isDragAccept, getRootProps, getInputProps }) => (
             <div {...getRootProps()}>
               <input data-cy="heroAvatarDropzone" {...getInputProps()} />

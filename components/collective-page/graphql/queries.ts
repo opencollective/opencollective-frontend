@@ -221,7 +221,9 @@ export const collectivePageQuery = gqlV1 /* GraphQL */ `
   ${fragments.contributeCardProjectFieldsFragment}
 `;
 
-export const getCollectivePageQueryVariables = slug => {
+export const getCollectivePageQueryVariables = (
+  slug: string,
+): { slug: string; nbContributorsPerContributeCard: number } => {
   return {
     slug: slug,
     nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,

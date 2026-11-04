@@ -7,7 +7,12 @@ import HeroBackgroundMask from '../../../public/static/images/collective-page/He
 export const BASE_HERO_WIDTH = 1368;
 export const BASE_HERO_HEIGHT = 325;
 
-const generateBackground = theme => {
+type HeroBackgroundCollective = {
+  settings?: Record<string, unknown>;
+  backgroundImageUrl?: string;
+};
+
+const generateBackground = (theme: { colors: { primary: Record<string, string> } }) => {
   const color = theme.colors.primary[300];
   const gradient = `linear-gradient(10deg, ${theme.colors.primary[800]}, ${theme.colors.primary[300]})`;
   return `${gradient}, ${color}`;
@@ -15,7 +20,11 @@ const generateBackground = theme => {
 
 const BackgroundImage = styled.img.attrs({ alt: '' })``;
 
-export const StyledHeroBackground = styled.div`
+export const StyledHeroBackground = styled.div<{
+  isEditing?: boolean;
+  isAlignedRight?: boolean;
+  backgroundImage?: string;
+}>`
   position: absolute;
   right: 0;
   top: 0;
@@ -56,7 +65,7 @@ export const StyledHeroBackground = styled.div`
     background-repeat: no-repeat;
     background-size: 100%;
 
-    mask: url(${HeroBackgroundMask}) no-repeat;
+    mask: url(${HeroBackgroundMask as string}) no-repeat;
     mask-size: cover;
 
     -webkit-mask-position-x: 0;
@@ -75,23 +84,25 @@ export const StyledHeroBackground = styled.div`
 
 export const DEFAULT_BACKGROUND_CROP = { x: 0, y: 0 };
 
-export const getCrop = collective => {
-  return get(collective.settings, 'collectivePage.background.crop') || DEFAULT_BACKGROUND_CROP;
+export const getCrop = (collective: HeroBackgroundCollective): { x: number; y: number } => {
+  return (
+    (get(collective.settings, 'collectivePage.background.crop') as { x: number; y: number }) || DEFAULT_BACKGROUND_CROP
+  );
 };
 
-export const getZoom = collective => {
-  return get(collective.settings, 'collectivePage.background.zoom') || 1;
+export const getZoom = (collective: HeroBackgroundCollective): number => {
+  return (get(collective.settings, 'collectivePage.background.zoom') as number) || 1;
 };
 
-export const getAlignedRight = collective => {
-  return get(collective.settings, 'collectivePage.background.isAlignedRight');
+export const getAlignedRight = (collective: HeroBackgroundCollective): boolean => {
+  return get(collective.settings, 'collectivePage.background.isAlignedRight') as boolean;
 };
 
 /**
  * Wraps the logic to display the hero background. Fallsback on a white background if
  * css `mask` is not supported.
  */
-const HeroBackground = ({ collective }) => {
+const HeroBackground = ({ collective }: { collective: HeroBackgroundCollective }): React.JSX.Element => {
   const crop = getCrop(collective);
   const zoom = getZoom(collective);
   const isAlignedRight = getAlignedRight(collective);

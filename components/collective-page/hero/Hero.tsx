@@ -9,6 +9,8 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
+import type { GraphQLV1Collective } from '../../../lib/custom_typings/GraphQLV1';
+import type { SocialLink } from '../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import { twitterProfileUrl } from '../../../lib/url-helpers';
 
@@ -49,7 +51,7 @@ const HeroEventDetails = dynamic(() => import('./HeroEventDetails'));
 const HeroBackgroundCropperModal = dynamic(() => import('./HeroBackgroundCropperModal'), {
   loading() {
     return (
-      <StyledModal>
+      <StyledModal onClose={() => {}}>
         <LoadingPlaceholder height={300} minWidth={280} />
       </StyledModal>
     );
@@ -99,10 +101,39 @@ const HiddenTagItem = styled(StyledLink)`
   }
 `;
 
+type HeroCollective = GraphQLV1Collective & {
+  backgroundImageUrl?: string;
+  twitterHandle?: string;
+  repositoryUrl?: string;
+  website?: string;
+  socialLinks?: SocialLink[];
+  tags?: string[];
+  company?: string;
+  connectedTo?: Array<{ collective: { id: number; name: string; slug: string } }>;
+  hasHosting?: boolean;
+  isApproved?: boolean;
+  isHost?: boolean;
+  canContact?: boolean;
+  location?: { name?: string; country?: string };
+  description?: string;
+  slug: string;
+  name: string;
+  type: string;
+};
+
+type HeroHost = GraphQLV1Collective & { hasHosting?: boolean };
+
+type HeroProps = {
+  collective: HeroCollective;
+  host?: HeroHost;
+  isAdmin?: boolean;
+  onPrimaryColorChange: (color: string | null) => void;
+};
+
 /**
  * Collective's page Hero/Banner/Cover component.
  */
-const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
+const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }: HeroProps) => {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const [hasColorPicker, showColorPicker] = React.useState(false);
@@ -186,7 +217,6 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
               color="black.800"
               fontSize="32px"
               lineHeight="36px"
-              textAlign="left"
               data-cy="collective-title"
               wordBreak="normal"
               textAlign={['center', 'left']}
@@ -419,9 +449,10 @@ const Hero = ({ collective, host, isAdmin, onPrimaryColorChange }) => {
             />
           )}
 
-          {!collective.isHost && [CollectiveType.USER, CollectiveType.ORGANIZATION].includes(collective.type) && (
-            <HeroTotalCollectiveContributionsWithData collective={collective} />
-          )}
+          {!collective.isHost &&
+            [CollectiveType.USER, CollectiveType.ORGANIZATION].some(type => type === collective.type) && (
+              <HeroTotalCollectiveContributionsWithData collective={collective} />
+            )}
         </ContainerSectionContent>
       </Container>
     </Fragment>

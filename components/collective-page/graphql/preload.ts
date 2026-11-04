@@ -1,3 +1,5 @@
+import type { ApolloClient } from '@apollo/client';
+
 import { isIndividualAccount } from '../../../lib/collective';
 import { getFilteredSectionsForCollective, getSectionsNames } from '../../../lib/collective-sections';
 import { CollectiveType } from '../../../lib/constants/collectives';
@@ -15,16 +17,30 @@ import { budgetSectionQuery, getBudgetSectionVariables } from '../sections/Finan
 import { getTransactionsSectionQueryVariables, transactionsSectionQuery } from '../sections/Transactions';
 import { getUpdatesSectionQueryVariables, updatesSectionQuery } from '../sections/Updates';
 
-export const preloadCollectivePageGraphqlQueries = async (client, collective) => {
+type PreloadCollective = {
+  slug: string;
+  type?: string;
+  isHost?: boolean;
+  host?: { slug?: string };
+};
+
+export const preloadCollectivePageGraphqlQueries = async (
+  client: ApolloClient<unknown>,
+  collective?: PreloadCollective,
+): Promise<void> => {
   if (collective) {
     const { slug } = collective;
-    const sections = getFilteredSectionsForCollective(collective);
+    const sections = getFilteredSectionsForCollective(collective, undefined, undefined);
     const sectionsNames = getSectionsNames(sections);
     const queries = [];
     const isIndividual = isIndividualAccount(collective) && !collective.isHost;
     if (sectionsNames.includes('budget')) {
-      const budget = sections.find(el => el.name === 'BUDGET')?.sections.find(el => el.name === 'budget');
-      if (budget?.version === 2) {
+      const budgetCategory = sections.find(el => el.name === 'BUDGET');
+      const budget =
+        budgetCategory && 'sections' in budgetCategory
+          ? budgetCategory.sections.find(el => el.name === 'budget')
+          : undefined;
+      if (budget && 'version' in budget && budget.version === 2) {
         queries.push(
           client.query({
             query: budgetSectionQuery,
