@@ -55,7 +55,7 @@ type InlineEditFieldRenderProps = {
   isEditing: boolean;
   maxLength?: number;
   enableEditor: () => void;
-  disableEditor: (noWarning?: boolean | React.MouseEvent) => void;
+  disableEditor: (noWarning?: boolean) => void;
   setValue: (draft: string) => void;
   setUploading?: (uploading: boolean) => void;
 };
@@ -72,7 +72,6 @@ type InlineEditFieldProps = {
   /** Can user edit the description */
   canEdit?: boolean;
   /** Unused by this component, accepted for consumers that still pass it (see PLAN.md) */
-  canDelete?: boolean;
   /** Use this to control the component state */
   isEditing?: boolean;
   /** Add a confirm if trying to leave the form with unsaved changes */
@@ -135,8 +134,7 @@ class InlineEditField extends Component<InlineEditFieldProps, InlineEditFieldSta
     this.setState({ isEditing: true, draft: getFieldDraft(this.props.values, this.props.field) });
   };
 
-  // Also registered as an `onClick` handler, which passes the event here (truthy); preserved as-is
-  disableEditor = (noWarning?: boolean | React.MouseEvent) => {
+  disableEditor = (noWarning?: boolean) => {
     const { warnIfUnsavedChanges, intl, values, field } = this.props;
     if (!noWarning && warnIfUnsavedChanges) {
       const isDirty = getFieldDraft(values, field) !== this.state.draft;
@@ -261,7 +259,7 @@ class InlineEditField extends Component<InlineEditFieldProps, InlineEditFieldSta
                       data-cy="InlineEditField-Btn-Cancel"
                       disabled={loading}
                       minWidth={buttonsMinWidth}
-                      onClick={this.disableEditor}
+                      onClick={() => this.disableEditor()}
                     >
                       <FormattedMessage id="form.cancel" defaultMessage="cancel" />
                     </FormButton>

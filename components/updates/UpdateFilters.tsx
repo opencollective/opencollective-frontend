@@ -11,28 +11,33 @@ type UpdateFiltersProps = {
 };
 
 const UpdateFilters = ({ values, onChange }: UpdateFiltersProps) => {
-  // Both filters receive the same props; each one only consumes the relevant ones (see PLAN.md)
-  const getFilterProps = (
-    name: string,
-  ): {
-    inputId: string;
+  const getOrderByFilterProps = (): {
     value: string;
     onChange: (value: string) => void;
   } => ({
-    inputId: `updates-filter-${name}`,
-    value: values?.[name] as string,
+    value: values?.orderBy as string,
     onChange: value => {
-      onChange({ ...values, [name]: value === 'ALL' ? null : value });
+      onChange({ ...values, orderBy: value === 'ALL' ? null : value });
+    },
+  });
+
+  const getSearchFilterProps = (): {
+    searchTerm?: string;
+    onChange: (searchTerm: string) => void;
+  } => ({
+    searchTerm: values?.searchTerm as string,
+    onChange: searchTerm => {
+      onChange({ ...values, searchTerm });
     },
   });
 
   return (
     <Flex flexWrap="wrap" gap="16px">
       <Box flex="1 0 150px">
-        <UpdateOrderByFilter {...getFilterProps('orderBy')} />
+        <UpdateOrderByFilter {...getOrderByFilterProps()} />
       </Box>
       <Box flex="10 0 250px">
-        <UpdateSearchFilter {...getFilterProps('searchTerm')} />
+        <UpdateSearchFilter {...getSearchFilterProps()} />
       </Box>
     </Flex>
   );
