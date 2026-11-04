@@ -280,12 +280,7 @@ class OnboardingModal extends React.Component<OnboardingModalProps, OnboardingMo
         {step === 3 ? (
           <React.Fragment>
             {showOnboardingModal && (
-              // `usePortal`/`minHeight` are legacy props that `StyledModal` no longer declares (see PLAN.md findings)
-              <ModalWithImage
-                {...({ usePortal: false, minHeight: '456px' } as Record<string, unknown>)}
-                width="576px"
-                onClose={this.onClose}
-              >
+              <ModalWithImage width="576px" onClose={this.onClose}>
                 <ModalBody>
                   <Flex flexDirection="column" alignItems="center">
                     <Container display="flex" flexDirection="column" alignItems="center">
@@ -331,22 +326,11 @@ class OnboardingModal extends React.Component<OnboardingModalProps, OnboardingMo
         ) : (
           <React.Fragment>
             {showOnboardingModal && (
-              // `usePortal`/`minHeight`/`trapFocus` are legacy props that `StyledModal` no longer declares (see PLAN.md)
-              <ResponsiveModal
-                {...({ usePortal: false, minHeight: '456px', trapFocus: true } as Record<string, unknown>)}
-                width="576px"
-                onClose={this.onClose}
-              >
+              <ResponsiveModal width="576px" onClose={this.onClose}>
                 <ResponsiveModalHeader onClose={this.onClose}>
                   <Flex flexDirection="column" alignItems="center" width="100%">
                     <StepsProgressBox ml={[0, '15px']} mb={[3, null, 4]} width={[1.0, 0.8]}>
-                      {/* `handleStep` is not a prop of `OnboardingStepsProgress` (dead prop, see PLAN.md findings) */}
-                      <OnboardingStepsProgress
-                        {...({ handleStep: (step: number) => this.setState({ step }) } as Record<string, unknown>)}
-                        step={step}
-                        mode={mode}
-                        slug={collective.slug}
-                      />
+                      <OnboardingStepsProgress step={step} mode={mode} slug={collective.slug} />
                     </StepsProgressBox>
                   </Flex>
                 </ResponsiveModalHeader>
