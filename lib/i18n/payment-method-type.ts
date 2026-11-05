@@ -26,6 +26,12 @@ const i18nTypes: Record<string, MessageDescriptor> = defineMessages({
   // - ALIPAY -> "Alipay" doesn't need translation
 });
 
+// Brand names, not translated
+const untranslatedTypes: Record<string, string> = {
+  // A Stripe checkout that wasn't completed: once it is, the type becomes the method used (CREDITCARD, SEPA_DEBIT...)
+  PAYMENT_INTENT: 'Stripe Payment Intent',
+};
+
 /**
  * Get only the (i18n) name of the payment method type.
  *
@@ -33,5 +39,5 @@ const i18nTypes: Record<string, MessageDescriptor> = defineMessages({
  */
 export const i18nPaymentMethodType = (intl: IntlShape, type: string | null): string | null => {
   const key = type === null ? 'null' : type;
-  return i18nTypes[key] ? intl.formatMessage(i18nTypes[key]) : type;
+  return i18nTypes[key] ? intl.formatMessage(i18nTypes[key]) : untranslatedTypes[key] || type;
 };
