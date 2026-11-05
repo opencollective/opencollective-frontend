@@ -28,7 +28,7 @@ evals:
   - id: noop_when_caught_up
     question: If the untranslated German list was empty, does the agent output show noop and no create_pull_request? If strings were listed, answer UNKNOWN.
   - id: scoped_files
-    question: Does the agent output show file changes limited to lang/de.json, scripts/i18n/translation-stats.ts, and lib/constants/locales.js?
+    question: Does the agent output show file changes limited to lang/de.json, scripts/i18n/translation-stats.ts, and lib/constants/locales.ts?
 ---
 
 # i18n Translate German

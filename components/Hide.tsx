@@ -1,4 +1,5 @@
 import { styled } from 'styled-components';
+import type { PositionProps } from 'styled-system';
 import { bottom, compose, flex, height, left, position, right, top } from 'styled-system';
 
 import { pointerEvents } from '../lib/styled-system-custom-properties';
@@ -38,7 +39,7 @@ const FILTERED_PROPS = new Set([
 
 const Hide = styled(Box).withConfig({
   shouldForwardProp: shouldForwardPropExcept(FILTERED_PROPS),
-})<{ xs?: boolean; sm?: boolean; md?: boolean; lg?: boolean }>`
+})<{ xs?: boolean; sm?: boolean; md?: boolean; lg?: boolean } & Pick<PositionProps, 'position'>>`
   ${xs}
   ${sm}
   ${md}

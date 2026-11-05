@@ -15,7 +15,6 @@ import ActivityDetails, { activityHasDetails } from './ActivityDetails';
 import { ActivityUser } from './ActivityUser';
 
 type ActivityDrawerProps = {
-  open: boolean;
   activity?: Activity | null;
   onClose: () => void;
 };

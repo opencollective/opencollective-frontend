@@ -1,0 +1,302 @@
+import React from 'react';
+import { useLazyQuery } from '@apollo/client';
+import { debounce } from 'lodash-es';
+import type { IntlShape } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
+
+import { CollectiveType } from '../lib/constants/collectives';
+import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
+import formatCollectiveType from '../lib/i18n/collective-type';
+
+import CollectivePicker from './CollectivePicker';
+
+const collectivePickerSearchQuery = gqlV1 /* GraphQL */ `
+  query CollectivePickerSearch(
+    $term: String!
+    $types: [TypeOfCollective]
+    $limit: Int
+    $hostCollectiveIds: [Int]
+    $parentCollectiveIds: [Int]
+    $skipGuests: Boolean
+    $includeArchived: Boolean
+    $includeVendorsForHostId: Int
+    $includeAllVendors: Boolean
+    $vendorVisibleToAccountIds: [Int]
+  ) {
+    search(
+      term: $term
+      types: $types
+      limit: $limit
+      hostCollectiveIds: $hostCollectiveIds
+      parentCollectiveIds: $parentCollectiveIds
+      skipGuests: $skipGuests
+      includeArchived: $includeArchived
+      includeVendorsForHostId: $includeVendorsForHostId
+      includeAllVendors: $includeAllVendors
+      vendorVisibleToAccountIds: $vendorVisibleToAccountIds
+    ) {
+      id
+      collectives {
+        id
+        type
+        slug
+        name
+        currency
+        location {
+          id
+          address
+          country
+        }
+        imageUrl(height: 64)
+        hostFeePercent
+        isActive
+        isArchived
+        isHost
+        ... on Vendor {
+          hasPayoutMethod
+          visibleToAccounts {
+            id
+            slug
+            name
+          }
+        }
+        ... on User {
+          isTwoFactorAuthEnabled
+        }
+        ... on Organization {
+          isTrustedHost
+        }
+      }
+    }
+  }
+`;
+
+/** Throttle search function to limit invocations while typing */
+const makeThrottledSearch = () => debounce((searchFunc, variables) => searchFunc({ variables }), 750);
+
+const isSameCollective = (a, b) => {
+  if (a?.id && b?.id && a.id === b.id) {
+    return true;
+  }
+  if (a?.slug && b?.slug && a.slug === b.slug) {
+    return true;
+  }
+  return false;
+};
+
+const Messages = defineMessages({
+  searchForType: {
+    id: 'SearchFor',
+    defaultMessage: 'Search for {entity}',
+  },
+  // eslint-disable-next-line camelcase
+  searchForType_2: {
+    id: 'SearchFor2',
+    defaultMessage: 'Search for {entity1} or {entity2}',
+  },
+  // eslint-disable-next-line camelcase
+  searchForType_3: {
+    id: 'SearchFor3',
+    defaultMessage: 'Search for {entity1}, {entity2} or {entity3}',
+  },
+  search: {
+    id: 'Search',
+    defaultMessage: 'Search',
+  },
+  searchForUsers: {
+    defaultMessage: 'Search for Users by name or email',
+    id: 'xLF0/9',
+  },
+});
+
+/**
+ * If a single type is selected, will return a label like: `Search for users`
+ * Otherwise it just returns `Search`
+ */
+const getPlaceholder = (
+  intl: IntlShape,
+  types: string[],
+  { useBeneficiaryForVendor }: { useBeneficiaryForVendor?: boolean } = {},
+) => {
+  const nbTypes = types ? types.length : 0;
+  if (nbTypes === 0 || nbTypes > 3) {
+    return intl.formatMessage(Messages.search);
+  } else if (nbTypes === 1) {
+    if (types[0] === CollectiveType.USER) {
+      return intl.formatMessage(Messages.searchForUsers);
+    } else {
+      // Rich-text message descriptors do not type their values; see the `as never` idiom in `lib/errors`
+      return intl.formatMessage(Messages.searchForType, {
+        entity: formatCollectiveType(intl, types[0], 100, { useBeneficiaryForVendor }),
+      } as never);
+    }
+  } else {
+    // Format by passing a map of entities like { entity1: 'Collectives' }
+    return intl.formatMessage(
+      Messages[`searchForType_${nbTypes}`],
+      types.reduce<Record<string, string>>((i18nParams, type, index) => {
+        i18nParams[`entity${index + 1}`] = formatCollectiveType(intl, type, 100, { useBeneficiaryForVendor });
+        return i18nParams;
+      }, {}),
+    );
+  }
+};
+
+/**
+ * A specialization of `CollectivePicker` that fetches the data based on user search.
+ */
+const CollectivePickerAsync = ({
+  inputId,
+  types = undefined,
+  limit = 20,
+  hostCollectiveIds = undefined,
+  parentCollectiveIds = undefined,
+  preload = false,
+  filterResults = undefined,
+  searchQuery = collectivePickerSearchQuery,
+  invitable = false,
+  emptyCustomOptions = [],
+  noCache = false,
+  isLoading = false,
+  skipGuests = true,
+  includeArchived = false,
+  includeVendorsForHostId = undefined,
+  defaultCollectives = undefined,
+  includeAllVendors = false,
+  vendorVisibleToAccountIds = undefined,
+  useBeneficiaryForVendor = false,
+  ...props
+}) => {
+  const fetchPolicy = noCache ? 'network-only' : undefined;
+  const [searchCollectives, { loading, data }] = useLazyQuery(searchQuery, { context: API_V1_CONTEXT, fetchPolicy });
+  const [term, setTerm] = React.useState(null);
+  const [isSearchPending, setIsSearchPending] = React.useState(false);
+  const [resolvedSearchTerm, setResolvedSearchTerm] = React.useState(null);
+  const lastSearchedTermRef = React.useRef(null);
+  const throttledSearchRef = React.useRef(null);
+  if (!throttledSearchRef.current) {
+    throttledSearchRef.current = makeThrottledSearch();
+  }
+  const intl = useIntl();
+
+  // Filter defaultCollectives by term if provided
+  const filteredDefaultCollectives = React.useMemo(() => {
+    if (!defaultCollectives) {
+      return [];
+    }
+
+    if (!term) {
+      return defaultCollectives;
+    }
+
+    const normalizedTerm = term.toLowerCase();
+    return defaultCollectives.filter(
+      c => c.name?.toLowerCase().includes(normalizedTerm) || c.slug?.toLowerCase().includes(normalizedTerm),
+    );
+  }, [defaultCollectives, term]);
+
+  // Combine API results with defaultCollectives
+  const collectives = React.useMemo(() => {
+    const currentTerm = term || '';
+    const apiResultsMatchTerm = resolvedSearchTerm === currentTerm;
+
+    // If we have search results for the current term, use them
+    if ((term || preload) && apiResultsMatchTerm && data?.search?.collectives) {
+      const apiResults = [...data.search.collectives];
+
+      // When loading is complete, we only need unique collectives
+      if (!loading && filteredDefaultCollectives.length > 0) {
+        filteredDefaultCollectives.forEach(c => {
+          if (!apiResults.some(r => isSameCollective(r, c))) {
+            apiResults.push(c);
+          }
+        });
+      }
+
+      return apiResults;
+    }
+
+    // When no search or results yet, show default collectives
+    return filteredDefaultCollectives;
+  }, [term, preload, data, loading, filteredDefaultCollectives, resolvedSearchTerm]);
+
+  const filteredCollectives = filterResults ? filterResults(collectives) : collectives;
+  const placeholder = getPlaceholder(intl, types, { useBeneficiaryForVendor });
+
+  // If preload is true, trigger a first query on mount or when one of the query param changes
+  React.useEffect(() => {
+    const throttledSearch = throttledSearchRef.current;
+    const searchTerm = term || '';
+
+    if (term || preload) {
+      setIsSearchPending(true);
+      throttledSearch(
+        ({ variables }) => {
+          lastSearchedTermRef.current = variables.term;
+          return Promise.resolve(searchCollectives({ variables })).finally(() => {
+            if (lastSearchedTermRef.current === variables.term) {
+              setIsSearchPending(false);
+              setResolvedSearchTerm(variables.term);
+            }
+          });
+        },
+        {
+          term: searchTerm,
+          types,
+          limit,
+          hostCollectiveIds,
+          parentCollectiveIds,
+          skipGuests,
+          includeArchived,
+          includeVendorsForHostId,
+          includeAllVendors,
+          vendorVisibleToAccountIds,
+        },
+      );
+    } else {
+      throttledSearch.cancel();
+      lastSearchedTermRef.current = null;
+      setIsSearchPending(false);
+      setResolvedSearchTerm(null);
+    }
+  }, [
+    types,
+    limit,
+    hostCollectiveIds,
+    parentCollectiveIds,
+    vendorVisibleToAccountIds,
+    includeArchived,
+    includeAllVendors,
+    term,
+    preload,
+    searchCollectives,
+    skipGuests,
+    includeVendorsForHostId,
+  ]);
+
+  return (
+    <CollectivePicker
+      inputId={inputId}
+      isLoading={Boolean(loading || isLoading || isSearchPending)}
+      collectives={filteredCollectives}
+      groupByType={!types || types.length > 1}
+      filterOption={() => true /** Filtering is done by the API */}
+      sortFunc={collectives => collectives /** Already sorted by the API */}
+      placeholder={placeholder}
+      types={types}
+      useSearchIcon={true}
+      isSearchable
+      // Only displays the invite option if no results were found:
+      invitable={invitable}
+      onInputChange={newTerm => {
+        setTerm(newTerm.trim());
+      }}
+      customOptions={!term ? emptyCustomOptions : []}
+      useBeneficiaryForVendor={useBeneficiaryForVendor}
+      vendorVisibleToAccountIds={vendorVisibleToAccountIds}
+      {...props}
+    />
+  );
+};
+
+export default CollectivePickerAsync;

@@ -3,25 +3,104 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { themeGet } from '@styled-system/theme-get';
 import { clsx } from 'clsx';
 import { unescape } from 'lodash-es';
-import { ChevronLeft, ChevronRight, Download, ExternalLink, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, ExternalLink, FileSpreadsheet, FileText, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { css, styled } from 'styled-components';
 
 import useKeyBoardShortcut, { ARROW_LEFT_KEY, ARROW_RIGHT_KEY } from '../lib/hooks/useKeyboardKey';
 import { generateDownloadUrlForFileUrl } from '../lib/image-utils';
+import { getFileExtensionFromUrl } from '../lib/url-helpers';
+import { getWebsiteUrl } from '../lib/utils';
 
+import { Button as UIButton } from './ui/Button';
 import { Dialog, DialogOverlay } from './ui/Dialog';
 import { Box, Flex } from './Grid';
 import Loading from './LoadingPlaceholder';
 import StyledTooltip from './StyledTooltip';
 import { Span } from './Text';
-import UploadedFilePreview from './UploadedFilePreview';
 
 const PDFViewer = dynamic(() => import('./PDFViewer'), {
   ssr: false,
   loading: () => <Loading />,
 });
+
+const CSVPreview = dynamic(() => import('./CSVPreview'), {
+  ssr: false,
+  loading: () => <Loading />,
+});
+
+const NON_IMAGE_EXTENSIONS = ['csv', 'txt', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'odt', 'ods', 'zip', 'json', 'xml'];
+
+type ViewerFile = {
+  url: string;
+  name?: string;
+  info?: { width: number; type: string };
+  type?: string;
+};
+
+/**
+ * Files attached by the platform (e.g. settlement CSV exports) are plain links without file info,
+ * so we fall back on the URL extension to know how to render them.
+ */
+const getFileKind = (file: ViewerFile): 'csv' | 'pdf' | 'image' | 'other' => {
+  const contentType = file.info?.type || file.type;
+  // Relative URLs (e.g. `/api/files/...`) are resolved against this website to read their extension
+  const extension = getFileExtensionFromUrl(new URL(file.url, getWebsiteUrl()).toString());
+  if (contentType === 'text/csv' || extension === 'csv') {
+    return 'csv';
+  } else if (contentType === 'application/pdf' || extension === 'pdf') {
+    return 'pdf';
+  } else if (contentType?.startsWith('image/') || (!contentType && !NON_IMAGE_EXTENSIONS.includes(extension))) {
+    return 'image';
+  } else {
+    return 'other';
+  }
+};
+
+const FilePreviewUnavailable = ({
+  file,
+  canDownload,
+  canOpenInNewWindow,
+}: {
+  file: ViewerFile;
+  canDownload: boolean;
+  canOpenInNewWindow: boolean;
+}) => {
+  const Icon = getFileKind(file) === 'csv' ? FileSpreadsheet : FileText;
+  return (
+    <div
+      className="flex w-80 max-w-full flex-col items-center gap-3 rounded-xl bg-white p-6 text-center shadow-lg"
+      data-cy="file-preview-unavailable"
+    >
+      <Icon size={48} strokeWidth={1.5} className="text-slate-400" />
+      {file.name && <p className="font-medium break-all text-slate-900">{unescape(file.name)}</p>}
+      <p className="text-sm text-muted-foreground">
+        <FormattedMessage defaultMessage="Preview is not available for this file." id="K/1jV7" />
+      </p>
+      {(canDownload || canOpenInNewWindow) && (
+        <div className="mt-1 flex flex-wrap justify-center gap-2">
+          {canDownload && (
+            <UIButton variant="outline" size="sm" asChild>
+              <a href={generateDownloadUrlForFileUrl(file.url)} download target="_blank" rel="noopener noreferrer">
+                <Download size={16} />
+                <FormattedMessage id="Download" defaultMessage="Download" />
+              </a>
+            </UIButton>
+          )}
+          {canOpenInNewWindow && (
+            <UIButton variant="outline" size="sm" asChild>
+              <a href={file.url} target="_blank" rel="noopener noreferrer">
+                <ExternalLink size={16} />
+                <FormattedMessage defaultMessage="Open in new window" id="b2Wfwm" />
+              </a>
+            </UIButton>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const Header = styled.div`
   position: absolute;
@@ -121,12 +200,7 @@ const ButtonLink = styled.a`
 type FilesViewerModalProps = {
   onClose: () => void;
   parentTitle?: string;
-  files?: {
-    url: string;
-    name?: string;
-    info?: { width: number; type: string };
-    type?: string;
-  }[];
+  files?: ViewerFile[];
   openFileUrl?: string;
   allowOutsideInteraction?: boolean;
   canDownload?: boolean;
@@ -181,29 +255,38 @@ export default function FilesViewerModal({
   useKeyBoardShortcut({ callback: onArrowLeft, keyMatch: ARROW_LEFT_KEY });
 
   const selectedItem = files?.length ? files?.[selectedIndex] : null;
-  const selectedItemContentType = selectedItem?.info?.type || selectedItem?.type;
+  const [failedImageUrl, setFailedImageUrl] = useState<string>(null);
 
   const nbFiles = files?.length || 0;
   const hasMultipleFiles = nbFiles > 1;
   const contentWrapperRef = React.useRef(null);
 
-  const renderFile = ({ url, name }: { url: string; name?: string; info?: { width: number } }, contentWrapperRef) => {
+  const renderFile = (file: ViewerFile, contentWrapperRef) => {
+    const { url, name } = file;
+    const fileKind = getFileKind(file);
+    const renderUnavailable = () => (
+      <FilePreviewUnavailable file={file} canDownload={canDownload} canOpenInNewWindow={canOpenInNewWindow} />
+    );
+
     let content: React.ReactNode;
-
-    const isText = ['text/csv', 'text/plain'].includes(selectedItemContentType);
-    const isPdf = 'application/pdf' === selectedItemContentType;
-
-    if (isText) {
-      content = <UploadedFilePreview size={288} url={url} alt={name} showFileName fileName={name} color="black.200" />;
-    } else if (isPdf) {
+    if (fileKind === 'csv') {
+      content = <CSVPreview key={url} url={url} renderFallback={renderUnavailable} />;
+    } else if (fileKind === 'pdf') {
       content = <PDFViewer pdfUrl={url} contentWrapperRef={contentWrapperRef} />;
-    } else {
+    } else if (fileKind === 'image' && failedImageUrl !== url) {
       content = (
-        <img src={url} alt={name} className="h-auto max-h-[calc(100dvh-74px-10rem)] w-auto max-w-full object-contain" />
+        <img
+          src={url}
+          alt={name}
+          className="h-auto max-h-[calc(100dvh-74px-10rem)] w-auto max-w-full object-contain"
+          onError={() => setFailedImageUrl(url)}
+        />
       );
+    } else {
+      content = renderUnavailable();
     }
 
-    return <Content>{content}</Content>;
+    return <Content className={clsx(fileKind === 'csv' && 'w-full max-w-6xl')}>{content}</Content>;
   };
 
   return (

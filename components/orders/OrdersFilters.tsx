@@ -1,0 +1,74 @@
+import React from 'react';
+import { FormattedMessage } from 'react-intl';
+import { styled } from 'styled-components';
+
+import { encodeDateInterval } from '../../lib/date-utils';
+import type { Currency } from '../../lib/graphql/types/v2/graphql';
+
+import AmountFilter from '../budget/filters/AmountFilter';
+import PeriodFilter from '../filters/PeriodFilter';
+import { Flex } from '../Grid';
+
+import OrderStatusFilter from './OrderStatusFilter';
+
+const FilterContainer = styled.div`
+  margin-bottom: 8px;
+  flex: 1 1 120px;
+  &:not(:last-child) {
+    margin-right: 18px;
+  }
+`;
+
+const FilterLabel = styled.label`
+  font-weight: 600;
+  font-size: 9px;
+  line-height: 14px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #9d9fa3;
+`;
+
+type OrdersFiltersProps = {
+  currency?: Currency;
+  filters?: Record<string, string>;
+  hasStatus?: boolean;
+  onChange: (filters: Record<string, string>) => void;
+};
+
+const OrdersFilters = ({ currency, filters, hasStatus, onChange }: OrdersFiltersProps) => {
+  const getFilterProps = (name: string, valueModifier?: (value: unknown) => unknown) => ({
+    inputId: `orders-filter-${name}`,
+    value: filters?.[name],
+    onChange: value => {
+      const preparedValue = valueModifier ? valueModifier(value) : value;
+      onChange({ ...filters, [name]: value === 'ALL' ? null : preparedValue });
+    },
+  });
+
+  return (
+    <Flex flexWrap="wrap">
+      <FilterContainer>
+        <FilterLabel htmlFor="orders-filter-period">
+          <FormattedMessage id="Period" defaultMessage="Period" />
+        </FilterLabel>
+        <PeriodFilter {...getFilterProps('period', encodeDateInterval)} />
+      </FilterContainer>
+      <FilterContainer>
+        <FilterLabel htmlFor="orders-filter-amount">
+          <FormattedMessage id="Fields.amount" defaultMessage="Amount" />
+        </FilterLabel>
+        <AmountFilter currency={currency} {...getFilterProps('amount')} />
+      </FilterContainer>
+      {hasStatus && (
+        <FilterContainer>
+          <FilterLabel htmlFor="orders-filter-status">
+            <FormattedMessage id="order.status" defaultMessage="Status" />
+          </FilterLabel>
+          <OrderStatusFilter {...getFilterProps('status')} />
+        </FilterContainer>
+      )}
+    </Flex>
+  );
+};
+
+export default React.memo(OrdersFilters);

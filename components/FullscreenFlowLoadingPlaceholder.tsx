@@ -27,7 +27,7 @@ export const FullscreenFlowLoadingPlaceholder = ({ handleOnClose }: { handleOnCl
           }
         }}
       >
-        <div className="flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden">
+        <div className="flex h-dvh max-w-screen min-w-screen flex-col overflow-hidden">
           {Boolean(handleOnClose) && (
             <header className="flex min-w-screen items-center justify-end px-4 py-3">
               <Button

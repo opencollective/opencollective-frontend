@@ -834,7 +834,7 @@ NODE
   PIDS+=($!)
 
   echo "> Starting frontend ($FRONTEND_DIR)"
-  (cd "$FRONTEND_DIR" && node server) >"$FRONTEND_LOG" 2>&1 &
+  (cd "$FRONTEND_DIR" && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON server/index.ts) >"$FRONTEND_LOG" 2>&1 &
   PIDS+=($!)
 
   echo "> Starting images ($IMAGES_DIR)"
