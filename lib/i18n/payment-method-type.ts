@@ -22,12 +22,11 @@ const i18nTypes: Record<string, MessageDescriptor> = defineMessages({
   VIRTUAL_CARD: { id: 'PayoutMethod.Type.VirtualCard', defaultMessage: 'Virtual Card' },
   SWISH: { id: 'Stripe.PaymentMethod.Label.swish', defaultMessage: 'Swish' },
   ['null']: { id: 'PaymentMethods.None', defaultMessage: 'No payment method' },
-  // For now, no need to support:
-  // - ALIPAY -> "Alipay" doesn't need translation
 });
 
 // Brand names, not translated
 const untranslatedTypes: Record<string, string> = {
+  ALIPAY: 'Alipay',
   // A Stripe checkout that wasn't completed: once it is, the type becomes the method used (CREDITCARD, SEPA_DEBIT...)
   PAYMENT_INTENT: 'Stripe Payment Intent',
 };
