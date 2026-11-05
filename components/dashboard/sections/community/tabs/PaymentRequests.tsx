@@ -5,7 +5,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import { get, omit } from 'lodash-es';
 import type { IntlShape } from 'react-intl';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 import type { FilterComponentConfigs, FiltersToVariables, Views } from '../../../../../lib/filters/filter-types';
 import type {

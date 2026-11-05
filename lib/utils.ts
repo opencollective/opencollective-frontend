@@ -120,6 +120,9 @@ export const isValidEmail = email => {
   );
 };
 
+/** `.local` is reserved for mDNS; addresses from it are not usable for invites */
+export const isLocalEmail = (email?: string | null): boolean => Boolean(email?.trim().toLowerCase().endsWith('.local'));
+
 export function parseToBoolean(value, defaultValue = false) {
   let lowerValue = value;
   // check whether it's string
@@ -156,7 +159,7 @@ export const singular = str => {
   return str.replace(/ies$/, 'y').replace(/s$/, '');
 };
 
-export const capitalize = str => {
+export const capitalize = (str: string = undefined): string => {
   if (typeof str !== 'string') {
     return '';
   }

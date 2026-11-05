@@ -1,0 +1,154 @@
+import React from 'react';
+import { useMutation } from '@apollo/client';
+import { get } from 'lodash-es';
+import { FormattedMessage } from 'react-intl';
+
+import { gql } from '../lib/graphql/helpers';
+
+import { useToast } from './ui/useToast';
+import { Box } from './Grid';
+import MessageBox from './MessageBox';
+import MessageBoxGraphqlError from './MessageBoxGraphqlError';
+import StyledButton from './StyledButton';
+import StyledInput from './StyledInput';
+import StyledInputField from './StyledInputField';
+import StyledTextarea from './StyledTextarea';
+import { H2, P, Span } from './Text';
+
+const sendMessageMutation = gql`
+  mutation SendMessage($account: AccountReferenceInput!, $message: NonEmptyString!, $subject: String) {
+    sendMessage(account: $account, message: $message, subject: $subject) {
+      success
+    }
+  }
+`;
+
+const CollectiveContactForm = ({ collective, isModal = false, onClose = undefined, onChange = undefined }) => {
+  const [subject, setSubject] = React.useState('');
+  const [message, setMessage] = React.useState('');
+  const [error, setError] = React.useState(null);
+  const [submit, { data, loading }] = useMutation(sendMessageMutation);
+  const { toast } = useToast();
+
+  // Dispatch changes to onChange if set
+  React.useEffect(() => {
+    if (onChange) {
+      onChange({ subject, message });
+    }
+  }, [subject, message]);
+
+  if (get(data, 'sendMessage.success') && !isModal) {
+    return (
+      <MessageBox type="success" withIcon maxWidth={400} m="32px auto">
+        <FormattedMessage id="MessageSent" defaultMessage="Message sent" />
+      </MessageBox>
+    );
+  }
+
+  const messageLabel = (
+    <Span fontWeight={700}>
+      <FormattedMessage id="Contact.Message" defaultMessage="Message" />
+    </Span>
+  );
+  const subjectLabel = (
+    <FormattedMessage
+      id="OptionalFieldLabel"
+      defaultMessage="{field} (optional)"
+      values={{
+        field: (
+          <Span fontWeight={700}>
+            <FormattedMessage id="Contact.Subject" defaultMessage="Subject" />
+          </Span>
+        ),
+      }}
+    />
+  );
+
+  return (
+    <Box flexDirection="column" alignItems={['center', 'flex-start']} maxWidth={1160} m="0 auto">
+      {!isModal && (
+        <H2 mb={2} fontSize={'40px'}>
+          <FormattedMessage
+            id="ContactCollective"
+            defaultMessage="Contact {collective}"
+            values={{ collective: collective.name }}
+          />
+        </H2>
+      )}
+      <P mb={4}>
+        <FormattedMessage
+          id="CollectiveContactForm.Disclaimer"
+          defaultMessage="Your email address will be shared with the admins who will receive this message."
+        />
+      </P>
+      <StyledInputField label={subjectLabel} htmlFor="subject" mb={4} width="100%">
+        {inputProps => (
+          <StyledInput
+            {...inputProps}
+            width="100%"
+            maxWidth={500}
+            maxLength={60}
+            onChange={e => setSubject(e.target.value)}
+            data-cy="subject"
+          />
+        )}
+      </StyledInputField>
+      <StyledInputField label={messageLabel} htmlFor="message" width="100%" maxWidth={800}>
+        {inputProps => (
+          <StyledTextarea
+            {...inputProps}
+            width="100%"
+            minHeight={200}
+            onChange={e => setMessage(e.target.value)}
+            minLength={10}
+            maxLength={4000}
+            value={message}
+            showCount
+            data-cy="message"
+          />
+        )}
+      </StyledInputField>
+      {error && <MessageBoxGraphqlError error={error} mt={3} />}
+      <p className="mt-2 text-sm">
+        <FormattedMessage defaultMessage="Message needs to be at least 10 characters long" id="322m9e" />
+      </p>
+      {isModal && <hr className="my-5" />}
+      {/* `''` is not a valid `text-align` value (browsers ignore it); kept as-is for behaviour parity */}
+      <Box textAlign={(isModal ? 'right' : '') as React.ComponentProps<typeof Box>['textAlign']}>
+        <StyledButton
+          mt={isModal ? 0 : 4}
+          minWidth={200}
+          buttonStyle="primary"
+          disabled={message.length < 10}
+          loading={loading}
+          data-cy="submit"
+          onClick={async () => {
+            try {
+              setError(null);
+              await submit({
+                variables: {
+                  account: { slug: collective.slug },
+                  subject,
+                  message,
+                },
+              });
+              if (isModal) {
+                toast({
+                  variant: 'success',
+                  message: <FormattedMessage id="MessageSent" defaultMessage="Message sent" />,
+                });
+                onClose?.();
+              }
+            } catch (e) {
+              setError(e);
+            }
+          }}
+        >
+          <FormattedMessage defaultMessage="Contact Collective" id="FAYdqn" />
+        </StyledButton>
+      </Box>
+    </Box>
+  );
+};
+
+export default CollectiveContactForm;

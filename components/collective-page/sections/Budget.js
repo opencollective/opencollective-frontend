@@ -93,8 +93,8 @@ const budgetSectionAccountFieldsFragment = gql`
   ${accountingCategorySelectFieldsFragment}
 `;
 
-const budgetSectionQuery = gql`
-  query BudgetSection($slug: String!, $limit: Int!, $kind: [TransactionKind], $heavyAccount: Boolean!) {
+const budgetSectionWithoutHostQuery = gql`
+  query BudgetSectionWithoutHost($slug: String!, $limit: Int!, $kind: [TransactionKind], $heavyAccount: Boolean!) {
     transactions(
       account: { slug: $slug }
       limit: $limit
@@ -223,7 +223,7 @@ export const getBudgetSectionQuery = (hasHost, isIndividual) => {
   } else if (isIndividual) {
     return budgetSectionForIndividualQuery;
   } else {
-    return budgetSectionQuery;
+    return budgetSectionWithoutHostQuery;
   }
 };
 

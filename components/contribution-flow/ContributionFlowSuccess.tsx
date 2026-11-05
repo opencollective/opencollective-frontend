@@ -172,6 +172,7 @@ const ContributionFlowSuccess = ({ collective, isEmbed }) => {
 
   const order = data?.order;
   const [paymentIntentResult, setPaymentIntentResult] = useState(null);
+  const [paymentIntentError, setPaymentIntentError] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const successTrackedRef = useRef(false);
   const redirectInitiatedRef = useRef(false);
@@ -209,11 +210,14 @@ const ContributionFlowSuccess = ({ collective, isEmbed }) => {
             setPaymentIntentResult(result);
           }
         }
-      } catch (e) {
-        // The payment status is unknown (e.g. Stripe.js failed to load): don't send the contributor back to the
-        // payment step, as the payment may have gone through. Fall back to the order status instead.
-        // eslint-disable-next-line no-console
-        console.error('Failed to retrieve the Stripe payment intent', e);
+      } catch (error) {
+        // The payment intent could not be verified: never fall through to the success view.
+        if (!cancelled) {
+          setPaymentIntentError(
+            (error instanceof Error && error.message) ||
+              intl.formatMessage({ id: 'UZEPLR', defaultMessage: 'An unknown error has occurred' }),
+          );
+        }
       } finally {
         if (!cancelled) {
           setLoaded(true);
@@ -226,7 +230,7 @@ const ContributionFlowSuccess = ({ collective, isEmbed }) => {
     return () => {
       cancelled = true;
     };
-  }, [router.query.payment_intent_client_secret, router.query.stripeAccount]);
+  }, [router.query.payment_intent_client_secret, router.query.stripeAccount, intl]);
 
   const stripeErrorMessage = useMemo(() => {
     if (!paymentIntentResult) {
@@ -293,7 +297,8 @@ const ContributionFlowSuccess = ({ collective, isEmbed }) => {
 
   useEffect(() => {
     // Wait for the payment intent check so we never send a failed payment to the external redirect
-    if (!order || !loaded || stripeErrorMessage || redirectInitiatedRef.current) {
+    // Never follow the success redirect when the payment intent could not be verified.
+    if (!order || !loaded || stripeErrorMessage || paymentIntentError || redirectInitiatedRef.current) {
       return;
     }
 
@@ -304,7 +309,7 @@ const ContributionFlowSuccess = ({ collective, isEmbed }) => {
         shouldRedirectParent: parseToBoolean(getQueryStringParam(router.query.shouldRedirectParent)),
       });
     }
-  }, [order, loaded, stripeErrorMessage, router, collective]);
+  }, [order, loaded, stripeErrorMessage, paymentIntentError, router, collective]);
 
   const email = getQueryStringParam(router.query.email) ?? null;
 
@@ -434,6 +439,17 @@ const ContributionFlowSuccess = ({ collective, isEmbed }) => {
       <div className="flex justify-center py-5 sm:py-6">
         <MessageBox type="warning" withIcon>
           <FormattedMessage id="Order.NotFound" defaultMessage="This contribution doesn't exist" />
+        </MessageBox>
+      </div>
+    );
+  }
+
+  // The payment intent could not be verified: do not pretend the contribution succeeded.
+  if (!isLoading && paymentIntentError) {
+    return (
+      <div className="flex justify-center py-5 sm:py-6">
+        <MessageBox type="warning" withIcon>
+          {paymentIntentError}
         </MessageBox>
       </div>
     );

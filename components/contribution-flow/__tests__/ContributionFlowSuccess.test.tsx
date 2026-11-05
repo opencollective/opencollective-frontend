@@ -376,13 +376,13 @@ describe('ContributionFlowSuccess', () => {
       );
     });
 
-    it('shows the success view when the payment intent lookup fails', async () => {
-      jest.spyOn(console, 'error').mockImplementation(() => {});
+    it('shows an error instead of the success view when the payment intent lookup fails', async () => {
       mockRetrievePaymentIntent.mockRejectedValue(new Error('Network error'));
 
       renderSuccess({ query: stripeReturnQuery });
 
-      expect(await screen.findByText('Thank you! 🎉')).toBeInTheDocument();
+      expect(await screen.findByText('Network error')).toBeInTheDocument();
+      expect(screen.queryByText('Thank you! 🎉')).not.toBeInTheDocument();
       expect(mockReplace).not.toHaveBeenCalled();
     });
   });
@@ -421,14 +421,13 @@ describe('ContributionFlowSuccess', () => {
       expect(mockPush).toHaveBeenCalledWith(expect.objectContaining({ pathname: '/external-redirect' }));
     });
 
-    it('still follows the external redirect when the payment intent lookup fails', async () => {
-      jest.spyOn(console, 'error').mockImplementation(() => {});
+    it('does not follow the external redirect when the payment intent lookup fails', async () => {
       mockRetrievePaymentIntent.mockRejectedValue(new Error('Network error'));
 
       renderSuccess({ query: { ...stripeReturnQuery, redirect: 'https://example.com/test' } });
 
-      await waitFor(() => expect(mockPush).toHaveBeenCalledTimes(1));
-      expect(mockPush).toHaveBeenCalledWith(expect.objectContaining({ pathname: '/external-redirect' }));
+      expect(await screen.findByText('Network error')).toBeInTheDocument();
+      expect(mockPush).not.toHaveBeenCalled();
       expect(mockReplace).not.toHaveBeenCalled();
     });
   });

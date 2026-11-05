@@ -1,0 +1,305 @@
+import React from 'react';
+import { useMutation, useQuery } from '@apollo/client';
+import { useIntl } from 'react-intl';
+
+import { formatCurrency } from '../../lib/currency-utils';
+import { i18nGraphqlException } from '../../lib/errors';
+import { gql } from '../../lib/graphql/helpers';
+import type { Currency } from '../../lib/graphql/types/v2/graphql';
+
+import Avatar from '../Avatar';
+import CollectivePickerAsync from '../CollectivePickerAsync';
+import ConfirmationModal from '../ConfirmationModal';
+import Container from '../Container';
+import DashboardHeader from '../dashboard/DashboardHeader';
+import { Flex } from '../Grid';
+import Link from '../Link';
+import OrdersPickerAsync from '../OrdersPickerAsync';
+import StyledButton from '../StyledButton';
+import StyledInputField from '../StyledInputField';
+import StyledLink from '../StyledLink';
+import StyledSelect from '../StyledSelect';
+import StyledTag from '../StyledTag';
+import { P, Span } from '../Text';
+import { useToast } from '../ui/useToast';
+
+const moveReceivedContributionsMutation = gql`
+  mutation MoveReceivedContributions($orders: [OrderReferenceInput!]!, $tier: TierReferenceInput) {
+    moveOrders(orders: $orders, tier: $tier) {
+      id
+      legacyId
+      description
+      createdAt
+      amount {
+        valueInCents
+        currency
+      }
+      tier {
+        id
+        legacyId
+      }
+      fromAccount {
+        id
+        name
+        slug
+        isIncognito
+        imageUrl(height: 48)
+        ... on Individual {
+          isGuest
+        }
+      }
+      toAccount {
+        id
+        slug
+        name
+      }
+    }
+  }
+`;
+
+const accountTiersQuery = gql`
+  query MoveContributionsTiers($accountSlug: String!) {
+    account(slug: $accountSlug) {
+      id
+      settings
+      ... on AccountWithContributions {
+        tiers {
+          nodes {
+            id
+            legacyId
+            slug
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+type MoveAccount = {
+  id?: number | string;
+  slug?: string;
+  name?: string;
+};
+
+type MoveTier = {
+  id?: number | string;
+  legacyId?: number;
+  slug?: string;
+  name?: string;
+};
+
+type TierOption = { value: MoveTier | 'custom'; label: string };
+
+type OrderOption = {
+  value: {
+    id?: number | string;
+    legacyId?: number;
+    description?: string;
+    createdAt?: string;
+    amount?: { valueInCents?: number; currency?: Currency };
+    receiverAccount?: Record<string, unknown>;
+    toAccount?: { slug?: string };
+    tier?: { slug?: string; legacyId?: number; name?: string };
+  };
+};
+
+const getCallToAction = (selectedOrdersOptions: ReadonlyArray<OrderOption>, newTier: MoveTier | 'custom' | null) => {
+  const base = `Move ${selectedOrdersOptions.length} contributions`;
+  if (newTier === 'custom') {
+    return `${base} to the "custom contribution" tier`;
+  } else {
+    return !newTier ? base : `${base} to "${newTier.name}" (#${newTier.legacyId})`;
+  }
+};
+
+const getTierOption = (tier: MoveTier): TierOption => {
+  return { value: tier, label: `#${tier.legacyId} - ${tier.name}` };
+};
+
+const getTiersOptions = (tiers: MoveTier[], accountSettings): TierOption[] => {
+  if (!tiers) {
+    return [];
+  }
+
+  const tiersOptions = tiers.map(getTierOption);
+  if (!accountSettings?.disableCustomContributions) {
+    tiersOptions.unshift({ value: 'custom', label: 'Custom contribution' });
+  }
+
+  return tiersOptions;
+};
+
+const MoveReceivedContributions = () => {
+  // Local state and hooks
+  const intl = useIntl();
+  const { toast } = useToast();
+  const [receiverAccount, setReceiverAccount] = React.useState<MoveAccount>(null);
+  const [hasConfirmationModal, setHasConfirmationModal] = React.useState(false);
+  const [selectedOrdersOptions, setSelectedOrderOptions] = React.useState<ReadonlyArray<OrderOption>>([]);
+  const [newTier, setNewTier] = React.useState<MoveTier | 'custom' | null>(null);
+  const isValid = Boolean(receiverAccount && selectedOrdersOptions.length && newTier);
+  const callToAction = getCallToAction(selectedOrdersOptions, newTier);
+
+  // Fetch tiers
+  const tiersQueryVariables = { accountSlug: receiverAccount?.slug };
+  const tiersQueryOptions = { skip: !receiverAccount, variables: tiersQueryVariables };
+  const { data: tiersData, loading: tiersLoading } = useQuery(accountTiersQuery, tiersQueryOptions);
+  const tiersNodes = tiersData?.account.tiers?.nodes;
+  const accountSettings = tiersData?.account.settings;
+  const tiersOptions = React.useMemo(() => getTiersOptions(tiersNodes, accountSettings), [tiersNodes, accountSettings]);
+
+  // Move contributions mutation
+  const [submitMoveContributions] = useMutation(moveReceivedContributionsMutation);
+  const moveContributions = async () => {
+    try {
+      // Prepare variables
+      const ordersInputs = selectedOrdersOptions.map(({ value }) => ({ id: value.id }));
+      const mutationVariables: {
+        orders: Array<{ id?: number | string }>;
+        tier: { isCustom: true } | { id?: number | string };
+      } = {
+        orders: ordersInputs,
+        tier: newTier === 'custom' ? { isCustom: true } : { id: newTier.id },
+      };
+
+      // Submit
+      await submitMoveContributions({ variables: mutationVariables });
+      toast({ variant: 'success', title: 'Contributions moved successfully', message: callToAction });
+      // Reset form and purge cache
+      setHasConfirmationModal(false);
+      setReceiverAccount(null);
+      setNewTier(null);
+      setSelectedOrderOptions([]);
+    } catch (e) {
+      toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+    }
+  };
+
+  return (
+    <div>
+      <DashboardHeader title="Move Received Contributions" className="mb-10" />
+      <StyledInputField htmlFor="receiverAccount" label="Account that received the contributions" flex="1 1">
+        {({ id }) => (
+          <CollectivePickerAsync
+            inputId={id}
+            collective={receiverAccount}
+            isClearable
+            onChange={option => {
+              setReceiverAccount(option?.value || null);
+              setSelectedOrderOptions([]);
+              setNewTier(null);
+            }}
+          />
+        )}
+      </StyledInputField>
+
+      <StyledInputField htmlFor="contributions" label="Select contributions" flex="1 1" mt={3}>
+        {({ id }) => (
+          <OrdersPickerAsync
+            value={selectedOrdersOptions}
+            inputId={id}
+            onChange={options => setSelectedOrderOptions(options)}
+            disabled={!receiverAccount}
+            closeMenuOnSelect={false}
+            account={receiverAccount}
+            filter="INCOMING"
+            includeIncognito
+            isMulti
+            isClearable
+          />
+        )}
+      </StyledInputField>
+
+      <StyledInputField htmlFor="tier" label="Select destination tier" flex="1 1" mt={3}>
+        {({ id }) => (
+          <StyledSelect
+            inputId={id}
+            disabled={!tiersData}
+            isLoading={tiersLoading}
+            onChange={({ value }) => setNewTier(value)}
+            options={tiersOptions}
+            value={!newTier || newTier === 'custom' ? null : getTierOption(newTier)}
+          />
+        )}
+      </StyledInputField>
+
+      <StyledButton
+        mt={4}
+        width="100%"
+        buttonStyle="primary"
+        disabled={!isValid}
+        onClick={() => setHasConfirmationModal(true)}
+      >
+        {callToAction}
+      </StyledButton>
+
+      {hasConfirmationModal && (
+        <ConfirmationModal
+          header={callToAction}
+          continueHandler={moveContributions}
+          onClose={() => setHasConfirmationModal(false)}
+        >
+          <P>
+            You&apos;re about to move {selectedOrdersOptions.length} orders to{' '}
+            {newTier === 'custom' ? (
+              'the custom contribution tier'
+            ) : (
+              <StyledLink
+                as={Link}
+                href={`/${receiverAccount.slug}/contribute/${newTier.slug}-${newTier.legacyId}`}
+                openInNewTab
+              >
+                {newTier.name} (#{newTier.legacyId})
+              </StyledLink>
+            )}
+            .
+          </P>
+          <Container maxHeight={300} overflowY="auto" border="1px solid lightgrey" borderRadius="8px" mt={3}>
+            {selectedOrdersOptions.map(({ value: order }, index) => (
+              <Container
+                key={order.id}
+                title={order.description}
+                borderTop={!index ? undefined : '1px solid lightgrey'}
+                p={2}
+              >
+                <Flex alignItems="center" title={order.description}>
+                  <Avatar collective={order.receiverAccount} size={24} />
+                  <StyledTag fontSize="10px" mx={2} minWidth={75}>
+                    #{order.legacyId}
+                  </StyledTag>
+                  <Flex flexDirection="column">
+                    <Span fontSize="13px">
+                      {intl.formatDate(order.createdAt)}
+                      {' - '}
+                      {formatCurrency(order.amount.valueInCents, order.amount.currency, {
+                        locale: intl.locale,
+                      })}{' '}
+                      contribution to @{order.toAccount.slug}
+                    </Span>
+                    <Span fontSize="13px">
+                      Current tier:{' '}
+                      {order.tier ? (
+                        <StyledLink
+                          as={Link}
+                          href={`/${order.toAccount.slug}/contribute/${order.tier.slug}-${order.tier.legacyId}`}
+                          openInNewTab
+                        >
+                          {order.tier.name}
+                        </StyledLink>
+                      ) : (
+                        'Custom contribution'
+                      )}
+                    </Span>
+                  </Flex>
+                </Flex>
+              </Container>
+            ))}
+          </Container>
+        </ConfirmationModal>
+      )}
+    </div>
+  );
+};
+
+export default MoveReceivedContributions;

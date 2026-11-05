@@ -1,18 +1,7 @@
 module.exports = {
+  // A file goes to the first project whose documents match it: graphqlV1 comes first so that its files are not taken
+  // by the default project's broad glob.
   projects: {
-    default: {
-      schema: 'lib/graphql/schemaV2.graphql',
-      extensions: {
-        endpoints: {
-          dev: 'http://localhost:3060/graphql/v2',
-          prod: 'https://api.opencollective.com/graphql/v2',
-        },
-        pluckConfig: {
-          globalGqlIdentifierName: 'gql',
-          gqlMagicComment: 'GraphQLV2',
-        },
-      },
-    },
     graphqlV1: {
       schema: 'lib/graphql/schema.graphql',
       documents: [
@@ -21,19 +10,19 @@ module.exports = {
         'components/collective-page/graphql/fragments.js',
         'components/collective-page/graphql/queries.js',
         'components/collective-page/hero/HeroTotalCollectiveContributionsWithData.js',
-        'components/CollectivePickerAsync.js',
+        'components/CollectivePickerAsync.tsx',
         'components/CreateCollectiveMiniForm.tsx',
         'components/edit-collective/EditUserEmailForm.js',
         'components/edit-collective/sections/PaymentReceipts.tsx',
         'components/edit-collective/sections/Webhooks.tsx',
-        'components/EditPublicMessagePopup.js',
-        'components/MembershipsWithData.js',
-        'components/MembersWithData.js',
-        'components/SignInOrJoinFree.js',
-        'components/tier-page/graphql/queries.js',
-        'lib/graphql/v1/fragments.js',
-        'lib/graphql/v1/mutations.js',
-        'lib/graphql/v1/queries.js',
+        'components/EditPublicMessagePopup.tsx',
+        'components/MembershipsWithData.tsx',
+        'components/MembersWithData.tsx',
+        'components/SignInOrJoinFree.tsx',
+        'components/tier-page/graphql/queries.ts',
+        'lib/graphql/v1/fragments.ts',
+        'lib/graphql/v1/mutations.ts',
+        'lib/graphql/v1/queries.ts',
         'pages/contribute.js',
         'pages/updatePaymentMethod.js',
         // The following documents use gql and gqlV1 at the same time, gqlV1 will not be linted
@@ -48,6 +37,21 @@ module.exports = {
         pluckConfig: {
           globalGqlIdentifierName: 'gqlV1',
           gqlMagicComment: 'GraphQL',
+        },
+      },
+    },
+    default: {
+      schema: 'lib/graphql/schemaV2.graphql',
+      // Every gql document, so that unique-operation-name and unique-fragment-name can compare them
+      documents: ['{components,lib,pages,test}/**/*.{js,jsx,ts,tsx}', '!lib/graphql/types/**'],
+      extensions: {
+        endpoints: {
+          dev: 'http://localhost:3060/graphql/v2',
+          prod: 'https://api.opencollective.com/graphql/v2',
+        },
+        pluckConfig: {
+          globalGqlIdentifierName: 'gql',
+          gqlMagicComment: 'GraphQLV2',
         },
       },
     },

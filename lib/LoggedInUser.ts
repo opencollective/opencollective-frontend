@@ -22,6 +22,7 @@ class LoggedInUser {
   public CollectiveId: number;
   public collective: GraphQLV1Collective;
   public isRoot: boolean;
+  public isLimited: boolean;
   public requiresProfileCompletion: boolean;
   public id: number;
   public image: string;

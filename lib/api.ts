@@ -126,14 +126,24 @@ export const canUseMockImageUpload = () => {
   }
 };
 
+type ImageUploadOptions = {
+  /** function called with upload progress as a number [0-100] */
+  onProgress?: (progress: number) => void;
+  onSuccess?: (url: string) => void;
+  onFailure?: (error: unknown) => void;
+  /** A mock image URL (or `true` for the default one) to return in test environments */
+  mockImage?: boolean | string;
+};
+
 /**
  * Similar to `upload` but uses XHR, which gives us the ability
  * to watch for upload progress (not yet supported by fetch).
- *
- * @param `onProgress` - function called with upload progress as a number [0-100]
- * @param mockImage - An image to return in test environments
  */
-export function uploadImageWithXHR(file, kind, { onProgress, onSuccess, onFailure, mockImage = false }) {
+export function uploadImageWithXHR(
+  file: File,
+  kind: string,
+  { onProgress, onSuccess, onFailure, mockImage = false }: ImageUploadOptions,
+) {
   // Mock for development
   if (mockImage && canUseMockImageUpload()) {
     const mockImageUrl = mockImage === true ? 'https://d.pr/free/i/OlQVIb+' : mockImage;
@@ -213,21 +223,6 @@ export function connectAccountCallback(CollectiveId, service, options: { redirec
     method: 'get',
     headers: addAuthTokenToHeader(),
   }).then(response => response.status === 200 || response.status === 302);
-}
-
-/**
- * Returns the PayPal Connect public client ID from the platform backend.
- * Returns null if PayPal Connect is not configured
- */
-export function getPaypalConnectConfig(accountId: string): Promise<{
-  clientId: string;
-  redirectUri: string;
-  authorizeUrl: string;
-} | null> {
-  const url = new URL(`${window.location.origin}/api/connected-accounts/paypal/connect-config`);
-  url.searchParams.set('accountId', accountId);
-  url.searchParams.set('redirect', window.location.href.replace(/\?.*/, ''));
-  return fetch(url.toString()).then(response => (response.ok ? response.json() : null));
 }
 
 export function checkUserExistence(email) {
@@ -446,27 +441,42 @@ export async function downloadLegalDocument(legalDocument, account, prompt2fa) {
 }
 
 /**
- * Fetch a CSV file, usually from the REST service
+ * Fetch a file from the REST service. Resolves with the response, so the body can be streamed.
  */
-export async function fetchCSVFileFromRESTService(url, filename, { isAuthenticated = true } = {}) {
-  const fetchParams = { method: 'GET' };
-  if (isAuthenticated) {
-    const accessToken = getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
-    fetchParams['headers'] = { Authorization: `Bearer ${accessToken}` };
+export async function fetchFromRESTService(
+  url: string,
+  { isAuthenticated = true, signal = undefined }: { isAuthenticated?: boolean; signal?: AbortSignal } = {},
+): Promise<Response> {
+  const fetchParams: RequestInit = { method: 'GET', signal };
+  const accessToken = isAuthenticated && getFromLocalStorage(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+  if (accessToken) {
+    fetchParams.headers = { Authorization: `Bearer ${accessToken}` };
   }
 
   let response;
   try {
     response = await fetch(url, fetchParams);
-  } catch {
+  } catch (e) {
+    if (signal?.aborted) {
+      throw e;
+    }
     throw createError(ERROR.NETWORK);
   }
 
-  const content = response && (await response.text());
   if (!response?.ok) {
+    const content = response && (await response.text());
     throw createError(ERROR.UNKNOWN, { message: content });
   }
 
+  return response;
+}
+
+/**
+ * Fetch a CSV file, usually from the REST service
+ */
+export async function fetchCSVFileFromRESTService(url, filename, { isAuthenticated = true } = {}) {
+  const response = await fetchFromRESTService(url, { isAuthenticated });
+  const content = await response.text();
   return exportFile('text/csv;charset=utf-8', `${filename}.csv`, content);
 }
 
