@@ -29,7 +29,7 @@ if [ -z "$FRONTEND_FOLDER" ]; then
 else
   cd $FRONTEND_FOLDER
 fi
-node server &
+node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON server/index.ts &
 FRONTEND_PID=$!
 cd -
 

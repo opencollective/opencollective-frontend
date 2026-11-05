@@ -10,7 +10,7 @@ import StyledButton from '../StyledButton';
 interface AddNewAttachedFilesButtonProps {
   disabled?: boolean;
   onSuccess?(...args: unknown[]): unknown;
-  mockImageGenerator?(...args: unknown[]): unknown;
+  mockImageGenerator?(index: number): string | boolean;
   isMulti?: boolean;
   kind?: string;
 }

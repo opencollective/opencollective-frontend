@@ -1,5 +1,5 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { DndContext, DragOverlay } from '@dnd-kit/core';
 import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -31,6 +31,7 @@ import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '../../lib/local-storage
 import { cn } from '../../lib/utils';
 
 import ConfirmationModal from '../ConfirmationModal';
+import { editAccountSettingsMutation } from '../edit-collective/mutations';
 import { InfoTooltipIcon } from '../InfoTooltipIcon';
 import Tabs from '../Tabs';
 import { Button } from '../ui/Button';
@@ -143,15 +144,6 @@ const DownloadLink = ({ url, disabled, children }: { url: string; disabled?: boo
       {children}
     </a>
   );
-
-const editAccountSettingsMutation = gql`
-  mutation EditAccountSettings($account: AccountReferenceInput!, $key: AccountSettingsKey!, $value: JSON!) {
-    editAccountSetting(account: $account, key: $key, value: $value) {
-      id
-      settings
-    }
-  }
-`;
 
 type ExportHostedCollectivesCSVModalProps = {
   open?: boolean;

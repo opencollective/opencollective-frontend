@@ -117,3 +117,9 @@ export const teamSectionQuery = gql`
   }
   ${memberFieldsFragment}
 `;
+
+export const cancelMemberInvitationMutation = gql`
+  mutation CancelMemberInvitation($invitation: MemberInvitationReferenceInput!) {
+    cancelMemberInvitation(invitation: $invitation)
+  }
+`;

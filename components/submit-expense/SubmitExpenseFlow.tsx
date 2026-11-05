@@ -133,7 +133,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           className="overflow-hidden rounded-none p-0 sm:max-w-screen sm:min-w-screen sm:rounded-none sm:p-0"
           hideCloseButton
         >
-          <div className="relative flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden before:absolute before:top-0 before:right-0 before:left-0 before:-z-1 before:h-44 before:rotate-180 before:[background:url('/static/images/home/fiscalhost-blue-bg-md.png')] sm:bg-[#F8FAFC]">
+          <div className="relative flex h-dvh max-w-screen min-w-screen flex-col overflow-hidden before:absolute before:top-0 before:right-0 before:left-0 before:-z-1 before:h-44 before:rotate-180 before:[background:url('/static/images/home/fiscalhost-blue-bg-md.png')] sm:bg-[#F8FAFC]">
             <header className="z-30 flex min-w-screen items-center justify-between border-b border-slate-100 bg-background px-4 py-3 sm:px-10">
               <DialogTitle className="text-xl leading-7 font-bold text-slate-800">
                 <FormattedMessage
@@ -206,7 +206,7 @@ export function SubmitExpenseFlow(props: SubmitExpenseFlowProps) {
           }
         }}
       >
-        <div className="flex max-h-screen min-h-screen max-w-screen min-w-screen flex-col overflow-hidden sm:bg-[#F8FAFC]">
+        <div className="flex h-dvh max-w-screen min-w-screen flex-col overflow-hidden sm:bg-[#F8FAFC]">
           <header className="flex min-w-screen items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-10">
             <DialogTitle className="text-xl leading-7 font-bold text-slate-800">
               <FormattedMessage id="ExpenseForm.Submit" defaultMessage="Submit expense" />

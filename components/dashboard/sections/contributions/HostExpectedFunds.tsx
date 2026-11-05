@@ -143,21 +143,21 @@ function HostExpectedFunds({ accountSlug }: DashboardSectionProps) {
     },
     {
       id: ContributionsTab.PAID,
-      label: intl.formatMessage({ defaultMessage: 'Paid', id: 'u/vOPu' }),
+      label: intl.formatMessage({ defaultMessage: 'Paid', id: 'ExpectedFunds.Status.Paid' }),
       filter: {
         status: [OrderStatus.PAID],
       },
     },
     {
       id: ContributionsTab.EXPIRED,
-      label: intl.formatMessage({ defaultMessage: 'Expired', id: 'RahCRH' }),
+      label: intl.formatMessage({ defaultMessage: 'Expired', id: 'ExpectedFunds.Status.Expired' }),
       filter: {
         status: [OrderStatus.EXPIRED],
       },
     },
     {
       id: ContributionsTab.CANCELED,
-      label: intl.formatMessage({ defaultMessage: 'Cancelled', id: '3wsVWF' }),
+      label: intl.formatMessage({ defaultMessage: 'Cancelled', id: 'ExpectedFunds.Status.Cancelled' }),
       filter: {
         status: [OrderStatus.CANCELLED],
       },

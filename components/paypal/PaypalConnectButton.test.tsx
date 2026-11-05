@@ -4,28 +4,43 @@ import React from 'react';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import * as api from '../../lib/api';
 import type { PayPalSupportedCurrencies } from '@/lib/constants/currency';
 import { withRequiredProviders } from '../../test/providers';
 
 import { PAYPAL_CONNECT_POPUP_MESSAGE } from './constants';
 import PaypalConnectButton from './PaypalConnectButton';
 
-jest.mock('../../lib/api', () => ({
-  getPaypalConnectConfig: jest.fn(),
-  addAuthTokenToHeader: jest.fn(() => ({ Authorization: 'Bearer test-token' })),
-}));
+// Mirrors the URL built by the API (`getRedirectUrl` in `opencollective-api/server/paymentProviders/paypal/index.ts`)
+const DEFAULT_AUTHORIZE_URL = `https://www.paypal.com/connect?${new URLSearchParams([
+  ['flowEntry', 'static'],
+  ['client_id', 'test-client-id'],
+  ['response_type', 'code'],
+  ['scope', 'openid profile email https://uri.paypal.com/services/paypalattributes'],
+  ['redirect_uri', 'https://example.com/redirect'],
+  ['state', 'test-state'],
+])}`;
+
+const mockGetPaypalOAuthUrl = jest.fn();
+const mockConnectPaypalPayoutMethod = jest.fn();
+
+jest.mock('@apollo/client', () => {
+  const actual = jest.requireActual('@apollo/client');
+  return {
+    ...actual,
+    useMutation: jest.fn((document: { definitions?: Array<{ name?: { value?: string } }> }) => {
+      const name = document?.definitions?.[0]?.name?.value;
+      if (name === 'PaypalOAuthUrl') {
+        return [mockGetPaypalOAuthUrl, { loading: false }];
+      }
+      return [mockConnectPaypalPayoutMethod, { loading: false }];
+    }),
+  };
+});
 
 const mockToast = jest.fn();
 jest.mock('../ui/useToast', () => ({
   useToast: () => ({ toast: mockToast }),
 }));
-
-const DEFAULT_CONFIG = {
-  clientId: 'test-client-id',
-  redirectUri: 'https://example.com/redirect',
-  authorizeUrl: 'https://www.paypal.com/connect',
-};
 
 const DEFAULT_PROPS = {
   accountId: 'account-123',
@@ -53,24 +68,26 @@ const simulatePopupMessage = (data: Record<string, unknown>) => {
 const TEST_STATE = 'eyJhbGciOiJIUzI1NiJ9.eyJDb2xsZWN0aXZlSWQiOjEsInVzZXJJZCI6MX0.test';
 
 describe('PaypalConnectButton', () => {
-  let mockPopup: { closed: boolean; close: jest.Mock; focus: jest.Mock };
+  let mockPopup: { closed: boolean; close: jest.Mock; focus: jest.Mock; location: { href: string } };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockPopup = { closed: false, close: jest.fn(), focus: jest.fn() };
+    mockPopup = { closed: false, close: jest.fn(), focus: jest.fn(), location: { href: 'about:blank' } };
     jest.spyOn(window, 'open').mockReturnValue(mockPopup as unknown as Window);
-    (api.getPaypalConnectConfig as jest.Mock).mockResolvedValue(DEFAULT_CONFIG);
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ connectedAccountId: 'ca-123', payoutMethodId: 'pm-456' }),
-    } as Response);
+    mockGetPaypalOAuthUrl.mockResolvedValue({ data: { getPaypalOAuthUrl: DEFAULT_AUTHORIZE_URL } });
+    mockConnectPaypalPayoutMethod.mockResolvedValue({
+      data: {
+        connectPaypalPayoutMethod: {
+          connectedAccount: { id: 'ca-123' },
+          payoutMethod: { id: 'pm-456' },
+        },
+      },
+    });
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
   });
-
-  // ─── Rendering ────────────────────────────────────────────────────────────
 
   describe('Rendering', () => {
     it('renders a "Connect PayPal" button', () => {
@@ -89,26 +106,25 @@ describe('PaypalConnectButton', () => {
     });
   });
 
-  // ─── Config fetch errors ───────────────────────────────────────────────────
-
-  describe('Config fetch errors', () => {
-    it('calls onError when getPaypalConnectConfig rejects', async () => {
+  describe('OAuth URL errors', () => {
+    it('calls onError when getPaypalOAuthUrl rejects', async () => {
       const user = userEvent.setup();
       const onError = jest.fn();
-      (api.getPaypalConnectConfig as jest.Mock).mockRejectedValue(new Error('Network failure'));
+      mockGetPaypalOAuthUrl.mockRejectedValue(new Error('Network failure'));
 
       renderButton({ onError });
       await user.click(screen.getByRole('button', { name: /connect paypal/i }));
 
       await waitFor(() => {
-        expect(onError).toHaveBeenCalledWith(expect.objectContaining({ message: 'Network failure' }));
+        expect(onError).toHaveBeenCalled();
       });
+      expect(window.open).not.toHaveBeenCalled();
     });
 
-    it('calls onError with "not available" message when config is null', async () => {
+    it('calls onError with "not available" message when OAuth URL is missing', async () => {
       const user = userEvent.setup();
       const onError = jest.fn();
-      (api.getPaypalConnectConfig as jest.Mock).mockResolvedValue(null);
+      mockGetPaypalOAuthUrl.mockResolvedValue({ data: { getPaypalOAuthUrl: null } });
 
       renderButton({ onError });
       await user.click(screen.getByRole('button', { name: /connect paypal/i }));
@@ -118,65 +134,28 @@ describe('PaypalConnectButton', () => {
           expect.objectContaining({ message: 'PayPal Connect is not available at the moment.' }),
         );
       });
-    });
-
-    it('calls onError with "not available" message when clientId is missing', async () => {
-      const user = userEvent.setup();
-      const onError = jest.fn();
-      (api.getPaypalConnectConfig as jest.Mock).mockResolvedValue({
-        redirectUri: DEFAULT_CONFIG.redirectUri,
-        authorizeUrl: DEFAULT_CONFIG.authorizeUrl,
-      });
-
-      renderButton({ onError });
-      await user.click(screen.getByRole('button', { name: /connect paypal/i }));
-
-      await waitFor(() => {
-        expect(onError).toHaveBeenCalledWith(
-          expect.objectContaining({ message: 'PayPal Connect is not available at the moment.' }),
-        );
-      });
-    });
-
-    it('calls onError with "not available" message when redirectUri is missing', async () => {
-      const user = userEvent.setup();
-      const onError = jest.fn();
-      (api.getPaypalConnectConfig as jest.Mock).mockResolvedValue({
-        clientId: DEFAULT_CONFIG.clientId,
-        authorizeUrl: DEFAULT_CONFIG.authorizeUrl,
-      });
-
-      renderButton({ onError });
-      await user.click(screen.getByRole('button', { name: /connect paypal/i }));
-
-      await waitFor(() => {
-        expect(onError).toHaveBeenCalledWith(
-          expect.objectContaining({ message: 'PayPal Connect is not available at the moment.' }),
-        );
-      });
+      expect(window.open).not.toHaveBeenCalled();
     });
   });
 
-  // ─── Popup opening ────────────────────────────────────────────────────────
-
   describe('Popup opening', () => {
-    it('calls window.open with the correct PayPal URL parameters', async () => {
+    it('does not open any window until the OAuth URL is received, so the 2FA prompt is never hidden', async () => {
       const user = userEvent.setup();
+      let resolveOAuthUrl: (value: unknown) => void;
+      mockGetPaypalOAuthUrl.mockReturnValue(new Promise(resolve => (resolveOAuthUrl = resolve)));
 
       renderButton();
       await user.click(screen.getByRole('button', { name: /connect paypal/i }));
 
-      await waitFor(() => expect(window.open).toHaveBeenCalled());
+      // The OAuth URL request can trigger a 2FA prompt: no window must be opened on top of it
+      expect(mockGetPaypalOAuthUrl).toHaveBeenCalledTimes(1);
+      expect(window.open).not.toHaveBeenCalled();
 
+      await act(async () => resolveOAuthUrl({ data: { getPaypalOAuthUrl: DEFAULT_AUTHORIZE_URL } }));
+      await waitFor(() => expect(window.open).toHaveBeenCalledTimes(1));
       const [calledUrl, target] = (window.open as jest.Mock).mock.calls[0];
-      const url = new URL(calledUrl as string);
+      expect(calledUrl).toBe(DEFAULT_AUTHORIZE_URL);
       expect(target).toBe('paypalConnect');
-      expect(url.origin + url.pathname).toBe(DEFAULT_CONFIG.authorizeUrl);
-      expect(url.searchParams.get('client_id')).toBe(DEFAULT_CONFIG.clientId);
-      expect(url.searchParams.get('redirect_uri')).toBe(DEFAULT_CONFIG.redirectUri);
-      expect(url.searchParams.get('flowEntry')).toBe('static');
-      expect(url.searchParams.get('response_type')).toBe('code');
-      expect(url.searchParams.get('scope')).toContain('openid');
     });
 
     it('shows the popup overlay dialog after opening the popup', async () => {
@@ -190,28 +169,94 @@ describe('PaypalConnectButton', () => {
       });
     });
 
-    it('shows an error toast when popup is blocked (window.open returns null)', async () => {
-      const user = userEvent.setup();
-      jest.spyOn(window, 'open').mockReturnValue(null);
-      const onError = jest.fn();
+    describe('when the browser blocks the popup', () => {
+      it('asks the user to continue, then opens the popup from that click', async () => {
+        const user = userEvent.setup();
+        const onError = jest.fn();
+        const openSpy = jest.spyOn(window, 'open').mockReturnValueOnce(null);
 
-      renderButton({ onError });
-      await user.click(screen.getByRole('button', { name: /connect paypal/i }));
+        renderButton({ onError });
+        await user.click(screen.getByRole('button', { name: /connect paypal/i }));
 
-      await waitFor(() => {
-        expect(mockToast).toHaveBeenCalledWith(expect.objectContaining({ variant: 'error' }));
+        await waitFor(() => {
+          expect(screen.getByText(/continue to paypal to connect your account/i)).toBeInTheDocument();
+        });
+        expect(mockToast).not.toHaveBeenCalled();
+
+        openSpy.mockReturnValue(mockPopup as unknown as Window);
+        await user.click(screen.getByRole('button', { name: /click to continue/i }));
+
+        expect(openSpy).toHaveBeenCalledTimes(2);
+        expect(openSpy.mock.calls[1][0]).toBe(DEFAULT_AUTHORIZE_URL);
+        await waitFor(() => {
+          expect(screen.getByText(/don't see the paypal login window/i)).toBeInTheDocument();
+        });
+
+        simulatePopupMessage({ type: PAYPAL_CONNECT_POPUP_MESSAGE, code: 'auth-code', state: TEST_STATE });
+        await waitFor(() => {
+          expect(DEFAULT_PROPS.onSuccess).toHaveBeenCalledWith({
+            connectedAccountId: 'ca-123',
+            payoutMethodId: 'pm-456',
+          });
+        });
+        expect(onError).not.toHaveBeenCalled();
       });
 
-      // When popup is blocked, the component returns early without showing the overlay
-      // or calling onError. No cleanup needed.
-      expect(onError).not.toHaveBeenCalled();
+      it('does not try to open the popup when the user activation has expired', async () => {
+        const user = userEvent.setup();
+        Object.defineProperty(window.navigator, 'userActivation', {
+          configurable: true,
+          value: { isActive: false, hasBeenActive: true },
+        });
+
+        try {
+          renderButton();
+          await user.click(screen.getByRole('button', { name: /connect paypal/i }));
+
+          await waitFor(() => {
+            expect(screen.getByText(/continue to paypal to connect your account/i)).toBeInTheDocument();
+          });
+          expect(window.open).not.toHaveBeenCalled();
+        } finally {
+          delete (window.navigator as { userActivation?: unknown }).userActivation;
+        }
+      });
+
+      it('shows an error toast and keeps the overlay open when the popup is still blocked after clicking', async () => {
+        const user = userEvent.setup();
+        const onError = jest.fn();
+        jest.spyOn(window, 'open').mockReturnValue(null);
+
+        renderButton({ onError });
+        await user.click(screen.getByRole('button', { name: /connect paypal/i }));
+        await user.click(await screen.findByRole('button', { name: /click to continue/i }));
+
+        await waitFor(() => {
+          expect(mockToast).toHaveBeenCalledWith(expect.objectContaining({ variant: 'error' }));
+        });
+        expect(screen.getByText(/continue to paypal to connect your account/i)).toBeInTheDocument();
+        expect(onError).not.toHaveBeenCalled();
+      });
+
+      it('cancels the flow when the X button is clicked', async () => {
+        const user = userEvent.setup();
+        const onError = jest.fn();
+        jest.spyOn(window, 'open').mockReturnValue(null);
+
+        renderButton({ onError });
+        await user.click(screen.getByRole('button', { name: /connect paypal/i }));
+        await user.click(await screen.findByRole('button', { name: /cancel/i }));
+
+        await waitFor(() => {
+          expect(onError).toHaveBeenCalledWith(expect.objectContaining({ message: 'PayPal login was cancelled' }));
+        });
+        expect(screen.queryByText(/continue to paypal to connect your account/i)).not.toBeInTheDocument();
+      });
     });
   });
 
-  // ─── Message event handling ───────────────────────────────────────────────
-
   describe('Message event handling', () => {
-    it('calls fetch and then onSuccess when the popup sends a valid auth code and state', async () => {
+    it('calls connectPaypalPayoutMethod and then onSuccess when the popup sends a valid auth code and state', async () => {
       const user = userEvent.setup();
       const onSuccess = jest.fn();
 
@@ -226,15 +271,12 @@ describe('PaypalConnectButton', () => {
       });
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith(
-          '/api/connected-accounts/paypal/connect',
-          expect.objectContaining({ method: 'POST' }),
-        );
+        expect(mockConnectPaypalPayoutMethod).toHaveBeenCalled();
         expect(onSuccess).toHaveBeenCalledWith({ connectedAccountId: 'ca-123', payoutMethodId: 'pm-456' });
       });
     });
 
-    it('sends code, state, accountId, currency, payoutMethodId, and alias in the request body', async () => {
+    it('sends code, state, account, currency, payoutMethod, and name to GraphQL', async () => {
       const user = userEvent.setup();
 
       renderButton({ payoutMethodId: 'pm-existing', alias: 'My PayPal' });
@@ -247,14 +289,20 @@ describe('PaypalConnectButton', () => {
         state: TEST_STATE,
       });
 
-      await waitFor(() => expect(global.fetch).toHaveBeenCalled());
-      const body = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
-      expect(body.code).toBe('auth_code_123');
-      expect(body.state).toBe(TEST_STATE);
-      expect(body.accountId).toBe('account-123');
-      expect(body.currency).toBe('USD');
-      expect(body.payoutMethodId).toBe('pm-existing');
-      expect(body.name).toBe('My PayPal');
+      await waitFor(() => expect(mockConnectPaypalPayoutMethod).toHaveBeenCalled());
+      expect(mockGetPaypalOAuthUrl).toHaveBeenCalledWith({
+        variables: { account: { id: 'account-123' }, currency: 'USD' },
+      });
+      expect(mockConnectPaypalPayoutMethod).toHaveBeenCalledWith({
+        variables: {
+          code: 'auth_code_123',
+          state: TEST_STATE,
+          account: { id: 'account-123' },
+          currency: 'USD',
+          name: 'My PayPal',
+          payoutMethod: { id: 'pm-existing' },
+        },
+      });
     });
 
     it('calls onError when the popup sends code without state', async () => {
@@ -326,24 +374,33 @@ describe('PaypalConnectButton', () => {
         );
       });
 
-      // Neither callback should be triggered by a cross-origin message
       await new Promise(resolve => setTimeout(resolve, 50));
       expect(onSuccess).not.toHaveBeenCalled();
       expect(onError).not.toHaveBeenCalled();
     });
 
-    it('ignores messages with a different type than PAYPAL_CONNECT_POPUP_MESSAGE', async () => {
+    it('ignores same-origin messages with an unrelated type', async () => {
       const user = userEvent.setup();
       const onSuccess = jest.fn();
+      const onError = jest.fn();
 
-      renderButton({ onSuccess });
+      renderButton({ onSuccess, onError });
       await user.click(screen.getByRole('button', { name: /connect paypal/i }));
       await waitFor(() => screen.getByText(/don't see the paypal login window/i));
 
-      simulatePopupMessage({ type: 'UNRELATED_MESSAGE', code: 'auth_code' });
+      act(() => {
+        window.dispatchEvent(
+          new MessageEvent('message', {
+            origin: window.location.origin,
+            data: { type: 'UNRELATED_MESSAGE', code: 'auth_code_123', state: 'some_state' },
+          }),
+        );
+      });
 
       await new Promise(resolve => setTimeout(resolve, 50));
+      expect(mockConnectPaypalPayoutMethod).not.toHaveBeenCalled();
       expect(onSuccess).not.toHaveBeenCalled();
+      expect(onError).not.toHaveBeenCalled();
     });
 
     it('closes the popup overlay after receiving a valid auth code and state', async () => {
@@ -365,17 +422,11 @@ describe('PaypalConnectButton', () => {
     });
   });
 
-  // ─── API fetch errors ─────────────────────────────────────────────────────
-
-  describe('API fetch errors', () => {
-    it('calls onError with the JSON error message when fetch returns a non-ok response', async () => {
+  describe('GraphQL connect errors', () => {
+    it('calls onError when connectPaypalPayoutMethod rejects', async () => {
       const user = userEvent.setup();
       const onError = jest.fn();
-      global.fetch = jest.fn().mockResolvedValue({
-        ok: false,
-        statusText: 'Bad Request',
-        json: () => Promise.resolve({ error: { message: 'Invalid authorization code' } }),
-      } as Response);
+      mockConnectPaypalPayoutMethod.mockRejectedValue(new Error('Invalid authorization code'));
 
       renderButton({ onError });
       await user.click(screen.getByRole('button', { name: /connect paypal/i }));
@@ -388,56 +439,10 @@ describe('PaypalConnectButton', () => {
       });
 
       await waitFor(() => {
-        expect(onError).toHaveBeenCalledWith(expect.objectContaining({ message: 'Invalid authorization code' }));
-      });
-    });
-
-    it('falls back to statusText when the error response has no message', async () => {
-      const user = userEvent.setup();
-      const onError = jest.fn();
-      global.fetch = jest.fn().mockResolvedValue({
-        ok: false,
-        statusText: 'Internal Server Error',
-        json: () => Promise.resolve({}),
-      } as Response);
-
-      renderButton({ onError });
-      await user.click(screen.getByRole('button', { name: /connect paypal/i }));
-      await waitFor(() => screen.getByText(/don't see the paypal login window/i));
-
-      simulatePopupMessage({
-        type: PAYPAL_CONNECT_POPUP_MESSAGE,
-        code: 'auth_code_123',
-        state: TEST_STATE,
-      });
-
-      await waitFor(() => {
-        expect(onError).toHaveBeenCalledWith(expect.objectContaining({ message: 'Internal Server Error' }));
-      });
-    });
-
-    it('calls onError when fetch rejects entirely (network error)', async () => {
-      const user = userEvent.setup();
-      const onError = jest.fn();
-      global.fetch = jest.fn().mockRejectedValue(new Error('fetch failed'));
-
-      renderButton({ onError });
-      await user.click(screen.getByRole('button', { name: /connect paypal/i }));
-      await waitFor(() => screen.getByText(/don't see the paypal login window/i));
-
-      simulatePopupMessage({
-        type: PAYPAL_CONNECT_POPUP_MESSAGE,
-        code: 'auth_code_123',
-        state: TEST_STATE,
-      });
-
-      await waitFor(() => {
-        expect(onError).toHaveBeenCalledWith(expect.objectContaining({ message: 'fetch failed' }));
+        expect(onError).toHaveBeenCalled();
       });
     });
   });
-
-  // ─── Popup closed before auth ─────────────────────────────────────────────
 
   describe('Popup closed before completing auth', () => {
     beforeEach(() => jest.useFakeTimers());
@@ -451,19 +456,40 @@ describe('PaypalConnectButton', () => {
       await user.click(screen.getByRole('button', { name: /connect paypal/i }));
       await waitFor(() => screen.getByText(/don't see the paypal login window/i));
 
-      // Simulate user closing the popup window
       mockPopup.closed = true;
 
-      act(() => jest.advanceTimersByTime(600)); // Trigger the 500ms poll
-      act(() => jest.runAllTimers()); // Flush the nested setTimeout(0)
+      act(() => jest.advanceTimersByTime(600));
+      act(() => jest.runAllTimers());
 
       await waitFor(() => {
         expect(onError).toHaveBeenCalledWith(expect.objectContaining({ message: 'PayPal login was cancelled' }));
       });
     });
 
+    it('keeps the flow alive when the popup is re-opened before the closed-popup check runs', async () => {
+      const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+      const onError = jest.fn();
+      const newPopup = { closed: false, close: jest.fn(), focus: jest.fn(), location: { href: '' } };
+
+      renderButton({ onError });
+      await user.click(screen.getByRole('button', { name: /connect paypal/i }));
+      await waitFor(() => screen.getByText(/don't see the paypal login window/i));
+
+      // The user closes the popup and clicks "Click to Continue" before the next 500ms check
+      mockPopup.closed = true;
+      jest.spyOn(window, 'open').mockReturnValue(newPopup as unknown as Window);
+      await user.click(screen.getByRole('button', { name: /click to continue/i }));
+      expect(window.open).toHaveBeenCalledWith(DEFAULT_AUTHORIZE_URL, 'paypalConnect', expect.any(String));
+
+      act(() => jest.advanceTimersByTime(2000));
+
+      expect(newPopup.close).not.toHaveBeenCalled();
+      expect(onError).not.toHaveBeenCalled();
+      expect(screen.getByText(/don't see the paypal login window/i)).toBeInTheDocument();
+    });
+
     it('does NOT call onError if popup closes after a successful auth', async () => {
-      jest.useRealTimers(); // Use real timers for this test since it involves a successful flow
+      jest.useRealTimers();
       const user = userEvent.setup();
       const onSuccess = jest.fn();
       const onError = jest.fn();
@@ -472,7 +498,6 @@ describe('PaypalConnectButton', () => {
       await user.click(screen.getByRole('button', { name: /connect paypal/i }));
       await waitFor(() => screen.getByText(/don't see the paypal login window/i));
 
-      // Successful auth via message (sets hadSuccess.current = true)
       simulatePopupMessage({
         type: PAYPAL_CONNECT_POPUP_MESSAGE,
         code: 'auth_code_123',
@@ -480,12 +505,9 @@ describe('PaypalConnectButton', () => {
       });
       await waitFor(() => expect(onSuccess).toHaveBeenCalled());
 
-      // Popup closes after success — should not trigger an error
       expect(onError).not.toHaveBeenCalled();
     });
   });
-
-  // ─── Popup overlay interactions ────────────────────────────────────────────
 
   describe('Popup overlay', () => {
     it('calls onError with "cancelled" and hides the overlay when the X button is clicked', async () => {

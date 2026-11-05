@@ -12,21 +12,16 @@ import { RICH_ERROR_MESSAGES } from '../lib/form-utils';
 /**
  * Attributes that can be set on an input element, inferred from a Zod schema.
  */
-type InputAttributesFromZodSchema =
-  | {
-      name?: string;
-      required?: boolean;
-    }
-  | {
-      type: 'text';
-      minLength?: number;
-      maxLength?: number;
-    }
-  | {
-      type: 'number';
-      min?: number;
-      max?: number;
-    };
+type InputAttributesFromZodSchema = {
+  name?: string;
+  required?: boolean;
+  defaultValue?: string | number | readonly string[];
+  type?: 'text' | 'number';
+  minLength?: number;
+  maxLength?: number;
+  min?: number;
+  max?: number;
+};
 
 /**
  * A Zod schema that can be used in a Formik form. It can be a plain Zod object or a Zod effect that wraps a Zod object.

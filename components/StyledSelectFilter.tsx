@@ -3,7 +3,7 @@ import React from 'react';
 import type { StyledSelectProps } from './StyledSelect';
 import StyledSelect from './StyledSelect';
 
-export const getSelectFilterStyles = stylesFromProps => ({
+export const getSelectFilterStyles = (stylesFromProps = undefined) => ({
   ...(stylesFromProps || null),
   control: (baseStyles, state) => {
     const styles = {

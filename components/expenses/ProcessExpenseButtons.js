@@ -38,8 +38,8 @@ import MarkExpenseAsUnpaidButton from './MarkExpenseAsUnpaidButton';
 import PayExpenseButton from './PayExpenseButton';
 import { SecurityChecksButton } from './SecurityChecksModal';
 
-const processExpenseMutation = gql`
-  mutation ProcessExpense(
+const processExpenseButtonsMutation = gql`
+  mutation ProcessExpenseButtons(
     $id: String
     $legacyId: Int
     $action: ExpenseProcessAction!
@@ -135,18 +135,18 @@ const ProcessExpenseButtons = ({
   permissions,
   buttonProps = DEFAULT_PROCESS_EXPENSE_BTN_PROPS,
   onSuccess,
-  onModalToggle,
-  onDelete,
-  isMoreActions,
+  onModalToggle = undefined,
+  onDelete = undefined,
+  isMoreActions = undefined,
   displaySecurityChecks = true,
   isViewingExpenseInHostContext = false,
-  disabled,
+  disabled = undefined,
   enableKeyboardShortcuts,
 }) => {
   const [confirmProcessExpenseAction, setConfirmProcessExpenseAction] = React.useState();
   const [showApproveExpenseModal, setShowApproveExpenseModal] = React.useState(false);
   const [selectedAction, setSelectedAction] = React.useState(null);
-  const [processExpense, { loading, error }] = useMutation(processExpenseMutation);
+  const [processExpense, { loading, error }] = useMutation(processExpenseButtonsMutation);
   const intl = useIntl();
   const { toast } = useToast();
   const { LoggedInUser } = useLoggedInUser();

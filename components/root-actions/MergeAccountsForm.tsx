@@ -1,0 +1,200 @@
+import React from 'react';
+import { useMutation } from '@apollo/client';
+import { useIntl } from 'react-intl';
+
+import { i18nGraphqlException } from '../../lib/errors';
+import { gql } from '../../lib/graphql/helpers';
+
+import CollectivePickerAsync from '../CollectivePickerAsync';
+import ConfirmationModal from '../ConfirmationModal';
+import DashboardHeader from '../dashboard/DashboardHeader';
+import { Flex } from '../Grid';
+import MessageBox from '../MessageBox';
+import StyledButton from '../StyledButton';
+import StyledCheckbox from '../StyledCheckbox';
+import StyledInputField from '../StyledInputField';
+import { P, Span } from '../Text';
+import { Alert, AlertDescription, AlertTitle } from '../ui/Alert';
+import { useToast } from '../ui/useToast';
+
+const mergeAccountsMutation = gql`
+  mutation MergeAccounts($fromAccount: AccountReferenceInput!, $toAccount: AccountReferenceInput!, $dryRun: Boolean!) {
+    mergeAccounts(fromAccount: $fromAccount, toAccount: $toAccount, dryRun: $dryRun) {
+      message
+      account {
+        id
+        name
+        slug
+        isIncognito
+        ... on Individual {
+          isGuest
+        }
+      }
+    }
+  }
+`;
+
+const MergeAccountsForm = () => {
+  const [submitMergeAccounts, { loading }] = useMutation(mergeAccountsMutation);
+  const [mergeSummary, setMergeSummary] = React.useState(false);
+  const [hasConfirmedOwnership, setHasConfirmedOwnership] = React.useState(false);
+  const [hasConfirmedRisk, setHasConfirmedRisk] = React.useState(false);
+  const [fromAccount, setFromAccount] = React.useState(null);
+  const [toAccount, setToAccount] = React.useState(null);
+  const { toast } = useToast();
+  const isValid = fromAccount && toAccount;
+  const intl = useIntl();
+  const mergeCTA = getMergeCTA(fromAccount, toAccount);
+
+  const mergeAccounts = async (dryRun = true) => {
+    try {
+      const result = await submitMergeAccounts({
+        variables: {
+          dryRun,
+          fromAccount: { legacyId: fromAccount.id },
+          toAccount: { legacyId: toAccount.id },
+        },
+      });
+
+      const resultMessage = result.data.mergeAccounts.message;
+      if (dryRun) {
+        setHasConfirmedOwnership(false);
+        setHasConfirmedRisk(false);
+        setMergeSummary(resultMessage);
+      } else {
+        const successMessage = `@${fromAccount.slug} has been merged into @${toAccount.slug}`;
+        toast({
+          variant: 'success',
+          message: !resultMessage ? successMessage : `${successMessage}\n${resultMessage}`,
+        });
+
+        // Reset the form
+        setMergeSummary(null);
+        setHasConfirmedOwnership(false);
+        setHasConfirmedRisk(false);
+        setFromAccount(null);
+        setToAccount(null);
+      }
+    } catch (e) {
+      toast({
+        variant: 'error',
+        message: i18nGraphqlException(intl, e),
+      });
+    }
+  };
+
+  return (
+    <div>
+      <DashboardHeader
+        title="Merge Accounts"
+        description="⚠️⚠️⚠️ Before merging user accounts, you must always make sure that the person who requested it own both emails. Merging means payment methods are merged too, so if we just merge 2 accounts because someones ask for it without verifying we could end up in a very bad situation. A simple way to do that is to send a unique random code to the other account they want to claim and ask them to share this code. ⚠️⚠️⚠️"
+        className="mb-10"
+      />
+      <Alert className="relative mb-8 flex items-center gap-2 bg-destructive/5 fade-in" variant="destructive">
+        <AlertTitle className="flex items-center">Dangerous Action</AlertTitle>
+        <AlertDescription>
+          Please be super careful with the action below, and double check everything you do.
+        </AlertDescription>
+      </Alert>
+      <Flex alignItems="flex-end">
+        <StyledInputField htmlFor="merge-account-1" label="Merge Account..." flex="1 1">
+          {({ id }) => (
+            <CollectivePickerAsync
+              inputId={id}
+              onChange={option => setFromAccount(option?.value || null)}
+              collective={fromAccount}
+              includeAllVendors
+              isClearable
+              noCache // Don't cache to prevent showing merged collectives
+              skipGuests={false}
+            />
+          )}
+        </StyledInputField>
+      </Flex>
+      <Flex alignItems="flex-end" mt={3}>
+        <StyledInputField htmlFor="merge-account-2" label="...into" flex="1 1">
+          {({ id }) => (
+            <CollectivePickerAsync
+              inputId={id}
+              onChange={option => setToAccount(option?.value || null)}
+              filterResults={accounts => (!fromAccount ? accounts : accounts.filter(a => a.id !== fromAccount.id))}
+              collective={toAccount}
+              types={fromAccount ? getMergeTargetTypes(fromAccount.type) : undefined}
+              includeAllVendors
+              isClearable
+              noCache // Don't cache to prevent showing merged collectives
+              skipGuests={false}
+            />
+          )}
+        </StyledInputField>
+      </Flex>
+      <StyledButton
+        mt={4}
+        width="100%"
+        buttonStyle="danger"
+        disabled={!isValid}
+        loading={loading}
+        onClick={() => mergeAccounts(true)}
+      >
+        {mergeCTA}
+      </StyledButton>
+      {mergeSummary && (
+        <ConfirmationModal
+          isDanger
+          continueLabel="Merge profiles"
+          header={mergeCTA}
+          continueHandler={() => mergeAccounts(false)}
+          disableSubmit={!hasConfirmedOwnership || !hasConfirmedRisk}
+          onClose={() => {
+            setMergeSummary(false);
+            setHasConfirmedOwnership(false);
+            setHasConfirmedRisk(false);
+          }}
+        >
+          <P whiteSpace="pre-wrap" lineHeight="24px">
+            {mergeSummary}
+          </P>
+          <MessageBox type="warning" mt={3}>
+            <StyledCheckbox
+              name="has-confirmed-ownership"
+              checked={hasConfirmedOwnership}
+              onChange={({ checked }) => setHasConfirmedOwnership(checked)}
+              label={
+                <Span>
+                  I have verified that the person who requested this merge owns both accounts (for example, by sending a
+                  unique verification code to each email).
+                </Span>
+              }
+            />
+            <StyledCheckbox
+              name="has-confirmed-risk"
+              checked={hasConfirmedRisk}
+              onChange={({ checked }) => setHasConfirmedRisk(checked)}
+              {...({ mt: 2 } as Record<string, unknown>)}
+              label={
+                <Span>
+                  I understand that payment methods and other profile data will be merged, and that this action cannot
+                  be easily undone.
+                </Span>
+              }
+            />
+          </MessageBox>
+        </ConfirmationModal>
+      )}
+    </div>
+  );
+};
+
+const getMergeCTA = (fromAccount, toAccount) => {
+  if (!fromAccount || !toAccount) {
+    return 'Merge';
+  } else {
+    return `Merge @${fromAccount.slug} into @${toAccount.slug}`;
+  }
+};
+
+const getMergeTargetTypes = fromAccountType =>
+  // Projects can also be merged into collectives hosted by the same host
+  fromAccountType === 'PROJECT' ? [fromAccountType, 'COLLECTIVE'] : [fromAccountType];
+
+export default MergeAccountsForm;

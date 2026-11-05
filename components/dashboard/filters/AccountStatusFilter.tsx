@@ -13,7 +13,7 @@ export enum ACCOUNT_STATUS {
 
 const AccountStatusMessages = defineMessages({
   [ACCOUNT_STATUS.ACTIVE]: {
-    id: 'Subscriptions.Active',
+    id: 'AccountStatus.Active',
     defaultMessage: 'Active',
   },
   [ACCOUNT_STATUS.ARCHIVED]: {

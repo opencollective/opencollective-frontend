@@ -8,7 +8,7 @@ export function getFlagEmoji(countryCode: string) {
 }
 
 export function getCountryDisplayName(intl: IntlShape, countryCode: string) {
-  const regionNames = getIntlDisplayNames(intl, 'region');
+  const regionNames = getIntlDisplayNames(intl.locale, 'region');
   return regionNames.of(countryCode);
 }
 

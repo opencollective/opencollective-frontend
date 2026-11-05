@@ -90,7 +90,7 @@ const Accounts = ({ accountSlug, subpath }: DashboardSectionProps) => {
     },
     {
       id: 'active',
-      label: intl.formatMessage({ id: 'Subscriptions.Active', defaultMessage: 'Active' }),
+      label: intl.formatMessage({ id: 'AccountStatus.Active', defaultMessage: 'Active' }),
       filter: { status: ACCOUNT_STATUS.ACTIVE },
       count: !isUndefined(metadata?.account?.active?.totalCount) ? metadata.account.active.totalCount + 1 : undefined,
     },

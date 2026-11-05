@@ -1,4 +1,5 @@
 import React from 'react';
+import { getContrast } from 'polished';
 
 import type LoggedInUser from '../lib/LoggedInUser';
 
@@ -35,7 +36,26 @@ interface PageProps {
   loading?: boolean;
   withTopBar?: boolean;
   updatesRss?: boolean;
+  /** Brand color (hex) used as the `--primary` color of the page's UI elements */
+  primaryColor?: string;
 }
+
+/**
+ * [POC] Turns a collective's brand color (`settings.collectivePage.primaryColor`) into
+ * CSS variable overrides applied on the page's `<main>` wrapper, so that all UI elements
+ * using `--primary` (buttons, links, checkboxes, focus rings...) pick it up. Returns
+ * `undefined` when no valid color is set, keeping the default theme.
+ */
+const getThemeStyle = (primaryColor?: string): React.CSSProperties | undefined => {
+  if (!primaryColor || !/^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(primaryColor)) {
+    return undefined;
+  }
+  return {
+    '--primary': primaryColor,
+    '--primary-foreground': getContrast(primaryColor, '#ffffff') >= 4.5 ? '#ffffff' : 'var(--color-slate-900)',
+    '--ring': primaryColor,
+  } as React.CSSProperties;
+};
 
 const Page = ({
   children,
@@ -57,6 +77,7 @@ const Page = ({
   showProfileAndChangelogMenu = true,
   loading,
   updatesRss,
+  primaryColor,
 }: PageProps) => {
   if (data.error) {
     return <ErrorPage data={data} LoggedInUser={LoggedInUser} />;
@@ -82,7 +103,9 @@ const Page = ({
         withTopBar={withTopBar}
         updatesRss={updatesRss}
       />
-      <Body className="flex-1">{typeof children === 'function' ? children(childProps) : children}</Body>
+      <Body className="flex-1" style={getThemeStyle(primaryColor)}>
+        {typeof children === 'function' ? children(childProps) : children}
+      </Body>
       {showFooter && <Footer />}
     </div>
   );

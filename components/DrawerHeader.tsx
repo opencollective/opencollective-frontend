@@ -23,6 +23,8 @@ type DrawerHeaderProps = {
   dropdownTriggerRef?: React.Ref<HTMLButtonElement>;
   forceMoreActions?: boolean;
   separateRowForEntityLabel?: boolean;
+  /** Cypress hook for the close button (defaults to `close-drawer-btn`) */
+  closeButtonDataCy?: string;
 };
 
 export default function DrawerHeader({
@@ -33,6 +35,7 @@ export default function DrawerHeader({
   dropdownTriggerRef,
   forceMoreActions = false,
   separateRowForEntityLabel = false,
+  closeButtonDataCy = 'close-drawer-btn',
 }: DrawerHeaderProps) {
   const { viewport } = useWindowResize();
   const isMobile = viewport === VIEWPORTS.XSMALL;
@@ -51,7 +54,7 @@ export default function DrawerHeader({
 
         <div className="flex items-center gap-1">
           <SheetClose asChild>
-            <Button variant="ghost" size="icon-xs" className="shrink-0" data-cy="close-drawer-btn">
+            <Button variant="ghost" size="icon-xs" className="shrink-0" data-cy={closeButtonDataCy}>
               <X className="h-4 w-4" />
               <span className="sr-only">
                 <FormattedMessage id="Close" defaultMessage="Close" />
@@ -106,7 +109,7 @@ export default function DrawerHeader({
                 {shouldPutPrimaryInMoreActions &&
                   primary?.map(action => <DropdownActionItem key={action.key} action={action} />)}
 
-                {shouldPutPrimaryInMoreActions && primary.length > 0 && secondary.length > 0 && (
+                {shouldPutPrimaryInMoreActions && primary.length > 0 && secondary?.length > 0 && (
                   <DropdownMenuSeparator />
                 )}
 

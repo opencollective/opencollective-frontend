@@ -1,0 +1,60 @@
+import React from 'react';
+import { styled } from 'styled-components';
+
+import { Flex } from '../Grid';
+import Link from '../Link';
+import StyledRoundButton from '../StyledRoundButton';
+import { P } from '../Text';
+
+import { CONTRIBUTE_CARD_BORDER_RADIUS, CONTRIBUTE_CARD_WIDTH } from './constants';
+
+const CreateNewCard = styled(Link)`
+  display: block;
+  background: white;
+  height: 100%;
+  width: ${CONTRIBUTE_CARD_WIDTH}px;
+  border-radius: ${CONTRIBUTE_CARD_BORDER_RADIUS}px;
+  border: 1px dashed #c0c5cc;
+  padding: 32px;
+  cursor: pointer;
+
+  a {
+    text-decoration: none;
+    display: block;
+  }
+
+  &:hover {
+    background: ${props => props.theme.colors.black[50]};
+  }
+`;
+
+/**
+ * A special card dedicated to admins to show them a `Create new ...` card (ex: Create new tier).
+ */
+type CreateNewProps = {
+  /** Target of the card link. Optional when rendered as another element (e.g. `as="div"`) */
+  route?: string;
+  children?: React.ReactNode;
+  as?: React.ElementType;
+  'data-cy'?: string;
+  onClick?: () => void;
+};
+
+const CreateNew = ({ route, children, ...props }: CreateNewProps) => {
+  return (
+    <CreateNewCard {...props} href={route}>
+      <Flex alignItems="center" justifyContent="center" height="100%">
+        <Flex flexDirection="column" justifyContent="center" alignItems="center" height="100%">
+          <StyledRoundButton buttonStyle="primary" fontSize={25}>
+            +
+          </StyledRoundButton>
+          <P mt={3} color="black.700">
+            {children}
+          </P>
+        </Flex>
+      </Flex>
+    </CreateNewCard>
+  );
+};
+
+export default CreateNew;

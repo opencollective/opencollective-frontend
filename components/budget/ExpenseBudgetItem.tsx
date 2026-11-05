@@ -1,0 +1,582 @@
+import React from 'react';
+import { AlertTriangle } from '@styled-icons/feather/AlertTriangle';
+import { Maximize2 as MaximizeIcon } from '@styled-icons/feather/Maximize2';
+import { get, includes, truncate } from 'lodash-es';
+import { FormattedMessage, useIntl } from 'react-intl';
+import styled, { css } from 'styled-components';
+import type { SpaceProps } from 'styled-system';
+import { space } from 'styled-system';
+
+import expenseTypes from '../../lib/constants/expenseTypes';
+import { getFilesFromExpense } from '../../lib/expenses';
+import { ExpenseStatus } from '../../lib/graphql/types/v2/graphql';
+import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
+import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
+import { toPx } from '../../lib/theme/helpers';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
+import { shouldDisplayExpenseCategoryPill } from '../expenses/lib/accounting-categories';
+import { isFeatureEnabled } from '@/lib/allowed-features';
+
+import { ExpenseKYCStatusBadge } from '../kyc/components/ExpenseKYCStatusBadge';
+
+import { AccountHoverCard } from '../AccountHoverCard';
+import AmountWithExchangeRateInfo from '../AmountWithExchangeRateInfo';
+import AutosizeText from '../AutosizeText';
+import Avatar from '../Avatar';
+import { AvatarWithLink } from '../AvatarWithLink';
+import DateTime from '../DateTime';
+import AdminExpenseStatusTag from '../expenses/AdminExpenseStatusTag';
+import { ExpenseAccountingCategoryPill } from '../expenses/ExpenseAccountingCategoryPill';
+import ExpenseStatusTag from '../expenses/ExpenseStatusTag';
+import ExpenseTypeTag from '../expenses/ExpenseTypeTag';
+import PayoutMethodTypeWithIcon from '../expenses/PayoutMethodTypeWithIcon';
+import ProcessExpenseButtons, {
+  DEFAULT_PROCESS_EXPENSE_BTN_PROPS,
+  hasProcessButtons,
+} from '../expenses/ProcessExpenseButtons';
+import FilesViewerModal from '../FilesViewerModal';
+import FormattedMoneyAmount from '../FormattedMoneyAmount';
+import { Box, Flex } from '../Grid';
+import CommentIcon from '../icons/CommentIcon';
+import Link from '../Link';
+import LinkCollective from '../LinkCollective';
+import LoadingPlaceholder from '../LoadingPlaceholder';
+import StackedAvatars from '../StackedAvatars';
+import StyledButton from '../StyledButton';
+import StyledLink from '../StyledLink';
+import Tags from '../Tags';
+import { H3 } from '../Text';
+import TransactionSign from '../TransactionSign';
+import TruncatedTextWithTooltip from '../TruncatedTextWithTooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
+
+const DetailColumnHeader = styled.div`
+  font-style: normal;
+  font-weight: bold;
+  font-size: 9px;
+  line-height: 14px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #c4c7cc;
+`;
+
+const ButtonsContainer = styled.div.attrs<{ 'data-cy'?: string }>({ 'data-cy': 'expense-actions' })`
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  grid-gap: 8px;
+  transition: opacity 0.05s;
+  justify-content: flex-end;
+
+  @media (max-width: 40em) {
+    justify-content: center;
+  }
+
+  & > *:last-child {
+    margin-right: 0;
+  }
+`;
+
+const ExpenseContainer = styled.div<{ useDrawer?: boolean; selected?: boolean } & SpaceProps>`
+  outline: none;
+  display: block;
+  width: 100%;
+  border: 0;
+  background: white;
+  ${space}
+
+  transition: background 0.1s;
+
+  ${props => props.useDrawer && props.selected && `background: #E5F3FF;`}
+
+  ${props =>
+    !props.selected &&
+    css`
+      @media (hover: hover) {
+        &:not(:hover):not(:focus-within) ${ButtonsContainer} {
+          opacity: 0.24;
+        }
+      }
+    `}
+`;
+
+const ExpenseBudgetItem = ({
+  isLoading = false,
+  host = undefined,
+  isInverted = false,
+  showAmountSign = false,
+  expense,
+  showProcessActions = false,
+  view = 'public',
+  onProcess = undefined,
+  selected = undefined,
+  expandExpense = undefined,
+  useDrawer = false,
+}) => {
+  const intl = useIntl();
+  const { LoggedInUser } = useLoggedInUser();
+  const [showFilesViewerModal, setShowFilesViewerModal] = React.useState(null);
+  const featuredProfile = isInverted ? expense?.account : expense?.payee;
+  const expenseAccountRoute = expense?.account && getCollectivePageRoute(expense.account);
+  const isAdminView = view === 'admin';
+  const isSubmitterView = view === 'submitter';
+  const isCharge = expense?.type === expenseTypes.CHARGE;
+  const pendingReceipt = isCharge && expense?.items?.every(i => i.url === null);
+  const invoiceFile = expense?.invoiceFile;
+  const attachedFiles = React.useMemo(
+    () => getFilesFromExpense(expense, intl).filter(f => !invoiceFile || f.url !== invoiceFile.url),
+    [expense, intl, invoiceFile],
+  );
+  const files = React.useMemo(() => getFilesFromExpense(expense, intl), [expense, intl]);
+  const nbAttachedFiles = !isAdminView ? 0 : attachedFiles.length;
+  const isExpensePaidOrRejected = [ExpenseStatus.REJECTED, ExpenseStatus.PAID].includes(expense?.status);
+  const shouldDisplayStatusTagActions =
+    (isExpensePaidOrRejected || expense?.status === ExpenseStatus.APPROVED) &&
+    (hasProcessButtons(expense.permissions) || expense.permissions.canMarkAsIncomplete);
+  const isMultiCurrency =
+    expense?.amountInAccountCurrency && expense.amountInAccountCurrency?.currency !== expense.currency;
+
+  const isLoggedInUserExpenseHostAdmin = LoggedInUser?.isAdminOfCollective(host);
+  const isLoggedInUserExpenseAdmin = LoggedInUser?.isAdminOfCollective(expense?.account);
+  const isViewingExpenseInHostContext = isLoggedInUserExpenseHostAdmin && !isLoggedInUserExpenseAdmin;
+  const hasKeyboardShortcutsEnabled = LoggedInUser?.hasPreviewFeatureEnabled(PREVIEW_FEATURE_KEYS.KEYBOARD_SHORTCUTS);
+  const lastComment = expense?.lastComment?.nodes?.[0];
+  const approvedBy = expense?.approvedBy?.length > 0 ? expense.approvedBy : null;
+  return (
+    <ExpenseContainer
+      px={[3, '24px']}
+      py={3}
+      data-cy={`expense-container-${expense?.legacyId}`}
+      selected={selected}
+      useDrawer={useDrawer}
+    >
+      <div className="mb-5 flex flex-wrap items-start justify-end gap-3">
+        <div className="flex grow gap-3">
+          <Box>
+            {isLoading ? (
+              <LoadingPlaceholder width={40} height={40} />
+            ) : (
+              <AccountHoverCard
+                account={featuredProfile}
+                includeAdminMembership={{
+                  accountSlug: expense.account?.slug,
+                  hostSlug: host?.slug,
+                }}
+                trigger={
+                  <span>
+                    <AvatarWithLink
+                      size={40}
+                      account={featuredProfile}
+                      secondaryAccount={
+                        featuredProfile.id === expense.createdByAccount.id ? null : expense.createdByAccount
+                      }
+                    />
+                  </span>
+                }
+              />
+            )}
+          </Box>
+          {isLoading ? (
+            <LoadingPlaceholder height={60} />
+          ) : (
+            <Box>
+              <Tooltip>
+                <TooltipContent>
+                  {useDrawer ? (
+                    <FormattedMessage id="Expense.SeeDetails" defaultMessage="See expense details" />
+                  ) : (
+                    <FormattedMessage id="Expense.GoToPage" defaultMessage="Go to expense page" />
+                  )}
+                </TooltipContent>
+                <TooltipTrigger asChild>
+                  <span>
+                    <StyledLink
+                      $underlineOnHover
+                      {...(useDrawer
+                        ? {
+                            as: 'button',
+                            type: 'button',
+                            onClick: expandExpense,
+                          }
+                        : expenseAccountRoute
+                          ? {
+                              as: Link,
+                              href: `${expenseAccountRoute}/expenses/${expense.legacyId}`,
+                            }
+                          : {})}
+                    >
+                      <AutosizeText
+                        value={expense.description}
+                        maxLength={255}
+                        minFontSizeInPx={12}
+                        maxFontSizeInPx={16}
+                        lengthThreshold={72}
+                        mobileRatio={0.875}
+                        valueFormatter={toPx}
+                      >
+                        {({ value, fontSize }) => {
+                          return (
+                            <H3
+                              fontWeight="500"
+                              lineHeight="1.5em"
+                              {...({ textDecoration: 'none' } as Record<string, unknown>)}
+                              color="black.900"
+                              fontSize={fontSize}
+                              overflowWrap="anywhere"
+                              data-cy="expense-title"
+                            >
+                              {value}
+                            </H3>
+                          );
+                        }}
+                      </AutosizeText>
+                    </StyledLink>
+                  </span>
+                </TooltipTrigger>
+              </Tooltip>
+
+              {shouldDisplayExpenseCategoryPill(LoggedInUser, expense, expense.account, host) && (
+                <div className="flex items-center gap-1">
+                  <span className="text-sm font-normal text-neutral-700">
+                    <FormattedMessage id="expense.accountingCategory" defaultMessage="Category" />
+                  </span>
+                  <ExpenseAccountingCategoryPill
+                    expense={expense}
+                    host={host}
+                    account={expense.account}
+                    canEdit={
+                      isFeatureEnabled(host, 'CHART_OF_ACCOUNTS') &&
+                      get(expense, 'permissions.canEditAccountingCategory', false)
+                    }
+                    editPermission={get(expense, 'permissions.editAccountingCategory')}
+                    allowNone
+                    showCodeInSelect={isLoggedInUserExpenseHostAdmin}
+                  />
+                </div>
+              )}
+
+              <div className="mt-1 text-xs text-slate-700">
+                {isAdminView ? (
+                  <AccountHoverCard
+                    account={expense.account}
+                    trigger={
+                      <span>
+                        <LinkCollective noTitle className="text-primary hover:underline" collective={expense.account} />
+                      </span>
+                    }
+                  />
+                ) : (
+                  <FormattedMessage
+                    defaultMessage="from {payee} to {account}"
+                    id="B5z1AU"
+                    values={{
+                      payee: (
+                        <AccountHoverCard
+                          account={expense.payee}
+                          includeAdminMembership={{
+                            accountSlug: expense.account?.slug,
+                            hostSlug: host?.slug,
+                          }}
+                          trigger={
+                            <span>
+                              <LinkCollective
+                                noTitle
+                                className="text-primary hover:underline"
+                                collective={expense.payee}
+                              />
+                            </span>
+                          }
+                        />
+                      ),
+                      account: (
+                        <AccountHoverCard
+                          account={expense.account}
+                          trigger={
+                            <span>
+                              <LinkCollective
+                                noTitle
+                                className="text-primary hover:underline"
+                                collective={expense.account}
+                              />
+                            </span>
+                          }
+                        />
+                      ),
+                    }}
+                  />
+                )}
+                {' • '}
+                <DateTime value={expense.createdAt} />
+                {isAdminView && (
+                  <React.Fragment>
+                    {' • '}
+                    <FormattedMessage
+                      id="BalanceAmount"
+                      defaultMessage="Balance {balance}"
+                      values={{
+                        balance: (
+                          <FormattedMoneyAmount
+                            amount={get(
+                              expense.account,
+                              'stats.balanceWithBlockedFunds.valueInCents',
+                              get(expense.account, 'stats.balanceWithBlockedFunds', 0),
+                            )}
+                            currency={expense.account.currency}
+                          />
+                        ),
+                      }}
+                    />
+                    {Boolean(expense.comments?.totalCount) && (
+                      <React.Fragment>
+                        {' • '}
+                        {expense.comments?.totalCount}
+                        &nbsp;
+                        <CommentIcon size={14} color="#4D4F51" />
+                      </React.Fragment>
+                    )}
+                  </React.Fragment>
+                )}
+              </div>
+            </Box>
+          )}
+        </div>
+        <div className="flex w-full flex-col items-end justify-between sm:w-fit">
+          <Flex flexDirection="column" minWidth={100} alignItems="flex-end" data-cy="transaction-amount">
+            {isLoading ? (
+              <LoadingPlaceholder height={19} width={120} />
+            ) : (
+              <React.Fragment>
+                <div>
+                  {showAmountSign && <TransactionSign isCredit={isInverted} />}
+                  <FormattedMoneyAmount
+                    amountClassName="font-bold"
+                    amount={expense.amount}
+                    currency={expense.currency}
+                    precision={2}
+                  />
+                </div>
+                {isMultiCurrency && (
+                  <div className="my-1 text-sm text-muted-foreground">
+                    <AmountWithExchangeRateInfo amount={expense.amountInAccountCurrency} />
+                  </div>
+                )}
+              </React.Fragment>
+            )}
+          </Flex>
+          {isLoading ? (
+            <LoadingPlaceholder height={20} width={140} />
+          ) : (
+            <Flex>
+              {(isAdminView || isSubmitterView) && pendingReceipt && (
+                <Box mr="1px">
+                  <Tooltip>
+                    <TooltipContent>
+                      <FormattedMessage id="Expense.MissingReceipt" defaultMessage="Expense is missing its Receipt" />
+                    </TooltipContent>
+                    <TooltipTrigger>
+                      <AlertTriangle size={18} />
+                    </TooltipTrigger>
+                  </Tooltip>
+                </Box>
+              )}
+              {(isAdminView || isSubmitterView) && (
+                <ExpenseTypeTag type={expense.type} legacyId={expense.legacyId} mb={0} py={0} mr="2px" fontSize="9px" />
+              )}
+              {shouldDisplayStatusTagActions ? (
+                <AdminExpenseStatusTag host={host} collective={expense.account} expense={expense} p="3px 8px" />
+              ) : (
+                <ExpenseStatusTag
+                  status={expense.status}
+                  fontSize="12px"
+                  fontWeight="bold"
+                  letterSpacing="0.06em"
+                  lineHeight="16px"
+                  p="3px 8px"
+                  showTaxFormTag={includes(expense.requiredLegalDocuments, 'US_TAX_FORM')}
+                  payee={expense.payee}
+                />
+              )}
+              {isLoggedInUserExpenseHostAdmin && expense.kycStatus?.payee?.status && (
+                <ExpenseKYCStatusBadge className="ml-1" status={expense.kycStatus?.payee?.status} />
+              )}
+            </Flex>
+          )}
+        </div>
+      </div>
+      <div className="mt-2 flex flex-wrap items-end justify-end gap-4">
+        <div className="w-full sm:flex sm:w-fit sm:grow">
+          {isAdminView || isSubmitterView ? (
+            <div className="mx-4 grid grid-cols-2 gap-x-6 gap-y-1 sm:mx-0 sm:grid-flow-col sm:gap-y-0">
+              <div>
+                <DetailColumnHeader>
+                  <FormattedMessage id="expense.payoutMethod" defaultMessage="payout method" />
+                </DetailColumnHeader>
+                <div className="flex h-6 items-center">
+                  <PayoutMethodTypeWithIcon
+                    isLoading={isLoading}
+                    type={expense.payoutMethod?.type}
+                    iconSize="10px"
+                    fontSize="11px"
+                    fontWeight="normal"
+                    color="black.700"
+                  />
+                </div>
+              </div>
+              {Boolean(expense.reference) && (
+                <div>
+                  <DetailColumnHeader>
+                    <FormattedMessage id="Expense.Reference" defaultMessage="Reference" />
+                  </DetailColumnHeader>
+                  {isLoading ? (
+                    <LoadingPlaceholder height={15} width={90} />
+                  ) : (
+                    <div className="text-[11px] leading-6">
+                      <TruncatedTextWithTooltip value={expense.reference} length={10} truncatePosition="middle" />
+                    </div>
+                  )}
+                </div>
+              )}
+              {expense.invoiceFile && (
+                <div>
+                  <DetailColumnHeader>
+                    <FormattedMessage defaultMessage="Invoice" id="Expense.Type.Invoice" />
+                  </DetailColumnHeader>
+                  {isLoading ? (
+                    <LoadingPlaceholder height={15} width={90} />
+                  ) : (
+                    <StyledButton
+                      color="black.700"
+                      fontSize="11px"
+                      {...({ cursor: 'pointer' } as Record<string, unknown>)}
+                      buttonSize="tiny"
+                      onClick={
+                        useDrawer
+                          ? e => expandExpense(e, expense.invoiceFile.url)
+                          : () => setShowFilesViewerModal([expense.invoiceFile])
+                      }
+                      px={2}
+                      ml={-2}
+                      isBorderless
+                      textAlign="left"
+                    >
+                      <MaximizeIcon size={10} />
+                      &nbsp;&nbsp;
+                      <FormattedMessage
+                        id="ExpenseInvoice.count"
+                        defaultMessage="{count, plural, one {# invoice} other {# invoices}}"
+                        values={{ count: 1 }}
+                      />
+                    </StyledButton>
+                  )}
+                </div>
+              )}
+              {nbAttachedFiles > 0 && (
+                <div>
+                  <DetailColumnHeader>
+                    <FormattedMessage id="Expense.Attachments" defaultMessage="Attachments" />
+                  </DetailColumnHeader>
+                  {isLoading ? (
+                    <LoadingPlaceholder height={15} width={90} />
+                  ) : (
+                    <StyledButton
+                      color="black.700"
+                      fontSize="11px"
+                      {...({ cursor: 'pointer' } as Record<string, unknown>)}
+                      buttonSize="tiny"
+                      onClick={
+                        useDrawer
+                          ? e => expandExpense(e, attachedFiles[0].url)
+                          : () => setShowFilesViewerModal(attachedFiles)
+                      }
+                      px={2}
+                      ml={-2}
+                      isBorderless
+                      textAlign="left"
+                    >
+                      <MaximizeIcon size={10} />
+                      &nbsp;&nbsp;
+                      <FormattedMessage
+                        id="ExepenseAttachments.count"
+                        defaultMessage="{count, plural, one {# attachment} other {# attachments}}"
+                        values={{ count: nbAttachedFiles }}
+                      />
+                    </StyledButton>
+                  )}
+                </div>
+              )}
+
+              {lastComment && (
+                <div>
+                  <DetailColumnHeader>
+                    <FormattedMessage defaultMessage="Last Comment" id="gSNApa" />
+                  </DetailColumnHeader>
+                  <div className="text-[11px]">
+                    <LinkCollective
+                      collective={lastComment.fromAccount}
+                      className="flex items-center gap-2 font-medium text-slate-700 hover:text-slate-700 hover:underline"
+                      withHoverCard
+                      hoverCardProps={{ includeAdminMembership: { accountSlug: lastComment.fromAccount.slug } }}
+                    >
+                      <Avatar collective={lastComment.fromAccount} radius={24} />{' '}
+                      {truncate(lastComment.fromAccount.name, { length: 40 })}
+                    </LinkCollective>
+                  </div>
+                </div>
+              )}
+              {approvedBy && expense.status === ExpenseStatus.APPROVED && !expense.onHold && (
+                <div>
+                  <DetailColumnHeader>
+                    <FormattedMessage defaultMessage="Approved By" id="JavAWD" />
+                  </DetailColumnHeader>
+                  <div className="text-[11px]">
+                    <StackedAvatars
+                      accounts={approvedBy}
+                      imageSize={24}
+                      withHoverCard={{ includeAdminMembership: true }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="mt-2">
+              <Tags expense={expense} canEdit={get(expense, 'permissions.canEditTags', false)} />
+            </div>
+          )}
+        </div>
+        {showProcessActions && expense?.permissions && !isExpensePaidOrRejected && (
+          <div
+            data-cy="expense-actions"
+            className="flex w-full flex-col items-stretch gap-2 self-end sm:float-right sm:w-auto sm:flex-row sm:items-end sm:justify-end"
+          >
+            <ProcessExpenseButtons
+              host={host}
+              isViewingExpenseInHostContext={isViewingExpenseInHostContext}
+              collective={expense.account}
+              expense={expense}
+              permissions={expense.permissions}
+              buttonProps={{ ...DEFAULT_PROCESS_EXPENSE_BTN_PROPS, mx: 1, py: 2 }}
+              onSuccess={onProcess}
+              enableKeyboardShortcuts={selected && hasKeyboardShortcutsEnabled}
+            />
+          </div>
+        )}
+      </div>
+      {showFilesViewerModal && (
+        <FilesViewerModal
+          files={files}
+          parentTitle={intl.formatMessage(
+            {
+              defaultMessage: 'Expense #{expenseId} attachment',
+              id: 'At2m8o',
+            },
+            { expenseId: expense.legacyId },
+          )}
+          onClose={() => setShowFilesViewerModal(null)}
+        />
+      )}
+    </ExpenseContainer>
+  );
+};
+
+export default ExpenseBudgetItem;
