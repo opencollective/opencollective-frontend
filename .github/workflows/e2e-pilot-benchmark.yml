@@ -1,0 +1,262 @@
+name: E2E pilot benchmark
+
+# Benchmark scaffolding for the pilot evaluation (opencollective/opencollective#8969).
+# Not part of CI: runs only when the plan file changes on the evaluation
+# branch, and can be dropped before merge. Each matrix job is one pair: both
+# pilot suites with Cypress and with Playwright on the same machine, same
+# prepared builds, pinned service revisions and supplied services, no retries,
+# runner order alternating between pairs. Uses no secrets beyond the
+# cache-version key and the stack checkout token.
+
+on:
+  push:
+    branches:
+      - feat/playwright-pilot-evaluation-8969
+    paths:
+      - test/playwright/evaluation/benchmark-plan.json
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  TZ: UTC
+  OC_ENV: ci
+  NODE_ENV: test
+  WEBSITE_URL: http://localhost:3000
+  IMAGES_URL: http://localhost:3001
+  PDF_SERVICE_URL: http://localhost:3002
+  API_URL: http://localhost:3060
+  API_KEY: dvl-1510egmf4a23d80342403fb599qd
+  CI: true
+  DISABLE_MOCK_UPLOADS: 1
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      batch: ${{ steps.plan.outputs.batch }}
+      pairs: ${{ steps.plan.outputs.pairs }}
+      api-ref: ${{ steps.plan.outputs.api-ref }}
+      images-ref: ${{ steps.plan.outputs.images-ref }}
+      pdf-ref: ${{ steps.plan.outputs.pdf-ref }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: plan
+        run: |
+          plan=test/playwright/evaluation/benchmark-plan.json
+          {
+            echo "batch=$(jq -r .batch "$plan")"
+            echo "pairs=$(jq -c .pairs "$plan")"
+            echo "api-ref=$(jq -r .apiRef "$plan")"
+            echo "images-ref=$(jq -r .imagesRef "$plan")"
+            echo "pdf-ref=$(jq -r .pdfRef "$plan")"
+          } >> "$GITHUB_OUTPUT"
+          cat "$plan"
+
+  # Same as ci.yml `build`.
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup-project
+        with:
+          CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
+      - uses: actions/cache@v6
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-${{ secrets.CACHE_VERSION }}-nextjs-${{ hashFiles('package-lock.json') }}-
+      - run: PRESERVE_NEXT_CACHE=true npm run build
+      - run: |
+          set -euo pipefail
+          mkdir -p /tmp/frontend-next
+          rsync -a --exclude cache/ .next/ /tmp/frontend-next/
+          mkdir -p /tmp/frontend-next/_generated-public/static/scripts
+          cp public/static/scripts/pdf.worker.min.mjs /tmp/frontend-next/_generated-public/static/scripts/
+          rsync -a public/static/cmaps /tmp/frontend-next/_generated-public/static/
+      - uses: actions/upload-artifact@v7
+        with:
+          name: frontend-next
+          path: /tmp/frontend-next
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 3
+
+  # Same as e2e-prepare.yml, with the plan's pinned service revisions.
+  prepare:
+    needs: plan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: package.json
+      - uses: ./.github/actions/checkout-e2e-stack
+        with:
+          api-ref: ${{ needs.plan.outputs.api-ref }}
+          images-ref: ${{ needs.plan.outputs.images-ref }}
+          pdf-ref: ${{ needs.plan.outputs.pdf-ref }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install and build API, images and PDF
+        run: |
+          set -eu
+          for repo in opencollective-api opencollective-images opencollective-pdf; do
+            (cd "$repo" && npm ci --prefer-offline --no-audit --no-fund)
+          done
+          (cd opencollective-api && npm run build:e2e) &
+          api=$!
+          (cd opencollective-images && npm run build) &
+          images=$!
+          (cd opencollective-pdf && npm run build) &
+          pdf=$!
+          wait "$api" && wait "$images" && wait "$pdf"
+          stage=/tmp/e2e-service-dists
+          for repo in opencollective-api opencollective-images opencollective-pdf; do
+            mkdir -p "$stage/$repo" && cp -a "$repo/dist" "$stage/$repo/dist"
+          done
+      - uses: actions/upload-artifact@v7
+        with:
+          name: e2e-service-dists
+          path: /tmp/e2e-service-dists
+          if-no-files-found: error
+          retention-days: 3
+
+  pair:
+    name: pair ${{ matrix.pair.pair }} (${{ matrix.pair.mode }}, ${{ matrix.pair.order }}, pw=${{ matrix.pair.playwrightWorkers }} cy=${{ matrix.pair.cypressProcesses }})
+    needs: [plan, build, prepare]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        pair: ${{ fromJson(needs.plan.outputs.pairs) }}
+    env:
+      AWS_KEY: user
+      AWS_SECRET: password
+      AWS_S3_BUCKET: opencollective-e2e
+      AWS_S3_REGION: us-east-1
+      AWS_S3_API_VERSION: latest
+      AWS_S3_ENDPOINT: http://localhost:9000
+      AWS_S3_SSL_ENABLED: false
+      AWS_S3_FORCE_PATH_STYLE: true
+      GRAPHQL_ERROR_DETAILED: true
+      E2E_TEST: 1
+      PGHOST: localhost
+      PGUSER: postgres
+      MAILPIT_URL: http://localhost:8025
+      REDIS_URL: redis://localhost:6379
+      CYPRESS_COVERAGE: false
+      CYPRESS_RECORD: false
+      CYPRESS_VIDEO: false
+      FRONTEND_FOLDER: ${{ github.workspace }}
+      API_FOLDER: ${{ github.workspace }}/opencollective-api
+      IMAGES_FOLDER: ${{ github.workspace }}/opencollective-images
+      PDF_FOLDER: ${{ github.workspace }}/opencollective-pdf
+      TERM: xterm
+    services:
+      redis:
+        image: valkey/valkey:9.1
+        ports:
+          - 6379:6379
+      postgres:
+        image: postgres:16.15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 2s --health-timeout 5s --health-retries 5
+      rustfs:
+        image: rustfs/rustfs:1.0.0-rc.6@sha256:97171b3d72cd47dc81000f92ea84de25608bfc35a94c965501afaeb5d99f6035
+        ports:
+          - 9000:9000
+        options: --name=rustfs --health-cmd "curl -f http://localhost:9000/health/ready"
+        env:
+          RUSTFS_ACCESS_KEY: user
+          RUSTFS_SECRET_KEY: password
+      mailpit:
+        image: axllent/mailpit:v1.28.0@sha256:c076638db1e15662150be4fb62b8a6e96ef6ba5bde90c838a0239225854830f7
+        ports:
+          - 8025:8025
+          - 1025:1025
+    steps:
+      - run: sudo rm -f /var/lib/man-db/auto-update
+      - run: sudo apt-get update || exit 0
+      - name: Install system packages for both runners
+        run: |
+          sudo apt-get install -y postgresql-client-16 redis-tools psmisc \
+            libgtk2.0-0t64 libgtk-3-0t64 libgbm-dev libnotify-dev libnss3 libxss1 libasound2t64 libxtst6 xauth xvfb
+      - name: Setup S3 bucket
+        env:
+          AWS_ACCESS_KEY_ID: user
+          AWS_SECRET_ACCESS_KEY: password
+          AWS_DEFAULT_REGION: us-east-1
+        run: aws --endpoint-url http://127.0.0.1:9000 s3api create-bucket --bucket opencollective-e2e
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: package.json
+          cache: npm
+      - uses: ./.github/actions/checkout-e2e-stack
+        with:
+          api-ref: ${{ needs.plan.outputs.api-ref }}
+          images-ref: ${{ needs.plan.outputs.images-ref }}
+          pdf-ref: ${{ needs.plan.outputs.pdf-ref }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install dependencies (api, images, pdf, frontend)
+        run: |
+          set -eu
+          for repo in opencollective-api opencollective-images opencollective-pdf; do
+            (cd "$repo" && npm ci --prefer-offline --no-audit --no-fund)
+          done
+          CYPRESS_INSTALL_BINARY=0 npm ci --prefer-offline --no-audit --no-fund
+      - uses: actions/cache@v6
+        with:
+          path: ~/.cache/Cypress
+          key: ${{ runner.os }}-cypress-${{ hashFiles('node_modules/cypress/package.json') }}
+      - run: npx cypress install
+      - uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+      - run: npx playwright install-deps chromium && npx playwright install chromium
+      - uses: actions/download-artifact@v8
+        with:
+          name: frontend-next
+          path: /tmp/frontend-next
+      - uses: actions/download-artifact@v8
+        with:
+          name: e2e-service-dists
+          path: /tmp/e2e-service-dists
+      - name: Restore downloaded builds
+        run: |
+          set -euo pipefail
+          mkdir -p .next
+          rsync -a --exclude _generated-public/ /tmp/frontend-next/ .next/
+          rsync -a /tmp/frontend-next/_generated-public/ public/
+          for repo in opencollective-api opencollective-images opencollective-pdf; do
+            rm -rf "$repo/dist" && cp -a "/tmp/e2e-service-dists/$repo/dist" "$repo/dist"
+          done
+      - name: Run pair
+        run: |
+          bash test/playwright/evaluation/bench-pair.sh /tmp/bench \
+            "${{ needs.plan.outputs.batch }}" "${{ matrix.pair.pair }}" "${{ matrix.pair.mode }}" \
+            "${{ matrix.pair.order }}" "${{ matrix.pair.playwrightWorkers }}" "${{ matrix.pair.cypressProcesses }}"
+          cat /tmp/bench/machine.txt
+      - name: Collect evidence
+        if: ${{ always() }}
+        run: |
+          mkdir -p /tmp/bench/playwright-artifacts
+          cp -r test/playwright/.artifacts/. /tmp/bench/playwright-artifacts/ 2>/dev/null || true
+      - uses: actions/upload-artifact@v7
+        if: ${{ always() }}
+        with:
+          name: bench-${{ needs.plan.outputs.batch }}-pair-${{ matrix.pair.pair }}-attempt-${{ github.run_attempt }}
+          path: /tmp/bench
+          include-hidden-files: true
+          retention-days: 30

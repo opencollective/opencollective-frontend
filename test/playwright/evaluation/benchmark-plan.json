@@ -1,0 +1,12 @@
+{
+  "comment": "Benchmark scaffolding: pairs run by .github/workflows/e2e-pilot-benchmark.yml on push. Service revisions are pinned so every batch uses the same inputs.",
+  "apiRef": "ce79e402fa0c8348e879e608a705e20c89f8d590",
+  "imagesRef": "2b0ca0601fcc6d161a729b7077fab6a79ece5bf0",
+  "pdfRef": "fe967d9f45360e910be93393794ab0f3d64e7a26",
+  "batch": "calibration",
+  "pairs": [
+    { "pair": 1, "mode": "parallel", "order": "playwright,cypress", "playwrightWorkers": 2, "cypressProcesses": 2 },
+    { "pair": 2, "mode": "parallel", "order": "cypress,playwright", "playwrightWorkers": 3, "cypressProcesses": 2 },
+    { "pair": 3, "mode": "parallel", "order": "playwright,cypress", "playwrightWorkers": 4, "cypressProcesses": 2 }
+  ]
+}
