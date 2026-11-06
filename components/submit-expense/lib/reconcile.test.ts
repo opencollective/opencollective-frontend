@@ -225,6 +225,13 @@ describe('reconcileExpenseForm', () => {
   });
 
   describe('attachmentsFollowExpenseType', () => {
+    it('keeps the attachments of an expense being loaded', () => {
+      const expense = existingExpense({ items: [{ ...existingExpense().items[0], url: 'item.pdf' }] });
+      const { patch } = firstRun({ expenseTypeOption: undefined }, { expense }, { phase: 'loading' });
+      expect(patch.expenseItems[0].attachment).toBe('item.pdf');
+      expect(patch).not.toHaveProperty('invoiceFile');
+    });
+
     it('moves a single receipt to the invoice file', () => {
       const result = afterChange(
         {

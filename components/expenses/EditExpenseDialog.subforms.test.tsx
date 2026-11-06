@@ -135,8 +135,7 @@ describe('EditExpenseDialog sub-forms (characterization)', () => {
     mockedLoggedInUser = mockLoggedInUser({ slug: 'jane', adminOf: ['org'] });
   });
 
-  // Current behaviour: when an invoice item carries a URL, loading the expense runs the "attachments follow
-  // the Expense type" rule, which moves the item attachment into the invoice file (replacing the existing one).
+  // Loading the expense keeps its invoice file, even when an invoice item carries a URL
   it('expense details: submits items, attachments, invoice and tax', async () => {
     const { user, mock } = await openDialog('expenseDetails');
     await waitFor(() => expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled());
@@ -148,7 +147,7 @@ describe('EditExpenseDialog sub-forms (characterization)', () => {
         items: [{ ...expectedItems[0], url: null }],
         attachedFiles: [{ url: 'https://e.x/attached.pdf' }],
         invoiceInfo: 'Invoice info',
-        invoiceFile: { url: 'https://e.x/item.pdf' },
+        invoiceFile: { url: 'https://e.x/invoice.pdf' },
         reference: 'REF-1',
         currency: 'USD',
         tax: [],
@@ -183,8 +182,7 @@ describe('EditExpenseDialog sub-forms (characterization)', () => {
       expense: {
         id: 'expense-1',
         type: 'RECEIPT',
-        // The item attachment was first moved to the invoice file on load (see above), then back to the item
-        items: [{ ...expectedItems[0], url: 'https://e.x/item.pdf' }],
+        items: [{ ...expectedItems[0], url: 'https://e.x/invoice.pdf' }],
         attachedFiles: [{ url: 'https://e.x/attached.pdf' }],
         invoiceFile: undefined,
         invoiceInfo: 'Invoice info',

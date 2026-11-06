@@ -679,7 +679,7 @@ describe('useExpenseForm (characterization)', () => {
       expect(form.current.values.accountingCategoryId).toBeNull();
     });
 
-    it('clears an initial accounting category even when the Host has categories (rule runs before options load)', async () => {
+    it('keeps an initial accounting category when the Host has categories', async () => {
       const world = defaultWorld();
       world.accounts.collective = collective({
         host: host({
@@ -690,8 +690,6 @@ describe('useExpenseForm (characterization)', () => {
         }),
       });
       const { form } = await setup({ world, values: newExpenseValues({ accountingCategoryId: 'cat-1' }) });
-      expect(form.current.values.accountingCategoryId).toBeNull();
-      await setValues(form, { accountingCategoryId: 'cat-1' });
       expect(form.current.values.accountingCategoryId).toBe('cat-1');
     });
 

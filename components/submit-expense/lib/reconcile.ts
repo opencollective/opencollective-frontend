@@ -332,7 +332,12 @@ const resetUnsupportedExpenseType: Rule = {
 const attachmentsFollowExpenseType: Rule = {
   name: 'attachmentsFollowExpenseType',
   dependencies: ({ values }) => [values.expenseTypeOption],
-  run: ({ values }) => {
+  run: ({ values, context }) => {
+    // Only when the submitter switches type: loading an expense keeps its attachments where they are
+    if (context.phase !== 'ready') {
+      return;
+    }
+
     let v = values;
     if (values.expenseTypeOption === ExpenseType.INVOICE) {
       if (values.expenseItems.length === 1 && values.expenseItems[0].attachment) {
@@ -399,9 +404,16 @@ const prefillVendorTax: Rule = {
 
 const clearUnavailableCategory: Rule = {
   name: 'clearUnavailableCategory',
-  dependencies: ({ values, options }) => [options.accountingCategories, values.accountingCategoryId],
-  run: ({ values, options }) => {
-    if (values.accountingCategoryId && (options.accountingCategories || []).length === 0) {
+  dependencies: ({ values, options, context }) => [
+    options.accountingCategories,
+    values.accountingCategoryId,
+    context.phase,
+  ],
+  run: ({ values, options, context }) => {
+    // Wait for the categories to load
+    if (context.phase !== 'ready') {
+      return;
+    } else if (values.accountingCategoryId && (options.accountingCategories || []).length === 0) {
       return { values: { ...values, accountingCategoryId: null } };
     }
   },
