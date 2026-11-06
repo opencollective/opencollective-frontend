@@ -1146,14 +1146,18 @@ journeys cover 16 of them and these journeys the other 7.
 ## Pilot coverage reconciliation
 
 Every `describe` and `it` of the two pilot Cypress files is accounted for by
-the journey tables above. Both files are unchanged and still run with Cypress.
+the journey tables above, except one gap: "Actions on expense › Previews a PDF
+attachment", added to Cypress (opencollective/opencollective-frontend#12558)
+before the pilot merged, has no journey. Both files are unchanged and still
+run with Cypress. `node test/playwright/evaluation/cli.ts inventory` checks
+this inventory against both sources (see `test/playwright/evaluation/README.md`).
 
-`27-expenses.test.ts` (28 tests):
+`27-expenses.test.ts` (29 tests):
 
 | Cypress block                                   | Tests | Journeys | Section            |
 | ----------------------------------------------- | ----- | -------- | ------------------ |
 | new expense when logged out                     | 2     | 2        | Expense submission |
-| Actions on expense                              | 5     | 5        | Expense management |
+| Actions on expense                              | 6     | 5        | Expense management |
 | Invoices › Create (new user, returning user)    | 2     | 2        | Expense submission |
 | Invoices › Create › Invite                      | 3     | 3        | Expense invitation |
 | Invoices › Create › Recurring, Duplicate        | 2     | 2        | Expense management |
@@ -1179,10 +1183,10 @@ the journey tables above. Both files are unchanged and still run with Cypress.
 | ---------------------------- | ------------- | ------------------- |
 | Expense submission           | 9             | 9                   |
 | Expense invitation           | 6             | 6                   |
-| Expense management           | 13            | 13                  |
+| Expense management           | 14            | 13                  |
 | Vendor picker                | 16            | 15                  |
 | Vendor creation and settings | 7             | 7                   |
-| Total                        | 51            | 50                  |
+| Total                        | 52            | 50                  |
 
 One consolidation and one partial mapping are recorded, each explained in its
 section:
@@ -1201,7 +1205,7 @@ it: both logged-out invitation journeys sign in and submit, the four editing
 journeys cover a real reimbursement next to the invoice, and both recurring
 journeys check the saved recurrence.
 
-Nothing else is left out. Steps the journeys do not repeat because the source
+Apart from the PDF preview gap, nothing else is left out. Steps the journeys do not repeat because the source
 does not test them (no expense is paid, no funds are added, no expected funds
 are recorded) are listed in the sections. With the six tests of the fixture,
 account and smoke specs, the Playwright selection holds 56 tests. On the
