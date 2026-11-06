@@ -1668,9 +1668,16 @@ check_database_identity() {
   fi
   current_rev="$(git_rev "$API_DIR")"
   current_migrations="$(migrations_hash "$API_DIR")"
-  if [[ "$recorded_rev" != "$current_rev" || "$recorded_migrations" != "$current_migrations" ]]; then
-    fail "the API changed since this E2E environment restored its database (revision ${recorded_rev:0:12} -> ${current_rev:0:12}$([[ "$recorded_migrations" != "$current_migrations" ]] && echo ", migrations changed")).
-  Restart it from a restored database with: npm run e2e -- --fresh <spec>"
+  local changes=()
+  if [[ "$recorded_rev" != "$current_rev" ]]; then
+    changes+=("API revision ${recorded_rev:0:12} -> ${current_rev:0:12}")
+  fi
+  if [[ "$recorded_migrations" != "$current_migrations" ]]; then
+    changes+=("API migrations changed")
+  fi
+  if [[ ${#changes[@]} -gt 0 ]]; then
+    fail "the E2E environment's database was restored for another API ($(IFS=';'; echo "${changes[*]}" | sed 's/;/; /g')).
+  Iteration cannot reuse it. Restart from a restored database with: npm run e2e -- --fresh <spec>"
     exit 2
   fi
 }
