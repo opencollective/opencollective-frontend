@@ -1,12 +1,117 @@
 {
-  "comment": "Benchmark scaffolding: pairs run by .github/workflows/e2e-pilot-benchmark.yml on push. Service revisions are pinned so every batch uses the same inputs.",
+  "comment": "Benchmark scaffolding: pairs run by .github/workflows/e2e-pilot-benchmark.yml on push. Service revisions are pinned so every batch uses the same inputs. Batch A: serial pairs 1-3, parallel pairs 4-8 (2 Playwright workers, 2 Cypress processes, chosen from calibration run 42229567627), Playwright artifact-recording ablation 90-91, independence checks 101-110.",
   "apiRef": "ce79e402fa0c8348e879e608a705e20c89f8d590",
   "imagesRef": "2b0ca0601fcc6d161a729b7077fab6a79ece5bf0",
   "pdfRef": "fe967d9f45360e910be93393794ab0f3d64e7a26",
-  "batch": "calibration",
+  "batch": "A",
   "pairs": [
-    { "pair": 1, "mode": "parallel", "order": "playwright,cypress", "playwrightWorkers": 2, "cypressProcesses": 2 },
-    { "pair": 2, "mode": "parallel", "order": "cypress,playwright", "playwrightWorkers": 3, "cypressProcesses": 2 },
-    { "pair": 3, "mode": "parallel", "order": "playwright,cypress", "playwrightWorkers": 4, "cypressProcesses": 2 }
+    {
+      "pair": 1,
+      "mode": "serial",
+      "order": "cypress,playwright",
+      "playwrightWorkers": 1,
+      "cypressProcesses": 1
+    },
+    {
+      "pair": 2,
+      "mode": "serial",
+      "order": "playwright,cypress",
+      "playwrightWorkers": 1,
+      "cypressProcesses": 1
+    },
+    {
+      "pair": 3,
+      "mode": "serial",
+      "order": "cypress,playwright",
+      "playwrightWorkers": 1,
+      "cypressProcesses": 1
+    },
+    {
+      "pair": 4,
+      "mode": "parallel",
+      "order": "playwright,cypress",
+      "playwrightWorkers": 2,
+      "cypressProcesses": 2
+    },
+    {
+      "pair": 5,
+      "mode": "parallel",
+      "order": "cypress,playwright",
+      "playwrightWorkers": 2,
+      "cypressProcesses": 2
+    },
+    {
+      "pair": 6,
+      "mode": "parallel",
+      "order": "playwright,cypress",
+      "playwrightWorkers": 2,
+      "cypressProcesses": 2
+    },
+    {
+      "pair": 7,
+      "mode": "parallel",
+      "order": "cypress,playwright",
+      "playwrightWorkers": 2,
+      "cypressProcesses": 2
+    },
+    {
+      "pair": 8,
+      "mode": "parallel",
+      "order": "playwright,cypress",
+      "playwrightWorkers": 2,
+      "cypressProcesses": 2
+    },
+    {
+      "task": "pair",
+      "pair": 90,
+      "mode": "ablation",
+      "order": "playwright",
+      "playwrightWorkers": 2,
+      "cypressProcesses": 0,
+      "playwrightArtifacts": "off"
+    },
+    {
+      "task": "pair",
+      "pair": 91,
+      "mode": "ablation",
+      "order": "playwright",
+      "playwrightWorkers": 2,
+      "cypressProcesses": 0,
+      "playwrightArtifacts": "off"
+    },
+    {
+      "task": "alone-fresh",
+      "pair": 101,
+      "shard": 1,
+      "shards": 5
+    },
+    {
+      "task": "alone-fresh",
+      "pair": 102,
+      "shard": 2,
+      "shards": 5
+    },
+    {
+      "task": "alone-fresh",
+      "pair": 103,
+      "shard": 3,
+      "shards": 5
+    },
+    {
+      "task": "alone-fresh",
+      "pair": 104,
+      "shard": 4,
+      "shards": 5
+    },
+    {
+      "task": "alone-fresh",
+      "pair": 105,
+      "shard": 5,
+      "shards": 5
+    },
+    {
+      "task": "populated",
+      "pair": 110
+    }
   ]
 }

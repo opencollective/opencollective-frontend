@@ -3,8 +3,10 @@
 # pilot suites with each runner, one runner after the other in the given
 # order, on the same prepared builds and supplied services, with no retries.
 #
-# Usage: bench-pair.sh OUT_DIR BATCH PAIR MODE ORDER PLAYWRIGHT_WORKERS CYPRESS_PROCESSES
-#   ORDER is "cypress,playwright" or "playwright,cypress".
+# Usage: bench-pair.sh OUT_DIR BATCH PAIR MODE ORDER PLAYWRIGHT_WORKERS CYPRESS_PROCESSES [PLAYWRIGHT_ARTIFACTS]
+#   ORDER is "cypress,playwright", "playwright,cypress" or a single runner.
+#   PLAYWRIGHT_ARTIFACTS=off (ablation only) turns off trace and video
+#   recording in a temporary copy of playwright.config.ts, restored afterwards.
 # Writes OUT_DIR/run-<batch>-<pair>-<runner>.json (see `cli.ts collect-run`),
 # timestamped logs, resource samples and machine facts.
 
@@ -17,6 +19,7 @@ MODE="$4"
 ORDER="$5"
 PW_WORKERS="$6"
 CY_PROCESSES="$7"
+PW_ARTIFACTS="${8:-on}"
 FRONTEND="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 CLI=(node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON "$FRONTEND/test/playwright/evaluation/cli.ts")
 mkdir -p "$OUT"
@@ -25,7 +28,7 @@ cd "$FRONTEND"
 # One Chromium binary for both runners.
 CHROMIUM="$(node -e "console.log(require('@playwright/test').chromium.executablePath())")"
 {
-  echo "batch=$BATCH pair=$PAIR mode=$MODE order=$ORDER playwrightWorkers=$PW_WORKERS cypressProcesses=$CY_PROCESSES"
+  echo "batch=$BATCH pair=$PAIR mode=$MODE order=$ORDER playwrightWorkers=$PW_WORKERS cypressProcesses=$CY_PROCESSES playwrightArtifacts=$PW_ARTIFACTS"
   echo "nproc=$(nproc)"
   free -m
   echo "chromium=$CHROMIUM $("$CHROMIUM" --version 2>/dev/null)"
@@ -58,6 +61,10 @@ run_runner() {
   mkdir -p "$runner_out"
   {
     echo "BENCH start $runner"
+    if [[ "$runner" == playwright && "$PW_ARTIFACTS" == off ]]; then
+      sed -i "s/trace: 'retain-on-failure'/trace: 'off'/; s/video: 'retain-on-failure'/video: 'off'/" playwright.config.ts
+      grep -nE "trace:|video:" playwright.config.ts
+    fi
     if [[ "$runner" == playwright ]]; then
       # The launcher accepts the path filter as a regular expression: both pilot directories.
       ./test/playwright/run-local.sh --spec 'test/playwright/specs/(expenses|vendors)/' \
@@ -66,6 +73,7 @@ run_runner() {
       bash test/playwright/evaluation/cypress-baseline.sh "$CY_PROCESSES" "$runner_out" "$CHROMIUM" 2>&1
     fi
     echo "BENCH end $runner exit=$?"
+    git checkout -- playwright.config.ts
   } | timestamp | tee "$log"
   exit_code="$(sed -n 's/.*BENCH end [a-z]* exit=\([0-9]*\).*/\1/p' "$log" | tail -n 1)"
   if [[ "$runner" == playwright ]]; then

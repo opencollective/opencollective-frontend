@@ -126,10 +126,10 @@ jobs:
           retention-days: 3
 
   pair:
-    name: pair ${{ matrix.pair.pair }} (${{ matrix.pair.mode }}, ${{ matrix.pair.order }}, pw=${{ matrix.pair.playwrightWorkers }} cy=${{ matrix.pair.cypressProcesses }})
+    name: ${{ matrix.pair.task || 'pair' }} ${{ matrix.pair.pair }} (${{ matrix.pair.mode }} ${{ matrix.pair.order }} pw=${{ matrix.pair.playwrightWorkers }} cy=${{ matrix.pair.cypressProcesses }})
     needs: [plan, build, prepare]
     runs-on: ubuntu-24.04
-    timeout-minutes: 75
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
@@ -243,11 +243,17 @@ jobs:
             rm -rf "$repo/dist" && cp -a "/tmp/e2e-service-dists/$repo/dist" "$repo/dist"
           done
       - name: Run pair
+        if: ${{ !matrix.pair.task || matrix.pair.task == 'pair' }}
         run: |
           bash test/playwright/evaluation/bench-pair.sh /tmp/bench \
             "${{ needs.plan.outputs.batch }}" "${{ matrix.pair.pair }}" "${{ matrix.pair.mode }}" \
-            "${{ matrix.pair.order }}" "${{ matrix.pair.playwrightWorkers }}" "${{ matrix.pair.cypressProcesses }}"
+            "${{ matrix.pair.order }}" "${{ matrix.pair.playwrightWorkers }}" "${{ matrix.pair.cypressProcesses }}" "${{ matrix.pair.playwrightArtifacts || 'on' }}"
           cat /tmp/bench/machine.txt
+      - name: Run independence checks
+        if: ${{ matrix.pair.task == 'alone-fresh' || matrix.pair.task == 'populated' }}
+        run: |
+          bash test/playwright/evaluation/independence.sh /tmp/bench "${{ matrix.pair.task }}" \
+            "${{ matrix.pair.shard }}" "${{ matrix.pair.shards }}"
       - name: Collect evidence
         if: ${{ always() }}
         run: |
