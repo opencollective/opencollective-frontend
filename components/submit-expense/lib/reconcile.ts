@@ -12,8 +12,9 @@ import { isEmpty, isEqual, pick, uniqBy } from 'lodash-es';
 import dayjs from '../../../lib/dayjs';
 import type { Currency, CurrencyExchangeRateRequest } from '../../../lib/graphql/types/v2/graphql';
 import { AccountType, ExpenseLockableFields, ExpenseStatus, ExpenseType } from '../../../lib/graphql/types/v2/graphql';
-import { NEW_PAYOUT_METHOD_ID, PAYEE_SLUG_VENDOR } from '../../expenses/lib/constants';
+import { NEW_PAYOUT_METHOD_ID } from '../../expenses/lib/constants';
 
+import { getPayeeChoice, PayeeKind } from './payee-choice';
 import type { ExpenseFormOptions, ExpenseFormStartOptions, ExpenseFormValues, ExpenseItem } from './types';
 import { InviteeAccountType, YesNoOption } from './types';
 
@@ -299,7 +300,7 @@ const keepPayeeConsistentWithHost: Rule = {
     }
 
     const wasVendor =
-      values.payeeSlug === PAYEE_SLUG_VENDOR ||
+      getPayeeChoice(values).kind === PayeeKind.VENDOR_PICKER ||
       previousOptions?.vendorsForAccount?.some(v => v.slug === values.payeeSlug);
     if (wasVendor && !options.vendorsForAccount?.some(v => v.slug === values.payeeSlug)) {
       return { values: { ...values, payeeSlug: null } };

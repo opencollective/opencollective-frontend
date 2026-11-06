@@ -6,6 +6,7 @@ import { AlertCircle } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
+import { getAccountQuerySlug } from '../lib/payee-choice';
 
 import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -121,7 +122,7 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
         )}
       </RadioGroup>
       {/** Show errors for account field (usually unsupported expense types) */}
-      {Boolean(props.accountSlug && !props.accountSlug.startsWith('__')) && (
+      {Boolean(getAccountQuerySlug(props.accountSlug)) && (
         <Field name="accountSlug">
           {({ meta }: { meta: FieldMetaProps<string> }) => {
             if (!meta.error) {

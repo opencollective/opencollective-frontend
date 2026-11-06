@@ -5,20 +5,12 @@ import { gql } from '@apollo/client';
 
 import type { ExpenseFormSchemaQueryVariables } from '../../../lib/graphql/types/v2/graphql';
 import type LoggedInUser from '../../../lib/LoggedInUser';
-import {
-  PAYEE_SLUG_CREATE_LEGAL_ENTITY,
-  PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER,
-  PAYEE_SLUG_INVITE,
-  PAYEE_SLUG_INVITE_EXISTING_USER,
-  PAYEE_SLUG_INVITE_SOMEONE,
-  PAYEE_SLUG_NEW_VENDOR,
-  PAYEE_SLUG_VENDOR,
-} from '../../expenses/lib/constants';
 
 import { accountHoverCardFieldsFragment } from '../../AccountHoverCard';
 import { accountingCategorySelectFieldsFragment } from '../../AccountingCategorySelect';
 import { loggedInAccountExpensePayoutFieldsFragment } from '../../expenses/graphql/fragments';
 
+import { getAccountQuerySlug, getPayeeChoice } from './payee-choice';
 import type { ExpenseFormStartOptions, ExpenseFormValues } from './types';
 
 export const expenseFormSchemaQuery = gql`
@@ -433,22 +425,6 @@ export const expenseFormSchemaQuery = gql`
   ${accountingCategorySelectFieldsFragment}
 `;
 
-function getPayeeSlug(values: ExpenseFormValues): string {
-  switch (values.payeeSlug) {
-    case PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER:
-    case PAYEE_SLUG_CREATE_LEGAL_ENTITY:
-    case PAYEE_SLUG_INVITE:
-    case PAYEE_SLUG_INVITE_SOMEONE:
-    case PAYEE_SLUG_VENDOR:
-    case PAYEE_SLUG_NEW_VENDOR:
-      return null;
-    case PAYEE_SLUG_INVITE_EXISTING_USER:
-      return values.inviteeExistingAccount;
-    default:
-      return values.payeeSlug;
-  }
-}
-
 /**
  * The query variables for the given values. Only the paying account, the payee to query, the
  * expense (or draft) and the submitter affect the query.
@@ -458,8 +434,8 @@ export function getFormQueryVariables(
   startOptions: ExpenseFormStartOptions,
   loggedInUser: LoggedInUser,
 ): ExpenseFormSchemaQueryVariables {
-  const collectiveSlug = values.accountSlug && !values.accountSlug.startsWith('__') ? values.accountSlug : null;
-  const payeeSlug = getPayeeSlug(values);
+  const collectiveSlug = getAccountQuerySlug(values.accountSlug);
+  const payeeSlug = getPayeeChoice(values).querySlug;
   return {
     collectiveSlug: collectiveSlug,
     hasCollectiveSlug: !!collectiveSlug,

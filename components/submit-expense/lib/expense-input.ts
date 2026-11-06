@@ -7,7 +7,6 @@
 import dayjs from 'dayjs';
 import { isEmpty, pick } from 'lodash-es';
 
-import { CollectiveType } from '../../../lib/constants/collectives';
 import { standardizeExpenseItemIncurredAt } from '../../../lib/expenses';
 import type {
   CreateExpenseFromDashboardMutationVariables,
@@ -19,12 +18,9 @@ import type {
   RecurringExpenseInterval,
 } from '../../../lib/graphql/types/v2/graphql';
 import { type Currency, ExpenseStatus, ExpenseType, PayoutMethodType } from '../../../lib/graphql/types/v2/graphql';
-import {
-  NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID,
-  NEW_PAYOUT_METHOD_ID,
-  PAYEE_SLUG_INVITE_EXISTING_USER,
-} from '../../expenses/lib/constants';
+import { NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID, NEW_PAYOUT_METHOD_ID } from '../../expenses/lib/constants';
 
+import { getPayeeChoice, getPayeeSubmission, PayeeKind } from './payee-choice';
 import type { Attachment, ExpenseFormOptions, ExpenseFormStartOptions, ExpenseFormValues } from './types';
 import { InviteeAccountType, RecurrenceFrequencyOption, YesNoOption } from './types';
 
@@ -181,10 +177,7 @@ export function planExpenseSubmission(
         },
       },
     };
-  } else if (
-    options.payee?.type === CollectiveType.VENDOR ||
-    options.payoutProfiles?.some(p => p.slug === values.payeeSlug)
-  ) {
+  } else if (getPayeeSubmission(getPayeeChoice(values), options) === 'create') {
     return {
       kind: 'create',
       variables: {
@@ -196,9 +189,10 @@ export function planExpenseSubmission(
       },
     };
   } else {
+    const choice = getPayeeChoice(values);
     const payee =
-      values.payeeSlug === PAYEE_SLUG_INVITE_EXISTING_USER
-        ? { slug: values.inviteeExistingAccount }
+      choice.kind === PayeeKind.INVITE_EXISTING_USER
+        ? choice.invitee
         : values.inviteeAccountType === InviteeAccountType.INDIVIDUAL
           ? values.inviteeNewIndividual
           : values.inviteeNewOrganization;

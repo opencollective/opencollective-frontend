@@ -11,6 +11,7 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { type Expense, ExpenseLockableFields, ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
 import { type ExpenseSubmissionPlan, getExpenseEditInputSlice } from '../submit-expense/lib/expense-input';
+import { getPayeeKind, PayeeKind } from '../submit-expense/lib/payee-choice';
 import { getAccountReferenceInput, isSameAccount } from '@/lib/collective';
 
 import CollectivePicker from '../CollectivePicker';
@@ -230,9 +231,8 @@ const EditPayee = ({ expense, onSubmit }) => {
   });
 
   const hasChangedPayee =
-    expenseForm.values.payeeSlug &&
-    expenseForm.values.payeeSlug !== expense.payee.slug &&
-    !expenseForm.values.payeeSlug.startsWith('__');
+    getPayeeKind(expenseForm.values.payeeSlug) === PayeeKind.ACCOUNT &&
+    expenseForm.values.payeeSlug !== expense.payee.slug;
   return (
     <FormikProvider value={expenseForm}>
       <form className="space-y-6" ref={formRef} onSubmit={e => e.preventDefault()}>

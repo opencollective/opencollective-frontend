@@ -23,19 +23,14 @@ import {
 import type LoggedInUser from '../../../lib/LoggedInUser';
 import { getArrayValuesMemoizer } from '../../../lib/utils';
 import { userMustSetAccountingCategory } from '../../expenses/lib/accounting-categories';
-import {
-  NEW_PAYOUT_METHOD_ID,
-  PAYEE_SLUG_CREATE_LEGAL_ENTITY,
-  PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER,
-  PAYEE_SLUG_INVITE,
-} from '../../expenses/lib/constants';
+import { NEW_PAYOUT_METHOD_ID } from '../../expenses/lib/constants';
 import { getAvailablePayoutMethods, getSupportedPayoutMethods } from '../../expenses/lib/payout-methods';
 import { computeExpenseAmounts } from '../../expenses/lib/utils';
 
 import { supportsBaseExpenseTypes } from '../form/helper';
 
+import { getPayeeChoice, PayeeKind } from './payee-choice';
 import type { ExpenseFormOptions, ExpenseFormStartOptions, ExpenseFormValues } from './types';
-import { InviteeAccountType } from './types';
 
 const memoizeAvailableReferenceCurrencies = getArrayValuesMemoizer<Currency>();
 
@@ -101,11 +96,9 @@ export function deriveFormOptions(
       options.loggedInAccount = query.data.loggedInAccount;
     }
 
-    if (values.payeeSlug === PAYEE_SLUG_INVITE) {
-      options.invitee =
-        values.inviteeAccountType === InviteeAccountType.INDIVIDUAL
-          ? values.inviteeNewIndividual
-          : values.inviteeNewOrganization;
+    const payeeChoice = getPayeeChoice(values);
+    if (payeeChoice.kind === PayeeKind.INVITE_NEW) {
+      options.invitee = payeeChoice.invitee as ExpenseFormOptions['invitee'];
     } else if (
       options.expense?.status === ExpenseStatus.DRAFT &&
       options.expense.draft.payee &&
@@ -145,8 +138,7 @@ export function deriveFormOptions(
     if (query.data?.loggedInAccount) {
       options.payoutProfiles = getPayoutProfiles(query.data.loggedInAccount);
       options.isAdminOfPayee =
-        options.payoutProfiles.some(p => p.slug === values.payeeSlug) ||
-        [PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER, PAYEE_SLUG_CREATE_LEGAL_ENTITY].includes(values.payeeSlug);
+        options.payoutProfiles.some(p => p.slug === values.payeeSlug) || payeeChoice.isAdministeredAccountPicker;
       // Cross-host only: the submitter administers the recipient host (e.g. a host admin completing
       // an invited draft on behalf of a collective they don't directly administer).
       const isAdminOfPayeeHost = Boolean(

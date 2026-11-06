@@ -13,18 +13,13 @@ import { z } from 'zod';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { Currency, ExpenseStatus, ExpenseType, PayoutMethodType } from '../../../lib/graphql/types/v2/graphql';
 import { isValidEmail } from '../../../lib/utils';
-import {
-  NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID,
-  NEW_PAYOUT_METHOD_ID,
-  PAYEE_SLUG_INVITE,
-  PAYEE_SLUG_INVITE_EXISTING_USER,
-  PAYEE_SLUG_INVITE_SOMEONE,
-} from '../../expenses/lib/constants';
+import { NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID, NEW_PAYOUT_METHOD_ID } from '../../expenses/lib/constants';
 
 import { getCustomZodErrorMap } from '../../FormikZod';
 import { isEmptyHTMLValue } from '../../HTMLContent';
 import { supportsBaseExpenseTypes } from '../form/helper';
 
+import { getAccountQuerySlug, getPayeeChoice, PayeeKind } from './payee-choice';
 import type { ExpenseFormOptions, ExpenseFormValues, RecursivePartial } from './types';
 import { InviteeAccountType, RecurrenceFrequencyOption, YesNoOption } from './types';
 
@@ -67,12 +62,13 @@ function buildSchemaForValues(
   pickSchemaFields?: Record<string, boolean>,
 ): z.ZodType<RecursivePartial<ExpenseFormValues>, z.ZodObjectDef, RecursivePartial<ExpenseFormValues>> {
   const requiredMessage = { message: intl.formatMessage({ defaultMessage: 'Required', id: 'Seanpx' }) };
+  const payee = getPayeeChoice(values);
   const schema = z.object({
     accountSlug: z
       .string()
       .nullish()
       .refine(slug => {
-        return slug && !slug.startsWith('__');
+        return Boolean(getAccountQuerySlug(slug));
       }, requiredMessage)
       .refine(
         accountSlug => {
@@ -110,13 +106,14 @@ function buildSchemaForValues(
       .string()
       .nullish()
       .refine(slug => {
-        if (slug === PAYEE_SLUG_INVITE || slug === PAYEE_SLUG_INVITE_EXISTING_USER) {
+        const { kind } = getPayeeChoice({ ...values, payeeSlug: slug });
+        if (kind === PayeeKind.INVITE_NEW || kind === PayeeKind.INVITE_EXISTING_USER) {
           return true;
         }
 
         return options.expense?.status === ExpenseStatus.DRAFT && !options.loggedInAccount
           ? true
-          : slug && !slug.startsWith('__');
+          : kind === PayeeKind.ACCOUNT;
       }, requiredMessage),
     expenseId: z.number().nullish(),
     expenseTypeOption: z.nativeEnum(ExpenseType).refine(v => {
@@ -134,9 +131,7 @@ function buildSchemaForValues(
       .string()
       .nullish()
       .refine(v => {
-        if (
-          [PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_SOMEONE, PAYEE_SLUG_INVITE_EXISTING_USER].includes(values.payeeSlug)
-        ) {
+        if (payee.isInvite) {
           return true;
         }
         if (
@@ -186,10 +181,7 @@ function buildSchemaForValues(
       .string()
       .nullish()
       .refine(v => {
-        if (
-          [PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_SOMEONE, PAYEE_SLUG_INVITE_EXISTING_USER].includes(values.payeeSlug) ||
-          values.expenseTypeOption === ExpenseType.GRANT
-        ) {
+        if (payee.isInvite || values.expenseTypeOption === ExpenseType.GRANT) {
           return true;
         }
 
@@ -243,9 +235,7 @@ function buildSchemaForValues(
         }),
       ])
       .refine(attachment => {
-        if (
-          [PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_SOMEONE, PAYEE_SLUG_INVITE_EXISTING_USER].includes(values.payeeSlug)
-        ) {
+        if (payee.isInvite) {
           return true;
         }
 
@@ -520,9 +510,7 @@ function buildSchemaForValues(
         .nativeEnum(PayoutMethodType)
         .nullish()
         .refine(type => {
-          if (
-            [PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_SOMEONE, PAYEE_SLUG_INVITE_EXISTING_USER].includes(values.payeeSlug)
-          ) {
+          if (payee.isInvite) {
             return true;
           }
 
@@ -547,11 +535,7 @@ function buildSchemaForValues(
             .string()
             .nullish()
             .refine(currency => {
-              if (
-                [PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_SOMEONE, PAYEE_SLUG_INVITE_EXISTING_USER].includes(
-                  values.payeeSlug,
-                )
-              ) {
+              if (payee.isInvite) {
                 return true;
               }
 
@@ -577,7 +561,7 @@ function buildSchemaForValues(
       .string()
       .nullish()
       .refine(inviteeExistingAccount => {
-        if (values.payeeSlug === PAYEE_SLUG_INVITE_EXISTING_USER) {
+        if (payee.kind === PayeeKind.INVITE_EXISTING_USER) {
           return !!inviteeExistingAccount;
         }
 
@@ -588,7 +572,7 @@ function buildSchemaForValues(
         .string()
         .nullish()
         .refine(name => {
-          if (values.payeeSlug === PAYEE_SLUG_INVITE && values.inviteeAccountType === InviteeAccountType.INDIVIDUAL) {
+          if (payee.kind === PayeeKind.INVITE_NEW && values.inviteeAccountType === InviteeAccountType.INDIVIDUAL) {
             return !isEmpty(name);
           }
 
@@ -598,7 +582,7 @@ function buildSchemaForValues(
         .string()
         .nullish()
         .refine(email => {
-          if (values.payeeSlug === PAYEE_SLUG_INVITE && values.inviteeAccountType === InviteeAccountType.INDIVIDUAL) {
+          if (payee.kind === PayeeKind.INVITE_NEW && values.inviteeAccountType === InviteeAccountType.INDIVIDUAL) {
             return isValidEmail(email);
           }
 
@@ -625,7 +609,7 @@ function buildSchemaForValues(
         .string()
         .nullish()
         .refine(name => {
-          if (values.payeeSlug === PAYEE_SLUG_INVITE && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
+          if (payee.kind === PayeeKind.INVITE_NEW && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
             return !isEmpty(name);
           }
 
@@ -635,7 +619,7 @@ function buildSchemaForValues(
         .string()
         .nullish()
         .refine(email => {
-          if (values.payeeSlug === PAYEE_SLUG_INVITE && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
+          if (payee.kind === PayeeKind.INVITE_NEW && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
             return !!email;
           }
 
@@ -663,7 +647,7 @@ function buildSchemaForValues(
             .nullish()
             .refine(name => {
               if (
-                values.payeeSlug === PAYEE_SLUG_INVITE &&
+                payee.kind === PayeeKind.INVITE_NEW &&
                 values.inviteeAccountType === InviteeAccountType.ORGANIZATION
               ) {
                 return !isEmpty(name);
@@ -676,7 +660,7 @@ function buildSchemaForValues(
             .nullish()
             .refine(slug => {
               if (
-                values.payeeSlug === PAYEE_SLUG_INVITE &&
+                payee.kind === PayeeKind.INVITE_NEW &&
                 values.inviteeAccountType === InviteeAccountType.ORGANIZATION
               ) {
                 return !isEmpty(slug);
@@ -690,7 +674,7 @@ function buildSchemaForValues(
             .nullish()
             .refine(description => {
               if (
-                values.payeeSlug === PAYEE_SLUG_INVITE &&
+                payee.kind === PayeeKind.INVITE_NEW &&
                 values.inviteeAccountType === InviteeAccountType.ORGANIZATION
               ) {
                 return !isEmpty(description);
@@ -701,7 +685,7 @@ function buildSchemaForValues(
         })
         .nullish()
         .refine(organization => {
-          if (values.payeeSlug === PAYEE_SLUG_INVITE && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
+          if (payee.kind === PayeeKind.INVITE_NEW && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
             return !!organization;
           }
 

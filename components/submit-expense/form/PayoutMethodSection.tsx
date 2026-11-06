@@ -16,14 +16,9 @@ import {
   type SavePayoutMethodMutationVariables,
 } from '../../../lib/graphql/types/v2/graphql';
 import { ExpenseType, PayoutMethodType } from '../../../lib/graphql/types/v2/graphql';
+import { getPayeeChoice, getPayeeKind, PayeeKind } from '../lib/payee-choice';
 import { getLastUsedPayoutMethod } from '../lib/reconcile';
-import {
-  NEW_PAYOUT_METHOD_ID,
-  PAYEE_SLUG_CREATE_LEGAL_ENTITY,
-  PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER,
-  PAYEE_SLUG_NEW_VENDOR,
-  PAYEE_SLUG_VENDOR,
-} from '@/components/expenses/lib/constants';
+import { NEW_PAYOUT_METHOD_ID } from '@/components/expenses/lib/constants';
 import type { PayPalSupportedCurrencies } from '@/lib/constants/currency';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import i18nPayoutMethodType from '@/lib/i18n/payout-method-type';
@@ -112,10 +107,9 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
   );
   const { LoggedInUser } = useLoggedInUser();
 
-  const isLoadingPayee = props.payeeSlug && !props.payeeSlug.startsWith('__') && props.payee?.slug !== props.payeeSlug;
-  const isPickingProfileAdministered = [PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER, PAYEE_SLUG_CREATE_LEGAL_ENTITY].includes(
-    props.payeeSlug,
-  );
+  const payeeChoice = getPayeeChoice({ payeeSlug: props.payeeSlug });
+  const isLoadingPayee = payeeChoice.kind === PayeeKind.ACCOUNT && props.payee?.slug !== props.payeeSlug;
+  const isPickingProfileAdministered = payeeChoice.isAdministeredAccountPicker;
 
   const payoutMethods = React.useMemo(() => {
     if (!props.payoutMethods) {
@@ -133,7 +127,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
   const { setFieldValue, setFieldTouched, refresh, onPayoutMethodDeleted } = props;
 
   const isNewPayoutMethodSelected = !isLoadingPayee && props.payoutMethodId === NEW_PAYOUT_METHOD_ID;
-  const isVendor = props.payeeSlug === PAYEE_SLUG_VENDOR || props.payee?.type === CollectiveType.VENDOR;
+  const isVendor = payeeChoice.kind === PayeeKind.VENDOR_PICKER || props.payee?.type === CollectiveType.VENDOR;
   const hasInviteeInfo =
     props.invitee &&
     (('email' in props.invitee && props.invitee.email) ||
@@ -241,7 +235,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
       !isLoadingPayee &&
       !isPickingProfileAdministered &&
       !isVendor &&
-      props.payeeSlug !== PAYEE_SLUG_NEW_VENDOR &&
+      payeeChoice.kind !== PayeeKind.NEW_VENDOR &&
       !props.isAdminOfPayee &&
       !props.isAdminOfPayeeHost &&
       !(props.expense?.status === ExpenseStatus.DRAFT && !props.loggedInAccount) ? (
@@ -258,7 +252,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
             />
           )}
         </MessageBox>
-      ) : props.payeeSlug === PAYEE_SLUG_NEW_VENDOR ? (
+      ) : payeeChoice.kind === PayeeKind.NEW_VENDOR ? (
         <MessageBox type="info">
           <FormattedMessage defaultMessage="Save the vendor information to create a payout method" id="E8oTcs" />
         </MessageBox>
@@ -520,7 +514,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
     props.newPayoutMethod.data?.accountHolderName?.length &&
     props.newPayoutMethod.type === PayoutMethodType.BANK_ACCOUNT &&
     props.payeeSlug &&
-    !props.payeeSlug.startsWith('__') &&
+    getPayeeKind(props.payeeSlug) === PayeeKind.ACCOUNT &&
     props.payeeSlug === props.payee?.slug &&
     !isLegalNameFuzzyMatched;
 
@@ -698,7 +692,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
   const hasLegalNameMismatch =
     props.payoutMethod.type === PayoutMethodType.BANK_ACCOUNT &&
     props.payeeSlug &&
-    !props.payeeSlug.startsWith('__') &&
+    getPayeeKind(props.payeeSlug) === PayeeKind.ACCOUNT &&
     props.payeeSlug === props.payee?.slug &&
     !isLegalNameFuzzyMatched;
   const isOpen = props.isChecked;

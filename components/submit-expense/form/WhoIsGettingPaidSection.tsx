@@ -9,6 +9,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { AccountType, ExpenseStatus, ExpenseType } from '../../../lib/graphql/types/v2/graphql';
+import { getPayeeChoice, getPayeeKind, PayeeKind } from '../lib/payee-choice';
 import { getLastUsedPayoutProfile } from '../lib/reconcile';
 import {
   PAYEE_SLUG_CREATE_LEGAL_ENTITY,
@@ -16,7 +17,6 @@ import {
   PAYEE_SLUG_INVITE,
   PAYEE_SLUG_INVITE_EXISTING_USER,
   PAYEE_SLUG_INVITE_SOMEONE,
-  PAYEE_SLUG_NEW_VENDOR,
   PAYEE_SLUG_VENDOR,
 } from '@/components/expenses/lib/constants';
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
@@ -108,9 +108,8 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
   const singleOtherProfile = administeredProfiles.length === 1 ? otherProfiles[0] : null;
   const hasMultipleOtherProfiles = administeredProfiles.length > 1 && otherProfiles.length > 0;
   const hasAdministeredProfiles = administeredProfiles.length > 0;
-  const isInvite = [PAYEE_SLUG_INVITE_SOMEONE, PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_EXISTING_USER].includes(
-    props.payeeSlug,
-  );
+  const payeeKind = getPayeeKind(props.payeeSlug);
+  const isInvite = getPayeeChoice({ payeeSlug: props.payeeSlug }).isInvite;
 
   const isUSHostWithTaxFormsEnabled =
     props.host?.location?.country === 'US' && isFeatureEnabled(props.host, FEATURES.TAX_FORMS);
@@ -130,7 +129,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
   const isMyOtherProfilesSelected =
     hasMultipleOtherProfiles &&
     (!props.payeeSlug ||
-      props.payeeSlug === PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER ||
+      payeeKind === PayeeKind.FIND_ACCOUNT_I_ADMINISTER ||
       otherProfiles.some(p => p.slug === props.payeeSlug));
 
   return (
@@ -234,7 +233,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
                   <CollectivePicker
                     disabled={props.isSubmitting}
                     collectives={otherProfiles}
-                    collective={props.payeeSlug === PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER ? null : props.payee}
+                    collective={payeeKind === PayeeKind.FIND_ACCOUNT_I_ADMINISTER ? null : props.payee}
                     onChange={e => {
                       const slug = e.value.slug;
                       setFieldValue('payeeSlug', !slug ? PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER : slug);
@@ -261,8 +260,8 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
         {!isLoading && !hasAdministeredProfiles && props.loggedInAccount && (
           <RadioGroupCard
             value={PAYEE_SLUG_CREATE_LEGAL_ENTITY}
-            checked={props.payeeSlug === PAYEE_SLUG_CREATE_LEGAL_ENTITY}
-            showSubcontent={props.payeeSlug === PAYEE_SLUG_CREATE_LEGAL_ENTITY}
+            checked={payeeKind === PayeeKind.NEW_LEGAL_ENTITY}
+            showSubcontent={payeeKind === PayeeKind.NEW_LEGAL_ENTITY}
             disabled={props.isSubmitting}
             className="min-w-0"
             subContent={
@@ -296,7 +295,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
                   onFocus={() => props.setFieldValue('payeeSlug', PAYEE_SLUG_INVITE_SOMEONE)}
                   invitable
                   expenseType={props.expenseTypeOption}
-                  collective={props.payeeSlug === PAYEE_SLUG_INVITE_EXISTING_USER ? props.payee : null}
+                  collective={payeeKind === PayeeKind.INVITE_EXISTING_USER ? props.payee : null}
                   types={[
                     CollectiveType.COLLECTIVE,
                     CollectiveType.EVENT,
@@ -316,7 +315,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
                   }}
                 />
 
-                {props.payeeSlug === PAYEE_SLUG_INVITE_EXISTING_USER && props.payee && (
+                {payeeKind === PayeeKind.INVITE_EXISTING_USER && props.payee && (
                   <React.Fragment>
                     <Separator className="mt-3" />
                     <div className="mt-3">
@@ -333,7 +332,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
                   </React.Fragment>
                 )}
 
-                {props.payeeSlug === PAYEE_SLUG_INVITE && (
+                {payeeKind === PayeeKind.INVITE_NEW && (
                   <React.Fragment>
                     <Separator className="mt-3" />
                     <div className="mt-3">
@@ -387,7 +386,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
       </RadioGroup>
       <Field name="payeeSlug">
         {({ meta }: { meta: FieldMetaProps<string> }) => {
-          if (!meta.error || !meta.value || meta.value.startsWith('__')) {
+          if (!meta.error || getPayeeKind(meta.value) !== PayeeKind.ACCOUNT) {
             return null;
           }
           return (
@@ -443,9 +442,10 @@ const VendorOption = React.memo(function VendorOption(props: {
   });
   // Setting a state variable to keep the Vendor option open when a vendor that is not part of the preloaded vendors is selected
   const [selectedVendor, setSelectedVendor] = React.useState(undefined);
+  const payeeKind = getPayeeKind(props.payeeSlug);
+  const isPickingVendor = payeeKind === PayeeKind.VENDOR_PICKER || payeeKind === PayeeKind.NEW_VENDOR;
   const isVendorSelected =
-    props.payeeSlug === PAYEE_SLUG_VENDOR ||
-    props.payeeSlug === PAYEE_SLUG_NEW_VENDOR ||
+    isPickingVendor ||
     props.vendorsForAccount.some(v => v.slug === props.payeeSlug) ||
     selectedVendor?.slug === props.payeeSlug;
 
@@ -468,11 +468,7 @@ const VendorOption = React.memo(function VendorOption(props: {
             includeVendorsForHostId={props.host.legacyId}
             disabled={props.isSubmitting}
             defaultCollectives={props.vendorsForAccount}
-            collective={
-              props.payeeSlug === PAYEE_SLUG_VENDOR || props.payeeSlug === PAYEE_SLUG_NEW_VENDOR
-                ? null
-                : selectedVendor || props.payee
-            }
+            collective={isPickingVendor ? null : selectedVendor || props.payee}
             {...(isHostAdmin
               ? quickCreateVendorCollectivePickerOptions(createVendorFromSearch, { isBeneficiary })
               : {})}
