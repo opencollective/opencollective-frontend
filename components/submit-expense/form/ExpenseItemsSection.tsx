@@ -296,7 +296,7 @@ function getExpenseItemProps(form: ExpenseForm) {
   return {
     payeeType: form.options.payee?.type,
     isDraft: form.options.expense?.status === ExpenseStatus.DRAFT,
-    ...pick(form, ['setFieldValue', 'isSubmitting', 'setFieldTouched']),
+    ...pick(form, ['setFieldValue', 'isSubmitting', 'setItemCurrency']),
     ...pick(form.options, [
       'allowExpenseItemAttachment',
       'isAdminOfPayee',
@@ -337,15 +337,9 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
   const hasAttachment = props.allowExpenseItemAttachment;
   const attachmentId = useId();
 
-  const { setFieldValue, setFieldTouched } = props;
+  const { setFieldValue, setItemCurrency } = props;
 
-  const onCurrencyChange = React.useCallback(
-    v => {
-      setFieldTouched('expenseItems');
-      setFieldValue(`expenseItems.${props.index}.amount.currency`, v);
-    },
-    [props.index, setFieldValue, setFieldTouched],
-  );
+  const onCurrencyChange = React.useCallback(v => setItemCurrency(props.index, v), [props.index, setItemCurrency]);
 
   const onGraphQLSuccess = React.useCallback(
     uploadResults => {

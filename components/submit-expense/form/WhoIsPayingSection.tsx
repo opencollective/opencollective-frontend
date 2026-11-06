@@ -30,7 +30,6 @@ function getFormProps(form: ExpenseForm) {
     initialLoading: form.initialLoading,
     ...pick(form.options, ['recentlySubmittedExpenses', 'account', 'canChangeAccount']),
     ...pick(form.values, ['accountSlug']),
-    accountSlugTouched: form.touched.accountSlug,
     isSubmitting: form.isSubmitting,
   };
 }
@@ -38,9 +37,6 @@ function getFormProps(form: ExpenseForm) {
 // eslint-disable-next-line prefer-arrow-callback
 export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSection(props: WhoIsPayingSectionProps) {
   const intl = useIntl();
-  const [isLoading, setIsLoading] = React.useState(true);
-  const lastSubmittedExpense = props.recentlySubmittedExpenses?.nodes?.at?.(0);
-  const lastSubmittedAccount = lastSubmittedExpense && lastSubmittedExpense.account;
 
   const recentlySubmittedAccounts = React.useMemo(
     () => uniqBy((props.recentlySubmittedExpenses?.nodes || []).map(e => e?.account).filter(Boolean), 'slug'),
@@ -48,22 +44,8 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
   );
 
   const { setFieldValue, setFieldTouched } = props;
-  React.useEffect(() => {
-    if (lastSubmittedAccount && !props.accountSlug && !props.accountSlugTouched) {
-      setFieldValue('accountSlug', lastSubmittedAccount.slug);
-    }
-
-    if (!props.initialLoading) {
-      setIsLoading(false);
-    }
-  }, [
-    lastSubmittedAccount,
-    setFieldValue,
-    props.accountSlug,
-    props.accountSlugTouched,
-    props.initialLoading,
-    setFieldTouched,
-  ]);
+  // The last submitted account is selected by default (see the form reconcile rules)
+  const isLoading = props.initialLoading;
 
   const isFindSelected =
     !props.accountSlug ||

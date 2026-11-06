@@ -9,6 +9,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { AccountType, ExpenseStatus, ExpenseType } from '../../../lib/graphql/types/v2/graphql';
+import { getLastUsedPayoutProfile } from '../lib/reconcile';
 import {
   PAYEE_SLUG_CREATE_LEGAL_ENTITY,
   PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER,
@@ -86,10 +87,12 @@ export const WhoIsGettingPaidSection = memoWithGetFormProps(function WhoIsGettin
 export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPaidForm(
   props: ReturnType<typeof getFormProps>,
 ) {
-  const [isLoading, setIsLoading] = React.useState(true);
   const intl = useIntl();
-  const [lastUsedProfile, setLastUsedProfile] = React.useState<ExpenseForm['options']['payoutProfiles'][number]>(null);
-  const [isMyOtherProfilesSelected, setIsMyOtherProfilesSelected] = React.useState(false);
+  const isLoading = props.initialLoading;
+  const lastUsedProfile = React.useMemo(
+    () => getLastUsedPayoutProfile(pick(props, ['payoutProfiles', 'recentlySubmittedExpenses'])),
+    [props.payoutProfiles, props.recentlySubmittedExpenses],
+  );
 
   const myProfiles = React.useMemo(() => props.payoutProfiles || [], [props.payoutProfiles]);
   const personalProfile = React.useMemo(() => myProfiles.find(p => p.type === AccountType.INDIVIDUAL), [myProfiles]);
@@ -122,54 +125,13 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
     [isUSHostWithTaxFormsEnabled],
   );
 
+  // The payee defaults to the last used profile, or the personal profile (see the form reconcile rules)
   const { setFieldValue, setFieldTouched } = props;
-  React.useEffect(() => {
-    const myProfileSlugs = myProfiles.map(m => m.slug);
-    const recentExpensesToMyProfiles = props.recentlySubmittedExpenses?.nodes?.filter(
-      e => e?.payee?.slug && myProfileSlugs.includes(e.payee.slug),
-    );
-
-    const lastUsedProfileId = recentExpensesToMyProfiles?.length > 0 && recentExpensesToMyProfiles.at(0).payee?.id;
-
-    const lastUsed = props.payoutProfiles?.find(p => p.id === lastUsedProfileId);
-
-    if (lastUsed) {
-      setLastUsedProfile(lastUsed);
-    } else {
-      setLastUsedProfile(null);
-    }
-
-    let newPayeeSlug = props.payeeSlug;
-    if (!newPayeeSlug) {
-      if (recentExpensesToMyProfiles?.length > 0) {
-        newPayeeSlug = recentExpensesToMyProfiles.at(0).payee.slug;
-      } else if (personalProfile) {
-        newPayeeSlug = personalProfile.slug;
-      }
-      setFieldValue('payeeSlug', newPayeeSlug);
-    }
-
-    const otherProfileSelection = otherProfiles.find(p => p.slug === newPayeeSlug);
-    const isMyOtherProfilesSelected =
-      hasMultipleOtherProfiles &&
-      (!newPayeeSlug || newPayeeSlug === PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER || !!otherProfileSelection);
-    setIsMyOtherProfilesSelected(isMyOtherProfilesSelected);
-
-    if (!props.initialLoading) {
-      setIsLoading(false);
-    }
-  }, [
-    props.payoutProfiles,
-    props.recentlySubmittedExpenses,
-    myProfiles,
-    setFieldValue,
-    props.payeeSlug,
-    personalProfile,
-    otherProfiles,
-    hasMultipleOtherProfiles,
-    lastUsedProfile?.slug,
-    props.initialLoading,
-  ]);
+  const isMyOtherProfilesSelected =
+    hasMultipleOtherProfiles &&
+    (!props.payeeSlug ||
+      props.payeeSlug === PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER ||
+      otherProfiles.some(p => p.slug === props.payeeSlug));
 
   return (
     <React.Fragment>

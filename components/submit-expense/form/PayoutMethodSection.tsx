@@ -16,6 +16,7 @@ import {
   type SavePayoutMethodMutationVariables,
 } from '../../../lib/graphql/types/v2/graphql';
 import { ExpenseType, PayoutMethodType } from '../../../lib/graphql/types/v2/graphql';
+import { getLastUsedPayoutMethod } from '../lib/reconcile';
 import {
   NEW_PAYOUT_METHOD_ID,
   PAYEE_SLUG_CREATE_LEGAL_ENTITY,
@@ -104,9 +105,11 @@ export const PayoutMethodSection = memoWithGetFormProps(function PayoutMethodSec
 export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMethodFormContent(
   props: ReturnType<typeof getFormProps>,
 ) {
-  const [lastUsedPayoutMethod, setLastUsedPayoutMethod] =
-    React.useState<ExpenseForm['options']['payoutMethods'][number]>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const isLoading = props.initialLoading;
+  const lastUsedPayoutMethod = React.useMemo(
+    () => getLastUsedPayoutMethod(pick(props, ['payoutMethods', 'recentlySubmittedExpenses']), props.payeeSlug),
+    [props.payoutMethods, props.recentlySubmittedExpenses, props.payeeSlug],
+  );
   const { LoggedInUser } = useLoggedInUser();
 
   const isLoadingPayee = props.payeeSlug && !props.payeeSlug.startsWith('__') && props.payee?.slug !== props.payeeSlug;
@@ -126,51 +129,8 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
     return [lastUsedPayoutMethod, ...(props.payoutMethods?.filter(p => p.id !== lastUsedPayoutMethod.id) || [])];
   }, [props.payoutMethods, lastUsedPayoutMethod]);
 
+  // The selection defaults to the last used payout method, or the first one (see the form reconcile rules)
   const { setFieldValue, setFieldTouched, refresh, onPayoutMethodDeleted } = props;
-  React.useEffect(() => {
-    const lastSubmittedExpenseByPayee = (props.recentlySubmittedExpenses?.nodes || [])
-      .filter(e => e && e.payee.slug === props.payeeSlug && e.payoutMethod?.id)
-      .find(() => true);
-    const lastUsedPayoutMethodId = lastSubmittedExpenseByPayee?.payoutMethod?.id;
-    const lastUsed = lastUsedPayoutMethodId && (props.payoutMethods || []).find(p => p.id === lastUsedPayoutMethodId);
-
-    if (lastUsed) {
-      setLastUsedPayoutMethod(lastUsed);
-    } else {
-      setLastUsedPayoutMethod(null);
-    }
-
-    const expensePayoutMethodId = props.expense?.payoutMethod?.id;
-    const isEditingExistingExpensePayoutMethod =
-      expensePayoutMethodId &&
-      (props.payeeSlug === props.expense?.payee?.slug || (props.isInlineEdit && !props.payeeSlug));
-
-    if (!isEditingExistingExpensePayoutMethod) {
-      if (!props.payoutMethodId && lastUsed) {
-        setFieldValue('payoutMethodId', lastUsed?.id);
-      } else if (
-        props.payoutMethodId !== NEW_PAYOUT_METHOD_ID &&
-        (!props.payoutMethodId || !payoutMethods.some(p => p.id === props.payoutMethodId))
-      ) {
-        setFieldValue('payoutMethodId', payoutMethods.at(0)?.id ?? '');
-      }
-    }
-
-    if (!props.initialLoading) {
-      setIsLoading(false);
-    }
-  }, [
-    props.initialLoading,
-    props.isInlineEdit,
-    props.payeeSlug,
-    props.recentlySubmittedExpenses,
-    props.expense?.payee?.slug,
-    props.expense?.payoutMethod?.id,
-    setFieldValue,
-    props.payoutMethodId,
-    props.payoutMethods,
-    payoutMethods,
-  ]);
 
   const isNewPayoutMethodSelected = !isLoadingPayee && props.payoutMethodId === NEW_PAYOUT_METHOD_ID;
   const isVendor = props.payeeSlug === PAYEE_SLUG_VENDOR || props.payee?.type === CollectiveType.VENDOR;

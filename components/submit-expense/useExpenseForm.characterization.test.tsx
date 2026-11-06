@@ -708,11 +708,10 @@ describe('useExpenseForm (characterization)', () => {
       await setValues(form, { payoutMethodId: 'pm-bank-usd' });
       expect(form.current.values.expenseItems[0].amount.currency).toBe('USD');
 
-      // The items section marks `expenseItems` as touched when the submitter picks a currency
       await act(async () => {
-        await form.current.setFieldTouched('expenseItems', true);
+        form.current.setItemCurrency(0, 'GBP');
       });
-      await setValues(form, { 'expenseItems.0.amount.currency': 'GBP' });
+      await settle();
       await setValues(form, { payoutMethodId: 'pm-bank-eur' });
       expect(form.current.values.expenseItems[0].amount.currency).toBe('GBP');
     });
@@ -764,7 +763,7 @@ describe('useExpenseForm (characterization)', () => {
       expect(form.current.values.payoutMethodNameDiscrepancyReason).toBe('');
     });
 
-    it('clears a payout method that is not available for the payee, once payout methods have loaded', async () => {
+    it('replaces a payout method that is not available for the payee, once payout methods have loaded', async () => {
       let release: () => void;
       const gate = new Promise<void>(resolve => (release = resolve));
       const world = defaultWorld();
@@ -781,10 +780,10 @@ describe('useExpenseForm (characterization)', () => {
 
       release();
       await waitForFormReady(result);
-      expect(result.current.values.payoutMethodId).toBeNull();
+      expect(result.current.values.payoutMethodId).toBe('pm-bank-usd'); // The first available one
     });
 
-    it('clears a Vendor payee when switching to an account under a Host without that Vendor', async () => {
+    it('replaces a Vendor payee when switching to an account under a Host without that Vendor', async () => {
       const world = defaultWorld();
       const hostVendor = vendor();
       world.accounts.vendor = hostVendor;
@@ -796,7 +795,46 @@ describe('useExpenseForm (characterization)', () => {
       expect(form.current.values.payeeSlug).toBe('vendor');
 
       await setValues(form, { accountSlug: 'elsewhere' });
-      expect(form.current.values.payeeSlug).toBeNull();
+      expect(form.current.values.payeeSlug).toBe('jane'); // The submitter's own profile
+    });
+  });
+
+  describe('defaults', () => {
+    const recentWorld = () => {
+      const world = defaultWorld();
+      const org = { ...collective({ slug: 'org', name: 'Org' }), __typename: 'Organization', type: 'ORGANIZATION' };
+      world.accounts.org = org;
+      world.accounts['last-collective'] = collective({ slug: 'last-collective' });
+      world.loggedInAccount = loggedInAccount({ slug: 'jane', payoutMethods: [BANK_USD, BANK_EUR] }, [org]);
+      world.recentlySubmittedExpenses = [
+        {
+          account: world.accounts['last-collective'],
+          payee: { ...world.loggedInAccount, slug: 'jane', id: world.loggedInAccount.id },
+          payoutMethod: { id: 'pm-bank-eur' },
+        },
+      ];
+      return world;
+    };
+
+    it('selects the last submitted account, the last used profile and its last payout method', async () => {
+      const { form } = await setup({
+        world: recentWorld(),
+        values: newExpenseValues({ accountSlug: undefined, payeeSlug: undefined }),
+      });
+      expect(form.current.values.accountSlug).toBe('last-collective');
+      expect(form.current.values.payeeSlug).toBe('jane');
+      expect(form.current.values.payoutMethodId).toBe('pm-bank-eur');
+    });
+
+    it('keeps the account picked by the submitter', async () => {
+      const { form } = await setup({ world: recentWorld(), values: newExpenseValues() });
+      expect(form.current.values.accountSlug).toBe('collective');
+    });
+
+    it('selects the personal profile without recent expenses', async () => {
+      const { form } = await setup({ values: newExpenseValues({ payeeSlug: undefined }) });
+      expect(form.current.values.payeeSlug).toBe('jane');
+      expect(form.current.values.payoutMethodId).toBe('pm-bank-usd');
     });
   });
 
@@ -811,7 +849,7 @@ describe('useExpenseForm (characterization)', () => {
       ['jane', 'jane'],
     ])('queries the payee for %s as %s', async (payeeSlug, queriedSlug) => {
       const { mock } = await setup({ values: newExpenseValues({ payeeSlug }) });
-      const vars = lastVariables(mock, 'ExpenseFormSchema');
+      const vars = mock.operationsNamed('ExpenseFormSchema')[0].variables;
       expect(vars.payeeSlug).toBe(queriedSlug);
       expect(vars.hasPayeeSlug).toBe(Boolean(queriedSlug));
     });
