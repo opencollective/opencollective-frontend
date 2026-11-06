@@ -7,7 +7,8 @@
 
 type Suite = 'expenses' | 'vendors';
 type Runner = 'cypress' | 'playwright';
-type Mode = 'serial' | 'parallel';
+/** `serial`, `parallel`, or a named configuration variant run as its own pairs. */
+type Mode = string;
 
 type TestSample = {
   suite: Suite;
@@ -206,7 +207,6 @@ const countBy = <T>(items: T[], key: (item: T) => string) =>
     return counts;
   }, {});
 
-const MODES: Mode[] = ['serial', 'parallel'];
 const RUNNERS: Runner[] = ['cypress', 'playwright'];
 
 /**
@@ -215,101 +215,108 @@ const RUNNERS: Runner[] = ['cypress', 'playwright'];
  * path (seconds saved by Playwright) where both runs of the pair passed.
  */
 export function summarizeBenchmark(runs: BenchmarkRun[]) {
-  const groups = MODES.flatMap(mode =>
-    RUNNERS.map(runner => {
-      const all = runs.filter(run => run.mode === mode && run.runner === runner);
-      const passed = all.filter(run => run.status === 'passed');
-      const metric = (pick: (run: BenchmarkRun) => number | null) => stats(passed.map(pick));
-      return {
-        mode,
-        runner,
-        concurrency: [...new Set(all.map(run => run.concurrency))],
-        statuses: countBy(all, run => run.status),
-        metrics: {
-          totalS: metric(run => run.phases.totalS),
-          preflightS: metric(run => run.phases.preflightS),
-          resetS: metric(run => run.phases.resetS),
-          startupS: metric(run => run.phases.startupS),
-          runnerBootS: metric(run => run.phases.runnerBootS),
-          browserS: metric(run => run.phases.browserS),
-          teardownS: metric(run => run.phases.teardownS),
-          expensesTestS: metric(run => testSeconds(run, 'expenses')),
-          vendorsTestS: metric(run => testSeconds(run, 'vendors')),
-          fixtureS: metric(fixtureSeconds),
-          artifactMB: metric(run => run.artifactBytes / 1_000_000),
-        },
-      };
-    }),
-  ).filter(group => Object.keys(group.statuses).length);
+  const modes: Mode[] = [...new Set(runs.map(run => run.mode))];
+  const groups = modes
+    .flatMap(mode =>
+      RUNNERS.map(runner => {
+        const all = runs.filter(run => run.mode === mode && run.runner === runner);
+        const passed = all.filter(run => run.status === 'passed');
+        const metric = (pick: (run: BenchmarkRun) => number | null) => stats(passed.map(pick));
+        return {
+          mode,
+          runner,
+          concurrency: [...new Set(all.map(run => run.concurrency))],
+          statuses: countBy(all, run => run.status),
+          metrics: {
+            totalS: metric(run => run.phases.totalS),
+            preflightS: metric(run => run.phases.preflightS),
+            resetS: metric(run => run.phases.resetS),
+            startupS: metric(run => run.phases.startupS),
+            runnerBootS: metric(run => run.phases.runnerBootS),
+            browserS: metric(run => run.phases.browserS),
+            teardownS: metric(run => run.phases.teardownS),
+            expensesTestS: metric(run => testSeconds(run, 'expenses')),
+            vendorsTestS: metric(run => testSeconds(run, 'vendors')),
+            fixtureS: metric(fixtureSeconds),
+            artifactMB: metric(run => run.artifactBytes / 1_000_000),
+          },
+        };
+      }),
+    )
+    .filter(group => Object.keys(group.statuses).length);
 
-  const paired = MODES.map(mode => {
-    const byPair = new Map<string, Partial<Record<Runner, BenchmarkRun>>>();
-    for (const run of runs.filter(candidate => candidate.mode === mode)) {
-      const key = `${run.batch}#${run.pair}`;
-      byPair.set(key, { ...byPair.get(key), [run.runner]: run });
-    }
-    const complete = [];
-    const excluded = [];
-    for (const pair of byPair.values()) {
-      const { cypress, playwright } = pair;
-      if (cypress?.status === 'passed' && playwright?.status === 'passed') {
-        complete.push({
-          batch: cypress.batch,
-          deltaS: cypress.phases.totalS - playwright.phases.totalS,
-          cypress,
-          playwright,
-        });
-      } else {
-        const any = cypress ?? playwright;
-        excluded.push({
-          batch: any.batch,
-          pair: any.pair,
-          cypress: cypress?.status ?? 'missing',
-          playwright: playwright?.status ?? 'missing',
-        });
+  const paired = modes
+    .map(mode => {
+      const byPair = new Map<string, Partial<Record<Runner, BenchmarkRun>>>();
+      for (const run of runs.filter(candidate => candidate.mode === mode)) {
+        const key = `${run.batch}#${run.pair}`;
+        byPair.set(key, { ...byPair.get(key), [run.runner]: run });
       }
-    }
-    const byBatch = {};
-    for (const batch of [...new Set(complete.map(pair => pair.batch))].sort()) {
-      const inBatch = complete.filter(pair => pair.batch === batch);
-      byBatch[batch] = {
-        pairs: inBatch.length,
-        playwrightFaster: inBatch.filter(pair => pair.deltaS > 0).length,
-        medianDeltaS: stats(inBatch.map(pair => pair.deltaS)).median,
-      };
-    }
-    return {
-      mode,
-      pairs: complete.length,
-      deltaS: stats(complete.map(pair => pair.deltaS)),
-      ratio: stats(complete.map(pair => pair.cypress.phases.totalS / pair.playwright.phases.totalS)),
-      playwrightFaster: complete.filter(pair => pair.deltaS > 0).length,
-      byBatch,
-      excluded,
-    };
-  }).filter(comparison => comparison.pairs || comparison.excluded.length);
-
-  const reliability = MODES.flatMap(mode =>
-    RUNNERS.map(runner => {
-      const all = runs.filter(run => run.mode === mode && run.runner === runner);
+      const complete = [];
+      const excluded = [];
+      for (const pair of byPair.values()) {
+        const { cypress, playwright } = pair;
+        if (cypress?.status === 'passed' && playwright?.status === 'passed') {
+          complete.push({
+            batch: cypress.batch,
+            deltaS: cypress.phases.totalS - playwright.phases.totalS,
+            cypress,
+            playwright,
+          });
+        } else {
+          const any = cypress ?? playwright;
+          excluded.push({
+            batch: any.batch,
+            pair: any.pair,
+            cypress: cypress?.status ?? 'missing',
+            playwright: playwright?.status ?? 'missing',
+          });
+        }
+      }
+      const byBatch = {};
+      for (const batch of [...new Set(complete.map(pair => pair.batch))].sort()) {
+        const inBatch = complete.filter(pair => pair.batch === batch);
+        byBatch[batch] = {
+          pairs: inBatch.length,
+          playwrightFaster: inBatch.filter(pair => pair.deltaS > 0).length,
+          medianDeltaS: stats(inBatch.map(pair => pair.deltaS)).median,
+        };
+      }
       return {
         mode,
-        runner,
-        runs: all.length,
-        testsRun: all.reduce((total, run) => total + run.tests.filter(test => test.status !== 'skipped').length, 0),
-        firstAttemptFailures: all.reduce(
-          (total, run) => total + run.tests.filter(test => test.status === 'failed').length,
-          0,
-        ),
-        unfinishedRuns: all.filter(run => run.status === 'setup-failed' || run.status === 'interrupted').length,
-        failedTests: all.flatMap(run =>
-          run.tests
-            .filter(test => test.status === 'failed')
-            .map(test => ({ batch: run.batch, pair: run.pair, title: test.title })),
-        ),
+        pairs: complete.length,
+        deltaS: stats(complete.map(pair => pair.deltaS)),
+        ratio: stats(complete.map(pair => pair.cypress.phases.totalS / pair.playwright.phases.totalS)),
+        playwrightFaster: complete.filter(pair => pair.deltaS > 0).length,
+        byBatch,
+        excluded,
       };
-    }),
-  ).filter(row => row.runs);
+    })
+    .filter(comparison => comparison.pairs || comparison.excluded.length);
+
+  const reliability = modes
+    .flatMap(mode =>
+      RUNNERS.map(runner => {
+        const all = runs.filter(run => run.mode === mode && run.runner === runner);
+        return {
+          mode,
+          runner,
+          runs: all.length,
+          testsRun: all.reduce((total, run) => total + run.tests.filter(test => test.status !== 'skipped').length, 0),
+          firstAttemptFailures: all.reduce(
+            (total, run) => total + run.tests.filter(test => test.status === 'failed').length,
+            0,
+          ),
+          unfinishedRuns: all.filter(run => run.status === 'setup-failed' || run.status === 'interrupted').length,
+          failedTests: all.flatMap(run =>
+            run.tests
+              .filter(test => test.status === 'failed')
+              .map(test => ({ batch: run.batch, pair: run.pair, title: test.title })),
+          ),
+        };
+      }),
+    )
+    .filter(row => row.runs);
 
   return { groups, paired, reliability };
 }
