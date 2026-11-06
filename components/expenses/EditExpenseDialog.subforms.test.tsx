@@ -194,7 +194,7 @@ describe('EditExpenseDialog sub-forms (characterization)', () => {
         attachedFiles: [{ url: 'https://e.x/attached.pdf' }],
         invoiceFile: undefined,
         invoiceInfo: 'Invoice info',
-        reference: 'REF-1',
+        reference: null, // Only invoices carry a reference
         tax: [],
       },
     });
@@ -212,7 +212,7 @@ describe('EditExpenseDialog sub-forms (characterization)', () => {
         payee: { slug: 'org' },
         payeeLocation: undefined,
         currency: 'USD',
-        items: [{ ...expectedItems[0], url: undefined }],
+        items: [{ ...expectedItems[0], url: null }], // Invoice items carry no receipt
         payoutMethod: { id: 'pm-org' },
         tax: [],
       },
@@ -246,7 +246,7 @@ describe('EditExpenseDialog sub-forms (characterization)', () => {
         payee: { slug: 'jane' },
         payeeLocation: undefined,
         currency: 'USD',
-        items: [{ ...expectedItems[0], url: undefined }],
+        items: [{ ...expectedItems[0], url: null }], // Invoice items carry no receipt
         tax: [],
       },
     });

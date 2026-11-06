@@ -312,7 +312,6 @@ function ExpenseFormikContainer(props: {
       },
     },
     startOptions: startOptions.current,
-    handleOnSubmit: true,
     customData: props.customData,
     onSuccess: props.onSuccess,
     onError: props.onError,

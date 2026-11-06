@@ -140,9 +140,7 @@ async function setup(opts: {
   const rendered = renderExpenseFormHook(mock.client, {
     initialValues: opts.values ?? newExpenseValues(),
     startOptions: opts.startOptions ?? {},
-    ...(opts.onSubmit
-      ? { onSubmit: opts.onSubmit }
-      : { handleOnSubmit: true, onSuccess, onError, customData: opts.customData }),
+    ...(opts.onSubmit ? { onSubmit: opts.onSubmit } : { onSuccess, onError, customData: opts.customData }),
   });
   if (opts.waitForReady !== false) {
     await waitForFormReady(rendered.result);
@@ -286,7 +284,7 @@ describe('useExpenseForm (characterization)', () => {
           longDescription: null,
           privateMessage: 'Thanks',
           tags: ['design'],
-          tax: null,
+          tax: [],
         },
       });
       expect(onSuccess).toHaveBeenCalledWith(expect.anything(), 'new');
@@ -481,15 +479,16 @@ describe('useExpenseForm (characterization)', () => {
       expect(form.current.options.allowDifferentItemCurrency).toBe(true);
     });
 
-    it('delegates to the caller submit callback with values and options', async () => {
+    it('delegates the submission plan to the caller submit callback', async () => {
       const onSubmit = jest.fn();
       const { form } = await setup({ values: newExpenseValues({ payoutMethodId: 'pm-bank-usd' }), onSubmit });
       await setValues(form, validInvoiceItem);
       await submit(form);
       expect(onSubmit).toHaveBeenCalledTimes(1);
-      const [values, , options] = onSubmit.mock.calls[0];
-      expect(values.payoutMethodId).toBe('pm-bank-usd');
-      expect(options.payee.slug).toBe('jane');
+      const [plan] = onSubmit.mock.calls[0];
+      expect(plan.kind).toBe('create');
+      expect(plan.variables.expenseCreateInput.payoutMethod).toEqual({ id: 'pm-bank-usd' });
+      expect(plan.variables.expenseCreateInput.payee).toEqual({ slug: 'jane' });
     });
 
     it('reports mutation errors to onError', async () => {
@@ -504,7 +503,6 @@ describe('useExpenseForm (characterization)', () => {
       const { result } = renderExpenseFormHook(mock.client, {
         initialValues: newExpenseValues({ payoutMethodId: 'pm-bank-usd' }),
         startOptions: {},
-        handleOnSubmit: true,
         onSuccess: jest.fn(),
         onError,
       });
@@ -778,7 +776,6 @@ describe('useExpenseForm (characterization)', () => {
       const { result } = renderExpenseFormHook(mock.client, {
         initialValues: newExpenseValues({ payoutMethodId: 'pm-unknown' }),
         startOptions: {},
-        handleOnSubmit: true,
         onSuccess: jest.fn(),
         onError: jest.fn(),
       });
@@ -937,7 +934,7 @@ describe('useExpenseForm (characterization)', () => {
       });
       world.accounts.collective = collective({ settings: { VAT: { type: 'OWN' } } });
       world.expense.account = world.accounts.collective;
-      const { form } = await setup({
+      const { form, mock } = await setup({
         world,
         values: newExpenseValues({ accountSlug: undefined, payeeSlug: undefined }),
         startOptions: { expenseId: 555 },
@@ -945,6 +942,11 @@ describe('useExpenseForm (characterization)', () => {
       expect(form.current.options.taxType).toBe('VAT');
       expect(form.current.values.hasTax).toBe(true);
       expect(form.current.values.tax).toEqual({ idNumber: 'FRXX999999999', rate: 0.2 });
+
+      // Removing the tax sends an empty list, which the API reads as "remove taxes" (`null` would keep them)
+      await setValues(form, { hasTax: false });
+      await submit(form);
+      expect(lastVariables(mock, 'EditExpenseFromDashboard').expenseEditInput.tax).toEqual([]);
     });
 
     it('keeps locked fields and the expense currency', async () => {

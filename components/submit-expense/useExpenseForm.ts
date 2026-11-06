@@ -53,7 +53,7 @@ import {
 } from '../expenses/lib/constants';
 import { getAvailablePayoutMethods, getSupportedPayoutMethods } from '../expenses/lib/payout-methods';
 import { computeExpenseAmounts } from '../expenses/lib/utils';
-import { planExpenseSubmission } from './lib/expense-input';
+import { type ExpenseSubmissionPlan, planExpenseSubmission } from './lib/expense-input';
 import type {
   ExpenseFormOptions,
   ExpenseFormStartOptions,
@@ -1554,19 +1554,16 @@ export function useExpenseForm(opts: {
   formRef?: React.RefObject<HTMLFormElement>;
   initialValues: ExpenseFormValues;
   startOptions: ExpenseFormStartOptions;
-  handleOnSubmit?: boolean;
   customData?: Record<string, unknown>;
+  /** Called after the hook submitted the plan successfully (when `onSubmit` is not provided) */
   onSuccess?: (
     result: FetchResult<CreateExpenseFromDashboardMutation> | FetchResult<EditExpenseFromDashboardMutation>,
     type: 'new' | 'invite' | 'edit',
-  ) => void; // when handleOnSubmit === true
-  onError?: (err) => void; // when handleOnSubmit === true
-  onSubmit?: (
-    values: ExpenseFormValues,
-    formikHelpers: FormikHelpers<ExpenseFormValues>,
-    options: ExpenseFormOptions,
-    startOptions: ExpenseFormStartOptions,
-  ) => void | Promise<unknown>;
+  ) => void;
+  /** Called when submitting the plan failed (when `onSubmit` is not provided) */
+  onError?: (err) => void;
+  /** Replaces the hook's submission: receives the submission plan to execute */
+  onSubmit?: (plan: ExpenseSubmissionPlan, formikHelpers: FormikHelpers<ExpenseFormValues>) => void | Promise<unknown>;
 }): ExpenseForm {
   const intl = useIntl();
   const apolloClient = useApolloClient();
@@ -1650,47 +1647,31 @@ export function useExpenseForm(opts: {
   const { onSubmit, onError, onSuccess } = opts;
   const onSubmitCallback = React.useCallback(
     async (values: ExpenseFormValues, formikHelpers: FormikHelpers<ExpenseFormValues>) => {
-      if (opts.handleOnSubmit) {
-        let result: FetchResult<CreateExpenseFromDashboardMutation> | FetchResult<EditExpenseFromDashboardMutation>;
-        try {
-          track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED);
-
-          const plan = planExpenseSubmission(values, formOptions, startOptions.current, {
-            customData: opts.customData,
-          });
-          if (plan.kind === 'edit') {
-            result = await editExpense({ variables: plan.variables });
-            onSuccess(result, 'edit');
-          } else if (plan.kind === 'create') {
-            result = await createExpense({ variables: plan.variables });
-            onSuccess(result, 'new');
-          } else {
-            result = await draftExpenseAndInviteUser({ variables: plan.variables });
-            onSuccess(result, 'invite');
-          }
-
-          track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED_SUCCESS);
-        } catch (err) {
-          track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED_ERROR);
-          onError(err);
-        } finally {
-          // h.setSubmitting(false);
-        }
-        return;
+      const plan = planExpenseSubmission(values, formOptions, startOptions.current, { customData: opts.customData });
+      if (onSubmit) {
+        return onSubmit(plan, formikHelpers);
       }
-      return onSubmit(values, formikHelpers, formOptions, startOptions.current);
+
+      let result: FetchResult<CreateExpenseFromDashboardMutation> | FetchResult<EditExpenseFromDashboardMutation>;
+      try {
+        track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED);
+        if (plan.kind === 'edit') {
+          result = await editExpense({ variables: plan.variables });
+          onSuccess(result, 'edit');
+        } else if (plan.kind === 'create') {
+          result = await createExpense({ variables: plan.variables });
+          onSuccess(result, 'new');
+        } else {
+          result = await draftExpenseAndInviteUser({ variables: plan.variables });
+          onSuccess(result, 'invite');
+        }
+        track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED_SUCCESS);
+      } catch (err) {
+        track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED_ERROR);
+        onError(err);
+      }
     },
-    [
-      opts.handleOnSubmit,
-      opts.customData,
-      onSubmit,
-      formOptions,
-      editExpense,
-      onSuccess,
-      createExpense,
-      draftExpenseAndInviteUser,
-      onError,
-    ],
+    [opts.customData, onSubmit, formOptions, editExpense, onSuccess, createExpense, draftExpenseAndInviteUser, onError],
   );
 
   const validate = React.useCallback(

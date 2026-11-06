@@ -285,7 +285,6 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
       },
     },
     startOptions: startOptions.current,
-    handleOnSubmit: true,
     onSuccess,
     onError,
   });

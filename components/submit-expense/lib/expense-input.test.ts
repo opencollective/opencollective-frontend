@@ -10,7 +10,7 @@ import {
   PAYEE_SLUG_INVITE_EXISTING_USER,
 } from '../../expenses/lib/constants';
 
-import { planExpenseSubmission } from './expense-input';
+import { getExpenseEditInputSlice, planExpenseSubmission } from './expense-input';
 import type { ExpenseFormOptions, ExpenseFormValues } from './types';
 import { InviteeAccountType, RecurrenceFrequencyOption, YesNoOption } from './types';
 
@@ -101,7 +101,7 @@ describe('planExpenseSubmission', () => {
         longDescription: null,
         privateMessage: null,
         tags: undefined,
-        tax: null,
+        tax: [],
       },
     });
   });
@@ -140,8 +140,13 @@ describe('planExpenseSubmission', () => {
       ]);
     });
 
-    it('sends no tax when tax is disabled', () => {
-      expect(input({ hasTax: false }).tax).toBeNull();
+    // An empty list (not `null`) so that editing an expense removes its existing taxes
+    it('sends an empty tax list when tax is disabled', () => {
+      expect(input({ hasTax: false }).tax).toEqual([]);
+    });
+
+    it('sends an empty tax list when the account has no tax type', () => {
+      expect(input({ hasTax: true, tax: { rate: 0.2, idNumber: 'FR1' } }, { taxType: undefined }).tax).toEqual([]);
     });
   });
 
@@ -191,7 +196,7 @@ describe('planExpenseSubmission', () => {
       });
     });
 
-    it('sends receipt URLs for reimbursements only', () => {
+    it('sends item URLs for the types whose items carry receipts only', () => {
       const items = [
         {
           description: 'a',
@@ -207,6 +212,10 @@ describe('planExpenseSubmission', () => {
         },
       ];
       expect(input({ expenseTypeOption: ExpenseType.RECEIPT, expenseItems: items }).items.map(i => i.url)).toEqual([
+        'https://e.x/a',
+        'https://e.x/b',
+      ]);
+      expect(input({ expenseTypeOption: ExpenseType.CHARGE, expenseItems: items }).items.map(i => i.url)).toEqual([
         'https://e.x/a',
         'https://e.x/b',
       ]);
@@ -309,6 +318,15 @@ describe('planExpenseSubmission', () => {
   });
 
   describe('edit', () => {
+    it('slices the edit input for the fields an edit sub-form edits', () => {
+      const p = plan({ hasTax: false }, { expense: { id: 'e1' } as any }, { expenseId: 1 });
+      expect(getExpenseEditInputSlice(p, ['payoutMethod', 'tax'])).toEqual({ payoutMethod: { id: 'pm-1' }, tax: [] });
+    });
+
+    it('refuses to slice a plan that is not an edit', () => {
+      expect(() => getExpenseEditInputSlice(plan(), ['payoutMethod'])).toThrow('Expected an edit submission');
+    });
+
     it('edits the expense with the draft key', () => {
       const p = plan({}, { expense: { id: 'e1' } as any }, { expenseId: 1, draftKey: 'key' });
       expect(p.variables.draftKey).toBe('key');

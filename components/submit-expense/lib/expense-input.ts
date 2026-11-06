@@ -13,6 +13,7 @@ import type {
   CreateExpenseFromDashboardMutationVariables,
   CurrencyExchangeRateInput,
   EditExpenseFromDashboardMutationVariables,
+  ExpenseUpdateInput,
   InviteExpenseFromDashboardMutationVariables,
   RecurringExpenseInput,
   RecurringExpenseInterval,
@@ -33,6 +34,9 @@ export type ExpenseSubmissionPlan =
   | { kind: 'create'; variables: CreateExpenseFromDashboardMutationVariables }
   | { kind: 'invite'; variables: InviteExpenseFromDashboardMutationVariables }
   | { kind: 'edit'; variables: EditExpenseFromDashboardMutationVariables };
+
+/** Expense types whose items carry their own attachment (receipt) */
+const TYPES_WITH_ITEM_ATTACHMENTS: ExpenseType[] = [ExpenseType.RECEIPT, ExpenseType.CHARGE];
 
 const getAttachmentUrl = (attachment: Attachment): string =>
   typeof attachment === 'string' ? attachment : attachment?.url;
@@ -100,7 +104,9 @@ function getItemsInput(values: ExpenseFormValues): ExpenseCreateInput['items'] {
         : null,
     },
     incurredAt: values.expenseTypeOption === ExpenseType.GRANT ? new Date() : new Date(ei.incurredAt),
-    url: values.expenseTypeOption === ExpenseType.RECEIPT ? getAttachmentUrl(ei.attachment) : null,
+    url: TYPES_WITH_ITEM_ATTACHMENTS.includes(values.expenseTypeOption)
+      ? (getAttachmentUrl(ei.attachment) ?? null)
+      : null,
   }));
 }
 
@@ -123,7 +129,7 @@ function getExpenseInput(
     payoutMethod: getPayoutMethodInput(values),
     type: values.expenseTypeOption,
     accountingCategory: values.accountingCategoryId ? { id: values.accountingCategoryId } : null,
-    attachedFiles: values.additionalAttachments.map(a => ({ url: getAttachmentUrl(a) })),
+    attachedFiles: (values.additionalAttachments ?? []).map(a => ({ url: getAttachmentUrl(a) })),
     currency: options.expenseCurrency,
     customData,
     invoiceInfo: values.invoiceInfo || null,
@@ -132,7 +138,11 @@ function getExpenseInput(
     longDescription: null,
     privateMessage: values.privateMessage || null,
     tags: values.tags,
-    tax: values.hasTax ? [{ rate: values.tax.rate, type: options.taxType, idNumber: values.tax.idNumber }] : null,
+    // An empty list removes existing taxes when editing (`null` would keep them)
+    tax:
+      values.hasTax && values.tax && options.taxType
+        ? [{ rate: values.tax.rate, type: options.taxType, idNumber: values.tax.idNumber }]
+        : [],
   };
 }
 
@@ -200,4 +210,19 @@ export function planExpenseSubmission(
       },
     };
   }
+}
+
+/**
+ * Returns the slice of an edit plan's input for the given fields, so that edit sub-forms submit the
+ * same input the main flow would produce for those fields.
+ */
+export function getExpenseEditInputSlice<K extends keyof ExpenseUpdateInput>(
+  plan: ExpenseSubmissionPlan,
+  fields: readonly K[],
+): Pick<ExpenseUpdateInput, K> {
+  if (plan.kind !== 'edit') {
+    throw new Error(`Expected an edit submission, got ${plan.kind}`);
+  }
+
+  return pick(plan.variables.expenseEditInput, fields);
 }
