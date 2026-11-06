@@ -1,5 +1,4 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
 import type { FieldMetaProps } from 'formik';
 import { Field, useFormikContext } from 'formik';
 import { isEmpty, isNil, pick } from 'lodash-es';
@@ -48,7 +47,6 @@ import { ExpenseAccountItem } from './ExpenseAccountItem';
 import { FormSectionContainer } from './FormSectionContainer';
 import { memoWithGetFormProps } from './helper';
 import { InviteUserOption } from './InviteUserOption';
-import { updateAccountLegalNameMutation, updateAccountUSEntityMutation } from './mutations';
 
 type WhoIsGettingPaidSectionProps = {
   inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
@@ -56,7 +54,7 @@ type WhoIsGettingPaidSectionProps = {
 
 function getFormProps(form: ExpenseForm) {
   return {
-    ...pick(form, 'initialLoading', 'setFieldValue', 'setFieldTouched', 'refresh', 'isSubmitting'),
+    ...pick(form, 'initialLoading', 'setFieldValue', 'setFieldTouched', 'actions', 'isSubmitting'),
     ...pick(form.options, [
       'payoutProfiles',
       'recentlySubmittedExpenses',
@@ -160,10 +158,13 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
             subContent={
               <div className="flex flex-col gap-2">
                 {isEmpty(lastUsedProfile?.legalName) && (
-                  <LegalNameWarning account={lastUsedProfile} onLegalNameUpdate={props.refresh} />
+                  <LegalNameWarning account={lastUsedProfile} updateLegalName={props.actions.updateLegalName} />
                 )}
                 {isUSEntityRequired(lastUsedProfile) && (
-                  <USPersonWarning account={lastUsedProfile} onUSPersonUpdate={props.refresh} />
+                  <USPersonWarning
+                    account={lastUsedProfile}
+                    updateUSEntityStatus={props.actions.updateUSEntityStatus}
+                  />
                 )}
               </div>
             }
@@ -187,10 +188,13 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
             subContent={
               <div className="flex flex-col gap-2">
                 {isEmpty(personalProfile?.legalName) && (
-                  <LegalNameWarning account={personalProfile} onLegalNameUpdate={props.refresh} />
+                  <LegalNameWarning account={personalProfile} updateLegalName={props.actions.updateLegalName} />
                 )}
                 {isUSEntityRequired(personalProfile) && (
-                  <USPersonWarning account={personalProfile} onUSPersonUpdate={props.refresh} />
+                  <USPersonWarning
+                    account={personalProfile}
+                    updateUSEntityStatus={props.actions.updateUSEntityStatus}
+                  />
                 )}
               </div>
             }
@@ -211,10 +215,13 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
             subContent={
               <div className="flex flex-col gap-2">
                 {isEmpty(singleOtherProfile.legalName) && (
-                  <LegalNameWarning account={singleOtherProfile} onLegalNameUpdate={props.refresh} />
+                  <LegalNameWarning account={singleOtherProfile} updateLegalName={props.actions.updateLegalName} />
                 )}
                 {isUSEntityRequired(singleOtherProfile) && (
-                  <USPersonWarning account={singleOtherProfile} onUSPersonUpdate={props.refresh} />
+                  <USPersonWarning
+                    account={singleOtherProfile}
+                    updateUSEntityStatus={props.actions.updateUSEntityStatus}
+                  />
                 )}
               </div>
             }
@@ -247,10 +254,13 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
                 {props.payee && props.payeeSlug === props.payee.slug && (
                   <React.Fragment>
                     {isEmpty(props.payee.legalName) && (
-                      <LegalNameWarning account={props.payee} onLegalNameUpdate={props.refresh} />
+                      <LegalNameWarning account={props.payee} updateLegalName={props.actions.updateLegalName} />
                     )}
                     {isUSEntityRequired(props.payee) && (
-                      <USPersonWarning account={props.payee} onUSPersonUpdate={props.refresh} />
+                      <USPersonWarning
+                        account={props.payee}
+                        updateUSEntityStatus={props.actions.updateUSEntityStatus}
+                      />
                     )}
                   </React.Fragment>
                 )}
@@ -271,9 +281,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
             subContent={
               <CreateLegalEntityPayeeForm
                 isSubmitting={props.isSubmitting}
-                refresh={props.refresh}
-                setFieldValue={props.setFieldValue}
-                setFieldTouched={props.setFieldTouched}
+                createPayeeOrganization={props.actions.createPayeeOrganization}
               />
             }
           >
@@ -498,48 +506,30 @@ const VendorOption = React.memo(function VendorOption(props: {
 
 function LegalNameWarning(props: {
   account: ExpenseForm['options']['payoutProfiles'][number] | ExpenseForm['options']['payee'];
-  onLegalNameUpdate: () => void;
+  updateLegalName: ExpenseForm['actions']['updateLegalName'];
 }) {
   const intl = useIntl();
   const { toast } = useToast();
   const [legalName, setLegalName] = React.useState('');
   const [legalNameUpdated, setLegalNameUpdated] = React.useState(false);
-  const timeoutRef = React.useRef(null);
+  const [loading, setLoading] = React.useState(false);
 
-  const [submitLegalNameMutation, { loading }] = useMutation(updateAccountLegalNameMutation, {
-    variables: {
-      account: {
-        id: props.account.id,
-        legalName,
-      },
-    },
-  });
-
-  const { onLegalNameUpdate } = props;
-  const handleLegalNameUpdate = React.useCallback(() => {
-    const timeout = setTimeout(() => {
-      onLegalNameUpdate();
-    }, 5000);
-    setLegalNameUpdated(true);
-    timeoutRef.current = timeout;
-  }, [onLegalNameUpdate]);
-
-  React.useEffect(() => {
-    return () => timeoutRef.current && clearTimeout(timeoutRef.current);
-  }, []);
-
+  const { updateLegalName } = props;
   const onSubmitLegalName = React.useCallback(async () => {
     try {
-      await submitLegalNameMutation();
-      handleLegalNameUpdate();
+      setLoading(true);
+      await updateLegalName(props.account.id, legalName);
+      setLegalNameUpdated(true);
       toast({
         variant: 'success',
         message: intl.formatMessage({ defaultMessage: 'Legal name updated', id: 'aLu6aT' }),
       });
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+    } finally {
+      setLoading(false);
     }
-  }, [submitLegalNameMutation, toast, intl, handleLegalNameUpdate]);
+  }, [updateLegalName, props.account.id, legalName, toast, intl]);
 
   if (legalNameUpdated) {
     return (
@@ -582,48 +572,30 @@ function LegalNameWarning(props: {
 
 function USPersonWarning(props: {
   account: ExpenseForm['options']['payoutProfiles'][number] | ExpenseForm['options']['payee'];
-  onUSPersonUpdate: () => void;
+  updateUSEntityStatus: ExpenseForm['actions']['updateUSEntityStatus'];
 }) {
   const intl = useIntl();
   const { toast } = useToast();
   const [isUSEntity, setIsUSEntity] = React.useState<boolean | null>(null);
   const [usPersonUpdated, setUsPersonUpdated] = React.useState(false);
-  const timeoutRef = React.useRef(null);
+  const [loading, setLoading] = React.useState(false);
 
-  const [submitUSPersonMutation, { loading }] = useMutation(updateAccountUSEntityMutation, {
-    variables: {
-      account: {
-        id: props.account.id,
-        isUSEntity,
-      },
-    },
-  });
-
-  const { onUSPersonUpdate } = props;
-  const handleUSPersonUpdate = React.useCallback(() => {
-    const timeout = setTimeout(() => {
-      onUSPersonUpdate();
-    }, 5000);
-    setUsPersonUpdated(true);
-    timeoutRef.current = timeout;
-  }, [onUSPersonUpdate]);
-
-  React.useEffect(() => {
-    return () => timeoutRef.current && clearTimeout(timeoutRef.current);
-  }, []);
-
+  const { updateUSEntityStatus } = props;
   const onSubmitUSPerson = React.useCallback(async () => {
     try {
-      await submitUSPersonMutation();
-      handleUSPersonUpdate();
+      setLoading(true);
+      await updateUSEntityStatus(props.account.id, isUSEntity);
+      setUsPersonUpdated(true);
       toast({
         variant: 'success',
         message: intl.formatMessage({ defaultMessage: 'Tax information updated', id: 'NeqwR2' }),
       });
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+    } finally {
+      setLoading(false);
     }
-  }, [submitUSPersonMutation, toast, intl, handleUSPersonUpdate]);
+  }, [updateUSEntityStatus, props.account.id, isUSEntity, toast, intl]);
 
   if (usPersonUpdated) {
     return (

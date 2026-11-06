@@ -35,6 +35,8 @@ import { track } from '@/lib/analytics/plausible';
 import { validatePayoutMethod } from '../expenses/PayoutMethodForm';
 import { getCustomZodErrorMap } from '../FormikZod';
 
+import { type ExpenseFormActions, useExpenseFormActions } from './useExpenseFormActions';
+
 export type { ExpenseFormValues } from './lib/types';
 export { InviteeAccountType, RecurrenceFrequencyOption, YesNoOption } from './lib/types';
 
@@ -55,6 +57,8 @@ export type ExpenseForm = ExpenseFormik & {
   refresh: () => void;
   /** Sets an item currency picked by the submitter: item currencies then stop following the payout method */
   setItemCurrency: (index: number, currency: string) => void;
+  /** Mutations sections trigger, which resync and select their result */
+  actions: ExpenseFormActions;
 };
 
 const expenseFormExchangeRatesQuery = gql`
@@ -118,7 +122,7 @@ export function useExpenseForm(opts: {
 }): ExpenseForm {
   const intl = useIntl();
   const apolloClient = useApolloClient();
-  const { LoggedInUser } = useLoggedInUser();
+  const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
   const [formQueryResult, setFormQueryResult] = React.useState<ExpenseFormQueryResult>(null);
   const startOptions = React.useRef(opts.startOptions);
 
@@ -393,11 +397,39 @@ export function useExpenseForm(opts: {
 
   const refresh = React.useCallback(() => fetchFormQuery(queryVariables, true), [fetchFormQuery, queryVariables]);
 
+  // New payout methods belong to the payee, or to the recipient Host for cross-host payees
+  const payeeHost = formOptions.payee && 'host' in formOptions.payee ? formOptions.payee.host : null;
+  const isCrossHostPayee = Boolean(payeeHost && formOptions.host && payeeHost.id !== formOptions.host.id);
+  const { setFieldTouched } = expenseForm;
+  const actions = useExpenseFormActions({
+    resync: refresh,
+    defaultPayoutMethodAccountSlug: isCrossHostPayee ? payeeHost.slug : expenseForm.values.payeeSlug,
+    onPayoutMethodSaved: (payoutMethodId, { isNew }) => {
+      setFieldValue('payoutMethodId', payoutMethodId);
+      if (isNew) {
+        setFieldValue('newPayoutMethod', { data: {} });
+      }
+    },
+    onPayoutMethodRemoved: payoutMethodId => {
+      if (payoutMethodId === latestValues.current.payoutMethodId) {
+        setFieldValue('payoutMethodId', '');
+      }
+    },
+    onProfilesChanged: refetchLoggedInUser,
+    onPayeeOrganizationCreated: organization => {
+      if (organization?.slug) {
+        setFieldValue('payeeSlug', organization.slug);
+        setFieldTouched('payeeSlug', true);
+      }
+    },
+  });
+
   return Object.assign(expenseForm, {
     options: formOptions,
     startOptions: startOptions.current,
     initialLoading: isLoading,
     refresh,
     setItemCurrency,
+    actions,
   });
 }
