@@ -225,6 +225,18 @@ describe('summarizeBenchmark', () => {
     expect(serial.excluded).toEqual([{ batch: 'B', pair: 4, cypress: 'failed', playwright: 'setup-failed' }]);
   });
 
+  it('summarizes every mode present, such as a configuration variant run as its own pairs', () => {
+    const variant = summarizeBenchmark([
+      run({ mode: 'parallel-novideo', pair: 20, phases: phases(300) }),
+      run({ mode: 'parallel-novideo', pair: 20, runner: 'playwright', position: 2, phases: phases(200) }),
+    ]);
+    expect(variant.paired.map(row => [row.mode, row.deltaS.median])).toEqual([['parallel-novideo', 100]]);
+    expect(variant.groups.map(group => `${group.mode} ${group.runner}`)).toEqual([
+      'parallel-novideo cypress',
+      'parallel-novideo playwright',
+    ]);
+  });
+
   it('reports first-attempt test failures and runs that never finished the browser step', () => {
     const cypress = summary.reliability.find(row => row.mode === 'serial' && row.runner === 'cypress');
     expect(cypress).toMatchObject({ runs: 4, testsRun: 7, firstAttemptFailures: 1, unfinishedRuns: 0 });
