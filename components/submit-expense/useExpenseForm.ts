@@ -275,7 +275,7 @@ export function useExpenseForm(opts: {
     async (variables: ExpenseFormSchemaQueryVariables, refresh = false) => {
       // Only the latest request's result is applied, so an outdated response cannot overwrite a newer one
       const requestId = ++latestFormQueryRequest.current;
-      let result: ExpenseFormQueryResult;
+      let result: ExpenseFormQueryResult | null = null;
       try {
         result = await apolloClient.query<ExpenseFormSchemaQuery, ExpenseFormSchemaQueryVariables>({
           query: expenseFormSchemaQuery,
@@ -286,11 +286,11 @@ export function useExpenseForm(opts: {
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error(err);
-        result = {};
       }
 
       if (requestId === latestFormQueryRequest.current) {
-        setFormQueryResult(result);
+        // A failed request keeps the data already loaded (e.g. the expense being edited)
+        setFormQueryResult(previous => result ?? previous ?? {});
       }
     },
     [apolloClient],

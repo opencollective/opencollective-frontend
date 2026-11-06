@@ -75,7 +75,11 @@ export function getPayeeChoice(values: PayeeValues): PayeeChoice {
   const slug = values.payeeSlug;
   const kind = !slug
     ? PayeeKind.NOT_CHOSEN
-    : (KIND_BY_SENTINEL[slug] ?? (isSentinel(slug) ? PayeeKind.NOT_CHOSEN : PayeeKind.ACCOUNT));
+    : Object.hasOwn(KIND_BY_SENTINEL, slug)
+      ? KIND_BY_SENTINEL[slug]
+      : isSentinel(slug)
+        ? PayeeKind.NOT_CHOSEN
+        : PayeeKind.ACCOUNT;
 
   let querySlug: string | null = null;
   let invitee: PayeeChoice['invitee'] = null;

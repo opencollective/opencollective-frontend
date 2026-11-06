@@ -1247,6 +1247,32 @@ describe('useExpenseForm (characterization)', () => {
   });
 
   describe('refresh', () => {
+    it('keeps the loaded data when a refresh fails', async () => {
+      const world = defaultWorld({ expense: existingExpense() });
+      let fail = false;
+      const answer = answerFormQuery(world);
+      const mock = createMockApolloClient({
+        ExpenseFormSchema: vars => {
+          if (fail) {
+            throw new Error('Network error');
+          }
+          return answer(vars);
+        },
+      });
+      const { result } = renderExpenseFormHook(mock.client, {
+        initialValues: inlineEditValues(),
+        startOptions: { expenseId: 555, isInlineEdit: true, pickSchemaFields: ['expenseItems'] },
+        onSubmit: jest.fn(),
+      });
+      await waitForFormReady(result);
+      fail = true;
+      jest.spyOn(console, 'error').mockImplementation(() => {});
+      await act(async () => {
+        await result.current.refresh();
+      });
+      expect(result.current.options.expense?.id).toBe('expense-1');
+    });
+
     it('re-runs the form query from the network', async () => {
       const { form, mock } = await setup({});
       const before = mock.operationsNamed('ExpenseFormSchema').length;

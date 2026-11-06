@@ -99,7 +99,8 @@ function getItemsInput(values: ExpenseFormValues): ExpenseCreateInput['items'] {
           } as CurrencyExchangeRateInput)
         : null,
     },
-    incurredAt: values.expenseTypeOption === ExpenseType.GRANT ? new Date() : new Date(ei.incurredAt),
+    // Grant items have no date field: new ones are dated at submission, existing ones keep their date
+    incurredAt: values.expenseTypeOption === ExpenseType.GRANT && !ei.incurredAt ? new Date() : new Date(ei.incurredAt),
     url: TYPES_WITH_ITEM_ATTACHMENTS.includes(values.expenseTypeOption)
       ? (getAttachmentUrl(ei.attachment) ?? null)
       : null,
@@ -193,9 +194,11 @@ export function planExpenseSubmission(
     const payee =
       choice.kind === PayeeKind.INVITE_EXISTING_USER
         ? choice.invitee
-        : values.inviteeAccountType === InviteeAccountType.INDIVIDUAL
-          ? values.inviteeNewIndividual
-          : values.inviteeNewOrganization;
+        : choice.kind === PayeeKind.ACCOUNT
+          ? { slug: choice.querySlug }
+          : values.inviteeAccountType === InviteeAccountType.INDIVIDUAL
+            ? values.inviteeNewIndividual
+            : values.inviteeNewOrganization;
     return {
       kind: 'invite',
       variables: {

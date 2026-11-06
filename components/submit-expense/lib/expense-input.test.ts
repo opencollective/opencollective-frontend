@@ -225,7 +225,15 @@ describe('planExpenseSubmission', () => {
       ]);
     });
 
-    it('dates Grant items at submission time', () => {
+    it('keeps the date of existing Grant items', () => {
+      const [item] = input({
+        expenseTypeOption: ExpenseType.GRANT,
+        expenseItems: [{ incurredAt: '2025-03-01', amount: { valueInCents: 1, currency: 'USD' } }],
+      }).items;
+      expect(item.incurredAt).toEqual(new Date('2025-03-01'));
+    });
+
+    it('dates new Grant items at submission time', () => {
       const before = Date.now();
       const [item] = input({
         expenseTypeOption: ExpenseType.GRANT,
@@ -280,6 +288,21 @@ describe('planExpenseSubmission', () => {
   });
 
   describe('invitee', () => {
+    it('invites an existing Account the submitter does not administer', () => {
+      const p = plan({ payeeSlug: 'bob' }, { payee: { slug: 'bob', type: CollectiveType.USER } as any });
+      expect(p.kind).toBe('invite');
+      expect(p.variables.expenseInviteInput.payee).toEqual({ slug: 'bob', isInvite: true });
+    });
+
+    it('invites an existing Account when duplicating an expense', () => {
+      const p = plan(
+        { payeeSlug: 'bob' },
+        { payee: { slug: 'bob', type: CollectiveType.USER } as any, expense: { id: 'e1' } as any },
+        { expenseId: 1, duplicateExpense: true },
+      );
+      expect(p.variables.expenseInviteInput.payee).toEqual({ slug: 'bob', isInvite: true });
+    });
+
     it('invites a new individual with the invitation note', () => {
       const p = plan(
         {

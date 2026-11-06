@@ -28,6 +28,7 @@ describe('getPayeeChoice', () => {
     ['', PayeeKind.NOT_CHOSEN, null, false],
     ['__unknown', PayeeKind.NOT_CHOSEN, null, false],
     ['jane', PayeeKind.ACCOUNT, 'jane', false],
+    ['constructor', PayeeKind.ACCOUNT, 'constructor', false],
     [PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER, PayeeKind.FIND_ACCOUNT_I_ADMINISTER, null, false],
     [PAYEE_SLUG_CREATE_LEGAL_ENTITY, PayeeKind.NEW_LEGAL_ENTITY, null, false],
     [PAYEE_SLUG_VENDOR, PayeeKind.VENDOR_PICKER, null, false],
