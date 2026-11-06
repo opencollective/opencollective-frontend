@@ -17,6 +17,8 @@ const ActivityCategories = {
       'COLLECTIVE_REJECTED',
       'COLLECTIVE_CREATED_GITHUB',
       'COLLECTIVE_UNHOSTED',
+      'FISCAL_HOST_NOTE_SET',
+      'FISCAL_HOST_NOTE_REMOVED',
     ],
   },
   EXPENSES: {

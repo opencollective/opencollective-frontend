@@ -5,7 +5,7 @@ import type { ActivityTypes } from '../constants/activities';
 
 interface TimelineMessageDescriptor extends MessageDescriptor {
   avatar?: 'fromAccount' | 'account' | 'individual'; // Used to determine which avatar to display (default is Individual)
-  content?: 'update' | 'conversation'; // Used to determine which content card to display
+  content?: 'update' | 'conversation' | 'fiscalHostNote'; // Used to determine which content card to display
 }
 
 export const ActivityTimelineMessageI18n = defineMessages<string, TimelineMessageDescriptor>({
@@ -209,6 +209,16 @@ export const ActivityTimelineMessageI18n = defineMessages<string, TimelineMessag
     defaultMessage: '<Individual></Individual> converted to Organization',
     id: 'St4vQ3',
   },
+
+  FISCAL_HOST_NOTE_SET: {
+    defaultMessage: '<Individual></Individual> added a fiscal host note on <FromAccount></FromAccount>',
+    id: 'FiscalHostNote.Activity.Message',
+    content: 'fiscalHostNote',
+  },
+  FISCAL_HOST_NOTE_REMOVED: {
+    defaultMessage: '<Individual></Individual> removed a fiscal host note on <FromAccount></FromAccount>',
+    id: 'FiscalHostNote.Activity.Removed',
+  },
 });
 
 export const ActivityDescriptionI18n = defineMessages({
@@ -225,6 +235,14 @@ export const ActivityDescriptionI18n = defineMessages({
   COLLECTIVE_EDITED: {
     defaultMessage: '<Account></Account> edited',
     id: 'A4+n4H',
+  },
+  FISCAL_HOST_NOTE_SET: {
+    defaultMessage: 'Fiscal host note added on <FromAccount></FromAccount>',
+    id: 'FiscalHostNote.Activity.Description',
+  },
+  FISCAL_HOST_NOTE_REMOVED: {
+    defaultMessage: 'Fiscal host note removed from <FromAccount></FromAccount>',
+    id: 'FiscalHostNote.Activity.RemovedDescription',
   },
   COLLECTIVE_CONVERTED_TO_ORGANIZATION: {
     defaultMessage: '<Account></Account> converted to Organization',
@@ -650,6 +668,14 @@ export const ActivityDescriptionI18n = defineMessages({
 type ActivityTranslations = Partial<Record<keyof typeof ActivityTypes, MessageDescriptor>>;
 
 export const ActivityTypeI18n: ActivityTranslations = defineMessages({
+  FISCAL_HOST_NOTE_SET: {
+    id: 'FiscalHostNote.Activity.TypeSet',
+    defaultMessage: 'Fiscal host note added',
+  },
+  FISCAL_HOST_NOTE_REMOVED: {
+    id: 'FiscalHostNote.Activity.TypeRemoved',
+    defaultMessage: 'Fiscal host note removed',
+  },
   ACTIVITY_ALL: {
     id: 'WebhookEvents.All',
     defaultMessage: 'All',

@@ -130,7 +130,7 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
   const { data, error, loading } = useQuery<HostApplicationsQuery, HostApplicationsQueryVariables>(
     hostApplicationsQuery,
     {
-      variables: { hostSlug, ...omit(queryFilter.variables, 'hostApplicationId') },
+      variables: { hostSlug, includeFiscalHostNote: true, ...omit(queryFilter.variables, 'hostApplicationId') },
       fetchPolicy: 'cache-and-network',
 
       onCompleted() {
@@ -195,6 +195,7 @@ const HostApplications = ({ accountSlug: hostSlug }: DashboardSectionProps) => {
           queryFilter.setFilter('hostApplicationId', undefined, false);
         }}
         applicationId={drawerApplicationId}
+        hostSlug={hostSlug}
       />
     </div>
   );

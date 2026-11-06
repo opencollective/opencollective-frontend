@@ -43,7 +43,13 @@ export default function HostApplicationRequests({
 
   const query = useQuery<HostApplicationRequestsQuery, HostApplicationRequestsQueryVariables>(
     gql`
-      query HostApplicationRequests($accountSlug: String!, $limit: Int, $offset: Int) {
+      query HostApplicationRequests(
+        $accountSlug: String!
+        $limit: Int
+        $offset: Int
+        $hostSlug: String
+        $includeFiscalHostNote: Boolean! = false
+      ) {
         account(slug: $accountSlug) {
           hostApplicationRequests(limit: $limit, offset: $offset) {
             totalCount
@@ -68,6 +74,9 @@ export default function HostApplicationRequests({
 
   const applicationRequests = query.data?.account?.hostApplicationRequests?.nodes ?? [];
   const totalCount = query.data?.account?.hostApplicationRequests?.totalCount ?? 0;
+  const drawerApplication = applicationRequests.find(
+    application => application.id === queryFilter.values.hostApplicationId,
+  );
 
   return (
     <div className="flex max-w-(--breakpoint-lg) flex-col gap-4">
@@ -95,6 +104,7 @@ export default function HostApplicationRequests({
         open={!!queryFilter.values.hostApplicationId}
         onClose={() => queryFilter.setFilter('hostApplicationId', null, false)}
         applicationId={queryFilter.values.hostApplicationId}
+        hostSlug={drawerApplication?.host?.slug}
         editCollectiveMutation={editCollectiveMutation}
       />
     </div>

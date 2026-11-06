@@ -111,6 +111,16 @@ const dashboardVendorsQuery = gql`
             creditCount
           }
         }
+        fiscalHostNote(host: { slug: $slug }) {
+          type
+          note
+          updatedAt
+          updatedBy {
+            id
+            name
+            slug
+          }
+        }
       }
     }
   }
@@ -179,6 +189,16 @@ const dashboardVendorsQuery = gql`
               currency
             }
             creditCount
+          }
+        }
+        fiscalHostNote(host: { slug: $slug }) {
+          type
+          note
+          updatedAt
+          updatedBy {
+            id
+            name
+            slug
           }
         }
       }

@@ -36,6 +36,8 @@ export const accountExpensesQuery = gql`
     $hasAmountInCreatedByAccountCurrency: Boolean!
     $accountingCategory: [String]
     $fetchGrantHistory: Boolean!
+    $hostSlug: String
+    $includeFiscalHostNote: Boolean! = false
   ) {
     expenses(
       account: $account
@@ -69,6 +71,30 @@ export const accountExpensesQuery = gql`
       nodes {
         id
         ...ExpensesListFields
+        account {
+          fiscalHostNote(host: { slug: $hostSlug }) @include(if: $includeFiscalHostNote) {
+            type
+            note
+            updatedAt
+            updatedBy {
+              id
+              name
+              slug
+            }
+          }
+        }
+        createdByAccount {
+          fiscalHostNote(host: { slug: $hostSlug }) @include(if: $includeFiscalHostNote) {
+            type
+            note
+            updatedAt
+            updatedBy {
+              id
+              name
+              slug
+            }
+          }
+        }
         amountInCreatedByAccountCurrency: amountV2(currencySource: CREATED_BY_ACCOUNT)
           @include(if: $hasAmountInCreatedByAccountCurrency) {
           value
@@ -89,6 +115,16 @@ export const accountExpensesQuery = gql`
         }
 
         payee {
+          fiscalHostNote(host: { slug: $hostSlug }) @include(if: $includeFiscalHostNote) {
+            type
+            note
+            updatedAt
+            updatedBy {
+              id
+              name
+              slug
+            }
+          }
           grantHistory: expenses(status: PAID, type: GRANT, direction: SUBMITTED, limit: 1, account: $account)
             @include(if: $fetchGrantHistory) {
             totalAmount {
@@ -220,8 +256,42 @@ export const hostDashboardExpensesQuery = gql`
         id
         ...ExpensesListFields
         ...ExpensesListAdminFields
+        account {
+          fiscalHostNote(host: { slug: $hostSlug }) {
+            type
+            note
+            updatedAt
+            updatedBy {
+              id
+              name
+              slug
+            }
+          }
+        }
+        createdByAccount {
+          fiscalHostNote(host: { slug: $hostSlug }) {
+            type
+            note
+            updatedAt
+            updatedBy {
+              id
+              name
+              slug
+            }
+          }
+        }
 
         payee {
+          fiscalHostNote(host: { slug: $hostSlug }) {
+            type
+            note
+            updatedAt
+            updatedBy {
+              id
+              name
+              slug
+            }
+          }
           grantHistory: expenses(status: PAID, type: GRANT, direction: SUBMITTED, limit: 1, host: { slug: $hostSlug })
             @include(if: $fetchGrantHistory) {
             totalAmount {
@@ -492,7 +562,54 @@ export const paidDisbursementsQuery = gql`
         ...ExpensesListFields
         ...ExpensesListAdminFields
         paidAt
+        account {
+          fiscalHostNote(host: { slug: $hostSlug }) {
+            type
+            note
+            updatedAt
+            updatedBy {
+              id
+              name
+              slug
+            }
+          }
+        }
+        payee {
+          fiscalHostNote(host: { slug: $hostSlug }) {
+            type
+            note
+            updatedAt
+            updatedBy {
+              id
+              name
+              slug
+            }
+          }
+        }
+        createdByAccount {
+          fiscalHostNote(host: { slug: $hostSlug }) {
+            type
+            note
+            updatedAt
+            updatedBy {
+              id
+              name
+              slug
+            }
+          }
+        }
+
         paidBy {
+          fiscalHostNote(host: { slug: $hostSlug }) {
+            type
+            note
+            updatedAt
+            updatedBy {
+              id
+              name
+              slug
+            }
+          }
           id
           slug
           name
@@ -542,6 +659,8 @@ export const dashboardExpensesQuery = gql`
     $approvedByAccount: AccountReferenceInput
     $paidByAccount: AccountReferenceInput
     $rejectedByAccount: AccountReferenceInput
+    $hostSlug: String
+    $includeFiscalHostNote: Boolean! = false
   ) {
     expenses(
       hostContext: $hostContext
@@ -578,8 +697,42 @@ export const dashboardExpensesQuery = gql`
         id
         ...ExpensesListFields
         ...ExpensesListAdminFields
+        account {
+          fiscalHostNote(host: { slug: $hostSlug }) @include(if: $includeFiscalHostNote) {
+            type
+            note
+            updatedAt
+            updatedBy {
+              id
+              name
+              slug
+            }
+          }
+        }
+        createdByAccount {
+          fiscalHostNote(host: { slug: $hostSlug }) @include(if: $includeFiscalHostNote) {
+            type
+            note
+            updatedAt
+            updatedBy {
+              id
+              name
+              slug
+            }
+          }
+        }
 
         payee {
+          fiscalHostNote(host: { slug: $hostSlug }) @include(if: $includeFiscalHostNote) {
+            type
+            note
+            updatedAt
+            updatedBy {
+              id
+              name
+              slug
+            }
+          }
           grantHistory: expenses(
             status: PAID
             type: GRANT

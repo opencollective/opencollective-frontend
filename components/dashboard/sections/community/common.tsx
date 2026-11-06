@@ -5,6 +5,7 @@ import {
   ArrowRightLeft,
   BookKey,
   Building2,
+  Flag,
   HandCoins,
   HelpCircle,
   Pencil,
@@ -33,6 +34,7 @@ import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
 import { i18nLegalDocumentStatus } from '@/lib/i18n/legal-document';
 
+import { FiscalHostNoteModal } from '@/components/FiscalHostNoteModal';
 import { KYCVerificationProviderBadge } from '@/components/kyc/components/KYCVerificationProviderBadge';
 import { i18nKYCVerificationStatus } from '@/components/kyc/intl';
 import { KYCVerificationStatusBadge } from '@/components/kyc/KYCVerificationStatusBadge';
@@ -392,7 +394,12 @@ export function usePersonActions(opts: UsePersonActionsOptions) {
       };
 
       // The contributor in this context is actually an Account from the community query
-      const account = contributor as unknown as { slug?: string; type?: string };
+      const account = contributor as unknown as {
+        slug?: string;
+        name?: string;
+        type?: string;
+        fiscalHostNote?: { type: 'WARNING' | 'INFO' | 'POSITIVE'; note: string } | null;
+      };
       const contributorSlug = account.slug;
       const hostSlug = router.query.slug as string;
 
@@ -445,6 +452,25 @@ export function usePersonActions(opts: UsePersonActionsOptions) {
             query: { searchTerm: `@${contributorSlug}` },
           });
         },
+      });
+
+      actions.secondary.push({
+        key: 'fiscal-host-note',
+        label: intl.formatMessage({
+          defaultMessage: 'Flag account',
+          id: 'FiscalHostNote.FlagAccount',
+        }),
+        Icon: Flag,
+        onClick: () =>
+          showModal(FiscalHostNoteModal, {
+            host: { slug: opts.accountSlug },
+            account: {
+              id: contributor.id,
+              name: account.name,
+              fiscalHostNote: account.fiscalHostNote,
+            },
+            refetchQueries: ['PeopleHostDashboard', 'DashboardVendors', 'CommunityAccountDetail'],
+          }),
       });
 
       if (account.type === CollectiveType.VENDOR) {

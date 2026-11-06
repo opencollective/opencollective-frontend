@@ -38,7 +38,11 @@ import { DashboardContext } from '../../DashboardContext';
 import type { TransactionDetailsQueryNode } from './types';
 
 const transactionQuery = gql`
-  query TransactionDetails($transaction: TransactionReferenceInput!) {
+  query TransactionDetails(
+    $transaction: TransactionReferenceInput!
+    $hostSlug: String
+    $includeFiscalHostNote: Boolean! = false
+  ) {
     transaction(transaction: $transaction) {
       id
       legacyId
@@ -117,6 +121,16 @@ const transactionQuery = gql`
             slug
           }
         }
+        fiscalHostNote(host: { slug: $hostSlug }) @include(if: $includeFiscalHostNote) {
+          type
+          note
+          updatedAt
+          updatedBy {
+            id
+            name
+            slug
+          }
+        }
         ...AccountHoverCardFields
         mainProfile {
           id
@@ -150,6 +164,16 @@ const transactionQuery = gql`
         imageUrl
         isIncognito
         type
+        fiscalHostNote(host: { slug: $hostSlug }) @include(if: $includeFiscalHostNote) {
+          type
+          note
+          updatedAt
+          updatedBy {
+            id
+            name
+            slug
+          }
+        }
         ...AccountHoverCardFields
         mainProfile {
           id
@@ -278,10 +302,14 @@ function TransactionDetails({ transactionId, getActions }: TransactionDetailsPro
   const intl = useIntl();
   const prevTransactionId = usePrevious(transactionId);
   const id = transactionId || prevTransactionId;
-  const { data, refetch, loading, error } = useQuery(transactionQuery, {
-    variables: { transaction: { legacyId: Number(id) } },
-  });
   const { account } = React.useContext(DashboardContext);
+  const { data, refetch, loading, error } = useQuery(transactionQuery, {
+    variables: {
+      transaction: { legacyId: Number(id) },
+      hostSlug: account?.slug,
+      includeFiscalHostNote: Boolean(account?.slug),
+    },
+  });
   const { transaction } = data || { transaction: null };
   const dropdownTriggerRef = React.useRef(undefined);
   const actions = getActions(transaction, dropdownTriggerRef, refetch);

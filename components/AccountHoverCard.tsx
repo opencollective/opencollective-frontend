@@ -23,6 +23,7 @@ import { Collapsible, CollapsibleContent } from './ui/Collapsible';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/HoverCard';
 import { AccountTrustBadge } from './AccountTrustBadge';
 import Avatar from './Avatar';
+import { FiscalHostNoteBlock } from './FiscalHostNoteBadge';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
 import Link from './Link';
 import Spinner from './Spinner';
@@ -133,6 +134,23 @@ const userContextualMembershipsQuery = gql`
             id
             slug
           }
+        }
+      }
+    }
+  }
+`;
+
+const hostFiscalHostNoteQuery = gql`
+  query HostFiscalHostNote($accountSlug: String!, $hostSlug: String!) {
+    account(slug: $accountSlug) {
+      id
+      fiscalHostNote(host: { slug: $hostSlug }) {
+        type
+        note
+        updatedAt
+        updatedBy {
+          id
+          name
         }
       }
     }
@@ -325,6 +343,15 @@ export const AccountHoverCard = ({
     fetchPolicy: 'cache-first',
   });
 
+  // Fiscal host notes are host-private: only fetch them when the hover card is used in a host context.
+  const noteHostSlug = hostSlug || dashboardAccount?.slug;
+  const { data: noteData } = useQuery(hostFiscalHostNoteQuery, {
+    variables: { accountSlug: account?.slug, hostSlug: noteHostSlug },
+    skip: !account?.slug || !noteHostSlug || isVendor || !(open || hasBeenHovered),
+    fetchPolicy: 'cache-first',
+    errorPolicy: 'ignore',
+  });
+
   const handleMouseEnter = () => {
     hoverTimeoutRef.current = setTimeout(() => {
       setHasBeenHovered(true);
@@ -342,6 +369,7 @@ export const AccountHoverCard = ({
     return trigger;
   }
 
+  const fiscalHostNote = noteData?.account?.fiscalHostNote;
   const infoItems = getInfoItems(account);
   const asyncInfoItems = getInfoItemsFromMembershipData(data);
   const accountUrl = context?.getProfileUrl?.(account) || getCollectivePageRoute(account);
@@ -361,14 +389,14 @@ export const AccountHoverCard = ({
           <div className="absolute top-0 right-0">
             {open && <AccountKYCStatusBadge account={account} host={dashboardAccount} />}
           </div>
-          <div className="flex flex-col gap-3 overflow-hidden break-words">
+          <div className="flex flex-col gap-3 break-words">
             <div className="flex justify-between">
               {accountUrl ? (
                 <Link href={accountUrl}>
-                  <Avatar collective={account} radius={64} />
+                  <Avatar collective={fiscalHostNote ? { ...account, fiscalHostNote } : account} radius={64} />
                 </Link>
               ) : (
-                <Avatar collective={account} radius={64} />
+                <Avatar collective={fiscalHostNote ? { ...account, fiscalHostNote } : account} radius={64} />
               )}
             </div>
 
@@ -398,6 +426,8 @@ export const AccountHoverCard = ({
           {account.description && (
             <div className="line-clamp-1 text-sm whitespace-pre-wrap text-foreground">{account.description}</div>
           )}
+
+          {fiscalHostNote && <FiscalHostNoteBlock note={fiscalHostNote} />}
 
           {(infoItems.length > 0 || asyncInfoItems.length > 0 || loading) && (
             <div>

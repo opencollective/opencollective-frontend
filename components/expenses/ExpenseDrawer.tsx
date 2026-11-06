@@ -6,6 +6,7 @@ import { usePrevious } from '../../lib/hooks/usePrevious';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 
 import { getVariablesFromQuery } from '../../pages/expense';
+import { DashboardContext } from '../dashboard/DashboardContext';
 import { EmptyResults } from '../dashboard/EmptyResults';
 import { Drawer } from '../Drawer';
 
@@ -34,11 +35,18 @@ export default function ExpenseDrawer({
 }: ExpenseDrawerProps) {
   const client = useApolloClient();
   const { LoggedInUser } = useLoggedInUser();
+  const { account: dashboardAccount } = React.useContext(DashboardContext);
   const prevExpenseId = usePrevious(openExpenseLegacyId);
   const id = openExpenseLegacyId || prevExpenseId;
 
   const { data, loading, error, refetch, fetchMore } = useQuery(expensePageQuery, {
-    variables: id ? getVariablesFromQuery({ ExpenseId: id }) : undefined,
+    variables: id
+      ? {
+          ...getVariablesFromQuery({ ExpenseId: id }),
+          hostSlug: dashboardAccount?.slug,
+          includeFiscalHostNote: Boolean(dashboardAccount?.slug),
+        }
+      : undefined,
     skip: !id,
 
     fetchPolicy: 'cache-and-network',
