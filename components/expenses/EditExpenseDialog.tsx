@@ -185,7 +185,6 @@ const EditPaidBy = ({ expense, handleClose }) => {
 };
 
 const EditPayee = ({ expense, onSubmit }) => {
-  const formRef = React.useRef<HTMLFormElement>(undefined);
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
@@ -198,7 +197,6 @@ const EditPayee = ({ expense, onSubmit }) => {
   );
 
   const expenseForm = useExpenseForm({
-    formRef,
     initialValues: {
       inviteeAccountType: InviteeAccountType.INDIVIDUAL,
       accountSlug: expense.account.slug,
@@ -229,7 +227,7 @@ const EditPayee = ({ expense, onSubmit }) => {
     expenseForm.values.payeeSlug !== expense.payee.slug;
   return (
     <FormikProvider value={expenseForm}>
-      <form className="space-y-6" ref={formRef} onSubmit={e => e.preventDefault()}>
+      <form className="space-y-6" onSubmit={e => e.preventDefault()}>
         <WhoIsGettingPaidForm {...WhoIsGettingPaidForm.getFormProps(expenseForm)} />
         <Collapsible open={hasChangedPayee}>
           <CollapsibleContent>
@@ -266,7 +264,6 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
 };
 
 const EditDraftPayoutMethod = ({ expense, onSubmit }) => {
-  const formRef = React.useRef<HTMLFormElement>(undefined);
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
@@ -279,7 +276,6 @@ const EditDraftPayoutMethod = ({ expense, onSubmit }) => {
   );
 
   const expenseForm = useExpenseForm({
-    formRef,
     initialValues: {
       inviteeAccountType: InviteeAccountType.INDIVIDUAL,
       referenceCurrency: expense.currency,
@@ -306,7 +302,7 @@ const EditDraftPayoutMethod = ({ expense, onSubmit }) => {
 
   return (
     <FormikProvider value={expenseForm}>
-      <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
+      <form className="space-y-4" onSubmit={e => e.preventDefault()}>
         <PayoutMethodFormContent {...PayoutMethodFormContent.getFormProps(expenseForm)} />
         <EditExpenseActionButtons disabled={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
       </form>
@@ -315,7 +311,6 @@ const EditDraftPayoutMethod = ({ expense, onSubmit }) => {
 };
 
 const EditExpenseDetails = ({ expense, onSubmit }) => {
-  const formRef = React.useRef<HTMLFormElement>(undefined);
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
@@ -335,7 +330,6 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
     );
 
   const expenseForm = useExpenseForm({
-    formRef,
     initialValues: {
       inviteeAccountType: InviteeAccountType.INDIVIDUAL,
       expenseItems: [
@@ -363,7 +357,7 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
 
   return (
     <FormikProvider value={expenseForm}>
-      <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
+      <form className="space-y-4" onSubmit={e => e.preventDefault()}>
         <ExpenseItemsForm {...ExpenseItemsForm.getFormProps(expenseForm)} />
         {expenseForm.values.expenseTypeOption === ExpenseType.INVOICE && (
           <InvoiceFormOption {...InvoiceFormOption.getFormProps(expenseForm)} />
@@ -376,7 +370,6 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
 };
 
 const AttachReceipts = ({ expense, onSubmit }) => {
-  const formRef = React.useRef<HTMLFormElement>(undefined);
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
@@ -386,7 +379,6 @@ const AttachReceipts = ({ expense, onSubmit }) => {
     onSubmit(getExpenseEditInputSlice(plan, ['items', 'attachedFiles']));
 
   const expenseForm = useExpenseForm({
-    formRef,
     initialValues: {
       inviteeAccountType: InviteeAccountType.INDIVIDUAL,
       expenseItems: [
@@ -415,7 +407,7 @@ const AttachReceipts = ({ expense, onSubmit }) => {
 
   return (
     <FormikProvider value={expenseForm}>
-      <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
+      <form className="space-y-4" onSubmit={e => e.preventDefault()}>
         {expenseForm.initialLoading ? (
           <Skeleton className="h-42 w-full" />
         ) : (
@@ -454,7 +446,6 @@ const getEditExpenseTypeSteps = (intl: IntlShape): StepItem[] => {
 const EditExpenseType = ({ expense, onSubmit }) => {
   const intl = useIntl();
 
-  const formRef = React.useRef<HTMLFormElement>(undefined);
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
@@ -474,7 +465,6 @@ const EditExpenseType = ({ expense, onSubmit }) => {
     );
 
   const expenseForm = useExpenseForm({
-    formRef,
     initialValues: {
       inviteeAccountType: InviteeAccountType.INDIVIDUAL,
       expenseItems: [
@@ -504,7 +494,7 @@ const EditExpenseType = ({ expense, onSubmit }) => {
 
   return (
     <FormikProvider value={expenseForm}>
-      <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
+      <form className="space-y-4" onSubmit={e => e.preventDefault()}>
         <Stepper initialStep={0} steps={steps} orientation="horizontal" className="mb-4">
           {steps.map(stepProps => {
             return (

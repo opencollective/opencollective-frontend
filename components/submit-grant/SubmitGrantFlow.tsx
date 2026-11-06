@@ -231,7 +231,6 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
   const { toast } = useToast();
   const [nextClickCount, setNextClickCount] = React.useState(0); // This form has not been designed to use `formik.submitCount`, so we keep track of submissions in a different variables to surfacee validation issues.
   const intl = useIntl();
-  const formRef = React.useRef<HTMLFormElement>(undefined);
 
   const startOptions = React.useRef<ExpenseForm['startOptions']>({
     expenseId: props.expenseId,
@@ -259,7 +258,6 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
   );
 
   const expenseForm = useExpenseForm({
-    formRef,
     initialValues: {
       accountSlug: props.accountSlug,
       title: '',
@@ -408,7 +406,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
         <div className="hidden w-64 min-w-44 sm:block">
           <SubmitGrantFlowSteps steps={steps.steps} />
         </div>
-        <form className="flex w-full flex-col sm:max-w-3xl" ref={formRef} onSubmit={e => e.preventDefault()}>
+        <form className="flex w-full flex-col sm:max-w-3xl" onSubmit={e => e.preventDefault()}>
           <div className="grow basis-1 sm:px-0">
             <div className="px-4 pb-4">
               <FormContainer activeHeader={steps.activeHeaderName} onVisibleSectionChange={onVisibleSectionChange} />

@@ -100,14 +100,15 @@ const logFormValidationError = debounce((...params) => {
  * data fetching/mutations, and handles complex initialization workflows for both expense
  * creation and editing scenarios.
  *
- * @param opts Configuration options including form ref, initial values, and callbacks
- * @returns ExpenseForm object with form state, validation, and submission methods
+ * @param opts Configuration options including initial values, start options and callbacks
+ * @returns ExpenseForm object with form state, options, actions and submission methods
  *
  * @see README.md for detailed architecture documentation
  */
 export function useExpenseForm(opts: {
-  formRef?: React.RefObject<HTMLFormElement>;
+  /** Read once, when the hook mounts */
   initialValues: ExpenseFormValues;
+  /** Read once, when the hook mounts */
   startOptions: ExpenseFormStartOptions;
   customData?: Record<string, unknown>;
   /** Called after the hook submitted the plan successfully (when `onSubmit` is not provided) */
