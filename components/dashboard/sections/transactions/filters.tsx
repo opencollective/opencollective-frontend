@@ -1,5 +1,5 @@
 import React from 'react';
-import { omit } from 'lodash-es';
+import { omit, uniq } from 'lodash-es';
 import { defineMessage } from 'react-intl';
 import { z } from 'zod';
 
@@ -111,11 +111,13 @@ export const filters: FilterComponentConfigs<FilterValues, FilterMeta> = {
   kind: {
     labelMsg: defineMessage({ id: 'Transaction.Kind', defaultMessage: 'Kind' }),
     Component: ({ meta, intl, ...props }) => {
-      const kinds = meta?.kinds || TransactionKind;
+      // Also list the selected kinds that are not returned by the API (e.g. from the default filter values),
+      // so that the options match the number of selected kinds and they can be unselected.
+      const kinds = uniq([...Object.values(meta?.kinds || TransactionKind), ...(props.value || [])]);
       return (
         <ComboSelectFilter
           isMulti
-          options={Object.values(kinds)
+          options={kinds
             .map(value => {
               const label = i18nTransactionKind(intl, value);
               return {

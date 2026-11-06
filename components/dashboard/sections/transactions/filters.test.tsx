@@ -8,6 +8,10 @@ jest.mock('../../../PaymentMethodLabel', () => ({
   PaymentMethodServiceLabel: () => null,
 }));
 
+import React from 'react';
+import { render } from '@testing-library/react';
+import { createIntl, IntlProvider } from 'react-intl';
+
 import {
   ExpenseType,
   PaymentMethodService,
@@ -19,7 +23,7 @@ import {
 import { AmountFilterType } from '../../filters/AmountFilter/schema';
 import { DateFilterType } from '../../filters/DateFilter/schema';
 
-import { schema, toVariables } from './filters';
+import { filters, schema, toVariables } from './filters';
 
 describe('transactions filters', () => {
   describe('schema', () => {
@@ -239,6 +243,38 @@ describe('transactions filters', () => {
           },
         });
       });
+    });
+  });
+
+  describe('kind filter component', () => {
+    const renderKindFilter = (value: TransactionKind[], kinds: TransactionKind[]) => {
+      const intl = createIntl({ locale: 'en' });
+      const KindFilter = filters.kind.Component;
+      const { container } = render(
+        <IntlProvider locale="en">
+          <KindFilter value={value} onChange={jest.fn()} intl={intl} meta={{ kinds }} />
+        </IntlProvider>,
+      );
+      return Array.from(container.querySelectorAll('[data-cy="combo-select-option"]')).map(el => el.textContent);
+    };
+
+    it('lists the kinds returned by the API', () => {
+      const options = renderKindFilter([], [TransactionKind.CONTRIBUTION, TransactionKind.EXPENSE]);
+      expect(options).toEqual(['Contribution', 'Expense']);
+    });
+
+    it('lists selected kinds even when the API did not return them', () => {
+      const options = renderKindFilter(
+        [
+          TransactionKind.ADDED_FUNDS,
+          TransactionKind.CONTRIBUTION,
+          TransactionKind.EXPENSE,
+          TransactionKind.BALANCE_TRANSFER,
+        ],
+        [TransactionKind.ADDED_FUNDS, TransactionKind.CONTRIBUTION, TransactionKind.EXPENSE],
+      );
+      expect(options).toHaveLength(4);
+      expect(options).toContain('Balance transfer');
     });
   });
 });
