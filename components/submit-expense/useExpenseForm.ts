@@ -11,30 +11,23 @@ import { debounce, isEmpty, isEqual, isNull, omit, pick, set, uniqBy } from 'lod
 import memoizeOne from 'memoize-one';
 import type { IntlShape } from 'react-intl';
 import { useIntl } from 'react-intl';
-import type { ZodObjectDef } from 'zod';
 import { z } from 'zod';
 
 import { CollectiveType } from '../../lib/constants/collectives';
-import { getPayoutProfiles, standardizeExpenseItemIncurredAt } from '../../lib/expenses';
+import { getPayoutProfiles } from '../../lib/expenses';
 import type {
   Amount,
   CreateExpenseFromDashboardMutation,
   CreateExpenseFromDashboardMutationVariables,
-  CurrencyExchangeRateInput,
   EditExpenseFromDashboardMutation,
   EditExpenseFromDashboardMutationVariables,
   ExpenseFormExchangeRatesQuery,
   ExpenseFormExchangeRatesQueryVariables,
-  ExpenseFormSchemaHostFieldsFragment,
   ExpenseFormSchemaQuery,
   ExpenseFormSchemaQueryVariables,
   ExpenseVendorFieldsFragment,
   InviteExpenseFromDashboardMutation,
   InviteExpenseFromDashboardMutationVariables,
-  LocationInput,
-  MakeOptional,
-  RecurringExpenseInput,
-  RecurringExpenseInterval,
 } from '../../lib/graphql/types/v2/graphql';
 import {
   Currency,
@@ -60,6 +53,15 @@ import {
 } from '../expenses/lib/constants';
 import { getAvailablePayoutMethods, getSupportedPayoutMethods } from '../expenses/lib/payout-methods';
 import { computeExpenseAmounts } from '../expenses/lib/utils';
+import { planExpenseSubmission } from './lib/expense-input';
+import type {
+  ExpenseFormOptions,
+  ExpenseFormStartOptions,
+  ExpenseFormValues,
+  ExpenseItem,
+  RecursivePartial,
+} from './lib/types';
+import { InviteeAccountType, RecurrenceFrequencyOption, YesNoOption } from './lib/types';
 import { AnalyticsEvent } from '@/lib/analytics/events';
 import { track } from '@/lib/analytics/plausible';
 
@@ -72,120 +74,8 @@ import { isEmptyHTMLValue } from '../HTMLContent';
 
 import { supportsBaseExpenseTypes } from './form/helper';
 
-export enum InviteeAccountType {
-  INDIVIDUAL = 'INDIVIDUAL',
-  ORGANIZATION = 'ORGANIZATION',
-}
-
-type ExpenseItem = {
-  id?: string;
-  key?: string; // used to enable FlipMove animations (will either be a generated uuid on "Add item", or using the expense item id)
-  description?: string;
-  incurredAt?: string;
-  amount?: {
-    value?: number;
-    valueInCents?: number;
-    currency?: string;
-    exchangeRate?: {
-      value?: number;
-      source?: string;
-      fromCurrency?: string;
-      toCurrency?: string;
-      date?: string;
-    };
-    referenceExchangeRate?: ExpenseItem['amount']['exchangeRate'] | { source: 'OPENCOLLECTIVE' };
-  };
-  attachment?: Attachment;
-};
-
-export enum RecurrenceFrequencyOption {
-  NONE = 'none',
-  MONTH = 'month',
-  QUARTER = 'quarter',
-  WEEK = 'week',
-  YEAR = 'year',
-}
-
-export enum YesNoOption {
-  YES = 'yes',
-  NO = 'no',
-}
-
-type Attachment =
-  | string
-  | {
-      id?: string;
-      name?: string;
-      size?: number;
-      type?: string;
-      url?: string;
-    };
-
-export type ExpenseFormValues = {
-  accountSlug?: string;
-
-  inviteeExistingAccount?: string;
-
-  inviteeAccountType: InviteeAccountType;
-
-  inviteeNewIndividual: {
-    name?: string;
-    email?: string;
-  };
-
-  inviteeNewOrganization: {
-    name?: string;
-    email?: string;
-    organization: {
-      name?: string;
-      slug?: string;
-      website?: string;
-      description?: string;
-    };
-  };
-
-  inviteNote?: string;
-
-  recurrenceFrequency?: RecurrenceFrequencyOption;
-  recurrenceEndAt?: string;
-
-  payoutMethodNameDiscrepancyReason?: string;
-  newPayoutMethod: {
-    type?: PayoutMethodType;
-    name?: string;
-    isSaved?: boolean;
-    data?: { currency?: string; accountHolderName?: string } & Record<string, unknown>;
-  };
-
-  payeeSlug?: string;
-  payeeLocation?: LocationInput;
-  expenseTypeOption?: ExpenseType;
-  payoutMethodId?: string;
-  title?: string;
-  accountingCategoryId?: string;
-  tags?: string[];
-  privateMessage?: string;
-  expenseItems?: ExpenseItem[];
-  additionalAttachments?: Attachment[];
-  referenceCurrency?: Currency; // The "payment source" currency to use for conversions
-  hasTax?: boolean;
-  tax?: {
-    rate: number;
-    idNumber: string;
-  };
-  acknowledgedCollectiveInvoiceExpensePolicy?: boolean;
-  acknowledgedCollectiveReceiptExpensePolicy?: boolean;
-  acknowledgedCollectiveTitleExpensePolicy?: boolean;
-  acknowledgedCollectiveGrantExpensePolicy?: boolean;
-  acknowledgedHostInvoiceExpensePolicy?: boolean;
-  acknowledgedHostReceiptExpensePolicy?: boolean;
-  acknowledgedHostTitleExpensePolicy?: boolean;
-  acknowledgedHostGrantExpensePolicy?: boolean;
-  hasInvoiceOption?: YesNoOption;
-  invoiceFile?: Attachment;
-  invoiceNumber?: string;
-  invoiceInfo?: string;
-};
+export type { ExpenseFormValues } from './lib/types';
+export { InviteeAccountType, RecurrenceFrequencyOption, YesNoOption } from './lib/types';
 
 type ExpenseFormik = Omit<ReturnType<typeof useFormik<ExpenseFormValues>>, 'setFieldValue' | 'getFieldProps'> & {
   setFieldValue: <F extends Path<ExpenseFormValues>>(
@@ -615,49 +505,6 @@ const expenseFormSchemaQuery = gql`
   ${accountingCategorySelectFieldsFragment}
 `;
 
-type ExpenseFormOptions = {
-  schema: z.ZodType<RecursivePartial<ExpenseFormValues>, ZodObjectDef, RecursivePartial<ExpenseFormValues>>;
-  supportedExpenseTypes?: ExpenseType[];
-  allowInvite?: boolean;
-  payoutProfiles?: ExpenseFormSchemaQuery['loggedInAccount'][];
-  payoutMethods?: Array<
-    MakeOptional<ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'][number], 'createdAt' | 'updatedAt'>
-  >;
-  payoutMethod?:
-    ExpenseFormSchemaQuery['loggedInAccount']['payoutMethods'][number] | ExpenseFormValues['newPayoutMethod'];
-  supportedPayoutMethods?: PayoutMethodType[];
-  newPayoutMethodTypes?: PayoutMethodType[];
-  expenseTags?: ExpenseFormSchemaHostFieldsFragment['expensesTags'];
-  isAccountingCategoryRequired?: boolean;
-  accountingCategories?: ExpenseFormSchemaHostFieldsFragment['accountingCategories']['nodes'];
-  allowExpenseItemAttachment?: boolean;
-  taxType?: TaxType;
-  recentlySubmittedExpenses?: ExpenseFormSchemaQuery['recentlySubmittedExpenses'];
-  host?: ExpenseFormSchemaHostFieldsFragment;
-  vendorsForAccount?: ExpenseVendorFieldsFragment[];
-  showVendorsOption?: boolean;
-  account?: ExpenseFormSchemaQuery['account'] | ExpenseFormSchemaQuery['expense']['account'];
-  payee?: ExpenseFormSchemaQuery['payee'];
-  isAdminOfPayee?: boolean;
-  isAdminOfPayeeHost?: boolean;
-  isHostAdmin?: boolean;
-  submitter?: ExpenseFormSchemaQuery['submitter'];
-  loggedInAccount?: ExpenseFormSchemaQuery['loggedInAccount'];
-  expense?: ExpenseFormSchemaQuery['expense'];
-  totalInvoicedInExpenseCurrency?: number;
-  invitee?: ExpenseFormValues['inviteeNewIndividual'] | ExpenseFormValues['inviteeNewOrganization'];
-  expenseCurrency?: Currency;
-  availableReferenceCurrencies?: Currency[]; // Available currencies that can be selected as reference
-  allowDifferentItemCurrency?: boolean;
-  isLongFormItemDescription?: boolean;
-  hasExpenseItemDate?: boolean;
-  canSetupRecurrence?: boolean;
-  canChangeAccount?: boolean;
-  lockedFields?: ExpenseLockableFields[];
-  hasInvalidAccount?: boolean;
-  isPaypalConnectEnabled?: boolean;
-};
-
 const memoizeAvailableReferenceCurrencies = getArrayValuesMemoizer<Currency>();
 
 /**
@@ -683,14 +530,6 @@ const memoizedExpenseFormSchema = memoizeOne(
     return !refresh && isEqual(newVariables, lastVariables);
   },
 );
-
-type RecursivePartial<T> = {
-  [P in keyof T]?: T[P] extends (infer U)[]
-    ? RecursivePartial<U>[]
-    : T[P] extends object | undefined
-      ? RecursivePartial<T[P]>
-      : T[P];
-};
 
 /**
  * Builds dynamic Zod validation schema based on form options and context.
@@ -1672,14 +1511,6 @@ const needExchangeRateFilter = (expectedCurrency: string) => (ei: ExpenseItem) =
     (ei.amount.exchangeRate.source === 'OPENCOLLECTIVE' &&
       Math.abs(dayjs.utc(ei.amount.exchangeRate.date).diff(dayjs.utc(ei.incurredAt), 'days')) > 2));
 
-const getPayeeForInvite = (values: ExpenseFormValues) => {
-  if (values.inviteeAccountType === 'INDIVIDUAL') {
-    return values.inviteeNewIndividual;
-  } else if (values.inviteeAccountType === 'ORGANIZATION') {
-    return values.inviteeNewOrganization;
-  }
-};
-
 /**
  * A recurrence end date is optional (leaving it empty means an open-ended recurrence), but when set
  * it must be a valid date in the future. This is the rule used by the form schema and by the
@@ -1698,36 +1529,6 @@ export function isValidRecurrenceEndAt(
   const endsAt = dayjs(recurrenceEndAt);
   return endsAt.isValid() && endsAt.isAfter(dayjs().startOf('day'));
 }
-
-/**
- * Builds the `recurring` input for the `createExpense` mutation from the form values.
- *
- * An empty end date means open-ended recurrence (`endsAt: null`). Invalid dates are
- * defensively mapped to `null`: `dayjs(undefined).toDate()` returns the current time,
- * which previously created recurring expenses that could never recur.
- */
-export function getRecurringExpenseInput(
-  recurrenceFrequency?: RecurrenceFrequencyOption,
-  recurrenceEndAt?: string,
-): RecurringExpenseInput | undefined {
-  if (!recurrenceFrequency || recurrenceFrequency === RecurrenceFrequencyOption.NONE) {
-    return undefined;
-  }
-
-  const endsAt = recurrenceEndAt ? dayjs(recurrenceEndAt) : null;
-  return {
-    interval: recurrenceFrequency as unknown as RecurringExpenseInterval,
-    endsAt: endsAt && endsAt.isValid() ? endsAt.toDate() : null,
-  };
-}
-
-type ExpenseFormStartOptions = {
-  duplicateExpense?: boolean;
-  expenseId?: number;
-  draftKey?: string;
-  isInlineEdit?: boolean;
-  pickSchemaFields?: Record<string, boolean>;
-};
 
 /**
  * The form does not always surface errors properly, this will help to troubleshoot.
@@ -1854,145 +1655,17 @@ export function useExpenseForm(opts: {
         try {
           track(AnalyticsEvent.EXPENSE_SUBMISSION_SUBMITTED);
 
-          const attachedFiles = values.additionalAttachments.map(a => ({
-            url: typeof a === 'string' ? a : a?.url,
-          }));
-
-          const expenseInput: CreateExpenseFromDashboardMutationVariables['expenseCreateInput'] = {
-            description:
-              values.expenseTypeOption === ExpenseType.GRANT && isEmpty(values.title)
-                ? generateGrantTitle(formOptions.account, formOptions.payee, formOptions.invitee)
-                : values.title,
-            reference:
-              values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES
-                ? values.invoiceNumber
-                : null,
-            payee: {
-              slug: formOptions.payee?.slug,
-            },
-            payeeLocation: values.payeeLocation,
-            payoutMethod:
-              !values.payoutMethodId || values.payoutMethodId === NEW_PAYOUT_METHOD_ID
-                ? { ...values.newPayoutMethod, isSaved: false }
-                : values.payoutMethodId === NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID
-                  ? {
-                      type: PayoutMethodType.ACCOUNT_BALANCE,
-                      data: {},
-                    }
-                  : {
-                      id: values.payoutMethodId,
-                    },
-            type: values.expenseTypeOption,
-            accountingCategory: values.accountingCategoryId
-              ? {
-                  id: values.accountingCategoryId,
-                }
-              : null,
-            attachedFiles,
-            currency: formOptions.expenseCurrency,
+          const plan = planExpenseSubmission(values, formOptions, startOptions.current, {
             customData: opts.customData,
-            invoiceInfo: values.invoiceInfo || null,
-            invoiceFile:
-              values.hasInvoiceOption === YesNoOption.NO
-                ? null
-                : values.invoiceFile
-                  ? { url: typeof values.invoiceFile === 'string' ? values.invoiceFile : values.invoiceFile.url }
-                  : undefined,
-            items: values.expenseItems.map(ei => ({
-              id: ei.id,
-              description: ei.description,
-              amountV2: {
-                valueInCents: ei.amount.valueInCents,
-                currency: ei.amount.currency as Currency,
-                exchangeRate: ei.amount.exchangeRate
-                  ? ({
-                      ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                      date: standardizeExpenseItemIncurredAt(ei.amount.exchangeRate.date || ei.incurredAt),
-                    } as CurrencyExchangeRateInput)
-                  : null,
-              },
-              incurredAt: values.expenseTypeOption === ExpenseType.GRANT ? new Date() : new Date(ei.incurredAt),
-              url:
-                values.expenseTypeOption === ExpenseType.RECEIPT
-                  ? typeof ei.attachment === 'string'
-                    ? ei.attachment
-                    : ei.attachment?.url
-                  : null,
-            })),
-            longDescription: null,
-            privateMessage: values.privateMessage || null,
-            tags: values.tags,
-            tax: values.hasTax
-              ? [
-                  {
-                    rate: values.tax.rate,
-                    type: formOptions.taxType,
-                    idNumber: values.tax.idNumber,
-                  },
-                ]
-              : null,
-          };
-
-          if (formOptions.expense?.id && !startOptions.current.duplicateExpense) {
-            const isConfirmingInvite = formOptions.expense?.status === ExpenseStatus.DRAFT && !formOptions.payee?.slug;
-            const editInput: EditExpenseFromDashboardMutationVariables['expenseEditInput'] = {
-              ...expenseInput,
-              id: formOptions.expense.id,
-              payee: !isConfirmingInvite
-                ? { slug: formOptions.payee?.slug }
-                : (getPayeeForInvite(values) ?? formOptions.expense?.draft?.payee),
-            };
-            result = await editExpense({
-              variables: {
-                expenseEditInput: editInput,
-                draftKey: startOptions.current.draftKey,
-              },
-            });
-
+          });
+          if (plan.kind === 'edit') {
+            result = await editExpense({ variables: plan.variables });
             onSuccess(result, 'edit');
-          } else if (
-            formOptions.payee?.type === CollectiveType.VENDOR ||
-            formOptions.payoutProfiles?.some(p => p.slug === values.payeeSlug)
-          ) {
-            result = await createExpense({
-              variables: {
-                account: {
-                  slug: formOptions.account?.slug,
-                },
-                expenseCreateInput: expenseInput,
-                ...(values.recurrenceFrequency !== RecurrenceFrequencyOption.NONE
-                  ? {
-                      recurring: getRecurringExpenseInput(values.recurrenceFrequency, values.recurrenceEndAt),
-                    }
-                  : {}),
-              },
-            });
-
+          } else if (plan.kind === 'create') {
+            result = await createExpense({ variables: plan.variables });
             onSuccess(result, 'new');
           } else {
-            const payee =
-              values.payeeSlug === PAYEE_SLUG_INVITE_EXISTING_USER
-                ? { slug: values.inviteeExistingAccount }
-                : values.inviteeAccountType === InviteeAccountType.INDIVIDUAL
-                  ? values.inviteeNewIndividual
-                  : values.inviteeNewOrganization;
-            const inviteInput: InviteExpenseFromDashboardMutationVariables['expenseInviteInput'] = {
-              ...expenseInput,
-              payee: {
-                ...payee,
-                isInvite: true,
-              },
-              recipientNote: values.inviteNote,
-            };
-            result = await draftExpenseAndInviteUser({
-              variables: {
-                account: {
-                  slug: formOptions.account?.slug,
-                },
-                expenseInviteInput: inviteInput,
-              },
-            });
-
+            result = await draftExpenseAndInviteUser({ variables: plan.variables });
             onSuccess(result, 'invite');
           }
 
@@ -2578,11 +2251,4 @@ export function useExpenseForm(opts: {
     initialLoading: initialLoading.current,
     refresh,
   });
-}
-export function generateGrantTitle(
-  account: ExpenseFormOptions['account'],
-  payee: ExpenseFormOptions['payee'],
-  invitee: ExpenseFormOptions['invitee'],
-): string {
-  return `${account.name} - ${payee ? payee.name : invitee?.name}`;
 }

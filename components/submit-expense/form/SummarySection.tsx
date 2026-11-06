@@ -11,6 +11,7 @@ import { ExpenseStatus, ExpenseType } from '../../../lib/graphql/types/v2/graphq
 import { RecurringExpenseIntervals } from '../../../lib/i18n/expense';
 import { i18nTaxType } from '../../../lib/i18n/taxes';
 import { getExpenseExchangeRateWarningOrError, getTaxAmount, isTaxRateValid } from '../../expenses/lib/utils';
+import { generateGrantTitle } from '../lib/expense-input';
 import type { AccountHoverCardFieldsFragment } from '@/lib/graphql/types/v2/graphql';
 
 import { I18nBold } from '@/components/I18nFormatters';
@@ -35,7 +36,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import UploadedFilePreview from '../../UploadedFilePreview';
 import { PayoutMethodDetailsContainer } from '../PayoutMethodDetails';
 import { Step } from '../SubmitExpenseFlowSteps';
-import { type ExpenseForm, generateGrantTitle, RecurrenceFrequencyOption, YesNoOption } from '../useExpenseForm';
+import { type ExpenseForm, RecurrenceFrequencyOption, YesNoOption } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
 
