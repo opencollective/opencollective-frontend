@@ -563,6 +563,15 @@ describe('useExpenseForm (characterization)', () => {
       expect(form.current.errors).toEqual({ additionalAttachments: [INVALID_URL] });
     });
 
+    it('keeps the same schema while the options do not change', async () => {
+      const { form } = await setup({ values: newExpenseValues({ payoutMethodId: 'pm-bank-usd' }) });
+      const schema = form.current.options.schema;
+      await setValues(form, { title: 'A title', privateMessage: 'Hello' });
+      expect(form.current.options.schema).toBe(schema);
+      await setValues(form, { payoutMethodId: 'pm-bank-eur' }); // Changes the expense currency
+      expect(form.current.options.schema).not.toBe(schema);
+    });
+
     it('shows errors for the values that were just entered', async () => {
       const { form } = await setup({ values: newExpenseValues({ payoutMethodId: 'pm-bank-usd' }) });
       await setValues(form, validInvoiceItem);

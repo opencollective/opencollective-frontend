@@ -9,6 +9,8 @@ import type { Path } from 'dot-path-value';
 import type { FormikErrors, FormikTouched } from 'formik';
 import { get, isEmpty, uniq } from 'lodash-es';
 
+import type { ExpenseUpdateInput } from '../../../lib/graphql/types/v2/graphql';
+
 import type { ExpenseFormOptions, ExpenseFormValues } from './types';
 
 export type FormFieldPath = Path<ExpenseFormValues>;
@@ -136,15 +138,17 @@ export function getGrantStepFields(id: GrantStep): readonly FormFieldPath[] {
 
 // ---- Edit dialog sub-forms ----
 
-/** The form values each edit dialog sub-form validates */
+/** The form values each edit dialog sub-form validates, and the Expense input fields it submits */
 export const EDIT_EXPENSE_STEPS = {
   payee: {
     id: 'payee',
     fields: ['accountSlug', 'payeeSlug', 'payoutMethodId', 'expenseItems', 'hasTax', 'tax'],
+    inputFields: ['payee', 'payeeLocation', 'currency', 'items', 'payoutMethod', 'tax'],
   },
   draftPayoutMethod: {
     id: 'draftPayoutMethod',
     fields: ['payoutMethodId', 'expenseItems', 'hasTax', 'tax', 'referenceCurrency'],
+    inputFields: ['payoutMethod', 'payee', 'payeeLocation', 'currency', 'items', 'tax'],
   },
   expenseDetails: {
     id: 'expenseDetails',
@@ -158,8 +162,9 @@ export const EDIT_EXPENSE_STEPS = {
       'invoiceInfo',
       'referenceCurrency',
     ],
+    inputFields: ['items', 'attachedFiles', 'invoiceInfo', 'invoiceFile', 'reference', 'currency', 'tax'],
   },
-  attachReceipts: { id: 'attachReceipts', fields: ['expenseItems'] },
+  attachReceipts: { id: 'attachReceipts', fields: ['expenseItems'], inputFields: ['items', 'attachedFiles'] },
   type: {
     id: 'type',
     fields: [
@@ -172,8 +177,9 @@ export const EDIT_EXPENSE_STEPS = {
       'invoiceInfo',
       'expenseTypeOption',
     ],
+    inputFields: ['items', 'attachedFiles', 'invoiceFile', 'invoiceInfo', 'reference', 'type', 'tax'],
   },
-} as const satisfies Record<string, FormStep>;
+} as const satisfies Record<string, FormStep & { inputFields: readonly (keyof ExpenseUpdateInput)[] }>;
 
 // ---- Derivations ----
 

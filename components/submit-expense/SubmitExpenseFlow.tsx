@@ -272,7 +272,6 @@ function ExpenseFormikContainer(props: {
   onSuccess: (result, type: 'edit' | 'new' | 'invite') => void;
   onExpenseInviteDeclined: () => void;
 }) {
-
   const startOptions = React.useRef({
     draftKey: props.draftKey,
     duplicateExpense: props.duplicateExpense,

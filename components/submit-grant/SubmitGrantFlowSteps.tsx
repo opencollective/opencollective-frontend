@@ -1,7 +1,6 @@
 import React from 'react';
-import { isEmpty, pick } from 'lodash-es';
 
-import type { FormFieldPath } from '../submit-expense/lib/form-steps';
+import { type FormFieldPath, isStepComplete, isStepTouched } from '../submit-expense/lib/form-steps';
 
 import { StepHeader, StepItem } from '../submit-expense/SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../submit-expense/useExpenseForm';
@@ -74,10 +73,10 @@ export function useExpenseFormSteps<StepNames extends string>(
       ...step,
       isActive:
         step.name === activeStep || ('items' in step && (step.items ?? []).some(item => item.name === activeStep)),
-      isComplete: i !== steps.length - 1 && isEmpty(pick(form.errors, step.formValues)),
+      isComplete: i !== steps.length - 1 && isStepComplete({ id: step.name, fields: step.formValues ?? [] }, form),
       hasError:
-        !isEmpty(pick(form.errors, step.formValues)) &&
-        !isEmpty(pick(form.touched, step.formValues)) &&
+        !isStepComplete({ id: step.name, fields: step.formValues ?? [] }, form) &&
+        isStepTouched({ id: step.name, fields: step.formValues ?? [] }, form) &&
         form.submitCount > 0,
     }));
   }, [config, activeStep, form.errors, form.touched, form.submitCount]);

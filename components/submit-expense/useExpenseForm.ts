@@ -300,14 +300,23 @@ export function useExpenseForm(opts: {
     fetchFormQuery(queryVariables);
   }, [fetchFormQuery, queryVariables]);
 
-  const formOptions = React.useMemo<ExpenseFormOptions>(() => {
-    if (!formQueryResult) {
-      return INITIAL_FORM_OPTIONS;
-    }
-
-    const derivedOptions = deriveFormOptions(formQueryResult, expenseForm.values, startOptions.current, LoggedInUser);
-    return { ...derivedOptions, schema: buildFormSchema(derivedOptions, intl, startOptions.current.pickSchemaFields) };
-  }, [formQueryResult, expenseForm.values, LoggedInUser, intl]);
+  // Options keep their identity until their content changes, so the schema only changes with them
+  const derivedOptions = useDeepEqualMemo(
+    React.useMemo(
+      () =>
+        formQueryResult
+          ? deriveFormOptions(formQueryResult, expenseForm.values, startOptions.current, LoggedInUser)
+          : null,
+      [formQueryResult, expenseForm.values, LoggedInUser],
+    ),
+  );
+  const formOptions = React.useMemo<ExpenseFormOptions>(
+    () =>
+      !derivedOptions
+        ? INITIAL_FORM_OPTIONS
+        : { ...derivedOptions, schema: buildFormSchema(derivedOptions, intl, startOptions.current.pickSchemaFields) },
+    [derivedOptions, intl],
+  );
   formOptionsRef.current = formOptions;
 
   // The form is loading until the query answered and, when editing, the expense values were loaded

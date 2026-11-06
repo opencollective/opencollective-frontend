@@ -107,7 +107,7 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
                   CollectiveType.ORGANIZATION,
                   CollectiveType.PROJECT,
                 ]}
-                collective={props.accountSlug === '__find' ? null : props.account}
+                collective={getAccountQuerySlug(props.accountSlug) ? props.account : null}
                 onChange={e => setFieldValue('accountSlug', e.value.slug)}
               />
             }

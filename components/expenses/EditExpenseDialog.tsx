@@ -191,8 +191,7 @@ const EditPayee = ({ expense, onSubmit }) => {
     pickSchemaFields: EDIT_EXPENSE_STEPS.payee.fields,
   });
   const transformedOnSubmit = React.useCallback(
-    (plan: ExpenseSubmissionPlan) =>
-      onSubmit(getExpenseEditInputSlice(plan, ['payee', 'payeeLocation', 'currency', 'items', 'payoutMethod', 'tax'])),
+    (plan: ExpenseSubmissionPlan) => onSubmit(getExpenseEditInputSlice(plan, EDIT_EXPENSE_STEPS.payee.inputFields)),
     [onSubmit],
   );
 
@@ -271,7 +270,7 @@ const EditDraftPayoutMethod = ({ expense, onSubmit }) => {
   });
   const transformedOnSubmit = React.useCallback(
     (plan: ExpenseSubmissionPlan) =>
-      onSubmit(getExpenseEditInputSlice(plan, ['payoutMethod', 'payee', 'payeeLocation', 'currency', 'items', 'tax'])),
+      onSubmit(getExpenseEditInputSlice(plan, EDIT_EXPENSE_STEPS.draftPayoutMethod.inputFields)),
     [onSubmit],
   );
 
@@ -317,17 +316,7 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
     pickSchemaFields: EDIT_EXPENSE_STEPS.expenseDetails.fields,
   });
   const transformedOnSubmit = (plan: ExpenseSubmissionPlan) =>
-    onSubmit(
-      getExpenseEditInputSlice(plan, [
-        'items',
-        'attachedFiles',
-        'invoiceInfo',
-        'invoiceFile',
-        'reference',
-        'currency',
-        'tax',
-      ]),
-    );
+    onSubmit(getExpenseEditInputSlice(plan, EDIT_EXPENSE_STEPS.expenseDetails.inputFields));
 
   const expenseForm = useExpenseForm({
     initialValues: {
@@ -376,7 +365,7 @@ const AttachReceipts = ({ expense, onSubmit }) => {
     pickSchemaFields: EDIT_EXPENSE_STEPS.attachReceipts.fields,
   });
   const transformedOnSubmit = (plan: ExpenseSubmissionPlan) =>
-    onSubmit(getExpenseEditInputSlice(plan, ['items', 'attachedFiles']));
+    onSubmit(getExpenseEditInputSlice(plan, EDIT_EXPENSE_STEPS.attachReceipts.inputFields));
 
   const expenseForm = useExpenseForm({
     initialValues: {
@@ -452,17 +441,7 @@ const EditExpenseType = ({ expense, onSubmit }) => {
     pickSchemaFields: EDIT_EXPENSE_STEPS.type.fields,
   });
   const transformedOnSubmit = (plan: ExpenseSubmissionPlan) =>
-    onSubmit(
-      getExpenseEditInputSlice(plan, [
-        'items',
-        'attachedFiles',
-        'invoiceFile',
-        'invoiceInfo',
-        'reference',
-        'type',
-        'tax',
-      ]),
-    );
+    onSubmit(getExpenseEditInputSlice(plan, EDIT_EXPENSE_STEPS.type.inputFields));
 
   const expenseForm = useExpenseForm({
     initialValues: {
