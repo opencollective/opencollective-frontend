@@ -40,7 +40,7 @@ import { Label } from '../../ui/Label';
 import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
 import { Separator } from '../../ui/Separator';
 import { useToast } from '../../ui/useToast';
-import { Step } from '../SubmitExpenseFlowSteps';
+import { getExpenseStepHeading, Step } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
 
 import { CreateLegalEntityPayeeForm } from './CreateLegalEntityPayeeForm';
@@ -77,7 +77,11 @@ export const WhoIsGettingPaidSection = memoWithGetFormProps(function WhoIsGettin
 ) {
   const { inViewChange, ...rest } = props;
   return (
-    <FormSectionContainer step={Step.WHO_IS_GETTING_PAID} inViewChange={inViewChange}>
+    <FormSectionContainer
+      id={Step.WHO_IS_GETTING_PAID}
+      {...getExpenseStepHeading(Step.WHO_IS_GETTING_PAID)}
+      inViewChange={inViewChange}
+    >
       <WhoIsGettingPaidForm {...rest} />
     </FormSectionContainer>
   );

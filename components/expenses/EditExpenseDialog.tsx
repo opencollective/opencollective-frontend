@@ -11,6 +11,7 @@ import { i18nGraphqlException } from '../../lib/errors';
 import { type Expense, ExpenseLockableFields, ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
 import { type ExpenseSubmissionPlan, getExpenseEditInputSlice } from '../submit-expense/lib/expense-input';
+import { EDIT_EXPENSE_STEPS } from '../submit-expense/lib/form-steps';
 import { getPayeeKind, PayeeKind } from '../submit-expense/lib/payee-choice';
 import { getAccountReferenceInput, isSameAccount } from '@/lib/collective';
 
@@ -188,14 +189,7 @@ const EditPayee = ({ expense, onSubmit }) => {
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
-    pickSchemaFields: {
-      expenseItems: true,
-      hasTax: true,
-      tax: true,
-      payoutMethodId: true,
-      payeeSlug: true,
-      accountSlug: true,
-    },
+    pickSchemaFields: EDIT_EXPENSE_STEPS.payee.fields,
   });
   const transformedOnSubmit = React.useCallback(
     (plan: ExpenseSubmissionPlan) =>
@@ -276,15 +270,7 @@ const EditDraftPayoutMethod = ({ expense, onSubmit }) => {
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
-    pickSchemaFields: {
-      expenseItems: true,
-      hasTax: true,
-      tax: true,
-      payoutMethodId: true,
-      payee: true,
-      payeeLocation: true,
-      referenceCurrency: true,
-    },
+    pickSchemaFields: EDIT_EXPENSE_STEPS.draftPayoutMethod.fields,
   });
   const transformedOnSubmit = React.useCallback(
     (plan: ExpenseSubmissionPlan) =>
@@ -333,16 +319,7 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
-    pickSchemaFields: {
-      expenseItems: true,
-      hasTax: true,
-      tax: true,
-      expenseAttachedFiles: true,
-      invoiceFile: true,
-      invoiceNumber: true,
-      invoiceInfo: true,
-      referenceCurrency: true,
-    },
+    pickSchemaFields: EDIT_EXPENSE_STEPS.expenseDetails.fields,
   });
   const transformedOnSubmit = (plan: ExpenseSubmissionPlan) =>
     onSubmit(
@@ -403,9 +380,7 @@ const AttachReceipts = ({ expense, onSubmit }) => {
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
-    pickSchemaFields: {
-      expenseItems: true,
-    },
+    pickSchemaFields: EDIT_EXPENSE_STEPS.attachReceipts.fields,
   });
   const transformedOnSubmit = (plan: ExpenseSubmissionPlan) =>
     onSubmit(getExpenseEditInputSlice(plan, ['items', 'attachedFiles']));
@@ -483,16 +458,7 @@ const EditExpenseType = ({ expense, onSubmit }) => {
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
-    pickSchemaFields: {
-      expenseItems: true,
-      hasTax: true,
-      tax: true,
-      expenseAttachedFiles: true,
-      invoiceFile: true,
-      invoiceNumber: true,
-      invoiceInfo: true,
-      expenseTypeOption: true,
-    },
+    pickSchemaFields: EDIT_EXPENSE_STEPS.type.fields,
   });
   const transformedOnSubmit = (plan: ExpenseSubmissionPlan) =>
     onSubmit(

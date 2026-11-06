@@ -99,7 +99,7 @@ type ExpenseInviteWelcomeSectionProps = {
 
 function ExpenseInviteWelcomeSection(props: ExpenseInviteWelcomeSectionProps) {
   return (
-    <FormSectionContainer step={Step.INVITE_WELCOME} inViewChange={props.inViewChange} hideTitle hideSubtitle>
+    <FormSectionContainer id={Step.INVITE_WELCOME} inViewChange={props.inViewChange} hideTitle>
       <ExpenseInviteWelcome
         expense={props.form.options.expense}
         draftKey={props.form.startOptions.draftKey}

@@ -16,6 +16,8 @@ import type {
   PayoutMethodType,
 } from '../../../lib/graphql/types/v2/graphql';
 
+import type { FormFieldPath } from './form-steps';
+
 export enum InviteeAccountType {
   INDIVIDUAL = 'INDIVIDUAL',
   ORGANIZATION = 'ORGANIZATION',
@@ -187,5 +189,45 @@ export type ExpenseFormStartOptions = {
   expenseId?: number;
   draftKey?: string;
   isInlineEdit?: boolean;
-  pickSchemaFields?: Record<string, boolean>;
+  /** Only validate these fields (partial validation), all by default */
+  pickSchemaFields?: readonly FormFieldPath[];
 };
+
+/** All the form values, at runtime (the type checker ensures the list is complete) */
+export const EXPENSE_FORM_VALUE_KEYS = Object.keys({
+  accountSlug: true,
+  inviteeExistingAccount: true,
+  inviteeAccountType: true,
+  inviteeNewIndividual: true,
+  inviteeNewOrganization: true,
+  inviteNote: true,
+  recurrenceFrequency: true,
+  recurrenceEndAt: true,
+  payoutMethodNameDiscrepancyReason: true,
+  newPayoutMethod: true,
+  payeeSlug: true,
+  payeeLocation: true,
+  expenseTypeOption: true,
+  payoutMethodId: true,
+  title: true,
+  accountingCategoryId: true,
+  tags: true,
+  privateMessage: true,
+  expenseItems: true,
+  additionalAttachments: true,
+  referenceCurrency: true,
+  hasTax: true,
+  tax: true,
+  acknowledgedCollectiveInvoiceExpensePolicy: true,
+  acknowledgedCollectiveReceiptExpensePolicy: true,
+  acknowledgedCollectiveTitleExpensePolicy: true,
+  acknowledgedCollectiveGrantExpensePolicy: true,
+  acknowledgedHostInvoiceExpensePolicy: true,
+  acknowledgedHostReceiptExpensePolicy: true,
+  acknowledgedHostTitleExpensePolicy: true,
+  acknowledgedHostGrantExpensePolicy: true,
+  hasInvoiceOption: true,
+  invoiceFile: true,
+  invoiceNumber: true,
+  invoiceInfo: true,
+} satisfies Record<keyof ExpenseFormValues, true>) as (keyof ExpenseFormValues)[];

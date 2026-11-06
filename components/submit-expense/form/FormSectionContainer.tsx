@@ -1,41 +1,30 @@
 import React from 'react';
 import { useInView } from 'react-intersection-observer';
-import { FormattedMessage } from 'react-intl';
-
-import { type Step, StepSubtitles, StepTitles } from '../SubmitExpenseFlowSteps';
 
 type FormSectionContainerProps = {
   children: React.ReactNode;
-  step: Step;
+  /** The step this section renders, used to scroll to it */
+  id: string;
   title?: React.ReactNode;
   subtitle?: React.ReactNode;
   hideTitle?: boolean;
-  hideSubtitle?: boolean;
   inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
-  error?: React.ReactNode;
 };
 
+/** A section of a multi-step form (Expense or Grant flows) */
 export function FormSectionContainer(props: FormSectionContainerProps) {
   const { ref } = useInView({
     onChange: props.inViewChange,
     rootMargin: '-50px 0px -70% 0px',
   });
 
-  const stepTitle = StepTitles[props.step];
-  const stepSubtitle = StepSubtitles[props.step];
-
   return (
-    <div ref={ref} id={props.step} className="scroll-m-8">
+    <div ref={ref} id={props.id} className="scroll-m-8">
       <div className="rounded-lg border border-white bg-white p-4 sm:p-6">
-        {!props.hideTitle && (
+        {!props.hideTitle && props.title && (
           <div className="mb-4">
-            <h2 className="text-xl font-bold text-[#0F1729]">{props.title || <FormattedMessage {...stepTitle} />}</h2>
-            {props.subtitle ||
-              (stepSubtitle && !props.hideSubtitle && (
-                <div className="text-sm text-muted-foreground">
-                  <FormattedMessage {...stepSubtitle} />
-                </div>
-              ))}
+            <h2 className="text-xl font-bold text-[#0F1729]">{props.title}</h2>
+            {props.subtitle && <div className="text-sm text-muted-foreground">{props.subtitle}</div>}
           </div>
         )}
         {props.children}

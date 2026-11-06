@@ -55,6 +55,7 @@ import { InviteeAccountType, RecurrenceFrequencyOption, YesNoOption } from './us
 
 silenceApolloMissingFieldErrors();
 
+const INVALID_URL = 'This URL is not valid, make sure it starts with its protocol (e.g., https://)';
 const BANK_USD = payoutMethod();
 const BANK_EUR = payoutMethod({
   id: 'pm-bank-eur',
@@ -556,10 +557,10 @@ describe('useExpenseForm (characterization)', () => {
       );
     });
 
-    it('does not validate additional attachment URLs (the rule targets a field the form never sets)', async () => {
+    it('validates additional attachment URLs', async () => {
       const { form } = await setup({ values: newExpenseValues({ payoutMethodId: 'pm-bank-usd' }) });
       await setValues(form, { ...validInvoiceItem, additionalAttachments: ['not a url'] });
-      expect(form.current.errors).toEqual({});
+      expect(form.current.errors).toEqual({ additionalAttachments: [INVALID_URL] });
     });
 
     it('shows errors for the values that were just entered', async () => {
@@ -1131,7 +1132,7 @@ describe('useExpenseForm (characterization)', () => {
       const { form } = await setup({
         world,
         values: inlineEditValues({ referenceCurrency: 'USD' as any }),
-        startOptions: { expenseId: 555, isInlineEdit: true, pickSchemaFields: { payoutMethodId: true } },
+        startOptions: { expenseId: 555, isInlineEdit: true, pickSchemaFields: ['payoutMethodId'] },
         onSubmit: jest.fn(),
       });
       await setValues(form, { payoutMethodId: 'pm-bank-eur' });
@@ -1145,7 +1146,7 @@ describe('useExpenseForm (characterization)', () => {
       const { form } = await setup({
         world,
         values: inlineEditValues(),
-        startOptions: { expenseId: 555, isInlineEdit: true, pickSchemaFields: { expenseItems: true } },
+        startOptions: { expenseId: 555, isInlineEdit: true, pickSchemaFields: ['expenseItems'] },
         onSubmit,
       });
       await setValues(form, { title: '' });

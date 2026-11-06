@@ -19,6 +19,7 @@ import { getCustomZodErrorMap } from '../../FormikZod';
 import { isEmptyHTMLValue } from '../../HTMLContent';
 import { supportsBaseExpenseTypes } from '../form/helper';
 
+import { type FormFieldPath, getValidatedValueKeys } from './form-steps';
 import { getAccountQuerySlug, getPayeeChoice, PayeeKind } from './payee-choice';
 import type { ExpenseFormOptions, ExpenseFormValues, RecursivePartial } from './types';
 import { InviteeAccountType, RecurrenceFrequencyOption, YesNoOption } from './types';
@@ -52,15 +53,9 @@ export function isValidRecurrenceEndAt(
  * @param values Current form values
  * @param options Form configuration options
  * @param intl Internationalization context for error messages
- * @param pickSchemaFields Optional field filtering for partial validation
  * @returns Zod schema for form validation
  */
-function buildSchemaForValues(
-  values: ExpenseFormValues,
-  options: Omit<ExpenseFormOptions, 'schema'>,
-  intl: IntlShape,
-  pickSchemaFields?: Record<string, boolean>,
-): z.ZodType<RecursivePartial<ExpenseFormValues>, z.ZodObjectDef, RecursivePartial<ExpenseFormValues>> {
+function buildFieldsSchema(values: ExpenseFormValues, options: Omit<ExpenseFormOptions, 'schema'>, intl: IntlShape) {
   const requiredMessage = { message: intl.formatMessage({ defaultMessage: 'Required', id: 'Seanpx' }) };
   const payee = getPayeeChoice(values);
   const schema = z.object({
@@ -115,7 +110,6 @@ function buildSchemaForValues(
           ? true
           : kind === PayeeKind.ACCOUNT;
       }, requiredMessage),
-    expenseId: z.number().nullish(),
     expenseTypeOption: z.nativeEnum(ExpenseType).refine(v => {
       if (v === ExpenseType.GRANT && options.account?.type === CollectiveType.FUND) {
         return true;
@@ -190,7 +184,6 @@ function buildSchemaForValues(
       .refine(v => !v || v.length <= 255, {
         message: 'Expense description is too long (max 255 characters).',
       }),
-    reference: z.string().optional(),
     tags: z.array(z.string()).optional(),
     privateMessage: z.string().optional().nullable(),
     recurrenceFrequency: z.nativeEnum(RecurrenceFrequencyOption).optional(),
@@ -219,12 +212,8 @@ function buildSchemaForValues(
             : intl.formatMessage({ defaultMessage: 'Required', id: 'Seanpx' }),
         }),
       ),
-    expenseAttachedFiles: z
-      .array(
-        z.object({
-          url: z.string().url(),
-        }),
-      )
+    additionalAttachments: z
+      .array(z.union([z.string().url(), z.object({ url: z.string().url() })]))
       .optional()
       .nullable(),
     invoiceFile: z
@@ -694,29 +683,44 @@ function buildSchemaForValues(
     }),
   });
 
-  const addRefine = (schema, pickSchemaFields) => {
-    return schema.superRefine((value, ctx) => {
-      if (!pickSchemaFields || (pickSchemaFields['accountSlug'] && pickSchemaFields['payeeSlug'])) {
-        if (value.accountSlug && value.payeeSlug && value.accountSlug === value.payeeSlug) {
-          const issue = {
-            code: z.ZodIssueCode.custom,
-            message: intl.formatMessage({
-              id: 'ExpenseForm.PayerPayeeMustDiffer',
-              defaultMessage: 'The account paying and the account getting paid must be different.',
-            }),
-          };
+  return schema;
+}
 
-          ctx.addIssue({ ...issue, path: ['accountSlug'] });
-          ctx.addIssue({ ...issue, path: ['payeeSlug'] });
-        }
-      }
-    });
-  };
+/** The form values the schema validates */
+export function getFormSchemaKeys(): (keyof ExpenseFormValues)[] {
+  const intl = { formatMessage: () => '' } as unknown as IntlShape;
+  return Object.keys(buildFieldsSchema({} as ExpenseFormValues, {}, intl).shape) as (keyof ExpenseFormValues)[];
+}
 
-  return addRefine(
-    pickSchemaFields ? schema.pick(pickSchemaFields as { [K in keyof z.infer<typeof schema>]?: true }) : schema,
-    pickSchemaFields,
-  );
+function buildSchemaForValues(
+  values: ExpenseFormValues,
+  options: Omit<ExpenseFormOptions, 'schema'>,
+  intl: IntlShape,
+  validatedKeys?: (keyof ExpenseFormValues)[],
+) {
+  const fieldsSchema = buildFieldsSchema(values, options, intl);
+  const schema = validatedKeys
+    ? fieldsSchema.pick(
+        Object.fromEntries(validatedKeys.map(key => [key, true])) as { [K in keyof typeof fieldsSchema.shape]?: true },
+      )
+    : fieldsSchema;
+
+  return schema.superRefine((value: RecursivePartial<ExpenseFormValues>, ctx) => {
+    const validatesPayerAndPayee =
+      !validatedKeys || (validatedKeys.includes('accountSlug') && validatedKeys.includes('payeeSlug'));
+    if (validatesPayerAndPayee && value.accountSlug && value.payeeSlug && value.accountSlug === value.payeeSlug) {
+      const issue = {
+        code: z.ZodIssueCode.custom,
+        message: intl.formatMessage({
+          id: 'ExpenseForm.PayerPayeeMustDiffer',
+          defaultMessage: 'The account paying and the account getting paid must be different.',
+        }),
+      };
+
+      ctx.addIssue({ ...issue, path: ['accountSlug'] });
+      ctx.addIssue({ ...issue, path: ['payeeSlug'] });
+    }
+  });
 }
 
 type ExpenseFormSchema = z.ZodType<RecursivePartial<ExpenseFormValues>>;
@@ -724,21 +728,19 @@ type ExpenseFormSchema = z.ZodType<RecursivePartial<ExpenseFormValues>>;
 /**
  * Builds the validation schema of the Expense form from its options.
  *
- * @param pickSchemaFields Optional field filtering for partial validation
+ * @param validatedFields Only validate these fields (partial validation), all by default
  */
 export function buildFormSchema(
   options: Omit<ExpenseFormOptions, 'schema'>,
   intl: IntlShape,
-  pickSchemaFields?: Record<string, boolean>,
+  validatedFields?: readonly FormFieldPath[],
 ): ExpenseFormSchema {
+  const validatedKeys = validatedFields && getValidatedValueKeys(validatedFields);
   const errorMap = getCustomZodErrorMap(intl);
   return z.custom<RecursivePartial<ExpenseFormValues>>().superRefine((values, ctx) => {
-    const result = buildSchemaForValues(values as ExpenseFormValues, options, intl, pickSchemaFields).safeParse(
-      values,
-      {
-        errorMap,
-      },
-    );
+    const result = buildSchemaForValues(values as ExpenseFormValues, options, intl, validatedKeys).safeParse(values, {
+      errorMap,
+    });
     if (!result.success) {
       result.error.issues.forEach(issue => ctx.addIssue({ ...issue, code: z.ZodIssueCode.custom }));
     }

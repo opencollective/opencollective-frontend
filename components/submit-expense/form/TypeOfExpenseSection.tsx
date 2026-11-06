@@ -17,7 +17,7 @@ import { Label } from '../../ui/Label';
 import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/Tabs';
 import { useToast } from '../../ui/useToast';
-import { Step } from '../SubmitExpenseFlowSteps';
+import { getExpenseStepHeading, Step } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
 import { YesNoOption } from '../useExpenseForm';
 
@@ -61,7 +61,8 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
 
   return (
     <FormSectionContainer
-      step={Step.TYPE_OF_EXPENSE}
+      id={Step.TYPE_OF_EXPENSE}
+      {...getExpenseStepHeading(Step.TYPE_OF_EXPENSE)}
       inViewChange={props.inViewChange}
       title={<FormattedMessage defaultMessage="Select the type of expense" id="hT+uK/" />}
     >

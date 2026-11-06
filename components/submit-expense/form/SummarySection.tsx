@@ -35,7 +35,7 @@ import { Label } from '../../ui/Label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/Select';
 import UploadedFilePreview from '../../UploadedFilePreview';
 import { PayoutMethodDetailsContainer } from '../PayoutMethodDetails';
-import { Step } from '../SubmitExpenseFlowSteps';
+import { getExpenseStepHeading, Step } from '../SubmitExpenseFlowSteps';
 import { type ExpenseForm, RecurrenceFrequencyOption, YesNoOption } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
@@ -46,7 +46,7 @@ type SummarySectionProps = {
 };
 export function SummarySection(props: SummarySectionProps) {
   return (
-    <FormSectionContainer step={Step.SUMMARY} inViewChange={props.inViewChange}>
+    <FormSectionContainer id={Step.SUMMARY} {...getExpenseStepHeading(Step.SUMMARY)} inViewChange={props.inViewChange}>
       <SummarySectionContent form={props.form} />
     </FormSectionContainer>
   );

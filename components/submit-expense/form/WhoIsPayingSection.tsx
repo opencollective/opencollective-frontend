@@ -13,7 +13,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
-import { Step, StepTitles } from '../SubmitExpenseFlowSteps';
+import { getExpenseStepHeading, Step, StepTitles } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
 
 import { ExpenseAccountItem } from './ExpenseAccountItem';
@@ -55,7 +55,8 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
 
   return (
     <FormSectionContainer
-      step={Step.WHO_IS_PAYING}
+      id={Step.WHO_IS_PAYING}
+      {...getExpenseStepHeading(Step.WHO_IS_PAYING)}
       inViewChange={props.inViewChange}
       title={intl.formatMessage(StepTitles[Step.WHO_IS_PAYING])}
     >

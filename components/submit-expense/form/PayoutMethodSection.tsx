@@ -42,7 +42,7 @@ import { Button } from '../../ui/Button';
 import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
 import { useToast } from '../../ui/useToast';
 import { PayoutMethodDetailsContainer } from '../PayoutMethodDetails';
-import { Step } from '../SubmitExpenseFlowSteps';
+import { getExpenseStepHeading, Step } from '../SubmitExpenseFlowSteps';
 import { type ExpenseForm } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
@@ -87,7 +87,8 @@ export const PayoutMethodSection = memoWithGetFormProps(function PayoutMethodSec
   const { inViewChange, ...rest } = props;
   return (
     <FormSectionContainer
-      step={Step.PAYOUT_METHOD}
+      id={Step.PAYOUT_METHOD}
+      {...getExpenseStepHeading(Step.PAYOUT_METHOD)}
       inViewChange={inViewChange}
       title={<FormattedMessage defaultMessage="Select a payout method" id="Ri4REE" />}
     >

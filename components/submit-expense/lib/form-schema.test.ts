@@ -14,6 +14,8 @@ import { buildFormSchema, isValidRecurrenceEndAt } from './form-schema';
 import type { ExpenseFormOptions, ExpenseFormValues } from './types';
 import { InviteeAccountType, RecurrenceFrequencyOption, YesNoOption } from './types';
 
+const INVALID_URL = 'This URL is not valid, make sure it starts with its protocol (e.g., https://)';
+
 const intl = createIntl({ locale: 'en' });
 
 const options = (overrides: Partial<ExpenseFormOptions> = {}): Omit<ExpenseFormOptions, 'schema'> =>
@@ -64,6 +66,13 @@ const errorsFor = (schemaOptions: Omit<ExpenseFormOptions, 'schema'>, values: Ex
 };
 
 describe('buildFormSchema', () => {
+  it('validates the additional attachment URLs', () => {
+    const values = validInvoice({ additionalAttachments: ['https://e.x/a.pdf', { url: 'not a url' }, 'nope'] });
+    expect(errorsFor(options(), values)).toEqual({
+      additionalAttachments: [undefined, { url: INVALID_URL }, INVALID_URL],
+    });
+  });
+
   it('accepts a valid invoice', () => {
     expect(errorsFor(options(), validInvoice())).toEqual({});
   });
@@ -193,7 +202,7 @@ describe('buildFormSchema', () => {
       title: '',
       expenseItems: [{ amount: { valueInCents: 0, currency: 'USD', exchangeRate: null } }],
     });
-    expect(errorsFor(options(), values, { title: true })).toEqual({ title: 'Required' });
+    expect(errorsFor(options(), values, ['title'])).toEqual({ title: 'Required' });
   });
 });
 
