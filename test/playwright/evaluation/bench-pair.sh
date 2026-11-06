@@ -5,8 +5,9 @@
 #
 # Usage: bench-pair.sh OUT_DIR BATCH PAIR MODE ORDER PLAYWRIGHT_WORKERS CYPRESS_PROCESSES [PLAYWRIGHT_ARTIFACTS]
 #   ORDER is "cypress,playwright", "playwright,cypress" or a single runner.
-#   PLAYWRIGHT_ARTIFACTS=off (ablation only) turns off trace and video
-#   recording in a temporary copy of playwright.config.ts, restored afterwards.
+#   PLAYWRIGHT_ARTIFACTS=off turns off trace and video recording, =novideo only
+#   video (traces of failed attempts kept), by editing playwright.config.ts
+#   for the run and restoring it afterwards. Configuration variants only.
 # Writes OUT_DIR/run-<batch>-<pair>-<runner>.json (see `cli.ts collect-run`),
 # timestamped logs, resource samples and machine facts.
 
@@ -63,6 +64,9 @@ run_runner() {
     echo "BENCH start $runner"
     if [[ "$runner" == playwright && "$PW_ARTIFACTS" == off ]]; then
       sed -i "s/trace: 'retain-on-failure'/trace: 'off'/; s/video: 'retain-on-failure'/video: 'off'/" playwright.config.ts
+      grep -nE "trace:|video:" playwright.config.ts
+    elif [[ "$runner" == playwright && "$PW_ARTIFACTS" == novideo ]]; then
+      sed -i "s/video: 'retain-on-failure'/video: 'off'/" playwright.config.ts
       grep -nE "trace:|video:" playwright.config.ts
     fi
     if [[ "$runner" == playwright ]]; then
