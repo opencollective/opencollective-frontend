@@ -44,6 +44,8 @@ type Touched = Partial<Record<keyof ExpenseFormValues, boolean>>;
 type ReconcileResult = {
   /** The values that changed */
   patch: Partial<ExpenseFormValues>;
+  /** The same changes, as the leaf paths to set (so they merge with concurrent updates) */
+  updates: ValueUpdate[];
   touched: Touched;
   /** Set when the expense values were loaded into the form */
   hydrated: boolean;
@@ -105,6 +107,32 @@ export function getLastUsedPayoutMethod(
   return (lastUsedPayoutMethodId && (options.payoutMethods || []).find(p => p.id === lastUsedPayoutMethodId)) || null;
 }
 
+// ---- Value updates ----
+
+export type ValueUpdate = { path: string; value: unknown };
+
+const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+  Boolean(value) && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Date);
+
+/**
+ * The leaf paths that differ between two values. Applying them one by one (with Formik's
+ * `setFieldValue`) merges with updates made in the meantime, unlike replacing all the values.
+ */
+export function getValueUpdates(before: unknown, after: unknown, path = ''): ValueUpdate[] {
+  if (Object.is(before, after)) {
+    return [];
+  } else if (isPlainObject(before) && isPlainObject(after)) {
+    const keys = new Set([...Object.keys(before), ...Object.keys(after)]);
+    return [...keys].flatMap(key => getValueUpdates(before[key], after[key], path ? `${path}.${key}` : key));
+  } else if (Array.isArray(before) && Array.isArray(after) && before.length === after.length) {
+    return after.flatMap((item, i) => getValueUpdates(before[i], item, path ? `${path}.${i}` : `${i}`));
+  } else if (isEqual(before, after)) {
+    return [];
+  } else {
+    return [{ path, value: after }];
+  }
+}
+
 // ---- Exchange rates ----
 
 const needsExchangeRate = (expectedCurrency: string) => (ei: ExpenseItem) =>
@@ -120,6 +148,15 @@ const needsExchangeRate = (expectedCurrency: string) => (ei: ExpenseItem) =>
       Math.abs(dayjs.utc(ei.amount.exchangeRate.date).diff(dayjs.utc(ei.incurredAt), 'days')) > 2));
 
 type ExchangeRate = { value: number; source: string; fromCurrency: string; toCurrency: string; date: string };
+
+/** The updates applying fetched exchange rates to the items that still need one */
+export function getExchangeRateUpdates(
+  values: ExpenseFormValues,
+  expenseCurrency: Currency,
+  rates: ExchangeRate[],
+): ValueUpdate[] {
+  return getValueUpdates(values, applyExchangeRates(values, expenseCurrency, rates));
+}
 
 /**
  * Applies fetched exchange rates to the items that still need one. Returns the values unchanged when
@@ -765,6 +802,7 @@ export function reconcileExpenseForm(
 
   return {
     patch,
+    updates: getValueUpdates(values, working),
     touched,
     hydrated,
     exchangeRateRequests,

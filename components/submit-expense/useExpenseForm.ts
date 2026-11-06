@@ -2,7 +2,7 @@ import React from 'react';
 import type { FetchResult } from '@apollo/client';
 import { gql, useApolloClient, useMutation } from '@apollo/client';
 import type { Path, PathValue } from 'dot-path-value';
-import type { FieldInputProps, FormikErrors, FormikHelpers, FormikTouched } from 'formik';
+import type { FieldInputProps, FormikErrors, FormikHelpers } from 'formik';
 import { useFormik } from 'formik';
 import { debounce, isEmpty, isEqual, omit, set } from 'lodash-es';
 import { useIntl } from 'react-intl';
@@ -27,7 +27,7 @@ import { type ExpenseSubmissionPlan, planExpenseSubmission } from './lib/expense
 import { deriveFormOptions, type ExpenseFormQueryResult } from './lib/form-options';
 import { expenseFormSchemaQuery, getFormQueryVariables } from './lib/form-query';
 import { buildFormSchema } from './lib/form-schema';
-import { applyExchangeRates, reconcileExpenseForm, type ReconcileState } from './lib/reconcile';
+import { getExchangeRateUpdates, reconcileExpenseForm, type ReconcileState, type ValueUpdate } from './lib/reconcile';
 import type { ExpenseFormOptions, ExpenseFormStartOptions, ExpenseFormValues } from './lib/types';
 import { AnalyticsEvent } from '@/lib/analytics/events';
 import { track } from '@/lib/analytics/plausible';
@@ -327,7 +327,20 @@ export function useExpenseForm(opts: {
 
   // Apply the rules for dependent fields
   const reconcileState = React.useRef<ReconcileState>(null);
-  const { setValues, setTouched } = expenseForm;
+  // Updates are applied path by path, so they merge with changes made since this render (e.g. an
+  // upload finishing). The form is then validated once, on the next render.
+  const { setFieldValue, setFieldTouched, validateForm } = expenseForm;
+  const pendingValidation = React.useRef(false);
+  const applyUpdates = React.useCallback(
+    (updates: ValueUpdate[]) => {
+      // Formik's setFieldValue takes a `shouldValidate` flag, which the typed wrapper doesn't expose
+      const setPath = setFieldValue as unknown as (field: string, value: unknown, shouldValidate: boolean) => void;
+      updates.forEach(({ path, value }) => setPath(path, value, false));
+      pendingValidation.current = pendingValidation.current || updates.length > 0;
+    },
+    [setFieldValue],
+  );
+
   React.useEffect(() => {
     const result = reconcileExpenseForm(reconcileState.current, expenseForm.values, formOptions, {
       phase: isLoading ? 'loading' : 'ready',
@@ -338,11 +351,11 @@ export function useExpenseForm(opts: {
       startOptions: startOptions.current,
     });
     reconcileState.current = result.state;
-    if (!isEmpty(result.touched)) {
-      setTouched({ ...expenseForm.touched, ...result.touched } as FormikTouched<ExpenseFormValues>, false);
-    }
-    if (!isEmpty(result.patch)) {
-      setValues({ ...expenseForm.values, ...result.patch });
+    Object.entries(result.touched).forEach(([field, isTouched]) => setFieldTouched(field, isTouched, false));
+    applyUpdates(result.updates);
+    if (!result.updates.length && pendingValidation.current) {
+      pendingValidation.current = false;
+      validateForm();
     }
     if (result.hydrated) {
       setHydrated(true);
@@ -357,11 +370,12 @@ export function useExpenseForm(opts: {
     isLoading,
     hydrated,
     itemCurrencyChosen,
-    setValues,
-    setTouched,
+    applyUpdates,
+    setFieldTouched,
+    validateForm,
   ]);
 
-  // Fetch the exchange rates the rules asked for, and apply them through the same values update
+  // Fetch the exchange rates the rules asked for, and apply them through the same updates
   const latestValues = React.useRef(expenseForm.values);
   latestValues.current = expenseForm.values;
   const expenseCurrency = formOptions.expenseCurrency;
@@ -377,10 +391,8 @@ export function useExpenseForm(opts: {
         variables: { exchangeRateRequests },
       })
       .then(res => {
-        const values = latestValues.current;
-        const newValues = applyExchangeRates(values, expenseCurrency, res.data?.currencyExchangeRate);
-        if (!cancelled && newValues !== values) {
-          setValues(newValues);
+        if (!cancelled) {
+          applyUpdates(getExchangeRateUpdates(latestValues.current, expenseCurrency, res.data?.currencyExchangeRate));
         }
       })
       .catch(() => {});
@@ -388,15 +400,13 @@ export function useExpenseForm(opts: {
     return () => {
       cancelled = true;
     };
-  }, [apolloClient, exchangeRateRequests, expenseCurrency, setValues]);
+  }, [apolloClient, exchangeRateRequests, expenseCurrency, applyUpdates]);
 
   // Revalidate when the options change
-  const validateForm = expenseForm.validateForm;
   React.useEffect(() => {
     validateForm();
   }, [formOptions.schema, validateForm]);
 
-  const { setFieldValue } = expenseForm;
   const setItemCurrency = React.useCallback(
     (index: number, currency: string) => {
       setItemCurrencyChosen(true);
@@ -410,7 +420,6 @@ export function useExpenseForm(opts: {
   // New payout methods belong to the payee, or to the recipient Host for cross-host payees
   const payeeHost = formOptions.payee && 'host' in formOptions.payee ? formOptions.payee.host : null;
   const isCrossHostPayee = Boolean(payeeHost && formOptions.host && payeeHost.id !== formOptions.host.id);
-  const { setFieldTouched } = expenseForm;
   const actions = useExpenseFormActions({
     resync: refresh,
     defaultPayoutMethodAccountSlug: isCrossHostPayee ? payeeHost.slug : expenseForm.values.payeeSlug,

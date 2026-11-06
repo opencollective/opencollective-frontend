@@ -6,7 +6,7 @@ import { NEW_PAYOUT_METHOD_ID, PAYEE_SLUG_VENDOR } from '../../expenses/lib/cons
 
 import { existingExpense } from '../testing/expense-form-fixtures';
 
-import { applyExchangeRates, type ReconcileContext, reconcileExpenseForm } from './reconcile';
+import { applyExchangeRates, getValueUpdates, type ReconcileContext, reconcileExpenseForm } from './reconcile';
 import type { ExpenseFormOptions, ExpenseFormValues } from './types';
 import { InviteeAccountType, YesNoOption } from './types';
 
@@ -446,5 +446,22 @@ describe('reconcileExpenseForm', () => {
     // ...but enabling it again without a change of tax type is left to the submitter
     const second = reconcileExpenseForm(first.state, values({ hasTax: true }), options(), context());
     expect(second.patch).not.toHaveProperty('hasTax');
+  });
+
+  describe('getValueUpdates', () => {
+    it.each([
+      ['nothing for equal values', { a: 1, b: [1] }, { a: 1, b: [1] }, []],
+      ['changed leaves', { a: 1, b: { c: 2, d: 3 } }, { a: 1, b: { c: 2, d: 4 } }, [{ path: 'b.d', value: 4 }]],
+      [
+        'changed array items',
+        { items: [{ x: 1 }, { x: 2 }] },
+        { items: [{ x: 1 }, { x: 3 }] },
+        [{ path: 'items.1.x', value: 3 }],
+      ],
+      ['whole arrays when their length changes', { items: [1] }, { items: [1, 2] }, [{ path: 'items', value: [1, 2] }]],
+      ['added keys', { a: 1 }, { a: 1, b: null }, [{ path: 'b', value: null }]],
+    ])('lists %s', (_, before, after, updates) => {
+      expect(getValueUpdates(before, after)).toEqual(updates);
+    });
   });
 });

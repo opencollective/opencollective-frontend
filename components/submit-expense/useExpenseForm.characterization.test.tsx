@@ -724,6 +724,46 @@ describe('useExpenseForm (characterization)', () => {
       expect(form.current.values.expenseItems[0].amount.currency).toBe('GBP');
     });
 
+    it('keeps changes made while exchange rates are loading', async () => {
+      let releaseRates: () => void;
+      const ratesLoaded = new Promise<void>(resolve => (releaseRates = resolve));
+      const { form } = await setup({
+        values: newExpenseValues({ payoutMethodId: 'pm-bank-usd', expenseTypeOption: ExpenseType.RECEIPT }),
+        exchangeRates: async vars => {
+          await ratesLoaded;
+          return {
+            currencyExchangeRate: vars.exchangeRateRequests.map(r => ({
+              __typename: 'CurrencyExchangeRate',
+              value: 1.1,
+              source: 'OPENCOLLECTIVE',
+              fromCurrency: r.fromCurrency,
+              toCurrency: r.toCurrency,
+              date: new Date(r.date).toISOString(),
+              isApproximate: false,
+            })),
+          };
+        },
+      });
+      await setValues(form, {
+        referenceCurrency: 'USD',
+        expenseItems: [
+          { key: 'a', description: 'a', incurredAt: '2025-03-01', amount: { valueInCents: 100, currency: 'USD' } },
+          { key: 'b', description: 'b', incurredAt: '2025-03-01', amount: { valueInCents: 100, currency: 'EUR' } },
+        ],
+      });
+
+      // A receipt finishes uploading right before the rates load, before React re-renders
+      await act(async () => {
+        form.current.setFieldValue('expenseItems.1.attachment', 'https://e.x/receipt.jpg');
+        releaseRates();
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
+      await settle();
+
+      expect(form.current.values.expenseItems[1].attachment).toBe('https://e.x/receipt.jpg');
+      expect(form.current.values.expenseItems[1].amount.exchangeRate).toEqual(expect.objectContaining({ value: 1.1 }));
+    });
+
     it('fetches and applies exchange rates for items in another currency', async () => {
       const { form, mock } = await setup({ values: newExpenseValues({ payoutMethodId: 'pm-bank-usd' }) });
       await setValues(form, {
@@ -1041,8 +1081,9 @@ describe('useExpenseForm (characterization)', () => {
         startOptions: { expenseId: 555, duplicateExpense: true },
       });
       expect(form.current.values.expenseItems[0]).toEqual(
-        expect.objectContaining({ id: undefined, attachment: null, incurredAt: null, description: 'Item one' }),
+        expect.objectContaining({ attachment: null, incurredAt: null, description: 'Item one' }),
       );
+      expect(form.current.values.expenseItems[0].id).toBeUndefined();
       expect(form.current.values.additionalAttachments).toEqual([]);
       expect(form.current.values.invoiceFile).toBeUndefined();
 
