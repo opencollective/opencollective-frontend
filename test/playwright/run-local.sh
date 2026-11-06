@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
-# Fresh Linux Playwright smoke launcher.
+# Playwright E2E launcher (Linux).
 #
-# One shared local/CI lifecycle with three modes:
+# One shared local/CI lifecycle with these modes:
+#   --iterate        Engineer entry point (`npm run e2e -- <spec> [playwright
+#                    args]`): installs missing dependencies, rebuilds services
+#                    whose build stamp does not match, then joins the running
+#                    E2E environment or starts one and leaves it running.
+#                    `--fresh` restarts it from a restored database,
+#                    `--rebuild <service>` rebuilds and restarts one service,
+#                    `--stop` (`npm run e2e:stop`) stops it.
 #   fresh (default)  Preflight, restore the API dump + migrations into an
 #                    explicitly owned disposable database, start services,
 #                    verify semantic readiness, run the selected test, write a
@@ -25,6 +32,9 @@
 #   test/playwright/run-local.sh --replay test/playwright/.artifacts/<run-id>/replay-manifest.json
 #   test/playwright/run-local.sh --reuse --spec test/playwright/specs/smoke.spec.ts
 #   test/playwright/run-local.sh --cleanup
+#   test/playwright/run-local.sh --iterate test/playwright/specs/smoke.spec.ts -g "switches language"
+#   test/playwright/run-local.sh --iterate --fresh test/playwright/specs/smoke.spec.ts
+#   test/playwright/run-local.sh --iterate --rebuild frontend test/playwright/specs/smoke.spec.ts
 #   PLAYWRIGHT_WORKERS=2 test/playwright/run-local.sh
 #   PLAYWRIGHT_RETRIES=1 test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts
 #
@@ -58,6 +68,11 @@ REPLAY_MANIFEST=""
 REPLAY_REQUESTED=false
 REUSE_REQUESTED=false
 CLEANUP_ONLY=false
+ITERATE_REQUESTED=false
+FRESH_REQUESTED=false
+REBUILD_SERVICES=()
+# Playwright arguments passed through verbatim in iteration (spec, -g, --ui, ...).
+PW_ARGS=()
 
 API_DIR_INPUT="${API_FOLDER:-${API_DIR:-}}"
 IMAGES_DIR_INPUT="${IMAGES_FOLDER:-${IMAGES_DIR:-}}"
@@ -73,7 +88,7 @@ IMAGES_URL="${IMAGES_URL:-http://localhost:3001}"
 PDF_SERVICE_URL="${PDF_SERVICE_URL:-http://localhost:3002}"
 
 usage() {
-  sed -n '2,20p' "$0"
+  sed -n '2,27p' "$0"
   echo ""
   echo "Options:"
   echo "  --spec PATH            Playwright spec (default: $SPEC)"
@@ -86,8 +101,17 @@ usage() {
   echo "                         selection unless overridden, then run as fresh"
   echo "  --reuse                Join the live owned environment for iteration (no reset,"
   echo "                         never tears down services)"
-  echo "  --cleanup              Stop the retained owned environment for --pg-database"
+  echo "  --cleanup, --stop      Stop the retained owned environment for --pg-database"
   echo "                         (refuses while other runs use it)"
+  echo ""
+  echo "Iteration (npm run e2e -- [options] [spec] [playwright args]):"
+  echo "  --iterate              Join the running E2E environment, or start one and leave"
+  echo "                         it running. Other arguments go to Playwright verbatim"
+  echo "                         (spec paths, -g, --headed, --ui, --debug, --workers, ...)."
+  echo "  --fresh                Stop the E2E environment, restore the database, start again"
+  echo "  --rebuild SERVICE      Rebuild and restart one service of the running E2E"
+  echo "                         environment (frontend, api, images or pdf; repeatable)"
+  echo ""
   echo "  --api-dir PATH         Explicit opencollective-api checkout"
   echo "  --frontend-dir PATH    Explicit frontend checkout"
   echo "  --images-dir PATH      Explicit opencollective-images checkout"
@@ -95,6 +119,41 @@ usage() {
   echo "  --pg-database NAME     Disposable database (default: opencollective_pw_e2e)"
   echo "  -h, --help             Show this help"
 }
+
+for arg in "$@"; do
+  if [[ "$arg" == "--iterate" ]]; then ITERATE_REQUESTED=true; fi
+done
+
+if [[ "$ITERATE_REQUESTED" == true ]]; then
+  # Iteration: only launcher options are consumed; everything else (spec paths,
+  # -g, --headed, --ui, --debug, ...) goes to Playwright unchanged.
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --iterate) shift ;;
+      --fresh) FRESH_REQUESTED=true; shift ;;
+      --rebuild)
+        [[ $# -ge 2 ]] || { echo "ERROR: --rebuild needs a service (frontend, api, images or pdf)." >&2; exit 2; }
+        case "$2" in
+          frontend|api|images|pdf) REBUILD_SERVICES+=("$2") ;;
+          *) echo "ERROR: --rebuild takes frontend, api, images or pdf (got '$2')." >&2; exit 2 ;;
+        esac
+        shift 2 ;;
+      --stop|--cleanup) CLEANUP_ONLY=true; shift ;;
+      --api-dir) API_DIR_INPUT="$2"; shift 2 ;;
+      --images-dir) IMAGES_DIR_INPUT="$2"; shift 2 ;;
+      --pdf-dir) PDF_DIR_INPUT="$2"; shift 2 ;;
+      --pg-database) PG_DATABASE_INPUT="$2"; shift 2 ;;
+      --keep-on-failure|--replay|--reuse|--spec|--grep|--frontend-dir)
+        echo "ERROR: $1 is not an iteration option. Pass the spec and Playwright options directly" >&2
+        echo "(npm run e2e -- test/playwright/specs/smoke.spec.ts -g \"title\"), or use run-local.sh without --iterate." >&2
+        exit 2 ;;
+      -h|--help) usage; exit 0 ;;
+      --) shift; PW_ARGS+=("$@"); break ;;
+      *) PW_ARGS+=("$1"); shift ;;
+    esac
+  done
+  set --
+fi
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -114,7 +173,7 @@ while [[ $# -gt 0 ]]; do
       REPLAY_MANIFEST="$2"; REPLAY_REQUESTED=true; shift 2 ;;
     --reuse)
       REUSE_REQUESTED=true; shift ;;
-    --cleanup)
+    --cleanup|--stop)
       CLEANUP_ONLY=true; shift ;;
     --api-dir)
       API_DIR_INPUT="$2"; shift 2 ;;
@@ -140,10 +199,15 @@ if [[ "$REUSE_REQUESTED" == true && "$REPLAY_REQUESTED" == true ]]; then
   echo "ERROR: --reuse and --replay cannot be combined." >&2
   exit 2
 fi
-if [[ "$REPLAY_REQUESTED" == true ]]; then
+if [[ "$ITERATE_REQUESTED" == true ]]; then
+  MODE="iterate"
+elif [[ "$REPLAY_REQUESTED" == true ]]; then
   MODE="replay"
 elif [[ "$REUSE_REQUESTED" == true ]]; then
   MODE="reuse"
+fi
+if [[ "$CLEANUP_ONLY" == true && "$MODE" == "iterate" ]]; then
+  MODE="fresh"
 fi
 if [[ "$CLEANUP_ONLY" == true ]] && [[ "$MODE" != "fresh" ]]; then
   echo "ERROR: --cleanup cannot be combined with --reuse or --replay." >&2
@@ -162,24 +226,38 @@ if ! [[ "$WORKERS" =~ ^[1-9][0-9]*$ ]]; then
   exit 2
 fi
 
-# --- Resolve service checkouts independently of cwd (worktrees, nested CI) ---
-resolve_dir() {
-  local explicit="$1"
-  local nested="$2"
-  local workspace_sibling="$3"
-  if [[ -n "$explicit" && -d "$explicit" ]]; then
-    (cd "$explicit" && pwd)
-    return 0
-  fi
-  if [[ -d "$nested" ]]; then
-    (cd "$nested" && pwd)
-    return 0
-  fi
-  if [[ -d "$workspace_sibling" ]]; then
-    (cd "$workspace_sibling" && pwd)
-    return 0
-  fi
-  return 1
+if [[ "$MODE" == "iterate" ]]; then
+  # Keep a selection summary for the manifest: the first positional argument is
+  # the spec (Playwright runs every spec without one) and -g/--grep the filter.
+  SPEC="test/playwright/specs"
+  GREP=""
+  spec_found=false
+  expects_value=""
+  for arg in ${PW_ARGS[@]+"${PW_ARGS[@]}"}; do
+    if [[ -n "$expects_value" ]]; then
+      [[ "$expects_value" == "grep" ]] && GREP="$arg"
+      expects_value=""
+      continue
+    fi
+    case "$arg" in
+      -g|--grep) expects_value="grep" ;;
+      --grep=*) GREP="${arg#--grep=}" ;;
+      -c|--config|-j|--workers|--retries|--project|--repeat-each|--reporter|--timeout|--max-failures|--shard|--output|--trace|--grep-invert|--ui-host|--ui-port|--global-timeout|--tsconfig)
+        expects_value="other" ;;
+      -*) ;;
+      *) if [[ "$spec_found" != true ]]; then SPEC="$arg"; spec_found=true; fi ;;
+    esac
+  done
+fi
+
+# --- Resolve service checkouts independently of cwd (monorepo, worktrees, CI) ---
+# Order per service: explicit path (variable or flag), then the frontend's
+# parent folder (monorepo layout: ../opencollective-api), then a subfolder of
+# the frontend (CI layout: ./opencollective-api). The helper prints every path
+# it tried and how to fix it when none exists.
+LAUNCHER_CLI="$SCRIPT_DIR/launcher/cli.ts"
+launcher_cli() {
+  node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON "$LAUNCHER_CLI" "$@"
 }
 
 FRONTEND_DIR_RESOLVED="$FRONTEND_DIR_INPUT"
@@ -187,37 +265,47 @@ if [[ ! -d "$FRONTEND_DIR_RESOLVED" ]]; then
   echo "ERROR: frontend checkout not found: $FRONTEND_DIR_RESOLVED" >&2
   exit 2
 fi
+FRONTEND_DIR_RESOLVED="$(cd "$FRONTEND_DIR_RESOLVED" && pwd)"
+if ! command -v node >/dev/null 2>&1; then
+  echo "ERROR: node is required (see .nvmrc / package.json engines)." >&2
+  exit 2
+fi
 
-WORKSPACE_ROOT_CANDIDATE="$(cd "$FRONTEND_DIR_RESOLVED/../.." 2>/dev/null && pwd || echo "")"
-API_NESTED="$FRONTEND_DIR_RESOLVED/opencollective-api"
-IMAGES_NESTED="$FRONTEND_DIR_RESOLVED/opencollective-images"
-PDF_NESTED="$FRONTEND_DIR_RESOLVED/opencollective-pdf"
+resolve_service() {
+  local service="$1" explicit="$2" line
+  line="$(launcher_cli resolve "$service" "$FRONTEND_DIR_RESOLVED" "$explicit")" || exit 2
+  echo "${line%%$'\t'*}"
+}
+API_DIR="$(resolve_service api "$API_DIR_INPUT")" || exit 2
+IMAGES_DIR="$(resolve_service images "$IMAGES_DIR_INPUT")" || exit 2
+PDF_DIR="$(resolve_service pdf "$PDF_DIR_INPUT")" || exit 2
 
-if ! API_DIR="$(resolve_dir "$API_DIR_INPUT" "$API_NESTED" "/workspace/opencollective-api")"; then
-  if [[ -n "$WORKSPACE_ROOT_CANDIDATE" && -d "$WORKSPACE_ROOT_CANDIDATE/opencollective-api" ]]; then
-    API_DIR="$(cd "$WORKSPACE_ROOT_CANDIDATE/opencollective-api" && pwd)"
-  else
-    echo "ERROR: opencollective-api checkout not found." >&2
-    echo "Set --api-dir or API_FOLDER (tried nested CI path, /workspace sibling, worktree parent)." >&2
-    exit 2
-  fi
-fi
-if ! IMAGES_DIR="$(resolve_dir "$IMAGES_DIR_INPUT" "$IMAGES_NESTED" "/workspace/opencollective-images")"; then
-  if [[ -n "$WORKSPACE_ROOT_CANDIDATE" && -d "$WORKSPACE_ROOT_CANDIDATE/opencollective-images" ]]; then
-    IMAGES_DIR="$(cd "$WORKSPACE_ROOT_CANDIDATE/opencollective-images" && pwd)"
-  else
-    echo "ERROR: opencollective-images checkout not found. Set --images-dir or IMAGES_FOLDER." >&2
-    exit 2
-  fi
-fi
-if ! PDF_DIR="$(resolve_dir "$PDF_DIR_INPUT" "$PDF_NESTED" "/workspace/opencollective-pdf")"; then
-  if [[ -n "$WORKSPACE_ROOT_CANDIDATE" && -d "$WORKSPACE_ROOT_CANDIDATE/opencollective-pdf" ]]; then
-    PDF_DIR="$(cd "$WORKSPACE_ROOT_CANDIDATE/opencollective-pdf" && pwd)"
-  else
-    echo "ERROR: opencollective-pdf checkout not found. Set --pdf-dir or PDF_FOLDER." >&2
-    exit 2
-  fi
-fi
+print_checkouts() {
+  local frontend_branch name dir line warning
+  frontend_branch="$(git -C "$FRONTEND_DIR" branch --show-current 2>/dev/null || true)"
+  echo "> Checkouts:"
+  for name in frontend api images pdf; do
+    case "$name" in
+      frontend) dir="$FRONTEND_DIR" ;;
+      api) dir="$API_DIR" ;;
+      images) dir="$IMAGES_DIR" ;;
+      pdf) dir="$PDF_DIR" ;;
+    esac
+    line="$(launcher_cli describe "$dir")"
+    printf '  %-8s %s (branch %s, %s)\n' "$name" "$dir" "${line%%$'\t'*}" "${line#*$'\t'}"
+  done
+  for name in api images pdf; do
+    case "$name" in
+      api) dir="$API_DIR" ;;
+      images) dir="$IMAGES_DIR" ;;
+      pdf) dir="$PDF_DIR" ;;
+    esac
+    warning="$(launcher_cli branch-warning "$name" "$dir" "$frontend_branch")"
+    if [[ -n "$warning" ]]; then
+      echo "> WARNING: $warning"
+    fi
+  done
+}
 
 FRONTEND_DIR="$FRONTEND_DIR_RESOLVED"
 PG_DATABASE="$PG_DATABASE_INPUT"
@@ -371,6 +459,10 @@ write_owner_record() {
     --arg apiDir "$API_DIR" \
     --arg imagesDir "$IMAGES_DIR" \
     --arg pdfDir "$PDF_DIR" \
+    --arg mode "$MODE" \
+    --arg apiRev "$(git_rev "$API_DIR")" \
+    --arg migrationsHash "$(migrations_hash "$API_DIR")" \
+    --arg logsDir "$ARTIFACTS_DIR" \
     '{envName: $envName, ownerRunId: $ownerRunId, ownerPid: $ownerPid,
       createdAt: $createdAt, keepOnFailure: false, phase: $phase,
       pgDatabase: $pgDatabase, pgHost: $pgHost,
@@ -379,7 +471,8 @@ write_owner_record() {
       redisUrl: $redisUrl, redisOwned: $redisOwned, redisPort: $redisPort,
       servicePids: {api: $apiPid, frontend: $frontendPid, images: $imagesPid, pdf: $pdfPid},
       manifest: $manifest,
-      frontendDir: $frontendDir, apiDir: $apiDir, imagesDir: $imagesDir, pdfDir: $pdfDir}' \
+      frontendDir: $frontendDir, apiDir: $apiDir, imagesDir: $imagesDir, pdfDir: $pdfDir,
+      mode: $mode, restoredFrom: {apiRev: $apiRev, migrationsHash: $migrationsHash}, logsDir: $logsDir}' \
     >"$RECORD_FILE.tmp" && mv "$RECORD_FILE.tmp" "$RECORD_FILE"
   echo "> Ownership record: $RECORD_FILE"
 }
@@ -606,14 +699,27 @@ EOF
 }
 
 # --- Preflight (before changing any state) ---
-preflight() {
+redis_ping() {
+  # redis-cli when installed, otherwise a raw RESP PING (only the client is optional).
+  local url="$1" hostport host port
+  if command -v redis-cli >/dev/null 2>&1; then
+    redis-cli -u "$url" ping >/dev/null 2>&1
+    return
+  fi
+  hostport="${url#*://}"
+  hostport="${hostport#*@}"
+  hostport="${hostport%%/*}"
+  host="${hostport%%:*}"
+  port="${hostport##*:}"
+  [[ "$host" != "$port" ]] || port=6379
+  timeout 3 bash -c 'exec 3<>"/dev/tcp/$0/$1" && printf "PING\r\n" >&3 && read -r line <&3 && [[ "$line" == +PONG* ]]' "$host" "$port" 2>/dev/null
+}
+
+preflight_tools() {
   # redis-server is only required when this run may start its own disposable
   # Redis (no REDIS_URL). With REDIS_URL the Redis is supplied infrastructure
   # (e.g. the pinned CI service container) and is never owned or reset here.
-  local tools=(node npm python3 psql pg_restore redis-cli curl jq git)
-  if [[ -z "${REDIS_URL:-}" ]]; then
-    tools+=(redis-server)
-  fi
+  local tools=(node npm python3 psql pg_restore curl jq git)
   local missing=()
   for tool in "${tools[@]}"; do
     command -v "$tool" >/dev/null 2>&1 || missing+=("$tool")
@@ -621,6 +727,13 @@ preflight() {
   if [[ ${#missing[@]} -gt 0 ]]; then
     fail "missing required tools: ${missing[*]}. Install them and retry."
     exit 2
+  fi
+  if [[ -z "${REDIS_URL:-}" ]] && ! command -v redis-server >/dev/null 2>&1; then
+    if ! redis_ping "redis://localhost:${REDIS_PORT:-6380}"; then
+      fail "redis-server is not installed and no Redis answers on port ${REDIS_PORT:-6380}. Install redis-server, or start one:
+  docker run -d --name oc-e2e-redis -p ${REDIS_PORT:-6380}:6379 valkey/valkey:9.1"
+      exit 2
+    fi
   fi
   if ! command -v npx >/dev/null 2>&1; then
     fail "npx is required (comes with npm)."
@@ -639,7 +752,9 @@ preflight() {
       exit 2
     fi
   done
+}
 
+preflight_builds() {
   # Build presence (record inputs in manifest; fail with corrective action).
   if [[ ! -f "$FRONTEND_DIR/.next/BUILD_ID" ]]; then
     fail "frontend is not built ($FRONTEND_DIR/.next/BUILD_ID missing). Run: (cd $FRONTEND_DIR && npm run build)"
@@ -657,6 +772,9 @@ preflight() {
     fail "PDF service is not built ($PDF_DIR/dist/server/index.js missing). Run: (cd $PDF_DIR && npm run build)"
     exit 2
   fi
+}
+
+preflight_browser() {
   if [[ ! -d "$FRONTEND_DIR/node_modules/@playwright/test" ]]; then
     fail "Playwright is not installed. Run: (cd $FRONTEND_DIR && npm ci && npx playwright install chromium)"
     exit 2
@@ -665,9 +783,28 @@ preflight() {
     fail "Playwright Chromium browser is not installed. Run: (cd $FRONTEND_DIR && npm run playwright:install)"
     exit 2
   fi
+}
 
+compose_command() {
+  # Exact command for the API's tracked Compose file of one dependency.
+  echo "docker compose -f $API_DIR/docker-compose/$1.yml up -d"
+}
+
+host_resolves() {
+  # Compose service names only resolve inside the devcontainer network; a slow
+  # resolver outside it must not cost seconds on every run.
+  timeout 2 getent hosts "$1" >/dev/null 2>&1
+}
+
+preflight_infra() {
   # Infrastructure reachability (supplied, not provisioned, except owned Redis below).
-  if getent hosts postgres >/dev/null 2>&1; then
+  if [[ "$MODE" == "iterate" && -f "$RECORD_FILE" ]]; then
+    # Iteration keeps the endpoints the E2E environment was started with.
+    PG_HOST="${PG_HOST:-$(jq -r '.pgHost // empty' "$RECORD_FILE")}"
+    MAILPIT_URL="${MAILPIT_URL:-$(jq -r '.mailpitUrl // empty' "$RECORD_FILE")}"
+    AWS_S3_ENDPOINT="${AWS_S3_ENDPOINT:-$(jq -r '.s3Endpoint // empty' "$RECORD_FILE")}"
+  fi
+  if [[ -z "${PG_HOST:-}" ]] && host_resolves postgres; then
     PG_HOST_DEFAULT="postgres"
   else
     PG_HOST_DEFAULT="localhost"
@@ -675,11 +812,12 @@ preflight() {
   PG_HOST="${PG_HOST:-$PG_HOST_DEFAULT}"
   export PG_HOST
   if ! pg_isready -h "$PG_HOST" >/dev/null 2>&1; then
-    fail "Postgres is not reachable at $PG_HOST. Start Postgres first (devcontainer compose or local service)."
+    fail "Postgres is not reachable at $PG_HOST. Start it with:
+  $(compose_command db)"
     exit 2
   fi
 
-  if getent hosts mailpit >/dev/null 2>&1; then
+  if [[ -z "${MAILPIT_URL:-}" ]] && host_resolves mailpit; then
     MAILPIT_URL_DEFAULT="http://mailpit:8025"
   else
     MAILPIT_URL_DEFAULT="http://localhost:1080"
@@ -687,11 +825,12 @@ preflight() {
   MAILPIT_URL="${MAILPIT_URL:-$MAILPIT_URL_DEFAULT}"
   export MAILPIT_URL
   if ! curl -sf "$MAILPIT_URL/api/v1/messages" >/dev/null 2>&1; then
-    fail "Mailpit is not reachable at $MAILPIT_URL. Start Mailpit first."
+    fail "Mailpit is not reachable at $MAILPIT_URL. Start it with:
+  $(compose_command mail)"
     exit 2
   fi
 
-  if getent hosts minio >/dev/null 2>&1; then
+  if [[ -z "${AWS_S3_ENDPOINT:-}" ]] && host_resolves minio; then
     AWS_S3_ENDPOINT_DEFAULT="http://minio:9000"
   else
     AWS_S3_ENDPOINT_DEFAULT="http://localhost:9000"
@@ -699,20 +838,46 @@ preflight() {
   AWS_S3_ENDPOINT="${AWS_S3_ENDPOINT:-$AWS_S3_ENDPOINT_DEFAULT}"
   export AWS_S3_ENDPOINT
   if ! curl -sf "$AWS_S3_ENDPOINT/health/ready" >/dev/null 2>&1 && ! curl -sf "$AWS_S3_ENDPOINT/minio/health/ready" >/dev/null 2>&1; then
-    fail "object store is not reachable at $AWS_S3_ENDPOINT. Start RustFS/MinIO first, e.g.: docker run --rm -p 9000:9000 -e RUSTFS_ACCESS_KEY=user -e RUSTFS_SECRET_KEY=password rustfs/rustfs:1.0.0-rc.6"
+    fail "object store (RustFS/MinIO) is not reachable at $AWS_S3_ENDPOINT. Start it with:
+  $(compose_command uploads)"
     exit 2
   fi
+}
 
+describe_port_owner() {
+  local owner pid
+  owner="$(launcher_cli port-owner "$1" 2>/dev/null || true)"
+  if [[ -z "$owner" ]]; then
+    echo "an unknown process"
+    return
+  fi
+  pid="${owner%%$'\t'*}"
+  if [[ "$pid" == "?" ]]; then
+    echo "${owner#*$'\t'} (docker ps lists containers publishing it)"
+  else
+    echo "pid $pid: ${owner#*$'\t'}"
+  fi
+}
+
+preflight_ports() {
   for port in 3000 3060 3001 3002; do
     if (echo >/dev/tcp/localhost/$port) >/dev/null 2>&1; then
       if [[ -f "$RECORD_FILE" ]] && registry_record_is_live; then
         live_env_refusal
       else
-        fail "port $port is already in use. Stop other servers first."
+        fail "port $port is already in use by $(describe_port_owner "$port"). Stop it first."
       fi
       exit 2
     fi
   done
+}
+
+preflight() {
+  preflight_tools
+  preflight_builds
+  preflight_browser
+  preflight_infra
+  preflight_ports
 }
 
 # --- Owned Redis (disposable cache, persistence disabled) ---
@@ -720,7 +885,7 @@ REDIS_STARTED_BY_SCRIPT=false
 REDIS_PORT="${REDIS_PORT:-6380}"
 ensure_redis() {
   if [[ -n "${REDIS_URL:-}" ]]; then
-    if ! redis-cli -u "$REDIS_URL" ping >/dev/null 2>&1; then
+    if ! redis_ping "$REDIS_URL"; then
       fail "REDIS_URL is set but unreachable: $REDIS_URL"
       exit 2
     fi
@@ -728,7 +893,7 @@ ensure_redis() {
   fi
   local redis_data_dir="$ARTIFACTS_DIR/redis-e2e"
   mkdir -p "$redis_data_dir"
-  if redis-cli -p "$REDIS_PORT" ping >/dev/null 2>&1; then
+  if redis_ping "redis://localhost:${REDIS_PORT}"; then
     echo "> Using existing Redis on port $REDIS_PORT (not owned; will not shut down)"
     export REDIS_URL="redis://localhost:${REDIS_PORT}"
   else
@@ -798,21 +963,11 @@ setup_db() {
 }
 
 # --- Service startup (CI per-service runtime contract) ---
-start_services() {
+export_runtime_env() {
   export TZ=UTC
   export OC_ENV=ci
   export NODE_ENV=test
   export E2E_TEST=1
-  # Keep launcher credentials outside uploaded evidence. Reuse reads this same
-  # private ownership proof; fresh/replay generate a new ephemeral token.
-  (umask 077; node - "$FIXTURE_OWNER_FILE" "$RUN_ID" "$PG_DATABASE" <<'NODE'
-const fs = require('fs');
-const crypto = require('crypto');
-const [file, ownerRunId, database] = process.argv.slice(2);
-fs.writeFileSync(file, JSON.stringify({ownerRunId, database, token: crypto.randomBytes(32).toString('hex')}), {mode: 0o600});
-fs.chmodSync(file, 0o600);
-NODE
-  )
   export E2E_FIXTURE_OWNER_FILE="$FIXTURE_OWNER_FILE"
   export PLAYWRIGHT_FIXTURE_OWNER_FILE="$FIXTURE_OWNER_FILE"
   export PLAYWRIGHT_RUN_ID="$RUN_ID"
@@ -828,22 +983,65 @@ NODE
   export AWS_S3_FORCE_PATH_STYLE="${AWS_S3_FORCE_PATH_STYLE:-true}"
   export DISABLE_MOCK_UPLOADS="${DISABLE_MOCK_UPLOADS:-1}"
   export GRAPHQL_ERROR_DETAILED="${GRAPHQL_ERROR_DETAILED:-true}"
+}
 
-  echo "> Starting API ($API_DIR)"
-  (cd "$API_DIR" && npm run start:e2e:server) >"$API_LOG" 2>&1 &
-  PIDS+=($!)
+write_fixture_credentials() {
+  # Keep launcher credentials outside uploaded evidence. Reuse reads this same
+  # private ownership proof; fresh/replay generate a new ephemeral token.
+  (umask 077; node - "$FIXTURE_OWNER_FILE" "$RUN_ID" "$PG_DATABASE" <<'NODE'
+const fs = require('fs');
+const crypto = require('crypto');
+const [file, ownerRunId, database] = process.argv.slice(2);
+fs.writeFileSync(file, JSON.stringify({ownerRunId, database, token: crypto.randomBytes(32).toString('hex')}), {mode: 0o600});
+fs.chmodSync(file, 0o600);
+NODE
+  )
+}
 
-  echo "> Starting frontend ($FRONTEND_DIR)"
-  (cd "$FRONTEND_DIR" && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON server/index.ts) >"$FRONTEND_LOG" 2>&1 &
-  PIDS+=($!)
+service_index() {
+  case "$1" in
+    api) echo 0 ;;
+    frontend) echo 1 ;;
+    images) echo 2 ;;
+    pdf) echo 3 ;;
+  esac
+}
 
-  echo "> Starting images ($IMAGES_DIR)"
-  (cd "$IMAGES_DIR" && npm start) >"$IMAGES_LOG" 2>&1 &
-  PIDS+=($!)
+start_service() {
+  # Iteration starts services in their own session so Ctrl-C on a Playwright
+  # run (or closing the terminal) leaves the E2E environment running.
+  local name="$1" log="$2" detach=()
+  if [[ "$MODE" == "iterate" ]]; then
+    detach=(setsid)
+  fi
+  case "$name" in
+    api)
+      echo "> Starting API ($API_DIR)"
+      (cd "$API_DIR" && exec ${detach[@]+"${detach[@]}"} npm run start:e2e:server) >"$log" 2>&1 &
+      ;;
+    frontend)
+      echo "> Starting frontend ($FRONTEND_DIR)"
+      (cd "$FRONTEND_DIR" && exec ${detach[@]+"${detach[@]}"} node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON server/index.ts) >"$log" 2>&1 &
+      ;;
+    images)
+      echo "> Starting images ($IMAGES_DIR)"
+      (cd "$IMAGES_DIR" && exec ${detach[@]+"${detach[@]}"} npm start) >"$log" 2>&1 &
+      ;;
+    pdf)
+      echo "> Starting PDF ($PDF_DIR)"
+      (cd "$PDF_DIR" && PORT=3002 API_URL="$API_URL" exec ${detach[@]+"${detach[@]}"} npm start) >"$log" 2>&1 &
+      ;;
+  esac
+  PIDS[$(service_index "$name")]=$!
+}
 
-  echo "> Starting PDF ($PDF_DIR)"
-  (cd "$PDF_DIR" && PORT=3002 API_URL="$API_URL" npm start) >"$PDF_LOG" 2>&1 &
-  PIDS+=($!)
+start_services() {
+  export_runtime_env
+  write_fixture_credentials
+  start_service api "$API_LOG"
+  start_service frontend "$FRONTEND_LOG"
+  start_service images "$IMAGES_LOG"
+  start_service pdf "$PDF_LOG"
 }
 
 wait_for_service() {
@@ -934,6 +1132,178 @@ migration_head() {
   [[ -n "$entry" ]] && echo "$entry" || echo "unknown"
 }
 
+migrations_hash() {
+  # Content hash of every migration file: iteration refuses to reuse a database
+  # restored before the API's migrations changed.
+  local dir="$1/migrations"
+  [[ -d "$dir" ]] || { echo "unknown"; return 0; }
+  (cd "$dir" && find . -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | awk '{print $1}')
+}
+
+# --- Build stamps (iteration): rebuild only what no longer matches ---
+SERVICES=(frontend api images pdf)
+
+service_dir() {
+  case "$1" in
+    frontend) echo "$FRONTEND_DIR" ;;
+    api) echo "$API_DIR" ;;
+    images) echo "$IMAGES_DIR" ;;
+    pdf) echo "$PDF_DIR" ;;
+  esac
+}
+
+stamp_file() {
+  # Next to each build output, so deleting or replacing the output drops it.
+  case "$1" in
+    frontend) echo "$FRONTEND_DIR/.next/oc-e2e-build-stamp.json" ;;
+    *) echo "$(service_dir "$1")/dist/.oc-e2e-build-stamp.json" ;;
+  esac
+}
+
+build_output_present() {
+  case "$1" in
+    frontend) [[ -f "$FRONTEND_DIR/.next/BUILD_ID" ]] ;;
+    api) [[ -f "$API_DIR/dist/e2e/index.js" || -f "$API_DIR/dist/e2e.js" ]] ;;
+    images) [[ -e "$IMAGES_DIR/dist/server" ]] ;;
+    pdf) [[ -f "$PDF_DIR/dist/server/index.js" ]] ;;
+  esac
+}
+
+build_env() {
+  # Every build-time variable the launcher passes; all of it goes into the stamp.
+  # One frontend configuration matches CI (ci.yml), including DISABLE_MOCK_UPLOADS
+  # which is compiled into the bundle.
+  case "$1" in
+    frontend)
+      echo "TZ=UTC"
+      echo "OC_ENV=ci"
+      echo "NODE_ENV=test"
+      echo "WEBSITE_URL=$WEBSITE_URL"
+      echo "API_URL=$API_URL"
+      echo "PDF_SERVICE_URL=$PDF_SERVICE_URL"
+      echo "API_KEY=${API_KEY:-dvl-1510egmf4a23d80342403fb599qd}"
+      echo "DISABLE_MOCK_UPLOADS=1"
+      echo "PRESERVE_NEXT_CACHE=true"
+      ;;
+    *)
+      echo "OC_ENV=ci"
+      ;;
+  esac
+}
+
+build_script() {
+  if [[ "$1" == "api" && "$(cd "$API_DIR" && npm pkg get scripts.build:e2e)" != "{}" ]]; then
+    echo "build:e2e"
+  else
+    echo "build"
+  fi
+}
+
+declare -A STAMP_JSON=()
+declare -A STALE_REASON=()
+
+compute_stamps() {
+  local svc dir env_pairs reason
+  for svc in "${SERVICES[@]}"; do
+    dir="$(service_dir "$svc")"
+    mapfile -t env_pairs < <(build_env "$svc")
+    STAMP_JSON[$svc]="$(launcher_cli stamp-compute "$dir" "${env_pairs[@]}")"
+    reason="$(launcher_cli stamp-check "$dir" "$(stamp_file "$svc")" "${STAMP_JSON[$svc]}")"
+    if ! build_output_present "$svc"; then
+      reason="build output missing"
+    fi
+    STALE_REASON[$svc]="$reason"
+  done
+}
+
+build_service() {
+  # Runs in the background next to other builds; output goes to a log.
+  local svc="$1" dir env_pairs script log
+  dir="$(service_dir "$svc")"
+  mapfile -t env_pairs < <(build_env "$svc")
+  script="$(build_script "$svc")"
+  log="$ARTIFACTS_DIR/build-$svc.log"
+  (cd "$dir" && env "${env_pairs[@]}" npm run "$script") >"$log" 2>&1 || return 1
+  if [[ "$svc" == "frontend" ]]; then
+    launcher_cli stamp-save "$(stamp_file "$svc")" "${STAMP_JSON[$svc]}" "$FRONTEND_DIR/.next/BUILD_ID"
+  else
+    launcher_cli stamp-save "$(stamp_file "$svc")" "${STAMP_JSON[$svc]}"
+  fi
+}
+
+build_services() {
+  # Production builds through each service's normal build script, in parallel.
+  local svc owner start pids=() names=() failed=() i
+  for svc in "$@"; do
+    if [[ "$svc" == "frontend" ]]; then
+      owner="$(launcher_cli frontend-owner "$FRONTEND_DIR/.next/BUILD_ID" "$(stamp_file frontend)")"
+      if [[ "$owner" == "other" ]]; then
+        echo "> NOTE: $FRONTEND_DIR/.next holds a build made outside the launcher (for example"
+        echo "  your own npm run build). It is replaced by the E2E build now; npm run dev"
+        echo "  (.next/dev) is unaffected."
+      fi
+    fi
+    echo "> Building $svc with npm run $(build_script "$svc") (${STALE_REASON[$svc]:-requested}); log: $ARTIFACTS_DIR/build-$svc.log"
+    build_service "$svc" &
+    pids+=($!)
+    names+=("$svc")
+  done
+  start=$(date +%s)
+  for i in "${!pids[@]}"; do
+    if ! wait "${pids[$i]}"; then
+      failed+=("${names[$i]}")
+      echo "ERROR: ${names[$i]} build failed. Last lines of $ARTIFACTS_DIR/build-${names[$i]}.log:" >&2
+      tail -n 30 "$ARTIFACTS_DIR/build-${names[$i]}.log" >&2 || true
+    fi
+  done
+  if [[ ${#failed[@]} -gt 0 ]]; then
+    fail "build failed: ${failed[*]}"
+    exit 1
+  fi
+  echo "> Built ${names[*]} in $(( $(date +%s) - start ))s"
+  for svc in "${names[@]}"; do
+    STALE_REASON[$svc]=""
+    if [[ "$svc" == "frontend" ]]; then
+      echo "> NOTE: .next now holds the E2E build. A later npm run build replaces it with a"
+      echo "  production build, and the next npm run e2e rebuilds the E2E one."
+    fi
+  done
+}
+
+ensure_dependencies() {
+  local svc dir reason
+  for svc in "${SERVICES[@]}"; do
+    dir="$(service_dir "$svc")"
+    reason="$(launcher_cli install-reason "$dir")"
+    [[ -n "$reason" ]] || continue
+    echo "> Installing $svc dependencies with npm ci ($reason); log: $ARTIFACTS_DIR/install-$svc.log"
+    # The API postinstall restores the development database; E2E has its own.
+    if ! (cd "$dir" && SKIP_POSTINSTALL=1 npm ci --no-audit --no-fund) >"$ARTIFACTS_DIR/install-$svc.log" 2>&1; then
+      tail -n 30 "$ARTIFACTS_DIR/install-$svc.log" >&2 || true
+      fail "npm ci failed in $dir"
+      exit 1
+    fi
+    launcher_cli install-record "$dir"
+  done
+  if [[ -z "$(ls -d ~/.cache/ms-playwright/chromium-* 2>/dev/null)" ]]; then
+    echo "> Installing the Playwright Chromium browser"
+    (cd "$FRONTEND_DIR" && npx playwright install chromium) || { fail "playwright install chromium failed"; exit 1; }
+  fi
+}
+
+build_stamps_json() {
+  local svc file out='{}'
+  for svc in "${SERVICES[@]}"; do
+    file="$(stamp_file "$svc" 2>/dev/null)"
+    if [[ -n "$file" && -f "$file" ]] && jq empty "$file" 2>/dev/null; then
+      out="$(jq -c --arg k "$svc" --slurpfile s "$file" '.[$k] = $s[0]' <<<"$out")"
+    else
+      out="$(jq -c --arg k "$svc" '.[$k] = null' <<<"$out")"
+    fi
+  done
+  echo "$out"
+}
+
 MANIFEST_WRITTEN=false
 
 write_manifest() {
@@ -998,7 +1368,9 @@ write_manifest() {
   "apiDir": "$API_DIR",
   "imagesDir": "$IMAGES_DIR",
   "pdfDir": "$PDF_DIR",
-  "artifactsDir": "$ARTIFACTS_DIR"
+  "artifactsDir": "$ARTIFACTS_DIR",
+  "playwrightArgs": $(jq -cn '$ARGS.positional' --args -- ${PW_ARGS[@]+"${PW_ARGS[@]}"}),
+  "buildStamps": $(build_stamps_json)
 }
 EOF
   echo "> Replay manifest: $MANIFEST"
@@ -1008,6 +1380,10 @@ EOF
 main() {
   if [[ "$CLEANUP_ONLY" == true ]]; then
     run_cleanup
+    exit $?
+  fi
+  if [[ "$MODE" == "iterate" ]]; then
+    iterate_main
     exit $?
   fi
   if [[ "$MODE" == "reuse" ]]; then
@@ -1053,6 +1429,13 @@ redact_artifacts() {
 }
 
 run_playwright() {
+  if [[ "$MODE" == "iterate" ]]; then
+    # Iteration passes the engineer's arguments verbatim; workers and retries
+    # come from playwright.config.ts (PLAYWRIGHT_WORKERS / PLAYWRIGHT_RETRIES).
+    echo "> Running: npx playwright test ${PW_ARGS[*]+${PW_ARGS[*]}}"
+    (cd "$FRONTEND_DIR" && npx playwright test ${PW_ARGS[@]+"${PW_ARGS[@]}"})
+    return
+  fi
   echo "> Running Playwright: $SPEC (workers=$WORKERS retries=$RETRIES)"
   local args=("$SPEC")
   if [[ -n "$GREP" ]]; then
@@ -1070,6 +1453,7 @@ fresh_main() {
   trap 'INTERRUPTED=true; exit 130' INT
   trap 'INTERRUPTED=true; exit 143' TERM
   PHASE="preflight"
+  print_checkouts
   preflight
   if [[ -n "$REPLAY_MANIFEST" ]]; then
     apply_replay_manifest "$REPLAY_MANIFEST"
@@ -1161,6 +1545,7 @@ reuse_main() {
   trap 'INTERRUPTED=true; exit 130' INT
   trap 'INTERRUPTED=true; exit 143' TERM
   PHASE="preflight"
+  print_checkouts
   local missing=()
   for tool in node npx python3 curl jq; do
     command -v "$tool" >/dev/null 2>&1 || missing+=("$tool")
@@ -1224,6 +1609,238 @@ reuse_main() {
   else
     write_manifest "$pw_exit" "failed"
   fi
+  exit "$pw_exit"
+}
+
+# --- Iteration (npm run e2e): join or start an E2E environment and leave it running ---
+service_url() {
+  case "$1" in
+    api) echo "$API_URL/status" ;;
+    frontend) echo "$WEBSITE_URL" ;;
+    images) echo "$IMAGES_URL" ;;
+    pdf) echo "$PDF_SERVICE_URL" ;;
+  esac
+}
+
+service_port() {
+  case "$1" in
+    api) echo 3060 ;;
+    frontend) echo 3000 ;;
+    images) echo 3001 ;;
+    pdf) echo 3002 ;;
+  esac
+}
+
+restart_service() {
+  # Stop one service of the running E2E environment and start its new build.
+  local svc="$1" pid cmd waited=0 port
+  pid="$(jq -r --arg s "$svc" '.servicePids[$s] // 0' "$RECORD_FILE")"
+  if [[ "$pid" != "0" ]] && kill -0 "$pid" 2>/dev/null; then
+    cmd="$(tr '\0' ' ' <"/proc/$pid/cmdline" 2>/dev/null || true)"
+    if [[ "$cmd" == *node* || "$cmd" == *npm* ]]; then
+      echo "> Stopping $svc (pid $pid)"
+      kill_tree "$pid"
+    fi
+  fi
+  port="$(service_port "$svc")"
+  while (echo >/dev/tcp/localhost/"$port") >/dev/null 2>&1; do
+    if [[ $waited -ge 30 ]]; then
+      fail "port $port is still held by $(describe_port_owner "$port") after stopping $svc."
+      exit 1
+    fi
+    sleep 1
+    waited=$((waited + 1))
+  done
+  start_service "$svc" "$ARTIFACTS_DIR/$svc.log"
+  jq --arg s "$svc" --argjson p "${PIDS[$(service_index "$svc")]}" '.servicePids[$s] = $p' "$RECORD_FILE" >"$RECORD_FILE.tmp" &&
+    mv "$RECORD_FILE.tmp" "$RECORD_FILE"
+  wait_for_service "$svc" "$(service_url "$svc")" || exit 1
+}
+
+check_database_identity() {
+  # The restored database belongs to one API revision and migration set.
+  local recorded_rev recorded_migrations current_rev current_migrations
+  recorded_rev="$(jq -r '.restoredFrom.apiRev // empty' "$RECORD_FILE")"
+  recorded_migrations="$(jq -r '.restoredFrom.migrationsHash // empty' "$RECORD_FILE")"
+  if [[ -z "$recorded_rev" ]]; then
+    echo "> NOTE: this E2E environment does not record which API revision restored its database."
+    return 0
+  fi
+  current_rev="$(git_rev "$API_DIR")"
+  current_migrations="$(migrations_hash "$API_DIR")"
+  local changes=()
+  if [[ "$recorded_rev" != "$current_rev" ]]; then
+    changes+=("API revision ${recorded_rev:0:12} -> ${current_rev:0:12}")
+  fi
+  if [[ "$recorded_migrations" != "$current_migrations" ]]; then
+    changes+=("API migrations changed")
+  fi
+  if [[ ${#changes[@]} -gt 0 ]]; then
+    fail "the E2E environment's database was restored for another API ($(IFS=';'; echo "${changes[*]}" | sed 's/;/; /g')).
+  Iteration cannot reuse it. Restart from a restored database with: npm run e2e -- --fresh <spec>"
+    exit 2
+  fi
+}
+
+init_s3_bucket() {
+  # Upload journeys need the opencollective-e2e bucket; the API script only adds missing buckets.
+  if ! (cd "$API_DIR" && npx babel-node --extensions .js,.ts scripts/dev/init-local-s3.ts) >>"$ARTIFACTS_DIR/s3-init.log" 2>&1; then
+    echo "> WARNING: could not create the $AWS_S3_BUCKET bucket (see $ARTIFACTS_DIR/s3-init.log); upload journeys may fail."
+  fi
+}
+
+print_stale_services() {
+  local svc stale=()
+  for svc in "${SERVICES[@]}"; do
+    if [[ -n "${STALE_REASON[$svc]}" ]]; then
+      stale+=("$svc")
+      echo "> WARNING: the running $svc is stale (${STALE_REASON[$svc]})."
+    fi
+  done
+  if [[ ${#stale[@]} -gt 0 ]]; then
+    echo "  This run uses the running services as they are. To rebuild and restart one:"
+    for svc in "${stale[@]}"; do
+      echo "    npm run e2e -- --rebuild $svc ${PW_ARGS[*]+${PW_ARGS[*]}}"
+    done
+    if [[ " ${stale[*]} " == *" frontend "* ]]; then
+      echo "  A frontend rebuild is a full Next.js production build (a few minutes)."
+    fi
+  fi
+}
+
+join_environment() {
+  local owner api svc
+  owner="$(jq -r '.ownerRunId // empty' "$RECORD_FILE" 2>/dev/null)"
+  api="$(record_api_url)"
+  OWNER_RUN_ID="$owner"
+  WEBSITE_URL="$(jq -r '.websiteUrl // empty' "$RECORD_FILE")"
+  API_URL="$api"
+  MAILPIT_URL="$(jq -r '.mailpitUrl // empty' "$RECORD_FILE")"
+  if [[ ! -r "$FIXTURE_OWNER_FILE" ]]; then
+    fail "fixture ownership proof missing for the running E2E environment. Restart it with: npm run e2e -- --fresh <spec>"
+    exit 2
+  fi
+  check_database_identity
+  if [[ ${#REBUILD_SERVICES[@]} -gt 0 ]]; then
+    local joiners owner_pid
+    joiners="$(live_joiner_ids)"
+    owner_pid="$(record_owner_pid)"
+    if [[ -n "$joiners" ]] || { [[ "$owner_pid" != "0" && "$owner_pid" != "$$" ]] && kill -0 "$owner_pid" 2>/dev/null; }; then
+      fail "other runs are using the E2E environment; --rebuild would restart services underneath them. Retry when they finish."
+      exit 2
+    fi
+    export_runtime_env
+    build_services "${REBUILD_SERVICES[@]}"
+    for svc in "${REBUILD_SERVICES[@]}"; do
+      restart_service "$svc"
+    done
+  fi
+  print_stale_services
+  export WEBSITE_URL API_URL MAILPIT_URL
+  export PLAYWRIGHT_FIXTURE_OWNER_FILE="$FIXTURE_OWNER_FILE"
+  export PLAYWRIGHT_RUN_ID="$RUN_ID"
+  register_joiner
+  JOINED=true
+  echo "> Iteration: joined the running E2E environment '$PG_DATABASE' (owner $owner). Database, cache,"
+  echo "  mail and files keep the state of earlier runs; use --fresh to start from a restored database."
+}
+
+start_environment() {
+  local svc stale=()
+  preflight_ports
+  for svc in "${SERVICES[@]}"; do
+    if [[ -n "${STALE_REASON[$svc]}" ]]; then
+      stale+=("$svc")
+    fi
+  done
+  for svc in ${REBUILD_SERVICES[@]+"${REBUILD_SERVICES[@]}"}; do
+    [[ " ${stale[*]-} " == *" $svc "* ]] || stale+=("$svc")
+  done
+  if [[ ${#stale[@]} -gt 0 ]]; then
+    build_services "${stale[@]}"
+  else
+    echo "> Builds match their stamps; nothing to build."
+  fi
+  PHASE="restore"
+  write_owner_record "restoring"
+  ensure_redis
+  setup_db
+  export_runtime_env
+  init_s3_bucket
+  PHASE="services"
+  start_services
+  write_owner_record "services"
+  PHASE="readiness"
+  if ! semantic_readiness; then
+    write_manifest 1 "setup-failed"
+    echo "> Setup failed; the E2E environment was stopped. Service logs: $ARTIFACTS_DIR" | sanitize
+    exit 1
+  fi
+  update_record_phase "ready"
+  # From here the E2E environment outlives this run (Ctrl-C included).
+  DETACH=true
+  echo "> E2E environment '$PG_DATABASE' is ready and stays running (stop it with npm run e2e:stop)."
+}
+
+iterate_main() {
+  trap on_exit EXIT
+  trap 'INTERRUPTED=true; exit 130' INT
+  trap 'INTERRUPTED=true; exit 143' TERM
+  local started
+  started=$(date +%s)
+  PHASE="preflight"
+  print_checkouts
+  preflight_tools
+  preflight_infra
+  ensure_dependencies
+  preflight_browser
+
+  if [[ "$FRESH_REQUESTED" == true && -f "$RECORD_FILE" ]]; then
+    echo "> --fresh: stopping the E2E environment '$PG_DATABASE'"
+    run_cleanup
+  fi
+
+  compute_stamps
+  if [[ -f "$RECORD_FILE" ]] && registry_record_is_live; then
+    DETACH=true
+    join_environment
+  else
+    if [[ -f "$RECORD_FILE" ]]; then
+      local owner_pid
+      owner_pid="$(record_owner_pid)"
+      if [[ "$owner_pid" != "0" ]] && kill -0 "$owner_pid" 2>/dev/null; then
+        fail "another run (pid $owner_pid) is starting the E2E environment '$PG_DATABASE' (phase $(jq -r '.phase // "unknown"' "$RECORD_FILE")). Retry when it is ready."
+        exit 2
+      fi
+      echo "> Removing the record of an E2E environment that is no longer running."
+      run_cleanup
+    fi
+    start_environment
+  fi
+
+  update_record_phase "testing"
+  echo "> Reached Playwright after $(( $(date +%s) - started ))s"
+  PHASE="test"
+  local pw_exit=0
+  set +e
+  run_playwright
+  pw_exit=$?
+  set -e
+  if ! redact_artifacts; then
+    [[ $pw_exit -ne 0 ]] || pw_exit=1
+  fi
+  PHASE="done"
+  update_record_phase "ready"
+  if [[ "${JOINED:-false}" == true ]]; then
+    deregister_joiner
+    JOINED=false
+  fi
+  if [[ $pw_exit -eq 0 ]]; then
+    write_manifest "$pw_exit" "passed"
+  else
+    write_manifest "$pw_exit" "failed"
+  fi
+  echo "> The E2E environment keeps running for the next npm run e2e. Stop it with: npm run e2e:stop"
   exit "$pw_exit"
 }
 

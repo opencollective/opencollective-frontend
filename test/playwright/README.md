@@ -1,45 +1,50 @@
-# Playwright E2E (fresh Linux smoke)
+# Playwright E2E
 
 Pilot runner for independent, reproducible E2E tests. The shared launcher owns
-a fresh disposable environment; Playwright only runs browser journeys.
+the E2E environment; Playwright only runs browser journeys.
 
 Canonical guide: [`docs/e2e.md`](../../docs/e2e.md). This file holds
 runner-specific details.
 
-## One-time setup
-
-Build all services (repeat after relevant code changes):
+## Run a spec
 
 ```bash
-cd /workspace/opencollective-api && npm run build:e2e
-cd /workspace/opencollective-frontend && npm run build
-cd /workspace/opencollective-images && npm run build
-cd /workspace/opencollective-pdf && npm run build
+npm run e2e -- test/playwright/specs/smoke.spec.ts            # install, build, start, run; leaves the E2E environment running
+npm run e2e -- test/playwright/specs/smoke.spec.ts -g "title" # iteration: joins the running E2E environment
+npm run e2e -- --rebuild frontend test/playwright/specs/smoke.spec.ts
+npm run e2e -- --fresh test/playwright/specs/smoke.spec.ts    # restore the database and restart
+npm run e2e:stop
 ```
 
-Install the pinned browser once per machine:
+Every option, service path rule, build stamp and preflight message is described
+in [Run a spec](../../docs/e2e.md#run-a-spec) and
+[Tweaking the behavior](../../docs/e2e.md#tweaking-the-behavior). Specs that
+use fixtures only work through the launcher, because the fixture endpoint
+exists only in an E2E environment it owns.
 
-```bash
-cd /workspace/opencollective-frontend && npm run playwright:install
-```
+Python 3 must be available for credential redaction. Infrastructure (Postgres,
+Mailpit, S3-compatible store) must already be running; the launcher prints the
+`docker compose` command for whatever is missing. Non-Stripe runs need no
+Stripe credentials.
 
-Python 3 must be available for credential redaction. Infrastructure (Postgres, Mailpit, S3-compatible store) must already be running.
-The launcher starts its own disposable Redis on port `6380` and validates the
-rest. Non-Stripe smoke runs need no Stripe credentials.
+## Fresh runs (CI contract)
 
-## Running the smoke
+`run-local.sh` without `--iterate` is the fresh run CI uses. It does not install
+or build: build every service first (`npm run build`, `npm run build:e2e` in
+the API, from each checkout) and install the browser once with
+`npm run playwright:install`.
+
+### Fresh run commands
 
 Stop other servers on ports 3000, 3060, 3001, 3002 first.
 
 ```bash
-cd /workspace/opencollective-frontend
-
 # Fresh disposable database (default opencollective_pw_e2e), semantic readiness, smoke
 ./test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts
 
 # Title filter / workers / explicit checkouts (worktrees and nested CI layouts supported)
 ./test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts --grep "switches language" --workers 1
-./test/playwright/run-local.sh --api-dir /workspace/opencollective-api --frontend-dir "$(pwd)"
+./test/playwright/run-local.sh --api-dir ../opencollective-api --frontend-dir "$(pwd)"
 
 # Keep owned processes on failure for inspection (prints cleanup command)
 ./test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts --keep-on-failure
@@ -81,9 +86,9 @@ Run-specific directory per execution (no shared overwrite):
 - `test/playwright/.artifacts/<run-id>/test-results/` — traces/screenshots/
   videos retained on failure (original attempt kept across retries).
 
-`test/playwright/report/` and `test/playwright/test-results/` are only the
-local defaults when running `npx playwright test` directly without the
-launcher (which exports run-specific overrides).
+Run specs through `npm run e2e` rather than `npx playwright test`: the
+launcher exports these run-specific report paths, and without it specs that
+use fixtures fail ("Fixtures require an owned stack").
 
 ## CI (pilot, observational)
 

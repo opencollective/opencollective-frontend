@@ -5,11 +5,154 @@ This is the canonical reproduction guide. Runner READMEs link here:
 - Playwright (pilot, Chromium): [`test/playwright/README.md`](../test/playwright/README.md)
 - Cypress (existing suite): [`test/cypress/README.md`](../test/cypress/README.md)
 
+## Run a spec
+
+From the frontend, with the API, images and PDF services checked out next to it
+(the [monorepo](https://github.com/opencollective/monorepo) layout):
+
+```bash
+npm run e2e -- test/playwright/specs/smoke.spec.ts
+```
+
+The first run installs missing dependencies (`npm ci`), builds every service,
+restores a disposable database, starts an **E2E environment** (API, frontend,
+images and PDF on ports 3060, 3000, 3001 and 3002) and runs the spec. It takes
+several minutes, mostly the Next.js build.
+
+The E2E environment then **stays running**. Every later `npm run e2e` joins it,
+which is **iteration**: with no changes, Playwright starts within seconds.
+
+```bash
+npm run e2e -- test/playwright/specs/smoke.spec.ts -g "switches language"
+npm run e2e -- test/playwright/specs/expenses --headed
+npm run e2e -- test/playwright/specs/smoke.spec.ts --ui
+npm run e2e -- test/playwright/specs/smoke.spec.ts --debug
+```
+
+Everything after `--` goes to `npx playwright test` unchanged, except the
+launcher options listed below. Editing a spec never needs a rebuild. After you
+change application code, the run warns that a service is stale and prints the
+command that rebuilds and restarts it:
+
+```bash
+npm run e2e -- --rebuild frontend test/playwright/specs/smoke.spec.ts
+```
+
+Iteration shares state: the database, cache, mail and files keep what earlier
+runs created. Journeys are written to tolerate that (see
+[Authoring independent Playwright fixtures](#authoring-independent-playwright-fixtures)).
+Start over from a restored database with `--fresh`, and stop the E2E
+environment when you are done:
+
+```bash
+npm run e2e -- --fresh test/playwright/specs/smoke.spec.ts
+npm run e2e:stop
+```
+
+`npm run test:playwright` and `npm run playwright:test` are aliases of
+`npm run e2e`. `npm run test:e2e` still runs Cypress.
+
+Postgres, Mailpit and an S3-compatible store (RustFS or MinIO) must already be
+running. When one is missing, the run prints the `docker compose` command that
+starts it.
+
+## Tweaking the behavior
+
+### Launcher options
+
+| Option                                   | Effect                                                                                                                     |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `--fresh`                                | Stop the E2E environment, restore the database and start it again (still left running).                                    |
+| `--rebuild <service>`                    | Rebuild one service (`frontend`, `api`, `images` or `pdf`) and restart only that service. Repeatable.                      |
+| `--stop`                                 | Stop the E2E environment (`npm run e2e:stop`). Refuses while another run uses it.                                          |
+| `--api-dir`, `--images-dir`, `--pdf-dir` | Explicit service checkout (same as the variables below).                                                                   |
+| `--pg-database <name>`                   | Disposable database, `opencollective_pw_e2e` (default) or `opencollective_pw_e2e_<suffix>`.                                |
+| anything else                            | Passed to `npx playwright test`: spec paths, `-g`, `--headed`, `--ui`, `--debug`, `--workers`, `--retries`, `--project`... |
+
+### Environment variables
+
+| Variable                                                  | Effect                                                                                              |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `API_FOLDER`, `IMAGES_FOLDER`, `PDF_FOLDER`               | Explicit service checkouts. `API_DIR`, `IMAGES_DIR`, `PDF_DIR` are accepted too.                    |
+| `PLAYWRIGHT_WORKERS`, `PLAYWRIGHT_RETRIES`                | Defaults for `--workers` (1) and `--retries` (0, at most 1).                                        |
+| `PG_HOST`, `MAILPIT_URL`, `AWS_S3_ENDPOINT`               | Infrastructure endpoints. Defaults: Compose service names when they resolve, otherwise `localhost`. |
+| `REDIS_URL`                                               | Use this Redis instead of starting a disposable one on `REDIS_PORT` (default 6380).                 |
+| `READY_TIMEOUT`                                           | Seconds each service may take to become ready (default 300).                                        |
+| `WEBSITE_URL`, `API_URL`, `IMAGES_URL`, `PDF_SERVICE_URL` | Service URLs. The ports are fixed at 3000, 3060, 3001 and 3002.                                     |
+
+### Service paths
+
+Each service checkout is resolved in this order:
+
+1. `API_FOLDER` / `--api-dir` (and the images and PDF equivalents), when set.
+   A path that does not exist is an error.
+2. The frontend's parent folder: `../opencollective-api`, `../opencollective-images`,
+   `../opencollective-pdf` (the monorepo layout, and matching worktrees).
+3. A subfolder of the frontend: `./opencollective-api`, ... (the CI layout).
+
+Every run prints the resolved path, branch and revision of each checkout. It
+warns when a service has a branch named like the frontend's but another one is
+checked out; it never switches branches. When nothing is found, the error lists
+every path tried. In a frontend-only Git worktree it also prints the
+`git worktree add` command that creates the matching service worktree next to
+it, for example `.worktrees/<feature>/opencollective-api` beside
+`.worktrees/<feature>/opencollective-frontend`.
+
+### Dependencies and builds
+
+- **Dependencies:** `npm ci` runs in a service whose `node_modules` is missing
+  or whose `package-lock.json` changed since the last install.
+- **Build stamps:** after each successful build, the launcher writes a build
+  stamp next to the build output (`.next/oc-e2e-build-stamp.json`,
+  `dist/.oc-e2e-build-stamp.json`). It records the Git HEAD, a hash of
+  uncommitted changes (`git diff HEAD` plus untracked, non-ignored files), the
+  lockfile hash and every build-time variable the launcher passes. Changes
+  under `test/` and `docs/`, and Markdown files, are left out, so editing a
+  spec never asks for a rebuild. The stamps are copied into every replay
+  manifest (`buildStamps`).
+- **Rebuilds:** a missing or mismatched stamp triggers a rebuild through the
+  service's normal build script (`npm run build`, `npm run build:e2e` for the
+  API). Builds run in parallel, log to `test/playwright/.artifacts/<run-id>/build-<service>.log`,
+  and stay production builds: there is no hot-reload mode.
+- **One frontend build:** the frontend is built once, in the CI configuration
+  (`TZ=UTC OC_ENV=ci NODE_ENV=test DISABLE_MOCK_UPLOADS=1`, local service URLs),
+  in the normal `.next`. When that replaces your own production build, or your
+  `npm run build` replaced the E2E one, the run says so before rebuilding.
+  `npm run dev` uses `.next/dev` and is unaffected.
+- **Stale services during iteration:** each run recomputes the stamps. When
+  they match, nothing is built. When a running service is stale, the run warns,
+  keeps using it, and prints the `--rebuild <service>` command. A frontend
+  rebuild is a full Next.js build of a few minutes; API, images and PDF
+  rebuilds take well under a minute.
+- **Database:** iteration refuses, and points to `--fresh`, when the API
+  revision or its migrations changed since the database was restored.
+
+### Preflight
+
+Before changing anything, the run checks the tools it needs, the
+infrastructure and the fixed ports. A missing Postgres, Mailpit or object store
+prints the exact command, for example
+`docker compose -f ../opencollective-api/docker-compose/db.yml up -d`
+(`mail.yml`, `uploads.yml`). A busy port names the process holding it. Without
+`redis-server`, the run suggests starting Redis in Docker on port 6380. When
+it starts an E2E environment, the launcher also creates the
+`opencollective-e2e` bucket if it is missing.
+
+### Fresh runs and replay
+
+`test/playwright/run-local.sh` without `--iterate` keeps the fresh-run
+contract that CI uses: it checks that every service is already built, restores
+the database, starts the services, runs the spec and stops everything it
+started. Replay (`--replay <manifest>`) always runs fresh. Both are described
+below.
+
 ## Playwright fresh reproduction (Linux pilot)
 
 One shared launcher provisions a fresh disposable Linux environment and runs a
 selected Chromium journey through the real frontend, API, database, images and
-PDF services. Local runs and CI use the same contract.
+PDF services. CI uses this fresh run; for day-to-day work, prefer
+[`npm run e2e`](#run-a-spec), which builds what it needs and keeps the E2E
+environment running between runs.
 
 Prerequisites (one-time): Python 3, built frontend/API/images/PDF (`npm run build` in
 each repo, `npm run build:e2e` in the API), `npx playwright install chromium`, and running Postgres, Mailpit,

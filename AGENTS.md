@@ -23,8 +23,9 @@ Schema/codegen: `npm run graphql:update` (API must be running).
 
 ## Playwright E2E (pilot)
 
-Fresh Linux reproduction: `./test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts`.
-Uses disposable `opencollective_pw_e2e` by default; explicit service paths via `--api-dir/--frontend-dir/--images-dir/--pdf-dir` for worktrees.
+Run a spec: `npm run e2e -- <spec> [playwright args]` installs, builds what changed (build stamps), and joins or starts an E2E environment that stays running; `--fresh`, `--rebuild <service>`, `npm run e2e:stop`. Guide: [`docs/e2e.md`](docs/e2e.md#run-a-spec).
+Services resolve from `API_FOLDER`/`--api-dir` (and images/PDF), then `../opencollective-*`, then `./opencollective-*`; in a worktree, create matching service worktrees under the same `.worktrees/<feature>/`.
+Fresh run (CI contract, no install or build): `./test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts`, disposable `opencollective_pw_e2e` by default.
 Evidence: `test/playwright/.artifacts/<run-id>/replay-manifest.json` plus owned service logs.
 Replay: `--replay <manifest>` (validates inputs, runs fresh). Iteration: `--reuse` (joins live env, no reset). Cleanup: `--cleanup` (refuses while active users remain).
 Mutable journeys: `test/playwright/fixtures` (`test`, `scenarioTest`) with API recipes; pilot specs in `test/playwright/specs/**`. Upload journeys need a frontend built with `DISABLE_MOCK_UPLOADS=1` (`docs/e2e.md`).
