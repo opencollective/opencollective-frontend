@@ -160,6 +160,16 @@ describe('reconcileExpenseForm', () => {
       }
     });
 
+    it('does not select an account nor a payee when editing inline', () => {
+      const { patch } = firstRun(
+        { accountSlug: undefined, payeeSlug: undefined },
+        { recentlySubmittedExpenses, payoutProfiles },
+        { startOptions: { isInlineEdit: true } },
+      );
+      expect(patch).not.toHaveProperty('accountSlug');
+      expect(patch).not.toHaveProperty('payeeSlug');
+    });
+
     it('selects the personal profile without recent expenses', () => {
       expect(firstRun({ payeeSlug: undefined }, { payoutProfiles }).patch.payeeSlug).toBe('jane');
     });

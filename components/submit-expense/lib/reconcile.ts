@@ -268,8 +268,9 @@ const defaultAccount: Rule = {
     context.accountChosen,
   ],
   run: ({ values, options, context }) => {
+    // Inline edits load the account of the expense
     const lastSubmittedAccount = getLastSubmittedAccount(options);
-    if (lastSubmittedAccount && !values.accountSlug && !context.accountChosen) {
+    if (lastSubmittedAccount && !values.accountSlug && !context.accountChosen && !context.startOptions.isInlineEdit) {
       return { values: { ...values, accountSlug: lastSubmittedAccount.slug } };
     }
   },
@@ -278,8 +279,9 @@ const defaultAccount: Rule = {
 const defaultPayee: Rule = {
   name: 'defaultPayee',
   dependencies: ({ values, options }) => [options.payoutProfiles, options.recentlySubmittedExpenses, values.payeeSlug],
-  run: ({ values, options }) => {
-    if (values.payeeSlug) {
+  run: ({ values, options, context }) => {
+    // Inline edits load the payee of the expense
+    if (values.payeeSlug || context.startOptions.isInlineEdit) {
       return;
     }
 
