@@ -790,9 +790,21 @@ compose_command() {
   echo "docker compose -f $API_DIR/docker-compose/$1.yml up -d"
 }
 
+host_resolves() {
+  # Compose service names only resolve inside the devcontainer network; a slow
+  # resolver outside it must not cost seconds on every run.
+  timeout 2 getent hosts "$1" >/dev/null 2>&1
+}
+
 preflight_infra() {
   # Infrastructure reachability (supplied, not provisioned, except owned Redis below).
-  if getent hosts postgres >/dev/null 2>&1; then
+  if [[ "$MODE" == "iterate" && -f "$RECORD_FILE" ]]; then
+    # Iteration keeps the endpoints the E2E environment was started with.
+    PG_HOST="${PG_HOST:-$(jq -r '.pgHost // empty' "$RECORD_FILE")}"
+    MAILPIT_URL="${MAILPIT_URL:-$(jq -r '.mailpitUrl // empty' "$RECORD_FILE")}"
+    AWS_S3_ENDPOINT="${AWS_S3_ENDPOINT:-$(jq -r '.s3Endpoint // empty' "$RECORD_FILE")}"
+  fi
+  if [[ -z "${PG_HOST:-}" ]] && host_resolves postgres; then
     PG_HOST_DEFAULT="postgres"
   else
     PG_HOST_DEFAULT="localhost"
@@ -805,7 +817,7 @@ preflight_infra() {
     exit 2
   fi
 
-  if getent hosts mailpit >/dev/null 2>&1; then
+  if [[ -z "${MAILPIT_URL:-}" ]] && host_resolves mailpit; then
     MAILPIT_URL_DEFAULT="http://mailpit:8025"
   else
     MAILPIT_URL_DEFAULT="http://localhost:1080"
@@ -818,7 +830,7 @@ preflight_infra() {
     exit 2
   fi
 
-  if getent hosts minio >/dev/null 2>&1; then
+  if [[ -z "${AWS_S3_ENDPOINT:-}" ]] && host_resolves minio; then
     AWS_S3_ENDPOINT_DEFAULT="http://minio:9000"
   else
     AWS_S3_ENDPOINT_DEFAULT="http://localhost:9000"
