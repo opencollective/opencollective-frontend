@@ -1,22 +1,15 @@
 import React from 'react';
-import type { ApolloClient, FetchResult } from '@apollo/client';
+import type { FetchResult } from '@apollo/client';
 import { gql, useApolloClient, useMutation } from '@apollo/client';
-import { accountHasGST, accountHasVAT, checkVATNumberFormat, TaxType } from '@opencollective/taxes';
-import type { Account } from '@opencollective/taxes/dist/types/Accounts';
 import dayjs from 'dayjs';
 import type { Path, PathValue } from 'dot-path-value';
 import type { FieldInputProps, FormikErrors, FormikHelpers } from 'formik';
 import { useFormik } from 'formik';
-import { debounce, isEmpty, isEqual, isNull, omit, pick, set, uniqBy } from 'lodash-es';
-import memoizeOne from 'memoize-one';
-import type { IntlShape } from 'react-intl';
+import { debounce, isEmpty, isEqual, omit, pick, set, uniqBy } from 'lodash-es';
 import { useIntl } from 'react-intl';
 import { z } from 'zod';
 
-import { CollectiveType } from '../../lib/constants/collectives';
-import { getPayoutProfiles } from '../../lib/expenses';
 import type {
-  Amount,
   CreateExpenseFromDashboardMutation,
   CreateExpenseFromDashboardMutationVariables,
   EditExpenseFromDashboardMutation,
@@ -25,54 +18,23 @@ import type {
   ExpenseFormExchangeRatesQueryVariables,
   ExpenseFormSchemaQuery,
   ExpenseFormSchemaQueryVariables,
-  ExpenseVendorFieldsFragment,
   InviteExpenseFromDashboardMutation,
   InviteExpenseFromDashboardMutationVariables,
 } from '../../lib/graphql/types/v2/graphql';
-import {
-  Currency,
-  ExpenseLockableFields,
-  ExpenseStatus,
-  ExpenseType,
-  PayoutMethodType,
-} from '../../lib/graphql/types/v2/graphql';
+import { Currency, ExpenseLockableFields, ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
-import type LoggedInUser from '../../lib/LoggedInUser';
-import { getArrayValuesMemoizer, isValidEmail } from '../../lib/utils';
-import { userMustSetAccountingCategory } from '../expenses/lib/accounting-categories';
-import {
-  NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID,
-  NEW_PAYOUT_METHOD_ID,
-  PAYEE_SLUG_CREATE_LEGAL_ENTITY,
-  PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER,
-  PAYEE_SLUG_INVITE,
-  PAYEE_SLUG_INVITE_EXISTING_USER,
-  PAYEE_SLUG_INVITE_SOMEONE,
-  PAYEE_SLUG_NEW_VENDOR,
-  PAYEE_SLUG_VENDOR,
-} from '../expenses/lib/constants';
-import { getAvailablePayoutMethods, getSupportedPayoutMethods } from '../expenses/lib/payout-methods';
-import { computeExpenseAmounts } from '../expenses/lib/utils';
+import { NEW_PAYOUT_METHOD_ID, PAYEE_SLUG_VENDOR } from '../expenses/lib/constants';
 import { type ExpenseSubmissionPlan, planExpenseSubmission } from './lib/expense-input';
-import type {
-  ExpenseFormOptions,
-  ExpenseFormStartOptions,
-  ExpenseFormValues,
-  ExpenseItem,
-  RecursivePartial,
-} from './lib/types';
-import { InviteeAccountType, RecurrenceFrequencyOption, YesNoOption } from './lib/types';
+import { deriveFormOptions, type ExpenseFormQueryResult } from './lib/form-options';
+import { expenseFormSchemaQuery, getFormQueryVariables } from './lib/form-query';
+import { buildFormSchema } from './lib/form-schema';
+import type { ExpenseFormOptions, ExpenseFormStartOptions, ExpenseFormValues, ExpenseItem } from './lib/types';
+import { InviteeAccountType, YesNoOption } from './lib/types';
 import { AnalyticsEvent } from '@/lib/analytics/events';
 import { track } from '@/lib/analytics/plausible';
 
-import { accountHoverCardFieldsFragment } from '../AccountHoverCard';
-import { accountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
-import { loggedInAccountExpensePayoutFieldsFragment } from '../expenses/graphql/fragments';
 import { validatePayoutMethod } from '../expenses/PayoutMethodForm';
 import { getCustomZodErrorMap } from '../FormikZod';
-import { isEmptyHTMLValue } from '../HTMLContent';
-
-import { supportsBaseExpenseTypes } from './form/helper';
 
 export type { ExpenseFormValues } from './lib/types';
 export { InviteeAccountType, RecurrenceFrequencyOption, YesNoOption } from './lib/types';
@@ -93,1402 +55,15 @@ export type ExpenseForm = ExpenseFormik & {
   refresh: () => void;
 };
 
-const expenseFormSchemaQuery = gql`
-  query ExpenseFormSchema(
-    $collectiveSlug: String
-    $hasCollectiveSlug: Boolean!
-    $payeeSlug: String
-    $hasPayeeSlug: Boolean!
-    $submitterSlug: String
-    $hasSubmitterSlug: Boolean!
-    $hasExpenseId: Boolean!
-    $expenseId: Int
-    $expenseKey: String
-  ) {
-    account(slug: $collectiveSlug) @include(if: $hasCollectiveSlug) {
-      ...ExpenseFormAccountFields
+const INITIAL_FORM_OPTIONS: ExpenseFormOptions = { schema: z.object({}) };
 
-      ... on AccountWithHost {
-        host {
-          vendorsForAccount: vendors(canBeUsedWithAccounts: [{ slug: $collectiveSlug }], limit: 5) {
-            nodes {
-              ...ExpenseVendorFields
-            }
-          }
-          vendors(canBeUsedWithAccounts: [{ slug: $collectiveSlug }], limit: 1) {
-            totalCount
-          }
-        }
-      }
-
-      ... on Organization {
-        host {
-          vendorsForAccount: vendors(canBeUsedWithAccounts: [{ slug: $collectiveSlug }], limit: 5) {
-            nodes {
-              ...ExpenseVendorFields
-            }
-          }
-          vendors(canBeUsedWithAccounts: [{ slug: $collectiveSlug }], limit: 1) {
-            totalCount
-          }
-        }
-      }
-    }
-
-    payee: account(slug: $payeeSlug) @include(if: $hasPayeeSlug) {
-      ...ExpenseFormPayeeFields
-
-      ... on Vendor {
-        hasPayoutMethod
-      }
-    }
-
-    loggedInAccount {
-      id
-      legacyId
-      ...LoggedInAccountExpensePayoutFields
-    }
-
-    submitter: account(slug: $submitterSlug) @include(if: $hasSubmitterSlug) {
-      ...ExpenseFormSubmitterFields
-    }
-
-    recentlySubmittedExpenses: expenses(
-      createdByAccount: { slug: $submitterSlug }
-      limit: 10
-      types: [INVOICE, RECEIPT]
-      orderBy: { field: CREATED_AT, direction: DESC }
-    ) @include(if: $hasSubmitterSlug) {
-      nodes {
-        account {
-          ...ExpenseFormAccountFields
-        }
-        payee {
-          ...ExpenseFormAccountFields
-        }
-        payoutMethod {
-          id
-        }
-      }
-    }
-
-    expense(expense: { legacyId: $expenseId }, draftKey: $expenseKey) @include(if: $hasExpenseId) {
-      id
-      legacyId
-      description
-      createdAt
-      longDescription
-      amountV2 {
-        valueInCents
-        currency
-      }
-      taxes {
-        id
-        type
-        rate
-        idNumber
-      }
-      requiredLegalDocuments
-      accountingCategory {
-        id
-      }
-      currency
-      type
-      status
-      account {
-        ...ExpenseFormAccountFields
-      }
-      createdByAccount {
-        ...ExpenseFormAccountFields
-      }
-      payee {
-        ...ExpenseFormPayeeFields
-      }
-      payoutMethod {
-        id
-        data
-      }
-      attachedFiles {
-        id
-        url
-        info {
-          name
-          type
-          size
-        }
-      }
-      invoiceFile {
-        id
-        url
-        name
-        type
-        size
-        ... on ImageFileInfo {
-          width
-        }
-      }
-      items {
-        id
-        description
-        url
-        file {
-          name
-          type
-          size
-        }
-        amount: amountV2 {
-          currency
-          valueInCents
-          exchangeRate {
-            value
-            source
-            fromCurrency
-            toCurrency
-            date
-          }
-        }
-        createdAt
-        incurredAt
-      }
-      privateMessage
-      invoiceInfo
-      reference
-      tags
-      permissions {
-        id
-        canEdit
-        canEditAccountingCategory
-        canEditTags
-        canDeclineExpenseInvite(draftKey: $expenseKey)
-      }
-      draft
-      lockedFields
-      submitter: createdByAccount {
-        ...ExpenseFormSubmitterFields
-      }
-    }
+/** Returns the previous value when the new one is deeply equal, to keep a stable identity */
+function useDeepEqualMemo<T>(value: T): T {
+  const ref = React.useRef<T>(value);
+  if (!isEqual(ref.current, value)) {
+    ref.current = value;
   }
-
-  ${loggedInAccountExpensePayoutFieldsFragment}
-
-  fragment ExpenseFormSchemaFeatureFields on Account {
-    features {
-      id
-      MULTI_CURRENCY_EXPENSES
-      PAYPAL_PAYOUTS
-      CHART_OF_ACCOUNTS
-      PAYPAL_CONNECT
-      TAX_FORMS
-    }
-  }
-
-  fragment ExpenseFormSchemaPolicyFields on Account {
-    policies {
-      id
-      COLLECTIVE_ADMINS_CAN_SEE_PAYOUT_METHODS
-      EXPENSE_CATEGORIZATION {
-        requiredForExpenseSubmitters
-        requiredForCollectiveAdmins
-      }
-      EXPENSE_POLICIES {
-        invoicePolicy
-        receiptPolicy
-        titlePolicy
-        grantPolicy
-      }
-      USE_VENDOR_POLICY
-    }
-  }
-
-  fragment ExpenseFormPayoutMethods on PayoutMethod {
-    id
-    type
-    name
-    data
-    isSaved
-    canBeEdited
-    canBeDeleted
-    createdAt
-    updatedAt
-    isVerified
-  }
-
-  fragment ExpenseFormSchemaHostFields on Host {
-    id
-    legacyId
-    publicId
-    name
-    legalName
-    slug
-    type
-    currency
-    settings
-    isFirstPartyHost
-    isTrustedHost
-
-    location {
-      id
-      address
-      country
-    }
-    transferwise {
-      id
-      availableCurrencies
-    }
-
-    supportedPayoutMethods
-
-    expensesTags {
-      id
-      tag
-    }
-
-    payoutMethods {
-      ...ExpenseFormPayoutMethods
-    }
-
-    ...ExpenseFormSchemaPolicyFields
-    ...ExpenseFormSchemaFeatureFields
-
-    accountingCategories(kind: EXPENSE) {
-      nodes {
-        ...AccountingCategorySelectFields
-      }
-    }
-  }
-
-  fragment ExpenseVendorFields on Vendor {
-    id
-    slug
-    name
-    type
-    hasPublicProfile
-    description
-    imageUrl(height: 64)
-    hasPayoutMethod
-    vendorInfo {
-      taxId
-      taxType
-    }
-    payoutMethods {
-      ...ExpenseFormPayoutMethods
-    }
-    canBeUsedWithAccounts {
-      id
-      legacyId
-      slug
-      name
-    }
-  }
-
-  fragment ExpenseFormAccountFields on Account {
-    id
-    publicId
-    legacyId
-    name
-    slug
-    type
-    currency
-    settings
-    supportedExpenseTypes
-    isVerified
-
-    stats {
-      balance {
-        valueInCents
-        currency
-      }
-    }
-
-    ...AccountHoverCardFields
-    ...ExpenseFormSchemaFeatureFields
-    ...ExpenseFormSchemaPolicyFields
-
-    ... on AccountWithHost {
-      host {
-        ...ExpenseFormSchemaHostFields
-      }
-    }
-    ... on Organization {
-      hasHosting
-      host {
-        ...ExpenseFormSchemaHostFields
-      }
-    }
-
-    policies {
-      id
-      EXPENSE_POLICIES {
-        invoicePolicy
-        receiptPolicy
-        titlePolicy
-        grantPolicy
-      }
-    }
-
-    ... on AccountWithParent {
-      parent {
-        id
-        legacyId
-        slug
-      }
-    }
-
-    admins: members(role: ADMIN) {
-      totalCount
-      nodes {
-        id
-        account {
-          id
-          type
-          slug
-          name
-          imageUrl
-          ...AccountHoverCardFields
-          emails
-        }
-      }
-    }
-  }
-
-  fragment ExpenseFormSubmitterFields on Account {
-    id
-    slug
-    type
-    isVerified
-    name
-    imageUrl
-    isHost
-    isArchived
-  }
-
-  fragment ExpenseFormPayeeFields on Account {
-    id
-    legacyId
-    slug
-    name
-    legalName
-    isUSEntity
-    type
-    isAdmin
-    payoutMethods {
-      ...ExpenseFormPayoutMethods
-    }
-
-    location {
-      address
-      country
-    }
-
-    ... on AccountWithHost {
-      host {
-        ...ExpenseFormSchemaHostFields
-      }
-    }
-    ... on Organization {
-      host {
-        ...ExpenseFormSchemaHostFields
-      }
-    }
-    ... on AccountWithParent {
-      parent {
-        id
-        slug
-      }
-    }
-    ... on Vendor {
-      ...ExpenseVendorFields
-    }
-  }
-
-  ${accountHoverCardFieldsFragment}
-  ${accountingCategorySelectFieldsFragment}
-`;
-
-const memoizeAvailableReferenceCurrencies = getArrayValuesMemoizer<Currency>();
-
-/**
- * Memoized GraphQL query for expense form schema data.
- *
- * Uses memoizeOne to cache query results and prevent redundant network requests.
- * Only refetches when variables change or refresh is explicitly requested.
- */
-const memoizedExpenseFormSchema = memoizeOne(
-  async (apolloClient: ApolloClient<unknown>, variables: ExpenseFormSchemaQueryVariables, refresh?: boolean) => {
-    return await apolloClient.query<ExpenseFormSchemaQuery, ExpenseFormSchemaQueryVariables>({
-      query: expenseFormSchemaQuery,
-
-      variables: variables,
-      errorPolicy: 'all',
-      fetchPolicy: refresh ? 'network-only' : 'cache-first',
-    });
-  },
-  (newArgs, lastArgs) => {
-    const [, newVariables, refresh] = newArgs;
-    const [, lastVariables] = lastArgs;
-
-    return !refresh && isEqual(newVariables, lastVariables);
-  },
-);
-
-/**
- * Builds dynamic Zod validation schema based on form options and context.
- *
- * This function creates different validation rules depending on:
- * - Expense type (INVOICE vs RECEIPT vs GRANT)
- * - Account settings (VAT/GST requirements, accounting categories)
- * - Form state (invite vs direct submission)
- *
- * @param values Current form values
- * @param options Form configuration options
- * @param intl Internationalization context for error messages
- * @param pickSchemaFields Optional field filtering for partial validation
- * @returns Zod schema for form validation
- */
-function buildFormSchema(
-  values: ExpenseFormValues,
-  options: Omit<ExpenseFormOptions, 'schema'>,
-  intl: IntlShape,
-  pickSchemaFields?: Record<string, boolean>,
-): z.ZodType<RecursivePartial<ExpenseFormValues>, z.ZodObjectDef, RecursivePartial<ExpenseFormValues>> {
-  const requiredMessage = { message: intl.formatMessage({ defaultMessage: 'Required', id: 'Seanpx' }) };
-  const schema = z.object({
-    accountSlug: z
-      .string()
-      .nullish()
-      .refine(slug => {
-        return slug && !slug.startsWith('__');
-      }, requiredMessage)
-      .refine(
-        accountSlug => {
-          if (!accountSlug) {
-            return false;
-          }
-          if (!options.supportedExpenseTypes) {
-            return true;
-          }
-
-          if (
-            values.expenseTypeOption === ExpenseType.GRANT &&
-            !options.supportedExpenseTypes.includes(ExpenseType.GRANT)
-          ) {
-            return false;
-          }
-
-          if (
-            values.expenseTypeOption !== ExpenseType.GRANT &&
-            !supportsBaseExpenseTypes(options.supportedExpenseTypes)
-          ) {
-            return false;
-          }
-
-          return true;
-        },
-        () => ({
-          message: intl.formatMessage({
-            defaultMessage: 'The selected account does not support expense submissions.',
-            id: '6dZw2w',
-          }),
-        }),
-      ),
-    payeeSlug: z
-      .string()
-      .nullish()
-      .refine(slug => {
-        if (slug === PAYEE_SLUG_INVITE || slug === PAYEE_SLUG_INVITE_EXISTING_USER) {
-          return true;
-        }
-
-        return options.expense?.status === ExpenseStatus.DRAFT && !options.loggedInAccount
-          ? true
-          : slug && !slug.startsWith('__');
-      }, requiredMessage),
-    expenseId: z.number().nullish(),
-    expenseTypeOption: z.nativeEnum(ExpenseType).refine(v => {
-      if (v === ExpenseType.GRANT && options.account?.type === CollectiveType.FUND) {
-        return true;
-      }
-
-      if (options.account?.supportedExpenseTypes?.length > 0) {
-        return options.account.supportedExpenseTypes.includes(v);
-      }
-
-      return true;
-    }, requiredMessage),
-    payoutMethodId: z
-      .string()
-      .nullish()
-      .refine(v => {
-        if (
-          [PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_SOMEONE, PAYEE_SLUG_INVITE_EXISTING_USER].includes(values.payeeSlug)
-        ) {
-          return true;
-        }
-        if (
-          v === NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID &&
-          options.payoutMethods?.some(pm => pm.type === PayoutMethodType.ACCOUNT_BALANCE)
-        ) {
-          return true;
-        }
-
-        if (options.payee?.type === CollectiveType.VENDOR && !options.payee?.['hasPayoutMethod']) {
-          return false;
-        }
-
-        // If the payee has a host and the payer account is under a different one, show the host's payout method (cross-host expense)
-        if (v && v !== NEW_PAYOUT_METHOD_ID) {
-          const payee = options.payee;
-          const account = options.account;
-          const host = account && 'host' in account ? account.host : null;
-          if (payee?.['host'] && host && payee['host'].id !== host.id) {
-            if (!payee['host'].payoutMethods?.some(pm => pm.id === v)) {
-              return false;
-            }
-          } else if (!options.payee?.payoutMethods?.some(pm => pm.id === v)) {
-            return false;
-          }
-        }
-
-        return true;
-      }, requiredMessage),
-    accountingCategoryId: z
-      .string()
-      .nullish()
-      .refine(v => {
-        if (
-          options.isAccountingCategoryRequired &&
-          options.accountingCategories?.length > 0 &&
-          !options.accountingCategories.some(ac => ac.id === v) &&
-          !isNull(v) && // null represents "I don't know" and is a valid option
-          values.expenseTypeOption !== ExpenseType.GRANT
-        ) {
-          return false;
-        }
-
-        return true;
-      }, requiredMessage),
-    title: z
-      .string()
-      .nullish()
-      .refine(v => {
-        if (
-          [PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_SOMEONE, PAYEE_SLUG_INVITE_EXISTING_USER].includes(values.payeeSlug) ||
-          values.expenseTypeOption === ExpenseType.GRANT
-        ) {
-          return true;
-        }
-
-        return v.length > 0;
-      }, requiredMessage)
-      .refine(v => !v || v.length <= 255, {
-        message: 'Expense description is too long (max 255 characters).',
-      }),
-    reference: z.string().optional(),
-    tags: z.array(z.string()).optional(),
-    privateMessage: z.string().optional().nullable(),
-    recurrenceFrequency: z.nativeEnum(RecurrenceFrequencyOption).optional(),
-    recurrenceEndAt: z
-      .string()
-      .nullish()
-      .refine(recurrenceEndAt => isValidRecurrenceEndAt(values.recurrenceFrequency, recurrenceEndAt), {
-        message: intl.formatMessage({ defaultMessage: 'End date must be in the future', id: 'd1V3ET' }),
-      }),
-    referenceCurrency: z
-      .nativeEnum(Currency)
-      .optional()
-      .nullable()
-      .refine(
-        v => {
-          // If multiple currencies are supported, the reference currency must be set
-          if (options.availableReferenceCurrencies.length > 1) {
-            return v && options.availableReferenceCurrencies.includes(v);
-          } else {
-            return !v || v === options.availableReferenceCurrencies[0];
-          }
-        },
-        value => ({
-          message: value
-            ? intl.formatMessage({ defaultMessage: 'Invalid value', id: 'FormError.InvalidValue' })
-            : intl.formatMessage({ defaultMessage: 'Required', id: 'Seanpx' }),
-        }),
-      ),
-    expenseAttachedFiles: z
-      .array(
-        z.object({
-          url: z.string().url(),
-        }),
-      )
-      .optional()
-      .nullable(),
-    invoiceFile: z
-      .union([
-        z.string().url().nullish(),
-        z.object({
-          url: z.string().url().nullish(),
-        }),
-      ])
-      .refine(attachment => {
-        if (
-          [PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_SOMEONE, PAYEE_SLUG_INVITE_EXISTING_USER].includes(values.payeeSlug)
-        ) {
-          return true;
-        }
-
-        if (values.expenseTypeOption === ExpenseType.INVOICE && values.hasInvoiceOption === YesNoOption.YES) {
-          return typeof attachment === 'string' ? !!attachment : !!attachment?.url;
-        }
-        return true;
-      }, requiredMessage),
-    invoiceNumber: z.string().nullish(),
-    invoiceInfo: z.string().optional(),
-    expenseItems: z.array(
-      z
-        .object({
-          description: z
-            .string()
-            .nullish()
-            .refine(v => {
-              if (
-                options.expense?.status !== ExpenseStatus.DRAFT &&
-                !options.loggedInAccount &&
-                !options.isAdminOfPayee &&
-                options.payee?.type !== CollectiveType.VENDOR
-              ) {
-                return true;
-              }
-
-              return !isEmptyHTMLValue(v);
-            }, requiredMessage),
-          attachment: z
-            .union([
-              z.string().nullish(),
-              z.object({
-                url: z.string().nullish(),
-              }),
-            ])
-            .nullish()
-            .refine(attachment => {
-              if (
-                [ExpenseType.GRANT, ExpenseType.INVOICE, ExpenseType.SETTLEMENT, ExpenseType.PLATFORM_BILLING].includes(
-                  values.expenseTypeOption,
-                )
-              ) {
-                return true;
-              }
-
-              return typeof attachment === 'string' ? !!attachment : !!attachment?.url;
-            }, requiredMessage),
-          incurredAt: z
-            .string()
-            .nullish()
-            .refine(incurredAt => {
-              if (
-                options.expense?.status !== ExpenseStatus.DRAFT &&
-                !options.isAdminOfPayee &&
-                options.payee?.type !== CollectiveType.VENDOR
-              ) {
-                return true; // For invites
-              } else if (values.expenseTypeOption === ExpenseType.GRANT) {
-                return true;
-              }
-
-              return !!incurredAt;
-            }, requiredMessage),
-          amount: z.object({
-            valueInCents: z.number().min(1),
-            currency: z.string().refine(
-              v => Object.values(Currency).includes(v as Currency),
-              () => ({
-                message: intl.formatMessage(
-                  {
-                    id: 'FormError.enum',
-                    defaultMessage: 'Must be one of: {options}',
-                  },
-                  {
-                    options: Object.values(Currency).join(','),
-                  },
-                ),
-              }),
-            ),
-            exchangeRate: z
-              .object({
-                value: z.number(),
-                source: z.string(),
-                fromCurrency: z.string(),
-                toCurrency: z.string(),
-                date: z.string().nullable(),
-              })
-              .nullable(),
-          }),
-        })
-        .refine(
-          item => {
-            if (item.amount.currency && item.amount.currency !== options.expenseCurrency) {
-              return (
-                item.amount.exchangeRate?.value &&
-                item.amount.exchangeRate?.source &&
-                item.amount.exchangeRate?.toCurrency === options.expenseCurrency
-              );
-            }
-            return true;
-          },
-          () => ({
-            message: intl.formatMessage({ defaultMessage: 'Missing exchange rate', id: 'UXE8lX' }),
-            path: ['amount', 'exchangeRate', 'value'],
-          }),
-        ),
-    ),
-    hasTax: z.boolean().nullable(),
-    tax: z
-      .object({
-        rate: z
-          .number()
-          .refine(
-            v => {
-              if (options.taxType !== TaxType.GST) {
-                return true;
-              }
-              return [0, 0.15].includes(v);
-            },
-            () => ({
-              message: intl.formatMessage(
-                {
-                  id: 'FormError.enum',
-                  defaultMessage: 'Must be one of: {options}',
-                },
-                {
-                  options: '0%, 15%',
-                },
-              ),
-            }),
-          )
-          .refine(
-            v => {
-              if (options.taxType !== TaxType.VAT) {
-                return true;
-              }
-
-              return v >= 0 && v < 1;
-            },
-            () => ({
-              message: intl.formatMessage(
-                { defaultMessage: 'Value must be between {min} and {max}', id: 'f5QMcL' },
-                { min: '0%', max: '100%' },
-              ),
-            }),
-          ),
-        idNumber: z
-          .string()
-          .nullable()
-          .refine(
-            v => {
-              if (options.taxType !== TaxType.VAT) {
-                return true;
-              }
-
-              return checkVATNumberFormat(v).isValid;
-            },
-            () => ({
-              message: intl.formatMessage({ defaultMessage: 'Invalid VAT Number', id: 'zL/Rl8' }),
-            }),
-          ),
-      })
-      .nullable()
-      .refine(v => {
-        if (!values.hasTax) {
-          return true;
-        }
-
-        return !!v;
-      }),
-    acknowledgedCollectiveInvoiceExpensePolicy: z
-      .boolean()
-      .nullish()
-      .refine(
-        v =>
-          values.expenseTypeOption === ExpenseType.INVOICE && options.account?.policies?.EXPENSE_POLICIES?.invoicePolicy
-            ? v
-            : true,
-        requiredMessage,
-      ),
-    acknowledgedCollectiveReceiptExpensePolicy: z
-      .boolean()
-      .nullish()
-      .refine(
-        v =>
-          values.expenseTypeOption === ExpenseType.RECEIPT && options.account?.policies?.EXPENSE_POLICIES?.receiptPolicy
-            ? v
-            : true,
-        requiredMessage,
-      ),
-    acknowledgedCollectiveTitleExpensePolicy: z
-      .boolean()
-      .nullish()
-      .refine(v => {
-        if (values.expenseTypeOption === ExpenseType.GRANT) {
-          return true;
-        }
-        return options.account?.policies?.EXPENSE_POLICIES?.titlePolicy ? v : true;
-      }, requiredMessage),
-    acknowledgedCollectiveGrantExpensePolicy: z
-      .boolean()
-      .nullish()
-      .refine(
-        v =>
-          values.expenseTypeOption === ExpenseType.GRANT && options.account?.policies?.EXPENSE_POLICIES?.grantPolicy
-            ? v
-            : true,
-        requiredMessage,
-      ),
-    acknowledgedHostInvoiceExpensePolicy: z
-      .boolean()
-      .nullish()
-      .refine(
-        v =>
-          values.expenseTypeOption === ExpenseType.INVOICE &&
-          options.host?.policies?.EXPENSE_POLICIES?.invoicePolicy &&
-          options.host?.slug !== options.account?.slug
-            ? v
-            : true,
-        requiredMessage,
-      ),
-    acknowledgedHostReceiptExpensePolicy: z
-      .boolean()
-      .nullish()
-      .refine(
-        v =>
-          values.expenseTypeOption === ExpenseType.RECEIPT &&
-          options.host?.policies?.EXPENSE_POLICIES?.receiptPolicy &&
-          options.host?.slug !== options.account?.slug
-            ? v
-            : true,
-        requiredMessage,
-      ),
-    acknowledgedHostTitleExpensePolicy: z
-      .boolean()
-      .nullish()
-      .refine(v => {
-        if (values.expenseTypeOption === ExpenseType.GRANT) {
-          return true;
-        }
-        return options.host?.policies?.EXPENSE_POLICIES?.titlePolicy && options.host?.slug !== options.account?.slug
-          ? v
-          : true;
-      }, requiredMessage),
-    acknowledgedHostGrantExpensePolicy: z
-      .boolean()
-      .nullish()
-      .refine(
-        v =>
-          values.expenseTypeOption === ExpenseType.GRANT &&
-          options.host?.policies?.EXPENSE_POLICIES?.grantPolicy &&
-          options.host?.slug !== options.account?.slug
-            ? v
-            : true,
-        requiredMessage,
-      ),
-    payoutMethodNameDiscrepancyReason: z.string().nullish().optional(),
-    // See https://github.com/opencollective/opencollective/issues/8306
-    // .refine(v => {
-    //   if (options.payoutMethod?.type === PayoutMethodType.BANK_ACCOUNT) {
-    //     const accountHolderName: string = options.payoutMethod?.data?.accountHolderName ?? '';
-    //     const payeeLegalName: string = options.payee?.legalName ?? options.payee?.name ?? '';
-    //     if (accountHolderName.trim().toLowerCase() !== payeeLegalName.trim().toLowerCase()) {
-    //       return !!v;
-    //     }
-    //   }
-
-    //   return true;
-    // }, requiredMessage)
-    newPayoutMethod: z.object({
-      type: z
-        .nativeEnum(PayoutMethodType)
-        .nullish()
-        .refine(type => {
-          if (
-            [PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_SOMEONE, PAYEE_SLUG_INVITE_EXISTING_USER].includes(values.payeeSlug)
-          ) {
-            return true;
-          }
-
-          if (options.payee?.type === CollectiveType.VENDOR && !options.isHostAdmin) {
-            return true;
-          }
-
-          if (options.expense?.status === ExpenseStatus.DRAFT && !options.loggedInAccount) {
-            return !!type;
-          }
-
-          if (!values.payoutMethodId || values.payoutMethodId === NEW_PAYOUT_METHOD_ID) {
-            return !!type;
-          }
-
-          return true;
-        }, requiredMessage),
-      name: z.string().nullish(),
-      data: z
-        .object({
-          currency: z
-            .string()
-            .nullish()
-            .refine(currency => {
-              if (
-                [PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_SOMEONE, PAYEE_SLUG_INVITE_EXISTING_USER].includes(
-                  values.payeeSlug,
-                )
-              ) {
-                return true;
-              }
-
-              if (options.payee?.type === CollectiveType.VENDOR && !options.isHostAdmin) {
-                return true;
-              }
-
-              if (values.payoutMethodId === NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID) {
-                return true;
-              }
-
-              if (values.payoutMethodId === NEW_PAYOUT_METHOD_ID) {
-                return !!currency;
-              }
-
-              return true;
-            }, requiredMessage),
-        })
-        .nullish(),
-    }),
-    inviteNote: z.string().nullish(),
-    inviteeExistingAccount: z
-      .string()
-      .nullish()
-      .refine(inviteeExistingAccount => {
-        if (values.payeeSlug === PAYEE_SLUG_INVITE_EXISTING_USER) {
-          return !!inviteeExistingAccount;
-        }
-
-        return true;
-      }, requiredMessage),
-    inviteeNewIndividual: z.object({
-      name: z
-        .string()
-        .nullish()
-        .refine(name => {
-          if (values.payeeSlug === PAYEE_SLUG_INVITE && values.inviteeAccountType === InviteeAccountType.INDIVIDUAL) {
-            return !isEmpty(name);
-          }
-
-          return true;
-        }, requiredMessage),
-      email: z
-        .string()
-        .nullish()
-        .refine(email => {
-          if (values.payeeSlug === PAYEE_SLUG_INVITE && values.inviteeAccountType === InviteeAccountType.INDIVIDUAL) {
-            return isValidEmail(email);
-          }
-
-          return true;
-        }, requiredMessage)
-        .refine(
-          email => {
-            if (email) {
-              return isValidEmail(email);
-            }
-
-            return true;
-          },
-          () => ({
-            message: intl.formatMessage({
-              defaultMessage: 'This email address is not valid',
-              id: 'FormError.InvalidEmail',
-            }),
-          }),
-        ),
-    }),
-    inviteeNewOrganization: z.object({
-      name: z
-        .string()
-        .nullish()
-        .refine(name => {
-          if (values.payeeSlug === PAYEE_SLUG_INVITE && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
-            return !isEmpty(name);
-          }
-
-          return true;
-        }, requiredMessage),
-      email: z
-        .string()
-        .nullish()
-        .refine(email => {
-          if (values.payeeSlug === PAYEE_SLUG_INVITE && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
-            return !!email;
-          }
-
-          return true;
-        }, requiredMessage)
-        .refine(
-          email => {
-            if (email) {
-              return isValidEmail(email);
-            }
-
-            return true;
-          },
-          () => ({
-            message: intl.formatMessage({
-              defaultMessage: 'This email address is not valid',
-              id: 'FormError.InvalidEmail',
-            }),
-          }),
-        ),
-      organization: z
-        .object({
-          name: z
-            .string()
-            .nullish()
-            .refine(name => {
-              if (
-                values.payeeSlug === PAYEE_SLUG_INVITE &&
-                values.inviteeAccountType === InviteeAccountType.ORGANIZATION
-              ) {
-                return !isEmpty(name);
-              }
-
-              return true;
-            }, requiredMessage),
-          slug: z
-            .string()
-            .nullish()
-            .refine(slug => {
-              if (
-                values.payeeSlug === PAYEE_SLUG_INVITE &&
-                values.inviteeAccountType === InviteeAccountType.ORGANIZATION
-              ) {
-                return !isEmpty(slug);
-              }
-
-              return true;
-            }, requiredMessage),
-          website: z.string().nullish(),
-          description: z
-            .string()
-            .nullish()
-            .refine(description => {
-              if (
-                values.payeeSlug === PAYEE_SLUG_INVITE &&
-                values.inviteeAccountType === InviteeAccountType.ORGANIZATION
-              ) {
-                return !isEmpty(description);
-              }
-
-              return true;
-            }, requiredMessage),
-        })
-        .nullish()
-        .refine(organization => {
-          if (values.payeeSlug === PAYEE_SLUG_INVITE && values.inviteeAccountType === InviteeAccountType.ORGANIZATION) {
-            return !!organization;
-          }
-
-          return true;
-        }, requiredMessage),
-    }),
-  });
-
-  const addRefine = (schema, pickSchemaFields) => {
-    return schema.superRefine((value, ctx) => {
-      if (!pickSchemaFields || (pickSchemaFields['accountSlug'] && pickSchemaFields['payeeSlug'])) {
-        if (value.accountSlug && value.payeeSlug && value.accountSlug === value.payeeSlug) {
-          const issue = {
-            code: z.ZodIssueCode.custom,
-            message: intl.formatMessage({
-              id: 'ExpenseForm.PayerPayeeMustDiffer',
-              defaultMessage: 'The account paying and the account getting paid must be different.',
-            }),
-          };
-
-          ctx.addIssue({ ...issue, path: ['accountSlug'] });
-          ctx.addIssue({ ...issue, path: ['payeeSlug'] });
-        }
-      }
-    });
-  };
-
-  return addRefine(
-    pickSchemaFields ? schema.pick(pickSchemaFields as { [K in keyof z.infer<typeof schema>]?: true }) : schema,
-    pickSchemaFields,
-  );
-}
-
-function getPayeeSlug(values: ExpenseFormValues): string {
-  switch (values.payeeSlug) {
-    case PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER:
-    case PAYEE_SLUG_CREATE_LEGAL_ENTITY:
-    case PAYEE_SLUG_INVITE:
-    case PAYEE_SLUG_INVITE_SOMEONE:
-    case PAYEE_SLUG_VENDOR:
-    case PAYEE_SLUG_NEW_VENDOR:
-      return null;
-    case PAYEE_SLUG_INVITE_EXISTING_USER:
-      return values.inviteeExistingAccount;
-    default:
-      return values.payeeSlug;
-  }
-}
-
-async function buildFormOptions(
-  intl: IntlShape,
-  apolloClient: ApolloClient<unknown>,
-  loggedInUser: LoggedInUser,
-  values: ExpenseFormValues,
-  startOptions: ExpenseFormStartOptions,
-  refresh?: boolean,
-): Promise<ExpenseFormOptions> {
-  const options: ExpenseFormOptions = { schema: z.object({}) };
-
-  const collectiveSlug = values.accountSlug && !values.accountSlug.startsWith('__') ? values.accountSlug : null;
-  const payeeSlug = getPayeeSlug(values);
-
-  try {
-    const query = await memoizedExpenseFormSchema(
-      apolloClient,
-      {
-        collectiveSlug: collectiveSlug,
-        hasCollectiveSlug: !!collectiveSlug,
-        payeeSlug: payeeSlug,
-        hasPayeeSlug: !!payeeSlug,
-        hasExpenseId: !!startOptions.expenseId,
-        expenseId: startOptions.expenseId,
-        expenseKey: startOptions.draftKey,
-        hasSubmitterSlug: !!loggedInUser?.collective?.slug,
-        submitterSlug: loggedInUser?.collective?.slug,
-      },
-      refresh,
-    );
-
-    const expense = query.data?.expense;
-    if (expense) {
-      options.expense = query.data.expense;
-    }
-
-    const recentlySubmittedExpenses = query.data?.recentlySubmittedExpenses;
-    const account = values.accountSlug ? query.data?.account : options.expense?.account;
-    const expenseType = values.expenseTypeOption || options.expense?.type;
-    const host = account && 'host' in account ? account.host : null;
-    const payee =
-      query.data?.payee ||
-      (options.expense?.status === ExpenseStatus.DRAFT &&
-      options.expense.payee &&
-      options.expense.draft?.payee?.slug === options.expense.payee.slug
-        ? options.expense.payee
-        : null);
-
-    const payeeHost = payee && 'host' in payee ? payee.host : null;
-    const submitter = options.expense?.submitter || query.data?.submitter;
-
-    if (account && options.expense?.status === ExpenseStatus.DRAFT) {
-      options.canChangeAccount = false;
-    } else {
-      options.canChangeAccount = true;
-    }
-
-    if (recentlySubmittedExpenses) {
-      options.recentlySubmittedExpenses = recentlySubmittedExpenses;
-    }
-
-    if (account) {
-      options.account = account;
-    }
-
-    if (submitter) {
-      options.submitter = submitter;
-    }
-
-    if (payee) {
-      options.payee = payee;
-    }
-
-    if (query.data?.loggedInAccount) {
-      options.loggedInAccount = query.data.loggedInAccount;
-    }
-
-    if (values.payeeSlug === PAYEE_SLUG_INVITE) {
-      options.invitee =
-        values.inviteeAccountType === InviteeAccountType.INDIVIDUAL
-          ? values.inviteeNewIndividual
-          : values.inviteeNewOrganization;
-    } else if (
-      options.expense?.status === ExpenseStatus.DRAFT &&
-      options.expense.draft.payee &&
-      !options.loggedInAccount
-    ) {
-      options.invitee = options.expense.draft.payee;
-    }
-
-    if (host) {
-      options.isHostAdmin = loggedInUser?.isAdminOfCollective(host) ?? false;
-      options.host = host;
-      options.isPaypalConnectEnabled = host.features?.PAYPAL_CONNECT !== 'DISABLED';
-      options.vendorsForAccount =
-        'vendorsForAccount' in host ? (host.vendorsForAccount?.['nodes'] as ExpenseVendorFieldsFragment[]) || [] : [];
-      const isInviteePayeeFlow = options.expense?.status === ExpenseStatus.DRAFT && !options.loggedInAccount;
-
-      const userCanUseVendors = options.isHostAdmin || ('vendors' in host && host.vendors?.['totalCount'] > 0);
-      options.showVendorsOption = isInviteePayeeFlow ? false : userCanUseVendors;
-      options.expenseTags = host.expensesTags;
-      options.isAccountingCategoryRequired = userMustSetAccountingCategory(loggedInUser, account, host);
-      options.accountingCategories = host.accountingCategories.nodes;
-
-      if (startOptions.duplicateExpense && expense?.payee?.type === CollectiveType.VENDOR) {
-        options.vendorsForAccount = [...options.vendorsForAccount, expense.payee as ExpenseVendorFieldsFragment];
-      }
-    }
-
-    options.supportedPayoutMethods = getSupportedPayoutMethods(host, payee);
-
-    if (account?.supportedExpenseTypes) {
-      options.supportedExpenseTypes = account.supportedExpenseTypes;
-      if (!supportsBaseExpenseTypes(options.supportedExpenseTypes) && !query.loading) {
-        options.hasInvalidAccount = true;
-      }
-    }
-
-    if (query.data?.loggedInAccount) {
-      options.payoutProfiles = getPayoutProfiles(query.data.loggedInAccount);
-      options.isAdminOfPayee =
-        options.payoutProfiles.some(p => p.slug === values.payeeSlug) ||
-        [PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER, PAYEE_SLUG_CREATE_LEGAL_ENTITY].includes(values.payeeSlug);
-      // Cross-host only: the submitter administers the recipient host (e.g. a host admin completing
-      // an invited draft on behalf of a collective they don't directly administer).
-      const isAdminOfPayeeHost = Boolean(
-        payeeHost && host && payeeHost.id !== host.id && options.payoutProfiles.some(p => p.slug === payeeHost.slug),
-      );
-      options.isAdminOfPayeeHost = isAdminOfPayeeHost;
-      if (payee && payee.type !== CollectiveType.VENDOR && (options.isAdminOfPayee || isAdminOfPayeeHost)) {
-        options.payoutMethods = getAvailablePayoutMethods({
-          host,
-          payee,
-          payoutMethods: options.payoutProfiles?.find(profile => profile.slug === payee.slug)?.payoutMethods,
-          supportedPayoutMethods: options.supportedPayoutMethods,
-        });
-      } else if (payee && payee.type === CollectiveType.VENDOR) {
-        options.payoutMethods = getAvailablePayoutMethods({
-          host,
-          payee,
-          payoutMethods: payee.payoutMethods,
-          supportedPayoutMethods: options.supportedPayoutMethods,
-        });
-      }
-
-      // Filter out ACCOUNT_BALANCE from the list of payout methods, since we add it manually to the default list
-      options.newPayoutMethodTypes = options.supportedPayoutMethods.filter(
-        t => ![PayoutMethodType.ACCOUNT_BALANCE, PayoutMethodType.STRIPE].includes(t),
-      );
-
-      if (values.payoutMethodId && values.payoutMethodId !== NEW_PAYOUT_METHOD_ID) {
-        options.payoutMethod = options.payoutMethods?.find(p => p.id === values.payoutMethodId);
-      } else if (
-        values.payoutMethodId === NEW_PAYOUT_METHOD_ID &&
-        ((options.payee?.type === CollectiveType.VENDOR && options.isHostAdmin) ||
-          options.isAdminOfPayee ||
-          isAdminOfPayeeHost)
-      ) {
-        options.payoutMethod = values.newPayoutMethod;
-      }
-    } else {
-      options.payoutMethod = values.newPayoutMethod;
-      options.newPayoutMethodTypes = options.supportedPayoutMethods;
-    }
-
-    if (!startOptions.duplicateExpense && options.expense?.lockedFields?.length) {
-      options.lockedFields = options.expense.lockedFields;
-    }
-
-    // Compute available reference currencies from all sources
-    const availableCurrencies = new Set<Currency>();
-    if (options.expense && options.lockedFields?.includes?.(ExpenseLockableFields.AMOUNT)) {
-      availableCurrencies.add(options.expense.currency);
-    } else if (expenseType === ExpenseType.GRANT && options.isHostAdmin !== true) {
-      // Grants are always in the account currency
-      availableCurrencies.add(options.account?.currency);
-    } else {
-      // For all other expenses one of the items currencies
-      values.expenseItems?.forEach(item => {
-        if (item.amount?.currency) {
-          availableCurrencies.add(item.amount.currency as Currency);
-        }
-      });
-
-      // If we didn't get any currency from the items, default to the account + payout method currencies
-      if (availableCurrencies.size === 0) {
-        if (options.account?.currency) {
-          availableCurrencies.add(options.account.currency);
-        }
-        if (options.payoutMethod?.data?.currency) {
-          availableCurrencies.add(options.payoutMethod.data.currency);
-        }
-      }
-    }
-
-    options.availableReferenceCurrencies = memoizeAvailableReferenceCurrencies(Array.from(availableCurrencies));
-
-    if (options.availableReferenceCurrencies.length === 1) {
-      options.expenseCurrency = options.availableReferenceCurrencies[0]; // If there's only one available currency, use it
-    } else if (options.availableReferenceCurrencies.includes(values.referenceCurrency as Currency)) {
-      options.expenseCurrency = values.referenceCurrency as Currency; // If the user provided a reference currency, use it
-    } else if (options.expense?.currency) {
-      options.expenseCurrency = options.expense.currency; // Use the expense currency if it's set
-    }
-
-    options.isLongFormItemDescription = false;
-    options.allowDifferentItemCurrency = true;
-    options.hasExpenseItemDate = true;
-    options.canSetupRecurrence = true;
-
-    if (expenseType === ExpenseType.GRANT) {
-      options.isLongFormItemDescription = true;
-      options.allowDifferentItemCurrency = Boolean(options.isHostAdmin);
-      options.hasExpenseItemDate = false;
-      options.canSetupRecurrence = false;
-    }
-
-    options.allowExpenseItemAttachment = expenseType === ExpenseType.RECEIPT || expenseType === ExpenseType.CHARGE;
-
-    options.allowInvite = !startOptions.isInlineEdit && options.expense?.status !== ExpenseStatus.DRAFT;
-
-    if (expenseType === ExpenseType.INVOICE) {
-      // Preserve tax type from existing expense if it has taxes
-      if (options.expense?.taxes?.length > 0) {
-        options.taxType = options.expense.taxes[0].type;
-      } else if (accountHasVAT(account as Account, host as Account)) {
-        options.taxType = TaxType.VAT;
-      } else if (accountHasGST(host || account)) {
-        options.taxType = TaxType.GST;
-      }
-    }
-
-    if (options.expenseCurrency && values.expenseItems?.length > 0) {
-      const { totalInvoiced } = computeExpenseAmounts(
-        options.expenseCurrency,
-        (values.expenseItems || []).map(ei => ({
-          description: ei.description,
-          amountV2: ei.amount as Amount,
-          incurredAt: typeof ei.incurredAt === 'string' ? new Date(ei.incurredAt) : ei.incurredAt,
-        })),
-        values.tax ? [{ ...values.tax, type: options.taxType }] : [],
-      );
-
-      options.totalInvoicedInExpenseCurrency = totalInvoiced;
-    }
-
-    options.schema = buildFormSchema(values, options, intl, startOptions.pickSchemaFields);
-
-    return options;
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error(err);
-    return options;
-  }
+  return ref.current;
 }
 
 function usePrevious<T>(value: T): T {
@@ -1510,25 +85,6 @@ const needExchangeRateFilter = (expectedCurrency: string) => (ei: ExpenseItem) =
     ei.amount.exchangeRate.toCurrency !== expectedCurrency ||
     (ei.amount.exchangeRate.source === 'OPENCOLLECTIVE' &&
       Math.abs(dayjs.utc(ei.amount.exchangeRate.date).diff(dayjs.utc(ei.incurredAt), 'days')) > 2));
-
-/**
- * A recurrence end date is optional (leaving it empty means an open-ended recurrence), but when set
- * it must be a valid date in the future. This is the rule used by the form schema and by the
- * recurrence editor (`SummarySection`) to validate the values before saving them.
- */
-export function isValidRecurrenceEndAt(
-  recurrenceFrequency?: RecurrenceFrequencyOption | null,
-  recurrenceEndAt?: string | null,
-): boolean {
-  if (!recurrenceFrequency || recurrenceFrequency === RecurrenceFrequencyOption.NONE) {
-    return true;
-  }
-  if (!recurrenceEndAt) {
-    return true; // No end date means open-ended recurrence
-  }
-  const endsAt = dayjs(recurrenceEndAt);
-  return endsAt.isValid() && endsAt.isAfter(dayjs().startOf('day'));
-}
 
 /**
  * The form does not always surface errors properly, this will help to troubleshoot.
@@ -1568,16 +124,15 @@ export function useExpenseForm(opts: {
   const intl = useIntl();
   const apolloClient = useApolloClient();
   const { LoggedInUser } = useLoggedInUser();
-  const [formOptions, setFormOptions] = React.useState<ExpenseFormOptions>({ schema: z.object({}) });
+  const [formQueryResult, setFormQueryResult] = React.useState<ExpenseFormQueryResult>(null);
   const startOptions = React.useRef(opts.startOptions);
   const [expenseLoaded, setExpenseLoaded] = React.useState(false);
   const setInitialExpenseValues = React.useRef(false);
-  const setInitialFormOptions = React.useRef(false);
   const initialLoading = React.useRef(true);
-  const expenseFormValues = React.useRef<ExpenseFormValues>(opts.initialValues);
 
   const initialValues = React.useRef(opts.initialValues);
-  const initialStatus = React.useRef({ schema: formOptions.schema });
+  // The options derive from the form values, which Formik owns: callbacks given to Formik read the latest ones
+  const formOptionsRef = React.useRef<ExpenseFormOptions>(INITIAL_FORM_OPTIONS);
 
   // GraphQL mutations for expense operations
   const [createExpense] = useMutation<CreateExpenseFromDashboardMutation, CreateExpenseFromDashboardMutationVariables>(
@@ -1647,7 +202,9 @@ export function useExpenseForm(opts: {
   const { onSubmit, onError, onSuccess } = opts;
   const onSubmitCallback = React.useCallback(
     async (values: ExpenseFormValues, formikHelpers: FormikHelpers<ExpenseFormValues>) => {
-      const plan = planExpenseSubmission(values, formOptions, startOptions.current, { customData: opts.customData });
+      const plan = planExpenseSubmission(values, formOptionsRef.current, startOptions.current, {
+        customData: opts.customData,
+      });
       if (onSubmit) {
         return onSubmit(plan, formikHelpers);
       }
@@ -1671,12 +228,12 @@ export function useExpenseForm(opts: {
         onError(err);
       }
     },
-    [opts.customData, onSubmit, formOptions, editExpense, onSuccess, createExpense, draftExpenseAndInviteUser, onError],
+    [opts.customData, onSubmit, editExpense, onSuccess, createExpense, draftExpenseAndInviteUser, onError],
   );
 
   const validate = React.useCallback(
     (values: ExpenseFormValues) => {
-      const result = formOptions.schema.safeParse(values, { errorMap: getCustomZodErrorMap(intl) });
+      const result = formOptionsRef.current.schema.safeParse(values, { errorMap: getCustomZodErrorMap(intl) });
       const newPayoutMethodErrors =
         values.payoutMethodId === NEW_PAYOUT_METHOD_ID &&
         omit(validatePayoutMethod(values.newPayoutMethod), ['data.currency', 'type']);
@@ -1703,16 +260,58 @@ export function useExpenseForm(opts: {
         return errs;
       }
     },
-    [formOptions.schema, intl],
+    [intl],
   );
 
   const expenseForm: ExpenseFormik = useFormik<ExpenseFormValues>({
     initialValues: initialValues.current,
-    initialStatus: initialStatus.current,
     validate,
     onSubmit: onSubmitCallback,
     validateOnBlur: false,
   });
+
+  const queryVariables = useDeepEqualMemo(
+    getFormQueryVariables(expenseForm.values, startOptions.current, LoggedInUser),
+  );
+  const latestFormQueryRequest = React.useRef(0);
+  const fetchFormQuery = React.useCallback(
+    async (variables: ExpenseFormSchemaQueryVariables, refresh = false) => {
+      // Only the latest request's result is applied, so an outdated response cannot overwrite a newer one
+      const requestId = ++latestFormQueryRequest.current;
+      let result: ExpenseFormQueryResult;
+      try {
+        result = await apolloClient.query<ExpenseFormSchemaQuery, ExpenseFormSchemaQueryVariables>({
+          query: expenseFormSchemaQuery,
+          variables,
+          errorPolicy: 'all',
+          fetchPolicy: refresh ? 'network-only' : 'cache-first',
+        });
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error(err);
+        result = {};
+      }
+
+      if (requestId === latestFormQueryRequest.current) {
+        setFormQueryResult(result);
+      }
+    },
+    [apolloClient],
+  );
+
+  React.useEffect(() => {
+    fetchFormQuery(queryVariables);
+  }, [fetchFormQuery, queryVariables]);
+
+  const formOptions = React.useMemo<ExpenseFormOptions>(() => {
+    if (!formQueryResult) {
+      return INITIAL_FORM_OPTIONS;
+    }
+
+    const derivedOptions = deriveFormOptions(formQueryResult, expenseForm.values, startOptions.current, LoggedInUser);
+    return { ...derivedOptions, schema: buildFormSchema(derivedOptions, intl, startOptions.current.pickSchemaFields) };
+  }, [formQueryResult, expenseForm.values, LoggedInUser, intl]);
+  formOptionsRef.current = formOptions;
 
   const prevFormOptions = usePrevious(formOptions);
 
@@ -2106,51 +705,21 @@ export function useExpenseForm(opts: {
     setFieldValue,
   ]);
 
-  const setStatus = expenseForm.setStatus;
-  React.useEffect(() => {
-    setStatus({ schema: formOptions.schema });
-  }, [formOptions.schema, setStatus]);
-
-  const refreshFormOptions = React.useCallback(
-    async (force?: boolean) => {
-      setFormOptions(
-        await buildFormOptions(
-          intl,
-          apolloClient,
-          LoggedInUser,
-          expenseFormValues.current,
-          startOptions.current,
-          force,
-        ),
-      );
-
-      setInitialFormOptions.current = true;
-    },
-    [apolloClient, LoggedInUser, intl],
-  );
-
-  // calculate form
-  React.useEffect(() => {
-    expenseFormValues.current = expenseForm.values;
-
-    refreshFormOptions();
-  }, [refreshFormOptions, expenseForm.values]);
-
   // revalidate form
   const validateForm = expenseForm.validateForm;
   React.useEffect(() => {
     async function runValidation() {
       await validateForm();
 
-      if (setInitialFormOptions.current && !startOptions.current.expenseId) {
+      if (formQueryResult && !startOptions.current.expenseId) {
         initialLoading.current = false;
-      } else if (setInitialFormOptions.current && setInitialExpenseValues.current) {
+      } else if (formQueryResult && setInitialExpenseValues.current) {
         initialLoading.current = false;
       }
     }
 
     runValidation();
-  }, [formOptions.schema, validateForm]);
+  }, [formOptions.schema, validateForm, formQueryResult]);
   React.useEffect(() => {
     if (startOptions.current.expenseId && !expenseLoaded) {
       return;
@@ -2216,7 +785,6 @@ export function useExpenseForm(opts: {
     formOptions.payoutMethods,
     expenseForm.values.payoutMethodId,
     setFieldValue,
-    setFormOptions,
     expenseForm.touched.expenseItems,
     expenseForm.values.expenseItems,
     formOptions.expense?.status,
@@ -2224,7 +792,7 @@ export function useExpenseForm(opts: {
     formOptions.loggedInAccount,
   ]);
 
-  const refresh = React.useCallback(async () => refreshFormOptions(true), [refreshFormOptions]);
+  const refresh = React.useCallback(() => fetchFormQuery(queryVariables, true), [fetchFormQuery, queryVariables]);
 
   return Object.assign(expenseForm, {
     options: formOptions,

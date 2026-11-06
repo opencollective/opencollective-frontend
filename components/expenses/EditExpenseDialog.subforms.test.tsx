@@ -11,12 +11,6 @@ jest.mock('../../lib/hooks/useLoggedInUser', () => ({
   default: () => ({ LoggedInUser: mockedLoggedInUser, refetchLoggedInUser: jest.fn() }),
 }));
 
-// Isolates the module-level memoization of the form query between tests (see the mock module)
-jest.mock(
-  'memoize-one',
-  () => jest.requireActual('../submit-expense/testing/memoize-one-per-client').memoizeOnePerClientMock,
-);
-
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';

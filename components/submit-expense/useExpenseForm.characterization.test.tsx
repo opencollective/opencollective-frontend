@@ -12,9 +12,6 @@ jest.mock('../../lib/hooks/useLoggedInUser', () => ({
   default: () => ({ LoggedInUser: mockedLoggedInUser, refetchLoggedInUser: jest.fn() }),
 }));
 
-// Isolates the module-level memoization of the form query between tests (see the mock module)
-jest.mock('memoize-one', () => jest.requireActual('./testing/memoize-one-per-client').memoizeOnePerClientMock);
-
 import { act } from '@testing-library/react';
 
 import { ExpenseLockableFields, ExpenseType, PayoutMethodType } from '../../lib/graphql/types/v2/graphql';
@@ -1119,6 +1116,46 @@ describe('useExpenseForm (characterization)', () => {
       await submit(form);
       expect(form.current.errors).toEqual({});
       expect(onSubmit).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('form query', () => {
+    it('only applies the result of the latest request', async () => {
+      const world = defaultWorld();
+      const answer = answerFormQuery(world);
+      let releaseSlowRequest: () => void;
+      const slowRequest = new Promise<void>(resolve => (releaseSlowRequest = resolve));
+      const mock = createMockApolloClient({
+        ExpenseFormSchema: async vars => {
+          if (vars.payeeSlug === 'bob') {
+            await slowRequest; // The request for "bob" resolves after the one for "jane"
+          }
+          return answer(vars);
+        },
+      });
+      const { result } = renderExpenseFormHook(mock.client, {
+        initialValues: newExpenseValues(),
+        startOptions: {},
+        onSuccess: jest.fn(),
+        onError: jest.fn(),
+      });
+      await waitForFormReady(result);
+      await setValues(result, { payeeSlug: 'bob' });
+      await setValues(result, { payeeSlug: 'jane' });
+      expect(result.current.options.payee.slug).toBe('jane');
+
+      releaseSlowRequest();
+      await settle();
+      expect(result.current.options.payee.slug).toBe('jane');
+    });
+
+    it('does not share results between hook instances', async () => {
+      const first = await setup({});
+      const otherWorld = defaultWorld();
+      otherWorld.accounts.collective = collective({ name: 'Another collective' });
+      const second = await setup({ world: otherWorld });
+      expect(first.form.current.options.account.name).toBe('collective');
+      expect(second.form.current.options.account.name).toBe('Another collective');
     });
   });
 

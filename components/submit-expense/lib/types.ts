@@ -2,7 +2,6 @@
  * Types shared by the Expense form modules (values, options, start options).
  */
 import type { TaxType } from '@opencollective/taxes';
-import type { ZodObjectDef } from 'zod';
 import type { z } from 'zod';
 
 import type {
@@ -133,7 +132,7 @@ export type ExpenseFormValues = {
 };
 
 export type ExpenseFormOptions = {
-  schema: z.ZodType<RecursivePartial<ExpenseFormValues>, ZodObjectDef, RecursivePartial<ExpenseFormValues>>;
+  schema: z.ZodType<RecursivePartial<ExpenseFormValues>>;
   supportedExpenseTypes?: ExpenseType[];
   allowInvite?: boolean;
   payoutProfiles?: ExpenseFormSchemaQuery['loggedInAccount'][];
