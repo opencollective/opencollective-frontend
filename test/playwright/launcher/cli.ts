@@ -127,7 +127,7 @@ function run(command: string | undefined, args: string[]): void {
     case 'port-owner': {
       const owner = portOwner(Number(args[0]));
       if (owner) {
-        process.stdout.write(`${owner.pid ?? '?'}\t${owner.command}\n`);
+        process.stdout.write(`${owner.pid ?? '?'}\t${owner.command}${owner.cwd ? ` (in ${owner.cwd})` : ''}\n`);
       }
       break;
     }

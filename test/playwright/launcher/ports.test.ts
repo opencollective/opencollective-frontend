@@ -11,6 +11,7 @@ describe('portOwner', () => {
       const owner = portOwner(port);
       expect(owner?.pid).toBe(process.pid);
       expect(owner?.command).toContain('node');
+      expect(owner?.cwd).toBe(process.cwd());
     } finally {
       await new Promise(resolve => server.close(resolve));
     }

@@ -33,9 +33,10 @@ const listeningInodes = (port: number): Set<string> => {
 
 /**
  * The process listening on `port`, or null when the port is free. `pid` is null
- * when the socket belongs to a process this user cannot inspect.
+ * when the socket belongs to a process this user cannot inspect; `cwd` tells
+ * which checkout a service runs from.
  */
-export function portOwner(port: number): { pid: number | null; command: string } | null {
+export function portOwner(port: number): { pid: number | null; command: string; cwd: string | null } | null {
   const inodes = listeningInodes(port);
   if (inodes.size === 0) {
     return null;
@@ -54,9 +55,10 @@ export function portOwner(port: number): { pid: number | null; command: string }
           .split('\0')
           .filter(Boolean)
           .join(' ');
-        return { pid: Number(entry), command: command || '<unknown command>' };
+        const cwd = readOrNull(() => fs.readlinkSync(`/proc/${entry}/cwd`));
+        return { pid: Number(entry), command: command || '<unknown command>', cwd };
       }
     }
   }
-  return { pid: null, command: 'a process this user cannot inspect (another user, a container, or root)' };
+  return { pid: null, command: 'a process this user cannot inspect (another user, a container, or root)', cwd: null };
 }
