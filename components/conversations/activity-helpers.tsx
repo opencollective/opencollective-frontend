@@ -13,10 +13,18 @@ import { UserMinus as UnapprovedIcon } from '@styled-icons/feather/UserMinus';
 import { SyncAlt as MoveIcon } from '@styled-icons/material/SyncAlt';
 import { Update as UpdateIcon } from '@styled-icons/material/Update';
 import { AlertCircleIcon, AlertOctagonIcon, InfoIcon, Lock as LockIcon } from 'lucide-react';
+import type { MessageDescriptor } from 'react-intl';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 
 import { renderDetailsString } from '../../lib/transactions';
 import { ExpenseStatus, type Transaction } from '@/lib/graphql/types/v2/graphql';
+
+import {
+  getExpenseUpdatedIcon,
+  getExpenseUpdatedMessage,
+  isSystemExpenseUpdate,
+  renderExpenseUpdatedActivityDetails,
+} from './ExpenseUpdatedActivity';
 
 /**
  * Defines activities display metadata.
@@ -70,8 +78,14 @@ export const ACTIVITIES_INFO = {
       id: 'Expense.Activity.Updated',
       defaultMessage: 'Expense updated',
     }),
-    renderDetails: ({ previousData, expense }) => {
-      if (previousData?.status !== ExpenseStatus.PENDING && expense?.status === ExpenseStatus.PENDING) {
+    getMessage: getExpenseUpdatedMessage,
+    getIcon: getExpenseUpdatedIcon,
+    renderDetails: data => {
+      const { previousData, expense } = data || {};
+      if (isSystemExpenseUpdate(data)) {
+        // Tax form and payout method changes don't modify the expense itself
+        return renderExpenseUpdatedActivityDetails(data);
+      } else if (previousData?.status !== ExpenseStatus.PENDING && expense?.status === ExpenseStatus.PENDING) {
         return (
           <FormattedMessage
             defaultMessage="The expense has been modified and re-submitted for approval by the collective."
@@ -298,9 +312,16 @@ export const getActivityColors = (activityType, theme) => {
 };
 
 export const getActivityIcon = (activity, theme, size = 18) => {
-  const IconComponent = ACTIVITIES_INFO[activity.type]?.icon || UpdateIcon;
+  const activityInfo = ACTIVITIES_INFO[activity.type];
+  const IconComponent = activityInfo?.getIcon?.(activity.data) || activityInfo?.icon || UpdateIcon;
   const colors = getActivityColors(activity.type, theme);
   return <IconComponent size={size} color={colors.border} />;
+};
+
+/** The title of the activity, which can depend on its data (e.g. tax form or payout method changes) */
+export const getActivityMessage = (activity): MessageDescriptor | undefined => {
+  const activityInfo = ACTIVITIES_INFO[activity?.type];
+  return activityInfo?.getMessage?.(activity.data) || activityInfo?.message;
 };
 
 export const isSupportedActivity = activity => {
