@@ -20,10 +20,11 @@
 #                    inputs — including a fresh database and fresh provider
 #                    resources — not historical provider state, and it cannot
 #                    guarantee recurrence of an intermittent failure.
-#   --reuse          Join the live owned environment for iteration: no reset of
-#                    database, cache, mail, or files. Reports how it differs
-#                    from fresh reproduction. Never tears down services.
-#   --cleanup        Stop one retained owned environment (refuses while other
+#   --reuse          Join a running E2E environment without installing or
+#                    building: no reset of database, cache, mail, or files.
+#                    Reports how it differs from fresh reproduction. Never
+#                    tears down services.
+#   --cleanup        Stop one retained E2E environment (refuses while other
 #                    runs still use it).
 #
 # Usage:
@@ -88,7 +89,8 @@ IMAGES_URL="${IMAGES_URL:-http://localhost:3001}"
 PDF_SERVICE_URL="${PDF_SERVICE_URL:-http://localhost:3002}"
 
 usage() {
-  sed -n '2,27p' "$0"
+  # The header comment, up to the first non-comment line.
+  awk 'NR > 1 && !/^#/ { exit } NR > 1' "$0"
   echo ""
   echo "Options:"
   echo "  --spec PATH            Playwright spec (default: $SPEC)"
@@ -99,9 +101,9 @@ usage() {
   echo "  --keep-on-failure      Retain owned processes/state on failure + print cleanup"
   echo "  --replay MANIFEST      Validate checkouts against a replay manifest, adopt its"
   echo "                         selection unless overridden, then run as fresh"
-  echo "  --reuse                Join the live owned environment for iteration (no reset,"
-  echo "                         never tears down services)"
-  echo "  --cleanup, --stop      Stop the retained owned environment for --pg-database"
+  echo "  --reuse                Join a running E2E environment (no install, build or"
+  echo "                         reset; never tears down services)"
+  echo "  --cleanup, --stop      Stop the retained E2E environment for --pg-database"
   echo "                         (refuses while other runs use it)"
   echo ""
   echo "Iteration (npm run e2e -- [options] [spec] [playwright args]):"
@@ -124,6 +126,14 @@ for arg in "$@"; do
   if [[ "$arg" == "--iterate" ]]; then ITERATE_REQUESTED=true; fi
 done
 
+require_value() {
+  # Options that take a value fail with a usage error, not an unbound variable.
+  if [[ $# -lt 2 ]]; then
+    echo "ERROR: $1 needs a value (see --help)." >&2
+    exit 2
+  fi
+}
+
 if [[ "$ITERATE_REQUESTED" == true ]]; then
   # Iteration: only launcher options are consumed; everything else (spec paths,
   # -g, --headed, --ui, --debug, ...) goes to Playwright unchanged.
@@ -139,10 +149,10 @@ if [[ "$ITERATE_REQUESTED" == true ]]; then
         esac
         shift 2 ;;
       --stop|--cleanup) CLEANUP_ONLY=true; shift ;;
-      --api-dir) API_DIR_INPUT="$2"; shift 2 ;;
-      --images-dir) IMAGES_DIR_INPUT="$2"; shift 2 ;;
-      --pdf-dir) PDF_DIR_INPUT="$2"; shift 2 ;;
-      --pg-database) PG_DATABASE_INPUT="$2"; shift 2 ;;
+      --api-dir) require_value "$@"; API_DIR_INPUT="$2"; shift 2 ;;
+      --images-dir) require_value "$@"; IMAGES_DIR_INPUT="$2"; shift 2 ;;
+      --pdf-dir) require_value "$@"; PDF_DIR_INPUT="$2"; shift 2 ;;
+      --pg-database) require_value "$@"; PG_DATABASE_INPUT="$2"; shift 2 ;;
       --keep-on-failure|--replay|--reuse|--spec|--grep|--frontend-dir)
         echo "ERROR: $1 is not an iteration option. Pass the spec and Playwright options directly" >&2
         echo "(npm run e2e -- test/playwright/specs/smoke.spec.ts -g \"title\"), or use run-local.sh without --iterate." >&2
@@ -158,33 +168,33 @@ fi
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --spec)
-      SPEC="$2"; SPEC_SET=true; shift 2 ;;
+      require_value "$@"; SPEC="$2"; SPEC_SET=true; shift 2 ;;
     --grep)
-      GREP="$2"; GREP_SET=true; shift 2 ;;
+      require_value "$@"; GREP="$2"; GREP_SET=true; shift 2 ;;
     --workers)
-      WORKERS="$2"; WORKERS_SET=true; shift 2 ;;
+      require_value "$@"; WORKERS="$2"; WORKERS_SET=true; shift 2 ;;
     --retries)
-      RETRIES="$2"; RETRIES_SET=true; shift 2 ;;
+      require_value "$@"; RETRIES="$2"; RETRIES_SET=true; shift 2 ;;
     --headed)
       HEADED=true; HEADED_SET=true; shift ;;
     --keep-on-failure)
       KEEP_ON_FAILURE=true; shift ;;
     --replay)
-      REPLAY_MANIFEST="$2"; REPLAY_REQUESTED=true; shift 2 ;;
+      require_value "$@"; REPLAY_MANIFEST="$2"; REPLAY_REQUESTED=true; shift 2 ;;
     --reuse)
       REUSE_REQUESTED=true; shift ;;
     --cleanup|--stop)
       CLEANUP_ONLY=true; shift ;;
     --api-dir)
-      API_DIR_INPUT="$2"; shift 2 ;;
+      require_value "$@"; API_DIR_INPUT="$2"; shift 2 ;;
     --frontend-dir)
-      FRONTEND_DIR_INPUT="$2"; shift 2 ;;
+      require_value "$@"; FRONTEND_DIR_INPUT="$2"; shift 2 ;;
     --images-dir)
-      IMAGES_DIR_INPUT="$2"; shift 2 ;;
+      require_value "$@"; IMAGES_DIR_INPUT="$2"; shift 2 ;;
     --pdf-dir)
-      PDF_DIR_INPUT="$2"; shift 2 ;;
+      require_value "$@"; PDF_DIR_INPUT="$2"; shift 2 ;;
     --pg-database)
-      PG_DATABASE_INPUT="$2"; shift 2 ;;
+      require_value "$@"; PG_DATABASE_INPUT="$2"; shift 2 ;;
     -h|--help)
       usage; exit 0 ;;
     --)
@@ -285,21 +295,12 @@ print_checkouts() {
   frontend_branch="$(git -C "$FRONTEND_DIR" branch --show-current 2>/dev/null || true)"
   echo "> Checkouts:"
   for name in frontend api images pdf; do
-    case "$name" in
-      frontend) dir="$FRONTEND_DIR" ;;
-      api) dir="$API_DIR" ;;
-      images) dir="$IMAGES_DIR" ;;
-      pdf) dir="$PDF_DIR" ;;
-    esac
+    dir="$(service_dir "$name")"
     line="$(launcher_cli describe "$dir")"
     printf '  %-8s %s (branch %s, %s)\n' "$name" "$dir" "${line%%$'\t'*}" "${line#*$'\t'}"
   done
   for name in api images pdf; do
-    case "$name" in
-      api) dir="$API_DIR" ;;
-      images) dir="$IMAGES_DIR" ;;
-      pdf) dir="$PDF_DIR" ;;
-    esac
+    dir="$(service_dir "$name")"
     warning="$(launcher_cli branch-warning "$name" "$dir" "$frontend_branch")"
     if [[ -n "$warning" ]]; then
       echo "> WARNING: $warning"
@@ -515,7 +516,7 @@ deregister_joiner() {
 run_cleanup() {
   command -v jq >/dev/null 2>&1 || { echo "ERROR: jq is required for --cleanup." >&2; exit 2; }
   if [[ ! -f "$RECORD_FILE" ]]; then
-    echo "ERROR: no owned environment '$PG_DATABASE' (no record at $RECORD_FILE)." >&2
+    echo "ERROR: no E2E environment '$PG_DATABASE' (no record at $RECORD_FILE)." >&2
     echo "Nothing to clean up." >&2
     exit 2
   fi
@@ -529,7 +530,7 @@ run_cleanup() {
     echo "remains, remove that entry file under $USERS_DIR and retry." >&2
     exit 2
   fi
-  echo "> Stopping owned environment '$PG_DATABASE' (owner $owner)"
+  echo "> Stopping the E2E environment '$PG_DATABASE' (owner $owner)"
   local owner_pid age
   owner_pid="$(record_owner_pid)"
   age="$(record_age_seconds)"
@@ -774,12 +775,29 @@ preflight_builds() {
   fi
 }
 
+playwright_browser_dirs() {
+  # Where this checkout's Playwright expects the browsers `playwright install
+  # chromium` installs (Chromium, headless shell, FFmpeg), honouring
+  # PLAYWRIGHT_BROWSERS_PATH and the pinned browser revisions.
+  (cd "$FRONTEND_DIR" && npx --no-install playwright install --dry-run chromium 2>/dev/null) |
+    sed -n 's/^ *Install location: *//p'
+}
+
+chromium_installed() {
+  local dirs dir
+  dirs="$(playwright_browser_dirs)" || return 1
+  [[ -n "$dirs" ]] || return 1
+  while IFS= read -r dir; do
+    [[ -f "$dir/INSTALLATION_COMPLETE" ]] || return 1
+  done <<<"$dirs"
+}
+
 preflight_browser() {
   if [[ ! -d "$FRONTEND_DIR/node_modules/@playwright/test" ]]; then
     fail "Playwright is not installed. Run: (cd $FRONTEND_DIR && npm ci && npx playwright install chromium)"
     exit 2
   fi
-  if [[ -z "$(ls -d ~/.cache/ms-playwright/chromium-* 2>/dev/null)" ]]; then
+  if ! chromium_installed; then
     fail "Playwright Chromium browser is not installed. Run: (cd $FRONTEND_DIR && npm run playwright:install)"
     exit 2
   fi
@@ -1064,6 +1082,24 @@ wait_for_service() {
   done
 }
 
+wait_for_frontend_markup() {
+  # A listening Next.js server can answer errors or placeholders while it warms
+  # up, so the home page is retried until it serves Open Collective markup.
+  local start body
+  start=$(date +%s)
+  while true; do
+    body="$(curl -sf "$WEBSITE_URL" 2>/dev/null || true)"
+    if grep -qi "open collective" <<<"$body"; then
+      return 0
+    fi
+    if [[ $(( $(date +%s) - start )) -ge $READY_TIMEOUT ]]; then
+      fail "frontend at $WEBSITE_URL did not serve Open Collective markup within ${READY_TIMEOUT}s. See $FRONTEND_LOG"
+      return 1
+    fi
+    sleep 2
+  done
+}
+
 semantic_readiness() {
   wait_for_service "API/status" "$API_URL/status" || return 1
   # API serves GraphQL through the same process; a persisted-query 400 still proves routing.
@@ -1072,10 +1108,7 @@ semantic_readiness() {
     curl -sf "$API_URL/graphql" -X POST -H 'Content-Type: application/json' -d '{"query":"{ __typename }"}' >/dev/null 2>&1 || true
   fi
   wait_for_service "Frontend" "$WEBSITE_URL" || return 1
-  if ! curl -sf "$WEBSITE_URL" 2>/dev/null | grep -qi "open collective"; then
-    fail "frontend at $WEBSITE_URL did not serve Open Collective markup. See $FRONTEND_LOG"
-    return 1
-  fi
+  wait_for_frontend_markup || return 1
   wait_for_service "Images" "$IMAGES_URL" || return 1
   wait_for_service "PDF" "$PDF_SERVICE_URL" || return 1
   wait_for_service "Mailpit/API" "$MAILPIT_URL/api/v1/messages" || return 1
@@ -1115,9 +1148,9 @@ file_sha() {
 }
 
 chromium_build() {
-  # Playwright-managed browser revision, e.g. chromium-1248.
+  # Playwright-managed browser revision this checkout uses, e.g. chromium-1248.
   local dir
-  dir="$(ls -d ~/.cache/ms-playwright/chromium-* 2>/dev/null | head -n 1)"
+  dir="$(playwright_browser_dirs | grep -m 1 '/chromium-[0-9]*$' || true)"
   [[ -n "$dir" ]] && basename "$dir" || echo "unknown"
 }
 
@@ -1285,7 +1318,7 @@ ensure_dependencies() {
     fi
     launcher_cli install-record "$dir"
   done
-  if [[ -z "$(ls -d ~/.cache/ms-playwright/chromium-* 2>/dev/null)" ]]; then
+  if ! chromium_installed; then
     echo "> Installing the Playwright Chromium browser"
     (cd "$FRONTEND_DIR" && npx playwright install chromium) || { fail "playwright install chromium failed"; exit 1; }
   fi
@@ -1518,7 +1551,7 @@ fresh_main() {
 
   if [[ "$KEEP_ON_FAILURE" == true && $pw_exit -ne 0 ]]; then
     mark_record_retained
-    echo "> Keeping owned environment '$PG_DATABASE' for inspection (keep-on-failure)." | sanitize
+    echo "> Keeping the E2E environment '$PG_DATABASE' for inspection (keep-on-failure)." | sanitize
     echo "  Artifacts: $ARTIFACTS_DIR" | sanitize
     echo "  Cleanup: ./test/playwright/run-local.sh --cleanup --pg-database $PG_DATABASE (from $FRONTEND_DIR)" | sanitize
     trap - EXIT
@@ -1558,12 +1591,12 @@ reuse_main() {
     fail "Playwright is not installed. Run: (cd $FRONTEND_DIR && npm ci && npx playwright install chromium)"
     exit 2
   fi
-  if [[ -z "$(ls -d ~/.cache/ms-playwright/chromium-* 2>/dev/null)" ]]; then
+  if ! chromium_installed; then
     fail "Playwright Chromium browser is not installed. Run: (cd $FRONTEND_DIR && npm run playwright:install)"
     exit 2
   fi
   if [[ ! -f "$RECORD_FILE" ]]; then
-    fail "no owned environment '$PG_DATABASE'. Start one with a fresh run first."
+    fail "no E2E environment '$PG_DATABASE'. Start one with a fresh run first."
     exit 2
   fi
   local api owner
@@ -1683,7 +1716,8 @@ check_database_identity() {
 }
 
 init_s3_bucket() {
-  # Upload journeys need the opencollective-e2e bucket; the API script only adds missing buckets.
+  # Upload journeys need the opencollective-e2e bucket. The API script creates
+  # missing buckets and makes sure every bucket lets the website read objects (CORS).
   if ! (cd "$API_DIR" && npx babel-node --extensions .js,.ts scripts/dev/init-local-s3.ts) >>"$ARTIFACTS_DIR/s3-init.log" 2>&1; then
     echo "> WARNING: could not create the $AWS_S3_BUCKET bucket (see $ARTIFACTS_DIR/s3-init.log); upload journeys may fail."
   fi
@@ -1700,7 +1734,10 @@ print_stale_services() {
   if [[ ${#stale[@]} -gt 0 ]]; then
     echo "  This run uses the running services as they are. To rebuild and restart one:"
     for svc in "${stale[@]}"; do
-      echo "    npm run e2e -- --rebuild $svc ${PW_ARGS[*]+${PW_ARGS[*]}}"
+      printf '    npm run e2e -- --rebuild %q' "$svc"
+      [[ ${#PW_ARGS[@]} -eq 0 ]] || printf ' %q' "${PW_ARGS[@]}"
+      printf '\n'
+
     done
     if [[ " ${stale[*]} " == *" frontend "* ]]; then
       echo "  A frontend rebuild is a full Next.js production build (a few minutes)."
@@ -1734,6 +1771,9 @@ join_environment() {
     for svc in "${REBUILD_SERVICES[@]}"; do
       restart_service "$svc"
     done
+    # Same semantic checks as a fresh start: a restarted service must serve
+    # real content (frontend markup, guarded fixture route), not just listen.
+    semantic_readiness || exit 1
   fi
   print_stale_services
   export WEBSITE_URL API_URL MAILPIT_URL

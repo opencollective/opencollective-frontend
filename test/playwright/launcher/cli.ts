@@ -19,11 +19,9 @@ import fs from 'node:fs';
 
 import { portOwner } from './ports.ts';
 import type { ServiceName } from './services.ts';
-import { branchMismatchWarning, describeCheckout, resolveServiceDir } from './services.ts';
+import { branchMismatchWarning, describeCheckout, resolveServiceDir, SERVICE_SETTINGS } from './services.ts';
 import type { BuildStamp } from './stamps.ts';
 import { computeBuildStamp, frontendBuildOwner, installReason, recordInstall, staleReasons } from './stamps.ts';
-
-const SERVICES = ['api', 'images', 'pdf'];
 
 class CliError extends Error {}
 
@@ -51,8 +49,17 @@ const readStamp = (file: string): BuildStamp | null => {
   }
 };
 
+/** A stamp passed on the command line: malformed JSON is a usage error. */
+const parseStamp = (json: string): BuildStamp => {
+  try {
+    return JSON.parse(json);
+  } catch {
+    return fail(`malformed build stamp JSON: ${json}`);
+  }
+};
+
 const service = (name: string): ServiceName =>
-  SERVICES.includes(name) ? (name as ServiceName) : fail(`unknown service: ${name}`);
+  Object.hasOwn(SERVICE_SETTINGS, name) ? (name as ServiceName) : fail(`unknown service: ${name}`);
 
 function run(command: string | undefined, args: string[]): void {
   switch (command) {
@@ -102,14 +109,14 @@ function run(command: string | undefined, args: string[]): void {
       break;
     }
     case 'stamp-check': {
-      const reasons = staleReasons({ dir: args[0], recorded: readStamp(args[1]), current: JSON.parse(args[2]) });
+      const reasons = staleReasons({ dir: args[0], recorded: readStamp(args[1]), current: parseStamp(args[2]) });
       if (reasons.length > 0) {
         process.stdout.write(`${reasons.join(', ')}\n`);
       }
       break;
     }
     case 'stamp-save': {
-      const stamp: BuildStamp = JSON.parse(args[1]);
+      const stamp = parseStamp(args[1]);
       const buildId = args[2] ? readText(args[2]) : null;
       if (args[2] && !buildId) {
         fail(`build finished without ${args[2]}`);

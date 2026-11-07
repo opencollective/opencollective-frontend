@@ -106,7 +106,7 @@ function collectRun() {
   const run: BenchmarkRun = {
     batch: required('batch'),
     pair: Number(required('pair')),
-    mode: required('mode') as BenchmarkRun['mode'],
+    mode: required('mode'),
     runner,
     position: Number(required('position')),
     concurrency: Number(required('concurrency')),

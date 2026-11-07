@@ -5,13 +5,14 @@
  * Runs under plain `node` (type stripping) from `test/playwright/run-local.sh`
  * through `cli.ts`, so it only uses erasable TypeScript syntax.
  */
-import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { gitText } from './git.ts';
+
 export type ServiceName = 'api' | 'images' | 'pdf';
 
-const SERVICE_SETTINGS: Record<ServiceName, { repo: string; variable: string; flag: string }> = {
+export const SERVICE_SETTINGS: Record<ServiceName, { repo: string; variable: string; flag: string }> = {
   api: { repo: 'opencollective-api', variable: 'API_FOLDER', flag: '--api-dir' },
   images: { repo: 'opencollective-images', variable: 'IMAGES_FOLDER', flag: '--images-dir' },
   pdf: { repo: 'opencollective-pdf', variable: 'PDF_FOLDER', flag: '--pdf-dir' },
@@ -29,18 +30,10 @@ const isDirectory = (dir: string) => {
   }
 };
 
-const git = (cwd: string, ...args: string[]): string | null => {
-  try {
-    return execFileSync('git', args, { cwd, stdio: ['ignore', 'pipe', 'ignore'], encoding: 'utf8' }).trim();
-  } catch {
-    return null;
-  }
-};
-
 /** The checkout that owns a linked worktree, or null when `dir` is not a linked worktree. */
 const worktreeMainCheckout = (dir: string): string | null => {
-  const gitDir = git(dir, 'rev-parse', '--path-format=absolute', '--git-dir');
-  const commonDir = git(dir, 'rev-parse', '--path-format=absolute', '--git-common-dir');
+  const gitDir = gitText(dir, ['rev-parse', '--path-format=absolute', '--git-dir']);
+  const commonDir = gitText(dir, ['rev-parse', '--path-format=absolute', '--git-common-dir']);
   if (!gitDir || !commonDir || gitDir === commonDir) {
     return null;
   }
@@ -48,7 +41,7 @@ const worktreeMainCheckout = (dir: string): string | null => {
     return path.dirname(commonDir);
   }
   // Submodule checkouts keep their repository elsewhere and point back with core.worktree.
-  return git(commonDir, `--git-dir=${commonDir}`, 'rev-parse', '--show-toplevel');
+  return gitText(commonDir, [`--git-dir=${commonDir}`, 'rev-parse', '--show-toplevel']);
 };
 
 /**
@@ -90,7 +83,7 @@ export function resolveServiceDir({
   const lines = [`${repo} checkout not found. Tried:`, ...tried.map(dir => `  - ${dir}`), howToSet];
   const mainCheckout = worktreeMainCheckout(frontendDir);
   if (mainCheckout) {
-    const branch = git(frontendDir, 'branch', '--show-current') || '<branch>';
+    const branch = gitText(frontendDir, ['branch', '--show-current']) || '<branch>';
     const mainService = path.join(path.dirname(mainCheckout), repo);
     lines.push(
       `This looks like a frontend-only worktree. Create a matching ${repo} worktree next to it:`,
@@ -104,8 +97,8 @@ export function resolveServiceDir({
 /** Current branch (or `(detached)`) and HEAD revision of a checkout, for the run header. */
 export function describeCheckout(dir: string): { branch: string; rev: string } {
   return {
-    branch: git(dir, 'branch', '--show-current') || '(detached)',
-    rev: git(dir, 'rev-parse', 'HEAD') || 'unknown',
+    branch: gitText(dir, ['branch', '--show-current']) || '(detached)',
+    rev: gitText(dir, ['rev-parse', 'HEAD']) || 'unknown',
   };
 }
 
@@ -125,17 +118,18 @@ export function branchMismatchWarning({
   if (!frontendBranch) {
     return null;
   }
-  const current = git(dir, 'branch', '--show-current') || '(detached)';
+  const current = gitText(dir, ['branch', '--show-current']) || '(detached)';
   if (current === frontendBranch) {
     return null;
   }
-  const refs = git(dir, 'for-each-ref', '--format=%(refname)', 'refs/heads', 'refs/remotes') || '';
+  const refs = gitText(dir, ['for-each-ref', '--format=%(refname)', 'refs/heads', 'refs/remotes']) || '';
+  const remotePrefix = /^refs\/remotes\/[^/]+\//;
   const hasMatchingBranch = refs
     .split('\n')
     .some(
       ref =>
         ref === `refs/heads/${frontendBranch}` ||
-        (/^refs\/remotes\/[^/]+\//.test(ref) && ref.replace(/^refs\/remotes\/[^/]+\//, '') === frontendBranch),
+        (remotePrefix.test(ref) && ref.replace(remotePrefix, '') === frontendBranch),
     );
   if (!hasMatchingBranch) {
     return null;

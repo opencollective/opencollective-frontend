@@ -7,8 +7,6 @@
 
 type Suite = 'expenses' | 'vendors';
 type Runner = 'cypress' | 'playwright';
-/** `serial`, `parallel`, or a named configuration variant run as its own pairs. */
-type Mode = string;
 
 type TestSample = {
   suite: Suite;
@@ -34,7 +32,8 @@ type Phases = {
 export type BenchmarkRun = {
   batch: string;
   pair: number;
-  mode: Mode;
+  /** `serial`, `parallel`, or a named configuration variant run as its own pairs. */
+  mode: string;
   runner: Runner;
   /** 1 when this runner went first in its pair. */
   position: number;
@@ -215,7 +214,7 @@ const RUNNERS: Runner[] = ['cypress', 'playwright'];
  * path (seconds saved by Playwright) where both runs of the pair passed.
  */
 export function summarizeBenchmark(runs: BenchmarkRun[]) {
-  const modes: Mode[] = [...new Set(runs.map(run => run.mode))];
+  const modes: string[] = [...new Set(runs.map(run => run.mode))];
   const groups = modes
     .flatMap(mode =>
       RUNNERS.map(runner => {
