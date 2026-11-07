@@ -1,0 +1,154 @@
+import React, { Component } from 'react';
+import { graphql } from '@apollo/client/react/hoc';
+import type { Router } from 'next/router';
+import { withRouter } from 'next/router';
+import { FormattedMessage } from 'react-intl';
+
+import { FEATURES, isFeatureEnabled } from '../../lib/allowed-features';
+import { getErrorFromGraphqlException } from '../../lib/errors';
+import { gql } from '../../lib/graphql/helpers';
+import type LoggedInUser from '../../lib/LoggedInUser';
+import { getCollectivePageRoute } from '../../lib/url-helpers';
+
+import { Box, Flex } from '../Grid';
+import { getI18nLink } from '../I18nFormatters';
+import MessageBox from '../MessageBox';
+import SignInOrJoinFree from '../SignInOrJoinFree';
+import { H1, P } from '../Text';
+import { withUser } from '../UserProvider';
+
+import Form from './Form';
+
+type CreateProjectProject = {
+  slug?: string;
+  name?: string;
+  description?: string;
+};
+
+type CreateProjectProps = {
+  parent?: {
+    slug?: string;
+    name?: string;
+    isFrozen?: boolean;
+    host?: { slug: string; type?: string; parentCollective?: { slug?: string }; parent?: { slug?: string } };
+  };
+  /** from withUser */
+  LoggedInUser?: LoggedInUser;
+  /** from withUser */
+  refetchLoggedInUser?: () => Promise<unknown>;
+  /** addCreateProjectMutation */
+  createProject?: (options: {
+    variables: { project: CreateProjectProject; parent: { slug?: string } };
+  }) => Promise<{ data?: { createProject?: { slug?: string } } }>;
+  router: Router;
+};
+
+type CreateProjectState = {
+  error?: string;
+  creating: boolean;
+};
+
+class CreateProject extends Component<CreateProjectProps, CreateProjectState> {
+  constructor(props: CreateProjectProps) {
+    super(props);
+
+    this.state = { error: null, creating: false };
+
+    this.createProject = this.createProject.bind(this);
+  }
+
+  async createProject(project: CreateProjectProject) {
+    // set state to loading
+    this.setState({ creating: true });
+
+    // try mutation
+    try {
+      const res = await this.props.createProject({
+        variables: { project, parent: { slug: this.props.parent.slug } },
+      });
+      const createdProject = res.data.createProject;
+      await this.props.refetchLoggedInUser();
+      this.props.router
+        .push({
+          pathname: `/${this.props.parent.slug}/projects/${createdProject.slug}`,
+          query: {
+            status: 'projectCreated',
+          },
+        })
+        .then(() => window.scrollTo(0, 0));
+    } catch (err) {
+      const errorMsg = getErrorFromGraphqlException(err).message;
+      this.setState({ error: errorMsg, creating: false });
+    }
+  }
+
+  render() {
+    const { LoggedInUser, parent } = this.props;
+    const { creating, error } = this.state;
+
+    if (!LoggedInUser) {
+      return (
+        <Flex flexDirection="column" alignItems="center" mb={5} p={2}>
+          <Flex flexDirection="column" p={4} mt={2}>
+            <Box mb={3}>
+              <H1 fontSize="32px" lineHeight="36px" fontWeight="bold" textAlign="center">
+                <FormattedMessage id="collective.create.join" defaultMessage="Join Open Collective" />
+              </H1>
+            </Box>
+            <Box textAlign="center">
+              <P fontSize="14px" color="black.600" mb={1}>
+                <FormattedMessage
+                  id="collective.create.createOrSignIn"
+                  defaultMessage="Create an account (or sign in) to start a collective."
+                />
+              </P>
+            </Box>
+          </Flex>
+          <SignInOrJoinFree />
+        </Flex>
+      );
+    } else if (parent?.isFrozen) {
+      return (
+        <Flex flexDirection="column" alignItems="center" my={6}>
+          <MessageBox withIcon type="warning">
+            <FormattedMessage
+              defaultMessage="This account is frozen, you cannot create new projects at this time."
+              id="vUYcYC"
+            />{' '}
+            {isFeatureEnabled(parent.host, FEATURES.CONTACT_FORM) && (
+              <FormattedMessage
+                defaultMessage="Please <ContactLink>contact</ContactLink> your fiscal host for more details."
+                id="KxBiJC"
+                values={{ ContactLink: getI18nLink({ href: `${getCollectivePageRoute(parent.host)}/contact` }) }}
+              />
+            )}
+          </MessageBox>
+        </Flex>
+      );
+    }
+
+    return <Form parent={parent} onSubmit={this.createProject} loading={creating} error={error} />;
+  }
+}
+
+const createProjectMutation = gql`
+  mutation CreateProject($project: ProjectCreateInput!, $parent: AccountReferenceInput) {
+    createProject(project: $project, parent: $parent) {
+      id
+      name
+      slug
+      description
+    }
+  }
+`;
+
+const addCreateProjectMutation = graphql<
+  Omit<CreateProjectProps, 'router' | 'LoggedInUser' | 'refetchLoggedInUser'>,
+  Record<string, unknown>,
+  Record<string, unknown>,
+  { createProject?: CreateProjectProps['createProject'] }
+>(createProjectMutation, {
+  name: 'createProject',
+});
+
+export default withRouter(withUser(addCreateProjectMutation(CreateProject)));

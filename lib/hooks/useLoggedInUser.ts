@@ -10,7 +10,7 @@ export type UserContextProps = {
   LoggedInUser: LoggedInUser | null;
   login: (token?: string) => Promise<LoggedInUser>;
   logout: (arg?: { redirect?: string; skipQueryRefetch?: boolean }) => Promise<void>;
-  refetchLoggedInUser: () => Promise<void>;
+  refetchLoggedInUser: () => Promise<unknown>;
   updateLoggedInUserFromCache: () => void;
 };
 

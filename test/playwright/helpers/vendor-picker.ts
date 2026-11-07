@@ -91,7 +91,8 @@ export async function expectVendorNotFound(page: Page, vendor: Vendor, { canCrea
     // Disabled while the search is running.
     await expect(list.getByRole('option', { name: `Create vendor: ${vendor.name}` })).toBeEnabled();
   } else {
-    await expect(list.getByText('No options')).toBeVisible();
+    // StyledSelect's own message (Select.NoOptions), not react-select's default "No options"
+    await expect(list.getByText('Nothing found')).toBeVisible();
   }
   await expect(vendorOption(page, 'payee', vendor)).toHaveCount(0);
 }

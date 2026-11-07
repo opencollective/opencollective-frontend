@@ -1,0 +1,179 @@
+import React from 'react';
+import { get } from 'lodash-es';
+import type { IntlShape } from 'react-intl';
+import { defineMessages } from 'react-intl';
+import { styled } from 'styled-components';
+
+import { formatCurrency } from '../lib/currency-utils';
+import type { Currency } from '../lib/graphql/types/v2/graphql';
+import { capitalize, firstSentence, formatDate, singular } from '../lib/utils';
+import injectIntl from '@/lib/injectIntl';
+
+import Avatar from './Avatar';
+import CollectiveCard from './CollectiveCard';
+import Container from './Container';
+import { Flex } from './Grid';
+import LinkCollective from './LinkCollective';
+
+const MemberContainer = styled.div`
+  max-width: 300px;
+  float: left;
+  position: relative;
+
+  .USER {
+    margin: 0.3rem 0.15rem;
+  }
+
+  .small {
+    width: 48px;
+  }
+
+  .small .avatar {
+    margin: 0;
+  }
+
+  .ORGANIZATION,
+  .COLLECTIVE {
+    width: 200px;
+    margin: 0.65rem;
+  }
+`;
+
+type MemberAccount = {
+  id?: number | string;
+  type?: string;
+  slug?: string;
+  name?: string;
+  description?: string;
+  company?: string;
+  user?: { email?: string };
+  /** Present on member entries: the account of the member */
+  member?: MemberAccount;
+};
+
+type MemberMembership = MemberAccount & {
+  collective?: MemberProps['collective'];
+  member?: MemberAccount;
+  tier?: { name?: string };
+  role?: string;
+  createdAt?: string;
+  stats?: { totalDonations?: number };
+};
+
+type MemberProps = {
+  member: MemberAccount;
+  collective: {
+    id?: number | string;
+    slug?: string;
+    name?: string;
+    type?: string;
+    currency?: Currency;
+  };
+  viewMode?: string;
+  intl?: IntlShape;
+  className?: string;
+};
+
+class Member extends React.Component<MemberProps> {
+  constructor(props: MemberProps) {
+    super(props);
+
+    this.messages = defineMessages({
+      'membership.since': { id: 'membership.since', defaultMessage: 'since {date}' },
+      ADMIN: { id: 'Member.Role.ADMIN', defaultMessage: 'Admin' },
+      MEMBER: { id: 'Member.Role.MEMBER', defaultMessage: 'Core Contributor' },
+      COMMUNITY_MANAGER: { id: 'Member.Role.COMMUNITY_MANAGER', defaultMessage: 'Community Manager' },
+      BACKER: { id: 'Member.Role.BACKER', defaultMessage: 'Financial Contributor' },
+      'membership.totalDonations': {
+        id: 'membership.totalDonations',
+        defaultMessage: 'Total amount contributed',
+      },
+    });
+  }
+
+  messages: Record<string, { id: string; defaultMessage: string }>;
+
+  render() {
+    const { collective, intl } = this.props;
+    const membership: MemberMembership = { ...this.props.member };
+    membership.collective = collective;
+    const { member, description } = membership;
+    const viewMode = this.props.viewMode || (get(member, 'type') === 'USER' ? 'USER' : 'ORGANIZATION');
+    const user = member.user || {};
+    const name =
+      (member.name && member.name.match(/^null/) ? null : member.name) ||
+      member.slug ||
+      (user.email && user.email.substr(0, user.email.indexOf('@')));
+    if (!name) {
+      return <div />;
+    }
+
+    const tierName = membership.tier
+      ? singular(membership.tier.name)
+      : this.messages[membership.role]
+        ? intl.formatMessage(this.messages[membership.role])
+        : membership.role;
+    let memberSinceStr = '';
+    if (tierName) {
+      memberSinceStr += capitalize(tierName);
+    }
+    memberSinceStr += ` ${intl.formatMessage(this.messages['membership.since'], {
+      date: formatDate(membership.createdAt),
+      tierName: tierName ? capitalize(tierName) : '',
+    })}`;
+    const className = this.props.className || '';
+    const totalDonationsStr = membership.stats
+      ? `${intl.formatMessage(this.messages['membership.totalDonations'])}: ${formatCurrency(
+          membership.stats.totalDonations,
+          collective.currency,
+          { precision: 0, locale: intl.locale },
+        )}`
+      : '';
+    let title = member.name;
+    if (member.company) {
+      title += `
+${member.company}`;
+    }
+    if (member.description) {
+      title += `
+${member.description}`;
+    }
+    if (className.match(/small/)) {
+      title += `
+
+${memberSinceStr}
+${totalDonationsStr}`;
+    }
+
+    return (
+      <MemberContainer>
+        <Container className={`${className} ${member.type} viewMode-${viewMode}`}>
+          {viewMode === 'USER' && (
+            <LinkCollective collective={this.props.member.member} target="_top" title={title}>
+              <Flex mt={2}>
+                <Avatar collective={member} radius={45} className="noFrame" />
+                <Container padding="0.65rem" paddingTop="0" textAlign="left" overflow="hidden" display="none">
+                  <Container fontSize="1.05rem">{name}</Container>
+                  <Container fontSize="0.85rem" color="black.600">
+                    {firstSentence(description || member.description, 64)}
+                  </Container>
+                  <Container className="since" fontSize="0.85rem">
+                    {memberSinceStr}
+                  </Container>
+                  {totalDonationsStr && (
+                    <Container className="totalDonations" fontSize="0.85rem" color="black.600">
+                      {totalDonationsStr}
+                    </Container>
+                  )}
+                </Container>
+              </Flex>
+            </LinkCollective>
+          )}
+          {viewMode === 'ORGANIZATION' && <CollectiveCard collective={member} membership={membership} />}
+        </Container>
+      </MemberContainer>
+    );
+  }
+}
+
+export default injectIntl(Member);

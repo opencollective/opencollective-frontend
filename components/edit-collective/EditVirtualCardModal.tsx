@@ -93,7 +93,7 @@ const createVirtualCardMutation = gql`
 `;
 
 // TODO : refactor this mutation
-const collectiveMembersQuery = gql`
+export const collectiveMembersQuery = gql`
   query CollectiveMembers($slug: String!) {
     account(slug: $slug) {
       id

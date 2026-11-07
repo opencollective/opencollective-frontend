@@ -6,9 +6,9 @@ const { withSentryConfig } = require('@sentry/nextjs');
 const CopyPlugin = require('copy-webpack-plugin');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const path = require('path');
-const { SENTRY_APPLICATION_KEY } = require('./sentry.constants');
-require('./env');
-const { REWRITES } = require('./rewrites');
+const { SENTRY_APPLICATION_KEY } = require('./sentry.constants.ts');
+require('./env.ts');
+const { REWRITES } = require('./rewrites.ts');
 
 /** Limit static/page-data workers on memory-constrained CI/Vercel (see scripts/build_next.sh). */
 function getBuildWorkerCpus() {

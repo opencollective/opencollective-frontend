@@ -18,6 +18,7 @@ description: Batches translation of locale JSON using show-untranslated and set-
 ## Workflow (loop)
 
 1. **User inputs**: `locale` + free-text **instructions** (follow them for register, formality, product terms, and consistency).
+   If `references/<locale>.md` exists in this skill, read it first and follow it: it is the style guide for that locale (glossary, address form, terms kept in English). Currently: [references/fr.md](references/fr.md) for French.
 
 2. **List work**: Run show-untranslated with a small batch so the task stays reviewable:
 
@@ -43,7 +44,7 @@ description: Batches translation of locale JSON using show-untranslated and set-
 
 5. **Sanity check**: Optionally re-run show-untranslated for that locale; remaining lines should be actual translation work, or items intentionally listed under `IGNORED`.
 
-6. **Update progress**: After finishing (or when the user stops), refresh locale completion percentages in `lib/constants/locales.js`:
+6. **Update progress**: After finishing (or when the user stops), refresh locale completion percentages in `lib/constants/locales.ts`:
 
    ```bash
    npm run langs:update-progress
@@ -75,7 +76,15 @@ Use when the English line alone is ambiguous (button vs heading, legal vs casual
 
 - Keep **ICU placeholders** and **rich-text tags** exactly as in English unless the target language requires a different order: `{name}`, `{count}`, `{amount}`, `<Link>...</Link>`, `<Account></Account>`, etc.
 - Do not invent new placeholders or remove required tags.
-- Prefer **consistent product terminology** with the rest of `lang/<locale>.json` when the same concept appears elsewhere.
+- Prefer **consistent product terminology**: the locale style guide in `references/<locale>.md` when one exists, then the rest of `lang/<locale>.json` when the same concept appears elsewhere.
+
+## Locale style guides
+
+| Locale | Guide                                | Covers                                                                                                                                                    |
+| ------ | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fr`   | [references/fr.md](references/fr.md) | Financial and accounting glossary, "hôte fiscal", "vous" address, French capitalization, calques to rewrite, typography, ids that belong in `IGNORED.fr`. |
+
+Read the guide before translating or reviewing that locale. When a guide and existing catalog strings disagree, the guide wins: the catalog may still contain the mistranslations the guide was written to remove.
 
 ## Scripts reference
 
@@ -83,6 +92,6 @@ Use when the English line alone is ambiguous (button vs heading, legal vs casual
 | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `scripts/i18n/show-untranslated.ts` | Lists `{id}: english` where locale value still equals English, minus per-locale `IGNORED` message ids. Optional `--limit N`. |
 | `scripts/i18n/set-translation.ts`   | Writes one key: `set-translation.ts <locale> <id> "text"`                                                                    |
-| `npm run langs:update-progress`     | Recomputes per-locale completion % and writes `lib/constants/locales.js`. Run once when done.                                |
+| `npm run langs:update-progress`     | Recomputes per-locale completion % and writes `lib/constants/locales.ts`. Run once when done.                                |
 
 Show-untranslated and set-translation are invoked with `npx tsx` from the repository root.

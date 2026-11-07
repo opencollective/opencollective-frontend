@@ -1,0 +1,196 @@
+import React, { Component } from 'react';
+import { ChevronDown } from '@styled-icons/feather/ChevronDown/ChevronDown';
+import { ChevronUp } from '@styled-icons/feather/ChevronUp/ChevronUp';
+import { themeGet } from '@styled-system/theme-get';
+import { FormattedMessage } from 'react-intl';
+import styled, { css } from 'styled-components';
+import { size, space } from 'styled-system';
+
+import Container from '../Container';
+import { Box } from '../Grid';
+import { P } from '../Text';
+
+/** Main entry container */
+export const Entry = styled.details`
+  &[open] {
+    border-color: ${themeGet('colors.primary.500')};
+
+    summary::after {
+      content: '−';
+    }
+  }
+
+  summary {
+    padding-top: ${themeGet('space.2')}px;
+    padding-bottom: ${themeGet('space.2')}px;
+    font-size: 13px;
+    font-weight: 500;
+    color: ${themeGet('colors.black.800')};
+    /* Remove arrow on Firefox */
+    list-style: none;
+
+    &:hover {
+      color: ${themeGet('colors.black.700')};
+    }
+
+    button {
+      display: none;
+    }
+  }
+
+  summary:focus {
+    outline: 1px dashed ${themeGet('colors.black.200')};
+    outline-offset: ${themeGet('space.1')}px;
+  }
+
+  summary::after {
+    content: '+';
+    display: inline-block;
+    padding-left: ${themeGet('space.2')}px;
+    color: ${themeGet('colors.black.600')};
+    font-weight: bold;
+  }
+
+  /* Remove arrow on Chrome */
+  summary::-webkit-details-marker {
+    display: none;
+  }
+`;
+
+const CollapseBtn = styled.div<{ size?: number | string; ml?: number }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  border: 1px solid #dcdee0;
+
+  svg {
+    stroke-width: 1.5;
+  }
+
+  [data-item='chevron-up'] {
+    margin-top: -5%;
+  }
+
+  [data-item='chevron-down'] {
+    margin-top: 5%;
+  }
+
+  ${size}
+  ${space}
+`;
+
+/** Entry title */
+export const Title = styled(
+  ({ children, ...props }: { children?: React.ReactNode } & React.ComponentProps<'summary'>) => (
+    <summary {...props}>
+      <div>{children}</div>
+      <CollapseBtn size={18} ml={3}>
+        <ChevronUp size="1em" data-item="chevron-up" style={{ marginTop: -1 }} />
+        <ChevronDown size="1em" data-item="chevron-down" />
+      </CollapseBtn>
+    </summary>
+  ),
+)`
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+`;
+
+/** Entry content (hidden by default) */
+export const Content = styled(Box).attrs(props => ({
+  py: props.py ?? 2,
+  fontSize: props.fontSize ?? '13px',
+  color: props.color ?? 'black.600',
+}))``;
+
+export const Separator = styled.hr`
+  background: ${themeGet('colors.black.400')};
+  width: 100%;
+`;
+
+type EntryContainerProps = {
+  withBorderLeft?: boolean;
+  withNewButtons?: boolean;
+};
+
+/** A simple wrapper to group entries */
+const EntryContainer = styled.div<EntryContainerProps>`
+  ${Entry} {
+    ${props =>
+      props.withNewButtons
+        ? css`
+            [data-item='chevron-up'] {
+              display: none;
+            }
+
+            &[open] {
+              [data-item='chevron-up'] {
+                display: inline-block;
+              }
+              [data-item='chevron-down'] {
+                display: none;
+              }
+            }
+
+            summary::after {
+              display: none;
+            }
+
+            button {
+              display: block;
+            }
+          `
+        : css`
+            ${CollapseBtn} {
+              display: none;
+            }
+          `}
+
+    ${props =>
+      props.withBorderLeft &&
+      css`
+        border-left: 1px solid #dcdee0;
+        padding-left: 8px;
+
+        &:focus-within,
+        &:hover {
+          border-color: ${themeGet('colors.primary.500')};
+        }
+      `}
+  }
+`;
+
+type FAQProps = {
+  children?: React.ReactNode;
+  /** The title to display above entries. Set to null to disable it. */
+  title?: string;
+  /** Props for styling the title */
+  titleProps?: Record<string, unknown>;
+  /** If true, a border will be displayed on the left  */
+  withBorderLeft?: boolean;
+  /** If true, will display a button with a chevron instead of the `+` sign  */
+  withNewButtons?: boolean;
+} & Omit<React.ComponentProps<typeof Container>, 'children'>;
+
+/**
+ * A small FAQ with expendable contents.
+ */
+export default class FAQ extends Component<FAQProps> {
+  render() {
+    const { title, children, withBorderLeft, withNewButtons, titleProps, ...props } = this.props;
+    return (
+      <Container {...props}>
+        {title !== null && (
+          <P fontWeight="bold" mb={1} color="black.900" {...titleProps}>
+            {title || <FormattedMessage id="FAQ" defaultMessage="FAQ" />}
+          </P>
+        )}
+        <EntryContainer withBorderLeft={withBorderLeft} withNewButtons={withNewButtons}>
+          {children}
+        </EntryContainer>
+      </Container>
+    );
+  }
+}

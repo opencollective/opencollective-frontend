@@ -25,7 +25,7 @@ import { P } from '../Text';
 import { useToast } from '../ui/useToast';
 import { StripeVirtualCardComplianceStatement } from '../virtual-cards/StripeVirtualCardComplianceStatement';
 
-import { virtualCardsAssignedToCollectiveQuery } from './EditVirtualCardModal';
+import { collectiveMembersQuery, virtualCardsAssignedToCollectiveQuery } from './EditVirtualCardModal';
 
 const initialValues = {
   cardNumber: undefined,
@@ -48,25 +48,6 @@ const assignNewVirtualCardMutation = gql`
       name
       last4
       data
-    }
-  }
-`;
-
-const collectiveMembersQuery = gql`
-  query CollectiveMembers($slug: String!) {
-    account(slug: $slug) {
-      id
-      members(role: ADMIN) {
-        nodes {
-          id
-          account {
-            id
-            name
-            imageUrl
-            slug
-          }
-        }
-      }
     }
   }
 `;

@@ -11,8 +11,10 @@ import MessageBox from '../../../MessageBox';
 import { P } from '../../../Text';
 
 type DisputedContributionsWarningProps = {
-  hasDisputedOrders: boolean;
-  hasInReviewOrders: boolean;
+  /** Unused: the flags are read from the query below */
+  hasDisputedOrders?: boolean;
+  /** Unused: the flags are read from the query below */
+  hasInReviewOrders?: boolean;
   hostSlug: string;
 };
 

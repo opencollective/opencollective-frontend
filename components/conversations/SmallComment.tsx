@@ -60,7 +60,6 @@ export default function SmallComment(props: CommentProps) {
                 values={comment}
                 field="html"
                 canEdit={props.canEdit}
-                canDelete={props.canDelete}
                 isEditing={isEditing}
                 showEditIcon={false}
                 prepareVariables={(comment, html) => ({ comment: { id: comment.id, html } })}

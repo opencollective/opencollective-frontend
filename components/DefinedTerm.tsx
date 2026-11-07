@@ -25,6 +25,8 @@ export const Terms = {
   ESTIMATED_BUDGET: 'ESTIMATED_BUDGET',
   EXPENSE_TYPE: 'EXPENSE_TYPE',
   TOTAL_RAISED: 'TOTAL_RAISED',
+  FUND_TOTAL_RAISED: 'FUND_TOTAL_RAISED',
+  FUND_TOTAL_DISBURSED: 'FUND_TOTAL_DISBURSED',
   TOTAL_INCOME: 'TOTAL_INCOME',
   BALANCE: 'BALANCE',
 } as const;
@@ -65,6 +67,14 @@ const TranslatedTerms = defineMessages({
   [Terms.TOTAL_RAISED]: {
     id: 'budgetSection-raised',
     defaultMessage: 'Total raised',
+  },
+  [Terms.FUND_TOTAL_RAISED]: {
+    id: 'budgetSection-raised',
+    defaultMessage: 'Total raised',
+  },
+  [Terms.FUND_TOTAL_DISBURSED]: {
+    id: 'budgetSection-disbursed',
+    defaultMessage: 'Total disbursed',
   },
   [Terms.TOTAL_INCOME]: {
     id: 'budgetSection-income',
@@ -118,6 +128,14 @@ const TranslatedDefinitions = defineMessages({
   [Terms.TOTAL_RAISED]: {
     id: 'budgetSection-raised-definition',
     defaultMessage: 'Total net amount available to spend after fees.',
+  },
+  [Terms.FUND_TOTAL_RAISED]: {
+    id: 'budgetSection-fund-raised-definition',
+    defaultMessage: 'Total amount contributed to this fund, before fees.',
+  },
+  [Terms.FUND_TOTAL_DISBURSED]: {
+    id: 'budgetSection-fund-disbursed-definition',
+    defaultMessage: 'Total amount distributed by this fund, including fees.',
   },
   [Terms.TOTAL_INCOME]: {
     id: 'budgetSection-total-income-definition',

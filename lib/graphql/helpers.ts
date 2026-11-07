@@ -1,0 +1,18 @@
+export { gql, gql as gqlV1 } from '@apollo/client';
+
+/** To pass as a context to your query/mutation to use API v1 */
+export const API_V1_CONTEXT = { apiVersion: '1' };
+
+export function fakeTag(literals: TemplateStringsArray, ...expressions: Array<string | number>): string {
+  let string = '';
+
+  for (const [index, literal] of literals.entries()) {
+    string += literal;
+
+    if (index in expressions) {
+      string += expressions[index];
+    }
+  }
+
+  return string;
+}

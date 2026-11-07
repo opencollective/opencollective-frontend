@@ -54,9 +54,10 @@ const getOption = (
 };
 
 interface AmountFilterProps {
-  steps: number[];
+  /** Defaults to [0, 50, 500, 5000] */
+  steps?: number[];
   currency?: Currency;
-  onChange: (...args: unknown[]) => unknown;
+  onChange: (value: unknown) => unknown;
   value?: string;
 }
 

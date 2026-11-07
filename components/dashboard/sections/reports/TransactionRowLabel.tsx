@@ -8,7 +8,7 @@ import { DefinitionTooltip } from './DefinitionTooltip';
 
 export const TransactionReportRowLabel = ({ filter }) => {
   const intl = useIntl();
-  let label = i18nTransactionKind(intl, filter.kind);
+  let label: React.ReactNode = i18nTransactionKind(intl, filter.kind);
   const transactionKindDefinition = i18nTransactionKindDefinition(intl, filter.kind);
 
   if (transactionKindDefinition) {

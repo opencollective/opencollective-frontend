@@ -1,0 +1,68 @@
+import React from 'react';
+import Router from 'next/router';
+import type { IntlShape, MessageDescriptor } from 'react-intl';
+import { defineMessages } from 'react-intl';
+
+import { IgnorableError } from '../lib/errors';
+import injectIntl from '@/lib/injectIntl';
+
+type Props = {
+  hasUnsavedChanges?: boolean;
+  children?: React.ReactNode;
+  intl?: IntlShape;
+};
+
+/**
+ * A component to warn users if they try to leave with unsaved data. Just set
+ * `hasUnsavedChanges` to true when this is the case and this component will block any
+ * attempt to leave the page.
+ *
+ * See `lib/hooks/warnIfUnsavedChanges.ts` for the hook version of this component.
+ */
+class WarnIfUnsavedChanges extends React.Component<Props> {
+  componentDidMount() {
+    window.addEventListener('beforeunload', this.beforeunload);
+    Router.router.events.on('routeChangeStart', this.routeChangeStart);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('beforeunload', this.beforeunload);
+    Router.router.events.off('routeChangeStart', this.routeChangeStart);
+  }
+
+  messages: Record<string, MessageDescriptor> = defineMessages({
+    warning: {
+      id: 'WarningUnsavedChanges',
+      defaultMessage: 'You have unsaved changes. Are you sure you want to leave this page?',
+    },
+  });
+
+  /**
+   * NextJS doesn't yet provide a nice way to abort page loading. We're stuck with throwing
+   * an error, which will produce an error in dev but should work fine in prod.
+   */
+  routeChangeStart = () => {
+    const { hasUnsavedChanges, intl } = this.props;
+    if (hasUnsavedChanges && !confirm(intl.formatMessage(this.messages.warning))) {
+      Router.router.events.emit('routeChangeError'); // For NProgress to stop the loading indicator
+      throw new IgnorableError('Abort page navigation');
+    }
+  };
+
+  /** Triggered when closing tabs */
+  beforeunload = (e: BeforeUnloadEvent) => {
+    const { hasUnsavedChanges, intl } = this.props;
+    if (hasUnsavedChanges) {
+      e.preventDefault();
+      const message = intl.formatMessage(this.messages.warning);
+      e.returnValue = message;
+      return message;
+    }
+  };
+
+  render() {
+    return this.props.children || null;
+  }
+}
+
+export default injectIntl(WarnIfUnsavedChanges);
