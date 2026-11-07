@@ -124,7 +124,7 @@
     "react-turnstile": "1.1.5",
     "react-verification-input": "4.2.2",
     "react-window": "2.3.4",
-    "redis": "6.3.0",
+    "redis": "6.3.1",
     "sanitize-html": "2.18.1",
     "slugify": "1.6.9",
     "spdx-license-list": "6.12.0",
