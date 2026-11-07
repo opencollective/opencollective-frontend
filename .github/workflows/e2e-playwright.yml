@@ -171,6 +171,10 @@ jobs:
           node-version-file: 'package.json'
           cache: 'npm'
 
+      - name: Get Node major version
+        id: node-major
+        run: echo "version=$(node -p 'process.versions.node.split(`.`)[0]')" >> "$GITHUB_OUTPUT"
+
       - name: Checkout E2E stack
         uses: ./.github/actions/checkout-e2e-stack
         with:
@@ -184,11 +188,13 @@ jobs:
         id: api-node-modules
         with:
           path: opencollective-api/node_modules
-          key: ${{ runner.os }}-api-node-modules-${{ hashFiles('opencollective-api/package-lock.json') }}
+          key: ${{ runner.os }}-node${{ steps.node-major.outputs.version }}-api-node-modules-${{ hashFiles('opencollective-api/package-lock.json') }}
 
       - name: Install dependencies (api)
         working-directory: opencollective-api
         if: steps.api-node-modules.outputs.cache-hit != 'true'
+        env:
+          npm_config_engine_strict: 'false'
         run: npm ci --prefer-offline --no-audit --no-fund
 
       - name: Restore node_modules (images)
@@ -196,11 +202,13 @@ jobs:
         id: images-node-modules
         with:
           path: opencollective-images/node_modules
-          key: ${{ runner.os }}-images-node-modules-${{ hashFiles('opencollective-images/package-lock.json') }}
+          key: ${{ runner.os }}-node${{ steps.node-major.outputs.version }}-images-node-modules-${{ hashFiles('opencollective-images/package-lock.json') }}
 
       - name: Install dependencies (images)
         working-directory: opencollective-images
         if: steps.images-node-modules.outputs.cache-hit != 'true'
+        env:
+          npm_config_engine_strict: 'false'
         run: npm ci --prefer-offline --no-audit --no-fund
 
       - name: Restore node_modules (pdf)
@@ -208,11 +216,13 @@ jobs:
         id: pdf-node-modules
         with:
           path: opencollective-pdf/node_modules
-          key: ${{ runner.os }}-pdf-node-modules-${{ hashFiles('opencollective-pdf/package-lock.json') }}
+          key: ${{ runner.os }}-node${{ steps.node-major.outputs.version }}-pdf-node-modules-${{ hashFiles('opencollective-pdf/package-lock.json') }}
 
       - name: Install dependencies (pdf)
         working-directory: opencollective-pdf
         if: steps.pdf-node-modules.outputs.cache-hit != 'true'
+        env:
+          npm_config_engine_strict: 'false'
         run: npm ci --prefer-offline --no-audit --no-fund
 
       - name: Restore node_modules (frontend)
@@ -220,7 +230,7 @@ jobs:
         id: node-modules
         with:
           path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}-${{ secrets.CACHE_VERSION }}
+          key: ${{ runner.os }}-node${{ steps.node-major.outputs.version }}-node-modules-${{ hashFiles('package-lock.json') }}-${{ secrets.CACHE_VERSION }}
 
       - name: Install dependencies (frontend)
         if: steps.node-modules.outputs.cache-hit != 'true'
