@@ -12,7 +12,7 @@ import { AutocompleteEditTags } from '../../EditTags';
 import ExpenseTypeTag from '../../expenses/ExpenseTypeTag';
 import RichTextEditor from '../../RichTextEditor';
 import { Label } from '../../ui/Label';
-import { Step } from '../SubmitExpenseFlowSteps';
+import { getExpenseStepHeading, Step } from '../SubmitExpenseFlowSteps';
 import { type ExpenseForm } from '../useExpenseForm';
 
 import { ExpensePolicyContainer } from './ExpensePolicyContainer';
@@ -48,7 +48,11 @@ export const AdditionalDetailsSection = memoWithGetFormProps(function Additional
   const collectiveSlug = props.accountSlug;
 
   return (
-    <FormSectionContainer step={Step.ADDITIONAL_DETAILS} inViewChange={props.inViewChange}>
+    <FormSectionContainer
+      id={Step.ADDITIONAL_DETAILS}
+      {...getExpenseStepHeading(Step.ADDITIONAL_DETAILS)}
+      inViewChange={props.inViewChange}
+    >
       <FormField
         disabled={
           props.initialLoading ||

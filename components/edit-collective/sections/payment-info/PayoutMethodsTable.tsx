@@ -5,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { PayoutMethodType } from '@/lib/constants/payout-method';
 
 import { PayoutMethodRadioGroupItem } from '@/components/submit-expense/form/PayoutMethodSection';
+import { useExpenseFormActions } from '@/components/submit-expense/useExpenseFormActions';
 
 import { MethodCard, moreActionsThunk } from './common';
 
@@ -27,6 +28,7 @@ export default function PayoutMethodsTable({ account, loading, onUpdate, ...prop
   }, [props.payoutMethods]);
 
   const generateMoreActions = moreActionsThunk(account);
+  const actions = useExpenseFormActions({ resync: onUpdate, defaultPayoutMethodAccountSlug: account.slug });
 
   return !loading && !props.payoutMethods?.length ? (
     <div className="flex flex-col items-center gap-2 py-6 text-center text-sm sm:p-12">
@@ -44,9 +46,7 @@ export default function PayoutMethodsTable({ account, loading, onUpdate, ...prop
           payeeSlug={account.slug}
           payee={account}
           Component={MethodCard}
-          onPaymentMethodDeleted={onUpdate}
-          onPaymentMethodEdited={onUpdate}
-          refresh={onUpdate}
+          actions={actions}
           moreActions={generateMoreActions(payoutMethod)}
           isChecked
           isEditable
@@ -74,9 +74,7 @@ export default function PayoutMethodsTable({ account, loading, onUpdate, ...prop
               payeeSlug={account.slug}
               payee={account}
               Component={MethodCard}
-              onPaymentMethodDeleted={onUpdate}
-              onPaymentMethodEdited={onUpdate}
-              refresh={onUpdate}
+              actions={actions}
               moreActions={generateMoreActions(payoutMethod)}
               isChecked
               isEditable

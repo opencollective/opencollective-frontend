@@ -7,11 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { ExpenseLockableFields, ExpenseType } from '../../../lib/graphql/types/v2/graphql';
 import { attachmentDropzoneParams } from '../../expenses/lib/attachments';
-import {
-  PAYEE_SLUG_INVITE,
-  PAYEE_SLUG_INVITE_EXISTING_USER,
-  PAYEE_SLUG_INVITE_SOMEONE,
-} from '../../expenses/lib/constants';
+import { getPayeeChoice } from '../lib/payee-choice';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 
 import { FormField } from '@/components/FormField';
@@ -21,7 +17,7 @@ import { Label } from '../../ui/Label';
 import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/Tabs';
 import { useToast } from '../../ui/useToast';
-import { Step } from '../SubmitExpenseFlowSteps';
+import { getExpenseStepHeading, Step } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
 import { YesNoOption } from '../useExpenseForm';
 
@@ -65,7 +61,8 @@ export const TypeOfExpenseSection = memoWithGetFormProps(function TypeOfExpenseS
 
   return (
     <FormSectionContainer
-      step={Step.TYPE_OF_EXPENSE}
+      id={Step.TYPE_OF_EXPENSE}
+      {...getExpenseStepHeading(Step.TYPE_OF_EXPENSE)}
       inViewChange={props.inViewChange}
       title={<FormattedMessage defaultMessage="Select the type of expense" id="hT+uK/" />}
     >
@@ -277,11 +274,7 @@ export const InvoiceFormOption = memoWithGetFormProps(function InvoiceFormOption
         <TabsContent value={YesNoOption.YES}>
           <div className="space-y-4">
             <FormField
-              required={
-                ![PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_SOMEONE, PAYEE_SLUG_INVITE_EXISTING_USER].includes(
-                  props.payeeSlug,
-                )
-              }
+              required={!getPayeeChoice({ payeeSlug: props.payeeSlug }).isInvite}
               disabled={props.isSubmitting}
               name="invoiceFile"
               isPrivate

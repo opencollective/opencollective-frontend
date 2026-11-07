@@ -1,46 +1,11 @@
 import React from 'react';
-import type { Path } from 'dot-path-value';
-import { get, isEmpty, pick } from 'lodash-es';
 
-import { StepHeader, StepItem, StepValues as ExpenseFormStepValues } from '../submit-expense/SubmitExpenseFlowSteps';
-import type { ExpenseForm, ExpenseFormValues } from '../submit-expense/useExpenseForm';
+import { type FormFieldPath, isStepComplete, isStepTouched } from '../submit-expense/lib/form-steps';
 
-export enum Step {
-  INFORMATION = 'INFORMATION',
-  GRANT_PROVIDER = 'GRANT_PROVIDER',
-  INSTRUCTIONS = 'INSTRUCTIONS',
-  INVITATION_NOTE = 'INVITATION_NOTE',
-  APPLICATION_FORM = 'APPLICATION_FORM',
+import { StepHeader, StepItem } from '../submit-expense/SubmitExpenseFlowSteps';
+import type { ExpenseForm } from '../submit-expense/useExpenseForm';
 
-  WHO_WILL_RECEIVE_FUNDS = 'WHO_WILL_RECEIVE_FUNDS',
-  PAYOUT_METHOD = 'PAYOUT_METHOD',
-  DESCRIPTION = 'DESCRIPTION',
-  SUMMARY = 'SUMMARY',
-}
-
-const StepValues: Record<Step, Path<ExpenseFormValues>[]> = {
-  [Step.GRANT_PROVIDER]: ExpenseFormStepValues.WHO_IS_PAYING,
-  [Step.INSTRUCTIONS]: ['acknowledgedHostGrantExpensePolicy', 'acknowledgedCollectiveGrantExpensePolicy'],
-  [Step.WHO_WILL_RECEIVE_FUNDS]: ExpenseFormStepValues.WHO_IS_GETTING_PAID,
-  [Step.PAYOUT_METHOD]: ExpenseFormStepValues.PAYOUT_METHOD,
-  [Step.INFORMATION]: [],
-  [Step.DESCRIPTION]: [],
-  [Step.SUMMARY]: [],
-  [Step.INVITATION_NOTE]: [],
-  [Step.APPLICATION_FORM]: [],
-};
-
-export function isExpenseFormStepCompleted(form: ExpenseForm, step: Step): boolean {
-  if (form.initialLoading) {
-    return false;
-  }
-
-  const valueKeys = StepValues[step];
-  if (isEmpty(valueKeys)) {
-    return true;
-  }
-  return valueKeys.map(valueKey => isEmpty(get(form.errors, valueKey))).every(Boolean);
-}
+export { GrantStep as Step } from '../submit-expense/lib/form-steps';
 
 type SubmitGrantFlowStepsProps = {
   steps: ReturnType<typeof useExpenseFormSteps>['steps'];
@@ -53,7 +18,7 @@ type StepHeaderConfig<StepNames extends string> = {
   nextButtonMessage?: React.ReactNode;
   items?: {
     name: StepNames;
-    formValues?: string[];
+    formValues?: readonly FormFieldPath[];
     title?: React.ReactNode;
     hidden?: boolean;
   }[];
@@ -66,7 +31,7 @@ type StepCommonValue<StepNames extends string> = {
   title?: React.ReactNode;
   isHeader: boolean;
   stepNumber: number;
-  formValues?: string[];
+  formValues?: readonly FormFieldPath[];
   isComplete: boolean;
   hasError: boolean;
   isActive: boolean;
@@ -80,7 +45,7 @@ type StepHeaderValue<StepNames extends string> = StepCommonValue<StepNames> & {
   items?: {
     name: string;
     hidden?: boolean;
-    formValues?: string[];
+    formValues?: readonly FormFieldPath[];
   }[];
   isHeader: true;
   previousButtonMessage?: React.ReactNode;
@@ -108,10 +73,10 @@ export function useExpenseFormSteps<StepNames extends string>(
       ...step,
       isActive:
         step.name === activeStep || ('items' in step && (step.items ?? []).some(item => item.name === activeStep)),
-      isComplete: i !== steps.length - 1 && isEmpty(pick(form.errors, step.formValues)),
+      isComplete: i !== steps.length - 1 && isStepComplete({ id: step.name, fields: step.formValues ?? [] }, form),
       hasError:
-        !isEmpty(pick(form.errors, step.formValues)) &&
-        !isEmpty(pick(form.touched, step.formValues)) &&
+        !isStepComplete({ id: step.name, fields: step.formValues ?? [] }, form) &&
+        isStepTouched({ id: step.name, fields: step.formValues ?? [] }, form) &&
         form.submitCount > 0,
     }));
   }, [config, activeStep, form.errors, form.touched, form.submitCount]);
