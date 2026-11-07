@@ -49,9 +49,9 @@ export const pilotInventory: InventoryEntry[] = [
   entry(MANAGEMENT, EXPENSES, 'Downloads PDF', [
     ['expenses/process-expense.spec.ts', 'Collective admin downloads the generated invoice of an expense as a PDF'],
   ]),
-  entry(MANAGEMENT, EXPENSES, 'Previews a PDF attachment', [], {
-    gap: 'Added to Cypress on 2026-10-13 (opencollective/opencollective-frontend#12558, pdf.js worker regression) before the pilot merged; no journey carries it.',
-  }),
+  entry(MANAGEMENT, EXPENSES, 'Previews a PDF attachment', [
+    ['expenses/preview-attachment.spec.ts', 'Collective admin previews the PDF attached to an expense'],
+  ]),
   entry(MANAGEMENT, EXPENSES, 'Approve, unapprove, reject and pay actions on expense', [
     [
       'expenses/process-expense.spec.ts',

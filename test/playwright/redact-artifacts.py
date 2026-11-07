@@ -12,12 +12,18 @@ owner_file = pathlib.Path(sys.argv[2])
 private_artifacts = pathlib.Path(sys.argv[3])
 token = json.loads(owner_file.read_text())["token"].encode() if owner_file.exists() else None
 jwt = re.compile(rb"eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+")
+# A signed-in browser also carries the session as two cookies (`accessTokenPayload`, `accessTokenSignature`),
+# which together are the token: traces record them in request headers and as name/value pairs.
+signature_cookie = re.compile(rb"(accessTokenSignature=)[a-zA-Z0-9_-]+")
+signature_pair = re.compile(rb'("name":\s*"accessTokenSignature",\s*"value":\s*")[^"]+')
 failures = []
 
 
 def redact(data):
     if token:
         data = data.replace(token, b"[redacted-fixture-token]")
+    data = signature_cookie.sub(rb"\1[redacted-auth-signature]", data)
+    data = signature_pair.sub(rb"\1[redacted-auth-signature]", data)
     return jwt.sub(b"[redacted-auth-token]", data)
 
 
