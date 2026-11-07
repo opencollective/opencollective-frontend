@@ -63,7 +63,7 @@ run_runner() {
   {
     echo "BENCH start $runner"
     if [[ "$runner" == playwright && "$PW_ARTIFACTS" == off ]]; then
-      sed -i "s/trace: 'retain-on-failure'/trace: 'off'/; s/video: 'retain-on-failure'/video: 'off'/" playwright.config.ts
+      sed -i "s/trace: .*/trace: 'off',/; s/video: 'retain-on-failure'/video: 'off'/" playwright.config.ts
       grep -nE "trace:|video:" playwright.config.ts
     elif [[ "$runner" == playwright && "$PW_ARTIFACTS" == novideo ]]; then
       sed -i "s/video: 'retain-on-failure'/video: 'off'/" playwright.config.ts

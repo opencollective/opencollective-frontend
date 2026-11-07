@@ -196,7 +196,10 @@ jobs:
           AWS_ACCESS_KEY_ID: user
           AWS_SECRET_ACCESS_KEY: password
           AWS_DEFAULT_REGION: us-east-1
-        run: aws --endpoint-url http://127.0.0.1:9000 s3api create-bucket --bucket opencollective-e2e
+        run: |
+          aws --endpoint-url http://127.0.0.1:9000 s3api create-bucket --bucket opencollective-e2e
+          aws --endpoint-url http://127.0.0.1:9000 s3api put-bucket-cors --bucket opencollective-e2e \
+            --cors-configuration '{"CORSRules":[{"AllowedOrigins":["http://localhost:3000"],"AllowedMethods":["GET","HEAD"],"AllowedHeaders":["*"],"MaxAgeSeconds":3600}]}'
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
@@ -266,3 +269,14 @@ jobs:
           path: /tmp/bench
           include-hidden-files: true
           retention-days: 30
+
+  # The real CI Playwright job, on the same prepared builds, to check its
+  # pdf.js restore and bucket CORS with the PDF preview journey.
+  ci-playwright-job:
+    needs: [plan, build, prepare]
+    uses: ./.github/workflows/e2e-playwright.yml
+    with:
+      api-ref: ${{ needs.plan.outputs.api-ref }}
+      images-ref: ${{ needs.plan.outputs.images-ref }}
+      pdf-ref: ${{ needs.plan.outputs.pdf-ref }}
+    secrets: inherit

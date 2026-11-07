@@ -1,82 +1,114 @@
 {
-  "comment": "Benchmark scaffolding: pairs run by .github/workflows/e2e-pilot-benchmark.yml on push. Service revisions are pinned so every batch uses the same inputs. Batch B: serial pairs 9-10, parallel pairs 11-15 (2 Playwright workers, 2 Cypress processes), and correction-evidence pairs 20-22 with Playwright video recording off (traces kept).",
-  "apiRef": "ce79e402fa0c8348e879e608a705e20c89f8d590",
+  "comment": "Benchmark scaffolding: pairs run by .github/workflows/e2e-pilot-benchmark.yml on push. Batch C (after corrections: PDF preview journey, trace without DOM snapshots): serial pairs 31-35 and parallel pairs 41-50 (2 Playwright workers, 2 Cypress processes), same protocol as batches A and B. The API is pinned to feat/playwright-pilot-evaluation-8969 (recipe option and bucket CORS); images and PDF unchanged.",
+  "apiRef": "3bf274e3d06bb91d0abbe8edf5725774c94c259a",
   "imagesRef": "2b0ca0601fcc6d161a729b7077fab6a79ece5bf0",
   "pdfRef": "fe967d9f45360e910be93393794ab0f3d64e7a26",
-  "batch": "B",
+  "batch": "C",
   "pairs": [
     {
-      "pair": 9,
-      "mode": "serial",
-      "order": "playwright,cypress",
-      "playwrightWorkers": 1,
-      "cypressProcesses": 1
-    },
-    {
-      "pair": 10,
+      "pair": 31,
       "mode": "serial",
       "order": "cypress,playwright",
       "playwrightWorkers": 1,
       "cypressProcesses": 1
     },
     {
-      "pair": 11,
-      "mode": "parallel",
-      "order": "cypress,playwright",
-      "playwrightWorkers": 2,
-      "cypressProcesses": 2
+      "pair": 32,
+      "mode": "serial",
+      "order": "playwright,cypress",
+      "playwrightWorkers": 1,
+      "cypressProcesses": 1
     },
     {
-      "pair": 12,
+      "pair": 33,
+      "mode": "serial",
+      "order": "cypress,playwright",
+      "playwrightWorkers": 1,
+      "cypressProcesses": 1
+    },
+    {
+      "pair": 34,
+      "mode": "serial",
+      "order": "playwright,cypress",
+      "playwrightWorkers": 1,
+      "cypressProcesses": 1
+    },
+    {
+      "pair": 35,
+      "mode": "serial",
+      "order": "cypress,playwright",
+      "playwrightWorkers": 1,
+      "cypressProcesses": 1
+    },
+    {
+      "pair": 41,
       "mode": "parallel",
       "order": "playwright,cypress",
       "playwrightWorkers": 2,
       "cypressProcesses": 2
     },
     {
-      "pair": 13,
+      "pair": 42,
       "mode": "parallel",
       "order": "cypress,playwright",
       "playwrightWorkers": 2,
       "cypressProcesses": 2
     },
     {
-      "pair": 14,
+      "pair": 43,
       "mode": "parallel",
       "order": "playwright,cypress",
       "playwrightWorkers": 2,
       "cypressProcesses": 2
     },
     {
-      "pair": 15,
+      "pair": 44,
       "mode": "parallel",
       "order": "cypress,playwright",
       "playwrightWorkers": 2,
       "cypressProcesses": 2
     },
     {
-      "pair": 20,
-      "mode": "parallel-novideo",
+      "pair": 45,
+      "mode": "parallel",
       "order": "playwright,cypress",
       "playwrightWorkers": 2,
-      "cypressProcesses": 2,
-      "playwrightArtifacts": "novideo"
+      "cypressProcesses": 2
     },
     {
-      "pair": 21,
-      "mode": "parallel-novideo",
+      "pair": 46,
+      "mode": "parallel",
       "order": "cypress,playwright",
       "playwrightWorkers": 2,
-      "cypressProcesses": 2,
-      "playwrightArtifacts": "novideo"
+      "cypressProcesses": 2
     },
     {
-      "pair": 22,
-      "mode": "parallel-novideo",
+      "pair": 47,
+      "mode": "parallel",
       "order": "playwright,cypress",
       "playwrightWorkers": 2,
-      "cypressProcesses": 2,
-      "playwrightArtifacts": "novideo"
+      "cypressProcesses": 2
+    },
+    {
+      "pair": 48,
+      "mode": "parallel",
+      "order": "cypress,playwright",
+      "playwrightWorkers": 2,
+      "cypressProcesses": 2
+    },
+    {
+      "pair": 49,
+      "mode": "parallel",
+      "order": "playwright,cypress",
+      "playwrightWorkers": 2,
+      "cypressProcesses": 2
+    },
+    {
+      "pair": 50,
+      "mode": "parallel",
+      "order": "cypress,playwright",
+      "playwrightWorkers": 2,
+      "cypressProcesses": 2
     }
   ]
 }
