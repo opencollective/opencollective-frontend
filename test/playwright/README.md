@@ -84,7 +84,9 @@ Run-specific directory per execution (no shared overwrite):
 - `test/playwright/.artifacts/<run-id>/report/` — HTML/JSON/JUnit reports
   for this attempt.
 - `test/playwright/.artifacts/<run-id>/test-results/` — traces/screenshots/
-  videos retained on failure (original attempt kept across retries).
+  videos retained on failure (original attempt kept across retries). Traces
+  have no DOM snapshots or network log unless `PLAYWRIGHT_TRACE_SNAPSHOTS=1`
+  (see the canonical guide).
 
 Run specs through `npm run e2e` rather than `npx playwright test`: the
 launcher exports these run-specific report paths, and without it specs that
