@@ -54,6 +54,8 @@ export type ExpenseForm = ExpenseFormik & {
   startOptions: ExpenseFormStartOptions;
   /** True until the form query answered and, when editing, the expense values were loaded */
   initialLoading: boolean;
+  /** True while the data for the current values (account, payee...) loads: the form can't be submitted then */
+  isLoadingOptions: boolean;
   refresh: () => void;
   /** Sets an item currency picked by the submitter: item currencies then stop following the payout method */
   setItemCurrency: (index: number, currency: string) => void;
@@ -124,7 +126,13 @@ export function useExpenseForm(opts: {
   const intl = useIntl();
   const apolloClient = useApolloClient();
   const { LoggedInUser, refetchLoggedInUser } = useLoggedInUser();
-  const [formQueryResult, setFormQueryResult] = React.useState<ExpenseFormQueryResult>(null);
+  // Each form query result is kept with the variables it was fetched for
+  const [formQuery, setFormQuery] = React.useState<{
+    variables: ExpenseFormSchemaQueryVariables;
+    result: ExpenseFormQueryResult;
+  }>(null);
+  const formQueryResult = formQuery?.result ?? null;
+  const isLoadingOptionsRef = React.useRef(true);
   const startOptions = React.useRef(opts.startOptions);
 
   const initialValues = React.useRef(opts.initialValues);
@@ -199,6 +207,11 @@ export function useExpenseForm(opts: {
   const { onSubmit, onError, onSuccess } = opts;
   const onSubmitCallback = React.useCallback(
     async (values: ExpenseFormValues, formikHelpers: FormikHelpers<ExpenseFormValues>) => {
+      // Never submit with options derived for other values (e.g. the previous account or payee)
+      if (isLoadingOptionsRef.current) {
+        return;
+      }
+
       const plan = planExpenseSubmission(values, formOptionsRef.current, startOptions.current, {
         customData: opts.customData,
       });
@@ -289,8 +302,9 @@ export function useExpenseForm(opts: {
       }
 
       if (requestId === latestFormQueryRequest.current) {
-        // A failed request keeps the data already loaded (e.g. the expense being edited)
-        setFormQueryResult(previous => result ?? previous ?? {});
+        // A failed request keeps the data already loaded (e.g. the expense being edited), still marked as
+        // fetched for its own variables
+        setFormQuery(previous => (result ? { variables, result } : (previous ?? { variables, result: {} })));
       }
     },
     [apolloClient],
@@ -322,6 +336,10 @@ export function useExpenseForm(opts: {
   // The form is loading until the query answered and, when editing, the expense values were loaded
   const [hydrated, setHydrated] = React.useState(false);
   const isLoading = !formQueryResult || (Boolean(startOptions.current.expenseId) && !hydrated);
+  // The options were derived from data fetched for other values (e.g. another account), and the data for
+  // the current values is loading (or failed to load)
+  const isLoadingOptions = !formQuery || formQuery.variables !== queryVariables;
+  isLoadingOptionsRef.current = isLoadingOptions;
   const [itemCurrencyChosen, setItemCurrencyChosen] = React.useState(false);
   const [exchangeRateRequests, setExchangeRateRequests] = React.useState<CurrencyExchangeRateRequest[]>([]);
 
@@ -343,7 +361,7 @@ export function useExpenseForm(opts: {
 
   React.useEffect(() => {
     const result = reconcileExpenseForm(reconcileState.current, expenseForm.values, formOptions, {
-      phase: isLoading ? 'loading' : 'ready',
+      phase: isLoading || isLoadingOptions ? 'loading' : 'ready',
       hydrated,
       itemCurrencyChosen,
       titleEdited: Boolean(expenseForm.touched.title),
@@ -368,6 +386,7 @@ export function useExpenseForm(opts: {
     expenseForm.touched,
     formOptions,
     isLoading,
+    isLoadingOptions,
     hydrated,
     itemCurrencyChosen,
     applyUpdates,
@@ -447,6 +466,7 @@ export function useExpenseForm(opts: {
     options: formOptions,
     startOptions: startOptions.current,
     initialLoading: isLoading,
+    isLoadingOptions,
     refresh,
     setItemCurrency,
     actions,

@@ -80,7 +80,7 @@ export function SubmitExpenseFlowForm(props: SubmitExpenseFlowFormProps) {
       )}
       <div className="flex justify-center sm:justify-end">
         <Button
-          disabled={form.initialLoading || form.isSubmitting || form.isValidating}
+          disabled={form.initialLoading || form.isLoadingOptions || form.isSubmitting || form.isValidating}
           loading={form.isSubmitting || form.isValidating}
           onClick={() => form.handleSubmit()}
         >

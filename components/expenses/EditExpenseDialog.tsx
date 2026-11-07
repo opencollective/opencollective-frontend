@@ -240,7 +240,7 @@ const EditPayee = ({ expense, onSubmit }) => {
         </Collapsible>
 
         <EditExpenseActionButtons
-          disabled={!hasChangedPayee || expenseForm.initialLoading}
+          disabled={!hasChangedPayee || expenseForm.initialLoading || expenseForm.isLoadingOptions}
           handleSubmit={expenseForm.handleSubmit}
         />
       </form>
@@ -303,7 +303,10 @@ const EditDraftPayoutMethod = ({ expense, onSubmit }) => {
     <FormikProvider value={expenseForm}>
       <form className="space-y-4" onSubmit={e => e.preventDefault()}>
         <PayoutMethodFormContent {...PayoutMethodFormContent.getFormProps(expenseForm)} />
-        <EditExpenseActionButtons disabled={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
+        <EditExpenseActionButtons
+          disabled={expenseForm.initialLoading || expenseForm.isLoadingOptions}
+          handleSubmit={expenseForm.handleSubmit}
+        />
       </form>
     </FormikProvider>
   );
@@ -352,7 +355,10 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
           <InvoiceFormOption {...InvoiceFormOption.getFormProps(expenseForm)} />
         )}
         <AdditionalAttachments {...AdditionalAttachments.getFormProps(expenseForm)} />
-        <EditExpenseActionButtons disabled={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
+        <EditExpenseActionButtons
+          disabled={expenseForm.initialLoading || expenseForm.isLoadingOptions}
+          handleSubmit={expenseForm.handleSubmit}
+        />
       </form>
     </FormikProvider>
   );
@@ -413,7 +419,10 @@ const AttachReceipts = ({ expense, onSubmit }) => {
           </div>
         )}
 
-        <EditExpenseActionButtons disabled={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
+        <EditExpenseActionButtons
+          disabled={expenseForm.initialLoading || expenseForm.isLoadingOptions}
+          handleSubmit={expenseForm.handleSubmit}
+        />
       </form>
     </FormikProvider>
   );
@@ -647,7 +656,7 @@ const EditTypeDetailsStep = ({ expenseForm }) => {
         </Button>
 
         <Button
-          disabled={expenseForm.initialLoading}
+          disabled={expenseForm.initialLoading || expenseForm.isLoadingOptions}
           type="submit"
           loading={expenseForm.isSubmitting}
           onClick={expenseForm.handleSubmit}

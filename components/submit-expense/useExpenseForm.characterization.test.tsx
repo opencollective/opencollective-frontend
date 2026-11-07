@@ -1246,6 +1246,51 @@ describe('useExpenseForm (characterization)', () => {
     });
   });
 
+  describe('stale form data', () => {
+    it('keeps the accounting category of an edited expense while its account loads', async () => {
+      const world = defaultWorld();
+      const categories = {
+        __typename: 'AccountingCategoryCollection',
+        nodes: [{ __typename: 'AccountingCategory', id: 'cat-1', code: '1', name: 'Cat', kind: 'EXPENSE' }],
+      };
+      world.accounts.collective = collective({ host: host({ accountingCategories: categories }) });
+      world.expense = existingExpense({ account: world.accounts.collective, accountingCategory: { id: 'cat-1' } });
+      const { form } = await setup({
+        world,
+        values: newExpenseValues({ accountSlug: undefined, payeeSlug: undefined }),
+        startOptions: { expenseId: 555 },
+      });
+      expect(form.current.values.accountingCategoryId).toBe('cat-1');
+    });
+
+    it('does not submit with the data of a previous account', async () => {
+      const world = defaultWorld();
+      world.accounts.other = collective({ slug: 'other', name: 'Other' });
+      const answer = answerFormQuery(world);
+      const mock = createMockApolloClient({
+        ExpenseFormSchema: vars => {
+          if (vars.collectiveSlug === 'other') {
+            throw new Error('Network error');
+          }
+          return answer(vars);
+        },
+        CreateExpenseFromDashboard: () => mutationResult(1),
+      });
+      jest.spyOn(console, 'error').mockImplementation(() => {});
+      const { result } = renderExpenseFormHook(mock.client, {
+        initialValues: newExpenseValues({ payoutMethodId: 'pm-bank-usd' }),
+        startOptions: {},
+        onSuccess: jest.fn(),
+        onError: jest.fn(),
+      });
+      await waitForFormReady(result);
+      await setValues(result, { ...validInvoiceItem, accountSlug: 'other' });
+      expect(result.current.isLoadingOptions).toBe(true);
+      await submit(result);
+      expect(mock.operationsNamed('CreateExpenseFromDashboard')).toHaveLength(0);
+    });
+  });
+
   describe('refresh', () => {
     it('keeps the loaded data when a refresh fails', async () => {
       const world = defaultWorld({ expense: existingExpense() });
