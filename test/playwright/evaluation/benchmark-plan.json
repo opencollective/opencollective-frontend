@@ -1,100 +1,43 @@
 {
-  "comment": "Benchmark scaffolding: pairs run by .github/workflows/e2e-pilot-benchmark.yml on push. Batch D repeats batch C on the corrected pilot (second batch for repeatability): serial pairs 61-63 and parallel pairs 71-80, runner order starting the other way round. Same pinned revisions as batch C.",
+  "comment": "Benchmark scaffolding: pairs run by .github/workflows/e2e-pilot-benchmark.yml on push. Batch E reruns the independence checks of batch A (jobs 201-210) on the corrected pilot (PDF preview journey, session cookies in fixture storage, trace without DOM snapshots). Same pinned revisions as batches C and D.",
   "apiRef": "3bf274e3d06bb91d0abbe8edf5725774c94c259a",
   "imagesRef": "2b0ca0601fcc6d161a729b7077fab6a79ece5bf0",
   "pdfRef": "fe967d9f45360e910be93393794ab0f3d64e7a26",
-  "batch": "D",
+  "batch": "E",
   "pairs": [
     {
-      "pair": 61,
-      "mode": "serial",
-      "order": "playwright,cypress",
-      "playwrightWorkers": 1,
-      "cypressProcesses": 1
+      "task": "alone-fresh",
+      "pair": 201,
+      "shard": 1,
+      "shards": 5
     },
     {
-      "pair": 62,
-      "mode": "serial",
-      "order": "cypress,playwright",
-      "playwrightWorkers": 1,
-      "cypressProcesses": 1
+      "task": "alone-fresh",
+      "pair": 202,
+      "shard": 2,
+      "shards": 5
     },
     {
-      "pair": 63,
-      "mode": "serial",
-      "order": "playwright,cypress",
-      "playwrightWorkers": 1,
-      "cypressProcesses": 1
+      "task": "alone-fresh",
+      "pair": 203,
+      "shard": 3,
+      "shards": 5
     },
     {
-      "pair": 71,
-      "mode": "parallel",
-      "order": "cypress,playwright",
-      "playwrightWorkers": 2,
-      "cypressProcesses": 2
+      "task": "alone-fresh",
+      "pair": 204,
+      "shard": 4,
+      "shards": 5
     },
     {
-      "pair": 72,
-      "mode": "parallel",
-      "order": "playwright,cypress",
-      "playwrightWorkers": 2,
-      "cypressProcesses": 2
+      "task": "alone-fresh",
+      "pair": 205,
+      "shard": 5,
+      "shards": 5
     },
     {
-      "pair": 73,
-      "mode": "parallel",
-      "order": "cypress,playwright",
-      "playwrightWorkers": 2,
-      "cypressProcesses": 2
-    },
-    {
-      "pair": 74,
-      "mode": "parallel",
-      "order": "playwright,cypress",
-      "playwrightWorkers": 2,
-      "cypressProcesses": 2
-    },
-    {
-      "pair": 75,
-      "mode": "parallel",
-      "order": "cypress,playwright",
-      "playwrightWorkers": 2,
-      "cypressProcesses": 2
-    },
-    {
-      "pair": 76,
-      "mode": "parallel",
-      "order": "playwright,cypress",
-      "playwrightWorkers": 2,
-      "cypressProcesses": 2
-    },
-    {
-      "pair": 77,
-      "mode": "parallel",
-      "order": "cypress,playwright",
-      "playwrightWorkers": 2,
-      "cypressProcesses": 2
-    },
-    {
-      "pair": 78,
-      "mode": "parallel",
-      "order": "playwright,cypress",
-      "playwrightWorkers": 2,
-      "cypressProcesses": 2
-    },
-    {
-      "pair": 79,
-      "mode": "parallel",
-      "order": "cypress,playwright",
-      "playwrightWorkers": 2,
-      "cypressProcesses": 2
-    },
-    {
-      "pair": 80,
-      "mode": "parallel",
-      "order": "playwright,cypress",
-      "playwrightWorkers": 2,
-      "cypressProcesses": 2
+      "task": "populated",
+      "pair": 210
     }
   ]
 }
