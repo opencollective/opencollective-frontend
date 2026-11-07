@@ -5,15 +5,17 @@
  *
  * Runs under plain `node` (type stripping) through `cli.ts`.
  */
-import { execFileSync, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { git } from './git.ts';
+
 export type BuildStamp = {
   /** Git HEAD the build was made from. */
   head: string;
-  /** Hash of `git diff HEAD` plus untracked, non-ignored files; `clean` when there are none. */
+  /** Hash of `git diff HEAD` plus untracked, non-ignored files outside IGNORED_PATHSPECS; `clean` when there are none. */
   uncommitted: string;
   /** sha256 of package-lock.json. */
   lockfile: string;
@@ -26,20 +28,15 @@ export type BuildStamp = {
 };
 
 /**
- * Paths that never reach a service build. Editing or committing a spec, a test
- * or docs must not ask for a rebuild during iteration.
+ * Paths that never reach a service build, so editing or committing a spec, a
+ * test or docs does not ask for a rebuild during iteration: the top-level
+ * `test/` and `docs/` folders, top-level Markdown and READMEs anywhere. Other
+ * Markdown stays a build input (the frontend bundles its static pages from
+ * `components/static-pages/*.md`). See docs/e2e.md (What the stamps leave out).
  */
-const IGNORED_PATHSPECS = [':(exclude)test', ':(exclude)docs', ':(exclude,glob)**/*.md'];
+const IGNORED_PATHSPECS = [':(exclude)test', ':(exclude)docs', ':(exclude,glob)*.md', ':(exclude,glob)**/README.md'];
 
 const sha256 = (data: string | Buffer) => crypto.createHash('sha256').update(data).digest('hex');
-
-const git = (dir: string, args: string[]) =>
-  execFileSync('git', args, {
-    cwd: dir,
-    encoding: 'buffer',
-    maxBuffer: 512 * 1024 * 1024,
-    stdio: ['ignore', 'pipe', 'ignore'],
-  });
 
 const fileSha = (file: string) => {
   try {

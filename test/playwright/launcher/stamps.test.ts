@@ -76,6 +76,15 @@ describe('build stamps', () => {
     expect(stale(before)).toEqual([]);
   });
 
+  it('is stale after editing Markdown that the app bundles, such as the static pages', () => {
+    write(dir, 'src/static-pages/about.md', 'About\n');
+    git(dir, 'add', '.');
+    git(dir, 'commit', '-q', '-m', 'about');
+    const before = computeBuildStamp({ dir, buildEnv: env });
+    write(dir, 'src/static-pages/about.md', 'About us\n');
+    expect(stale(before)).toEqual(['uncommitted changes']);
+  });
+
   it('is stale when the lockfile or the build env changes', () => {
     const before = computeBuildStamp({ dir, buildEnv: env });
     write(dir, 'package-lock.json', '{"v":2}');
