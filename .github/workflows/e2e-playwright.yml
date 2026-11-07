@@ -133,7 +133,7 @@ jobs:
         # (localhost:1025). The scratch-built mailpit image has no
         # curl/wget, so no container healthcheck: the launcher verifies
         # Mailpit/API readiness with its own five-minute deadlines.
-        image: axllent/mailpit:v1.28.0@sha256:c076638db1e15662150be4fb62b8a6e96ef6ba5bde90c838a0239225854830f7
+        image: axllent/mailpit:v1.33.0@sha256:9b3a463be15354c0f0eba91697d80e3e0d8a5623ef0e627cacc836bc17fd5231
         ports:
           - 8025:8025
           - 1025:1025
