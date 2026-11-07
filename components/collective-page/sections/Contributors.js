@@ -159,6 +159,7 @@ export default class SectionContributors extends React.PureComponent {
         <ContributorsGrid
           contributors={contributors}
           collectiveId={collective.id}
+          collectiveSlug={collective.slug}
           currency={collective.currency}
           maxWidthWhenNotFull={Dimensions.MAX_SECTION_WIDTH}
           gridRef={this.contributorsGridRef}
