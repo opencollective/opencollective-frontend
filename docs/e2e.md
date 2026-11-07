@@ -174,7 +174,10 @@ The object store must also contain the `opencollective-e2e` bucket. CI creates
 it in the workflow; locally run `scripts/dev/init-local-s3.ts` from the API
 with the launcher's `AWS_*` values once (it only adds missing buckets). Upload
 journeys fail with a message naming the mocked upload, or with the API's upload
-error in `api.log`, when either is missing.
+error in `api.log`, when either is missing. The same script gives the bucket the
+CORS rule of the production bucket, so the browser can read stored files (the
+PDF viewer fetches attachments); run it again on a bucket created before that
+rule existed. Without it the PDF preview journey shows "Failed to load PDF file.".
 
 ```bash
 cd opencollective-frontend
@@ -200,6 +203,12 @@ E2E_TEST=1`) and the established E2E stubs.
 Evidence per run lives under `test/playwright/.artifacts/<run-id>/`
 (manifest, owned service logs, and that attempt's HTML/JSON/JUnit reports
 plus traces/screenshots/videos on failure — no shared-path overwrite).
+Traces keep actions, logs, errors, sources and the screencast of every failed
+attempt, without DOM snapshots or the network log, which cost about 40% of
+the pilot's wall time on a 4-vCPU runner. The failure screenshot, video, page
+snapshot (`error-context.md`) and service logs complete them. To diagnose a
+failure that needs the network log or DOM snapshots, run it again with
+`PLAYWRIGHT_TRACE_SNAPSHOTS=1` (for example with `--replay`).
 `--keep-on-failure` retains owned processes for inspection and prints the
 explicit cleanup command.
 
@@ -257,7 +266,8 @@ cost is not steady-state cost.
   failures, recoveries, and final failures stay distinguishable.
 - Every attempt uploads its run-specific `test/playwright/.artifacts/`
   directory (replay manifest, sanitized service logs, HTML/JSON/JUnit
-  reports, original traces/screenshots/videos). Failure/recovery evidence
+  reports, original traces (without DOM snapshots or network log, see
+  above)/screenshots/videos). Failure/recovery evidence
   is retained 14 days, successful evidence 7 days; expiry deletes only CI
   artifacts, never local scenario or provider records.
 - Later pilot journeys reuse the same job via its `spec`/`grep` inputs; no
@@ -344,7 +354,7 @@ test.describe('paying Collective subject to VAT', () => {
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `expense-submission`   | `collective: { country, vat }`, `secondCollective`, `payeeOrganization`, `priorExpense`, `priorExpenseType`, `invitee`, `inviteeOrganization`                                       | `hostAdmin`, `submitter` (administers nothing unless `payeeOrganization`), `invitee`, `inviteeAdmin`    | `host`, `collective`, `collective2`, `organization`, `inviteeOrganization` (administered by `inviteeAdmin` only); expense `prior` (pending, by the submitter on `collective`, with a saved payout method: an invoice, or with `priorExpenseType: 'RECEIPT'` a reimbursement whose item has a stored receipt); URLs `collective`, `newExpense`, `submittedExpenses`                                |
 | `expense-draft-invite` | `description`, `currency`, `items` (required)                                                                                                                                       | `hostAdmin`, `drafter` (Collective admin), `payeeAdmin`                                                 | `host`, `collective`, `payee` (Organization); expense `draft`; URL `draft` (the invitation link)                                                                                                                                                                                                                                                                                                  |
-| `expense-management`   | `expense: { description, items }`, `project`                                                                                                                                        | `hostAdmin`, `admin` (Collective admin; submitter and payee of the expense)                             | `host`, `collective` (no expense policy), `project` (under `collective`, same host); expense `pending` (invoice by `admin` on `collective`, with a saved payout method); URLs `expenses`, `policies`, `projectNewExpense`                                                                                                                                                                         |
+| `expense-management`   | `expense: { description, items, attachedPdf }`, `project`                                                                                                                           | `hostAdmin`, `admin` (Collective admin; submitter and payee of the expense)                             | `host`, `collective` (no expense policy), `project` (under `collective`, same host); expense `pending` (invoice by `admin` on `collective`, with a saved payout method); URLs `expenses`, `policies`, `projectNewExpense`                                                                                                                                                                         |
 | `vendor-host`          | `useVendorPolicy`, `grants`, `secondCollective`, `project`, `outsider`, `otherHost: { admin, collective }`, `vendors: [{ label, host, usableWith, useVendorPolicy, payoutMethod }]` | `hostAdmin`, `collectiveAdmin`, `outsider` (no role anywhere), `otherHostAdmin`, `otherCollectiveAdmin` | `host` (no vendor policy unless `useVendorPolicy`), `collective` (admin `collectiveAdmin`), `collective2` (admin `hostAdmin`), `project` (under `collective`), `otherHost` (unrelated host, administered by `hostAdmin` or `otherHostAdmin`), `otherCollective` (on `otherHost`); vendors by `label` in `scenario.vendors`; URLs `hostedCollectives`, `vendors`, `expectedFunds` (host dashboard) |
 
 Each request owns a new active fiscal host, so no journey adds Collectives or
@@ -467,8 +477,11 @@ identity when a journey needs them. Never reset the global database, cache,
 mail inbox or storage between tests, and retain scenario records after failures.
 
 The transport uses Node fetch to keep fixture authorization out of browser
-traces. Authentication is supplied through isolated browser storage, avoiding
-sign-in URL tokens and shared sign-in IP counters (the journeys about
+traces. Authentication is supplied through isolated browser storage (the
+access token in local storage and the two session cookies the API sets at
+sign-in, which requests outside the GraphQL client, such as protected files
+through `/api/files`, use), avoiding sign-in URL tokens and shared sign-in IP
+counters (the journeys about
 signing in use the sign-in form). Scenario attachments contain only named
 references and attempt metadata ([what is attached](#what-an-attempt-attaches)). The launcher redacts JWTs and fixture
 credentials from trace archives and textual reports/logs before handoff or
@@ -808,13 +821,14 @@ workers on such a machine; the cap is not a property of the journeys.
 `test/playwright/specs/expenses/` also carries the rest of the Cypress expense
 pilot (`test/cypress/integration/27-expenses.test.ts`: `Actions on expense`,
 `Recurring`, `Duplicate` and `Edit` blocks), which stays unchanged and
-runnable. Thirteen Cypress tests map to thirteen journeys:
+runnable. Fourteen Cypress tests map to fourteen journeys:
 
 | Cypress test                                                                            | Playwright journey (`specs/expenses/`)                                                                                             |
 | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | Actions on expense › Approve, unapprove, reject and pay actions on expense              | `process-expense.spec.ts` › Collective admin approves, unapproves and rejects an expense, leaving a comment for each reversal      |
 | Actions on expense › Delete expense                                                     | `process-expense.spec.ts` › Collective admin deletes a rejected expense, which is then no longer available                         |
 | Actions on expense › Downloads PDF                                                      | `process-expense.spec.ts` › Collective admin downloads the generated invoice of an expense as a PDF                                |
+| Actions on expense › Previews a PDF attachment                                          | `preview-attachment.spec.ts` › Collective admin previews the PDF attached to an expense                                            |
 | Actions on expense › Displays expense policy                                            | `expense-policy.spec.ts` › Collective admin writes expense policies in the dashboard and submitters see them on the expense form   |
 | Actions on expense › Projects inherit and display expense policy from parent collective | `expense-policy.spec.ts` › Collective with a Project › expense form of a Project shows the expense policy of its parent Collective |
 | Invoices › Edit invoice expense › Edits title                                           | `edit-expense.spec.ts` › pending invoice › submitter renames it                                                                    |
@@ -848,6 +862,17 @@ the suggested name (`Expense-<id>-<collective slug>-invoice-<date>.pdf`) and
 that the document names this attempt's expense number and title, Collective,
 payee, billed host, item line and total. The API's stub for PDFs attached to
 emails is untouched and not involved.
+
+The PDF preview journey opens an expense whose attachment is a real one-page
+PDF in the uploads bucket (`expense.attachedPdf` of the recipe, stored like a
+reimbursement receipt), clicks the attachment and checks that pdf.js renders
+the page and its text layer with the document's text, and that the viewer's
+error message is absent. It fails when the pdf.js worker is missing or does not
+match the library, which is what the Cypress test guards
+(opencollective/opencollective-frontend#12558). Cypress uploads the file
+through the API and creates the expense as the user; the recipe arranges both,
+since previewing is the behaviour under test. Cypress disables web security,
+so it does not need the bucket's CORS rule; Playwright does.
 
 Where the journeys differ from the Cypress source, and why:
 
@@ -912,12 +937,13 @@ Where the journeys differ from the Cypress source, and why:
 Focused reproduction:
 
 ```bash
-# The thirteen journeys, fresh
+# The fourteen journeys, fresh ("Collective admin" also selects the PDF preview)
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses --workers 3 \
   --grep "Collective admin|Project|pending (invoice|reimbursement)|recur every month|duplicates"
 
 # One journey, fresh
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses/process-expense.spec.ts --grep "downloads the generated invoice"
+./test/playwright/run-local.sh --spec test/playwright/specs/expenses/preview-attachment.spec.ts
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses/edit-expense.spec.ts --grep "pending reimbursement submitter edits"
 
 # One journey against a retained populated stack
@@ -1289,10 +1315,10 @@ journeys cover 16 of them and these journeys the other 7.
 ## Pilot coverage reconciliation
 
 Every `describe` and `it` of the two pilot Cypress files is accounted for by
-the journey tables above, except one gap: "Actions on expense › Previews a PDF
-attachment", added to Cypress (opencollective/opencollective-frontend#12558)
-before the pilot merged, has no journey. Both files are unchanged and still
-run with Cypress. `node test/playwright/evaluation/cli.ts inventory` checks
+the journey tables above. "Actions on expense › Previews a PDF attachment",
+added to Cypress (opencollective/opencollective-frontend#12558) before the
+pilot merged, was first missed and is now carried. Both files are unchanged and
+still run with Cypress. `node test/playwright/evaluation/cli.ts inventory` checks
 this inventory against both sources (see `test/playwright/evaluation/README.md`).
 
 `27-expenses.test.ts` (29 tests):
@@ -1300,7 +1326,7 @@ this inventory against both sources (see `test/playwright/evaluation/README.md`)
 | Cypress block                                   | Tests | Journeys | Section            |
 | ----------------------------------------------- | ----- | -------- | ------------------ |
 | new expense when logged out                     | 2     | 2        | Expense submission |
-| Actions on expense                              | 6     | 5        | Expense management |
+| Actions on expense                              | 6     | 6        | Expense management |
 | Invoices › Create (new user, returning user)    | 2     | 2        | Expense submission |
 | Invoices › Create › Invite                      | 3     | 3        | Expense invitation |
 | Invoices › Create › Recurring, Duplicate        | 2     | 2        | Expense management |
@@ -1326,10 +1352,10 @@ this inventory against both sources (see `test/playwright/evaluation/README.md`)
 | ---------------------------- | ------------- | ------------------- |
 | Expense submission           | 9             | 9                   |
 | Expense invitation           | 6             | 6                   |
-| Expense management           | 14            | 13                  |
+| Expense management           | 14            | 14                  |
 | Vendor picker                | 16            | 15                  |
 | Vendor creation and settings | 7             | 7                   |
-| Total                        | 52            | 50                  |
+| Total                        | 52            | 51                  |
 
 One consolidation and one partial mapping are recorded, each explained in its
 section:
@@ -1348,11 +1374,11 @@ it: both logged-out invitation journeys sign in and submit, the four editing
 journeys cover a real reimbursement next to the invoice, and both recurring
 journeys check the saved recurrence.
 
-Apart from the PDF preview gap, nothing else is left out. Steps the journeys do not repeat because the source
+Nothing else is left out. Steps the journeys do not repeat because the source
 does not test them (no expense is paid, no funds are added, no expected funds
 are recorded) are listed in the sections. With the six tests of the fixture,
-account and smoke specs, the Playwright selection holds 56 tests. On the
-8-CPU Linux VM used throughout, with retries disabled, it takes 110-123 s of
+account and smoke specs, the Playwright selection holds 57 tests. When it held
+56, on the 8-CPU Linux VM used throughout, with retries disabled, it took 110-123 s of
 Playwright time with three workers, 133 s with two and 217 s with one, after
 roughly 55 s of launcher startup on a fresh stack.
 
