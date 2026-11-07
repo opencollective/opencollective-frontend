@@ -1,8 +1,11 @@
 # Pilot evaluation
 
 Tooling for the evaluation of the expense and vendor Playwright pilots
-(opencollective/opencollective#8969): a coverage inventory, a paired
-Cypress/Playwright benchmark, independence checks and a full-CI baseline.
+(opencollective/opencollective#8969): a coverage inventory, the summary of a
+paired Cypress/Playwright benchmark and a full-CI baseline. The benchmark and
+independence-check scaffolding is not part of this branch; it lives on the
+pushed branch
+[`feat/playwright-pilot-evaluation-8969`](https://github.com/opencollective/opencollective-frontend/tree/feat/playwright-pilot-evaluation-8969).
 Commands run from the frontend root with Node 24, which runs these TypeScript
 files directly.
 
@@ -24,8 +27,12 @@ but reports that not every core flow is carried by a journey.
 
 ## Benchmark pairs (scaffolding)
 
-`.github/workflows/e2e-pilot-benchmark.yml` runs when
-`benchmark-plan.json` changes on the evaluation branch. The plan pins the API,
+The scaffolding below (the workflow and the scripts it calls) is only on
+`feat/playwright-pilot-evaluation-8969`; check out that branch to reproduce
+the runs. `cli.ts collect-run` and `cli.ts aggregate` stay here.
+
+On that branch, `.github/workflows/e2e-pilot-benchmark.yml` runs when
+`test/playwright/evaluation/benchmark-plan.json` changes. The plan pins the API,
 images and PDF revisions and lists the matrix jobs. A `pair` job
 (`bench-pair.sh`) runs both pilot suites with each runner, one after the
 other on the same machine, in the plan's order:
@@ -59,7 +66,7 @@ critical path within one job, overall and per batch.
 
 ## Independence checks (scaffolding)
 
-Plan entries with `task: alone-fresh` (sharded) or `task: populated` run
+Also only on `feat/playwright-pilot-evaluation-8969`. Plan entries with `task: alone-fresh` (sharded) or `task: populated` run
 `independence.sh`: every pilot test alone on a fresh stack; and on one
 retained stack a controlled failure, a probe run kept on failure, every test
 alone with `--reuse`, the whole selection with 1 and 4 workers, the two
