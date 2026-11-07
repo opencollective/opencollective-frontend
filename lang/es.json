@@ -3378,6 +3378,7 @@
   "Payouts": "Pagos",
   "PayPal.ConnectSuccess": "Tu cuenta de PayPal se ha conectado.",
   "Paypal.Email": "Correo electrónico de PayPal",
+  "Paypal.Payment": "PayPal Payment",
   "PayPal.Unverified.Tooltip": "Esta cuenta de PayPal no se ha verificado mediante «Iniciar sesión con PayPal».{canEdit, select, true { Edita este método de pago para conectarla y verificarla.} other {}}",
   "PaypalConnectButton.popupOverlay.cta": "Haz clic para continuar",
   "pB1jn6": "No se realizarán más cargos por esta contribución.",

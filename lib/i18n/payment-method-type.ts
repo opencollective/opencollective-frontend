@@ -13,11 +13,11 @@ const i18nTypes: Record<string, MessageDescriptor> = defineMessages({
   HOST: { defaultMessage: 'Added Funds', id: 'AccountingCategory.Kind.ADDED_FUNDS' },
   LINK: { id: 'Stripe.PaymentMethod.Label.link', defaultMessage: 'Link' },
   MANUAL: { id: 'Payout.Manual', defaultMessage: 'Manual' },
-  PAYMENT: { id: 'ContributionFlow.Payment', defaultMessage: 'Payment' },
+  PAYMENT: { id: 'Paypal.Payment', defaultMessage: 'PayPal Payment' },
   PAYOUT: { id: 'Payout', defaultMessage: 'Payout' },
   PREPAID: { id: 'Prepaid', defaultMessage: 'Prepaid Card' },
   SEPA_DEBIT: { id: 'Stripe.PaymentMethod.Label.sepa_debit', defaultMessage: 'SEPA Direct Debit' },
-  SUBSCRIPTION: { id: 'PaymentMethod.Paypal.type.Subscription', defaultMessage: 'Subscription' },
+  SUBSCRIPTION: { id: 'PaymentMethod.Paypal.type.Subscription', defaultMessage: 'PayPal Subscription' },
   US_BANK_ACCOUNT: { id: 'ACH Debit', defaultMessage: 'ACH Debit' },
   VIRTUAL_CARD: { id: 'PayoutMethod.Type.VirtualCard', defaultMessage: 'Virtual Card' },
   SWISH: { id: 'Stripe.PaymentMethod.Label.swish', defaultMessage: 'Swish' },
@@ -26,6 +26,12 @@ const i18nTypes: Record<string, MessageDescriptor> = defineMessages({
   // - ALIPAY -> "Alipay" doesn't need translation
 });
 
+// Brand names, not translated
+const untranslatedTypes: Record<string, string> = {
+  // A Stripe checkout that wasn't completed: once it is, the type becomes the method used (CREDITCARD, SEPA_DEBIT...)
+  PAYMENT_INTENT: 'Stripe Payment Intent',
+};
+
 /**
  * Get only the (i18n) name of the payment method type.
  *
@@ -33,5 +39,5 @@ const i18nTypes: Record<string, MessageDescriptor> = defineMessages({
  */
 export const i18nPaymentMethodType = (intl: IntlShape, type: string | null): string | null => {
   const key = type === null ? 'null' : type;
-  return i18nTypes[key] ? intl.formatMessage(i18nTypes[key]) : type;
+  return i18nTypes[key] ? intl.formatMessage(i18nTypes[key]) : untranslatedTypes[key] || type;
 };
