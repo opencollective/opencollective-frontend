@@ -56,10 +56,10 @@ PLAYWRIGHT_WORKERS=2 PLAYWRIGHT_RETRIES=1 ./test/playwright/run-local.sh
 # Replay a recorded run from fresh matching inputs (validates, then runs fresh)
 ./test/playwright/run-local.sh --replay test/playwright/.artifacts/<run-id>/replay-manifest.json
 
-# Join the live owned environment for iteration (no reset; never tears down)
+# Join a running E2E environment without installing, building or resetting (never tears it down)
 ./test/playwright/run-local.sh --reuse --spec test/playwright/specs/smoke.spec.ts
 
-# Stop a retained owned environment (refuses while other runs use it)
+# Stop a retained E2E environment (refuses while other runs use it)
 ./test/playwright/run-local.sh --cleanup
 ```
 

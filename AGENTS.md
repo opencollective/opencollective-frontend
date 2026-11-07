@@ -27,6 +27,6 @@ Run a spec: `npm run e2e -- <spec> [playwright args]` installs, builds what chan
 Services resolve from `API_FOLDER`/`--api-dir` (and images/PDF), then `../opencollective-*`, then `./opencollective-*`; in a worktree, create matching service worktrees under the same `.worktrees/<feature>/`.
 Fresh run (CI contract, no install or build): `./test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts`, disposable `opencollective_pw_e2e` by default.
 Evidence: `test/playwright/.artifacts/<run-id>/replay-manifest.json` plus owned service logs.
-Replay: `--replay <manifest>` (validates inputs, runs fresh). Iteration: `--reuse` (joins live env, no reset). Cleanup: `--cleanup` (refuses while active users remain).
+Replay: `--replay <manifest>` (validates inputs, runs fresh). Join a running E2E environment without install, build or reset: `--reuse`. Cleanup: `--cleanup` (refuses while active users remain).
 Mutable journeys: `test/playwright/fixtures` (`test`, `scenarioTest`) with API recipes; pilot specs in `test/playwright/specs/**`. Upload journeys need a frontend built with `DISABLE_MOCK_UPLOADS=1` (`docs/e2e.md`).
 CI pilot (`CI / e2e-playwright / playwright smoke`): observational, same launcher; failure evidence 14d, success 7d.

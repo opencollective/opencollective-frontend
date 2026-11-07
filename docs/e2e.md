@@ -106,10 +106,16 @@ it, for example `.worktrees/<feature>/opencollective-api` beside
   stamp next to the build output (`.next/oc-e2e-build-stamp.json`,
   `dist/.oc-e2e-build-stamp.json`). It records the Git HEAD, a hash of
   uncommitted changes (`git diff HEAD` plus untracked, non-ignored files), the
-  lockfile hash and every build-time variable the launcher passes. Changes
-  under `test/` and `docs/`, and Markdown files, are left out, so editing a
-  spec never asks for a rebuild. The stamps are copied into every replay
-  manifest (`buildStamps`).
+  lockfile hash and every build-time variable the launcher passes. The stamps
+  are copied into every replay manifest (`buildStamps`).
+- **What the stamps leave out:** unlike a plain `git diff HEAD`, the stamps
+  ignore the top-level `test/` and `docs/` folders, top-level Markdown files
+  and `README.md` files anywhere, so editing a spec or a doc never asks for a
+  rebuild. No service build reads them. Other Markdown counts (the frontend
+  bundles `components/static-pages/*.md`). Code that reads those paths at
+  runtime, such as the API's import-export sanitizer loading
+  `test/test-helpers/fake-data`, only changes after the service restarts: use
+  `--rebuild <service>` or `--fresh`.
 - **Rebuilds:** a missing or mismatched stamp triggers a rebuild through the
   service's normal build script (`npm run build`, `npm run build:e2e` for the
   API). Builds run in parallel, log to `test/playwright/.artifacts/<run-id>/build-<service>.log`,
@@ -227,17 +233,19 @@ provider resources — not historical provider state, and it cannot guarantee
 recurrence of an intermittent failure. Mismatched inputs fail with an
 expected-vs-actual list instead of overwriting local changes.
 
-Join the live owned environment for fast iteration (no database, cache, mail,
-or file reset; populated state stays shared; the run registers as an active
-user so the owner cannot tear the environment down underneath it):
+Join a running E2E environment from `run-local.sh` with `--reuse`. Unlike
+iteration (`npm run e2e`), it installs, builds and checks nothing; like
+iteration, it resets no database, cache, mail or files, so populated state stays
+shared. The run registers as an active user so the owner cannot tear the E2E
+environment down underneath it:
 
 ```bash
 ./test/playwright/run-local.sh --reuse --spec test/playwright/specs/smoke.spec.ts
 ```
 
-Retain a failed stack and clean it up explicitly (cleanup refuses while other
-runs still use the environment, and only affects the retained
-owned environment):
+Keep the E2E environment of a failed fresh run and stop it explicitly (cleanup
+refuses while other runs still use it, and only stops the E2E environment of
+`--pg-database`):
 
 ```bash
 ./test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts --keep-on-failure
@@ -259,7 +267,7 @@ until pilot adoption, and the Playwright job reports real
 test/setup/interruption outcomes without masking failures. Duplicate pilot
 cost is not steady-state cost.
 
-- Workers share one services stack (`PLAYWRIGHT_WORKERS`, default 1; raise
+- Workers share one E2E environment (`PLAYWRIGHT_WORKERS`, default 1; raise
   only from measured CPU/memory/service capacity). Retries default to 0
   locally and in benchmarks; routine CI allows at most 1
   (`PLAYWRIGHT_RETRIES`; larger values are rejected) so first-attempt
@@ -458,9 +466,10 @@ an advisory transaction lock, with bounded database waits. A disconnected
 request rolls back when observed before commit; a response lost after commit
 recovers the durable receipt. Validation/setup failures roll back database
 writes. Side effects that cannot roll back must use scenario identities and
-report identifiable retained leftovers; do not add deletion registries. The
-stored receipt of a prior reimbursement (`createStoredReceipt`) is the one
-such side effect today.
+report identifiable retained leftovers; do not add deletion registries. Two
+such side effects exist today, both files written to the object store: the
+stored receipt of a prior reimbursement (`createStoredReceipt`) and the stored
+PDF attached to an expense (`attachStoredPdf`).
 
 Safe reuse is deliberate. Read-only journeys can use Playwright's base `test`
 and the existing public homepage or seeded Account pages without arranging a
@@ -532,7 +541,7 @@ helper, or the same wait, in a new journey over the same form.
 
 ### Independence and interruption checks
 
-Run both journeys and the fixture protocol checks on one stack:
+Run both journeys and the fixture protocol checks in one E2E environment:
 
 ```bash
 ./test/playwright/run-local.sh --spec test/playwright/specs --workers 2
@@ -556,7 +565,7 @@ leaves behind>')` from `helpers/attempt.ts` right after its first real change;
 with one retry, the retried attempt must then pass on prerequisites of its own. Run each
 mutable spec with a fresh launcher as well to verify standalone reproduction.
 
-Focused API HTTP checks against a retained owned stack cover missing attempt
+Focused API HTTP checks against a retained E2E environment cover missing attempt
 identity, domain failure after partial creation, and a client disconnect while
 setup is blocked. The database lock is fault injection in the API test, followed
 by a corrected same-identity retry and independent peer request. It performs no
@@ -641,7 +650,7 @@ Focused reproduction:
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses/submit-first-expense.spec.ts --grep "first reimbursement"
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses/draft-currency.spec.ts
 
-# One journey against a retained populated stack
+# One journey against a retained populated E2E environment
 ./test/playwright/run-local.sh --reuse --spec test/playwright/specs/expenses/submit-returning-expense.spec.ts --grep "requests invoice payment"
 
 # First attempt fails after a real submission; the retry arranges a new host, users and prior expense
@@ -764,7 +773,7 @@ Focused reproduction:
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses/invite-new-user.spec.ts --grep "emailed invoice"
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses/invite-organization-logged-out.spec.ts --grep "emailed reimbursement"
 
-# One journey against a retained populated stack and inbox
+# One journey against a retained populated E2E environment and inbox
 ./test/playwright/run-local.sh --reuse --spec test/playwright/specs/expenses/invite-organization.spec.ts --grep "emailed reimbursement"
 
 # First attempt fails with its invitation delivered and unanswered; the retry
@@ -946,7 +955,7 @@ Focused reproduction:
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses/preview-attachment.spec.ts
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses/edit-expense.spec.ts --grep "pending reimbursement submitter edits"
 
-# One journey against a retained populated stack
+# One journey against a retained populated E2E environment
 ./test/playwright/run-local.sh --reuse --spec test/playwright/specs/expenses/expense-policy.spec.ts --grep "expense form of a Project"
 
 # First attempts fail after a real unapproval, download, policy save,
@@ -1122,7 +1131,7 @@ Focused reproduction:
 ./test/playwright/run-local.sh --spec test/playwright/specs/vendors/vendor-foreign-host.spec.ts --grep "admin of two hosts"
 ./test/playwright/run-local.sh --spec test/playwright/specs/vendors/grant-beneficiary.spec.ts --grep "submits a grant request"
 
-# One journey against a retained populated stack
+# One journey against a retained populated E2E environment
 ./test/playwright/run-local.sh --reuse --spec test/playwright/specs/vendors/vendor-policy.spec.ts --grep "submitter without any role"
 
 # First attempts fail with a loaded picker or a submitted grant behind them;
@@ -1274,7 +1283,7 @@ Focused reproduction:
 ./test/playwright/run-local.sh --spec test/playwright/specs/vendors/vendor-creation.spec.ts --grep "recording expected funds"
 ./test/playwright/run-local.sh --spec test/playwright/specs/vendors/vendor-settings.spec.ts --grep "take up a vendor policy"
 
-# One journey against a retained populated stack
+# One journey against a retained populated E2E environment
 ./test/playwright/run-local.sh --reuse --spec test/playwright/specs/vendors/vendor-settings.spec.ts --grep "limits a vendor"
 
 # First attempts fail with a created vendor, an edited vendor or a changed host
