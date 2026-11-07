@@ -5,11 +5,160 @@ This is the canonical reproduction guide. Runner READMEs link here:
 - Playwright (pilot, Chromium): [`test/playwright/README.md`](../test/playwright/README.md)
 - Cypress (existing suite): [`test/cypress/README.md`](../test/cypress/README.md)
 
+## Run a spec
+
+From the frontend, with the API, images and PDF services checked out next to it
+(the [monorepo](https://github.com/opencollective/monorepo) layout):
+
+```bash
+npm run e2e -- test/playwright/specs/smoke.spec.ts
+```
+
+The first run installs missing dependencies (`npm ci`), builds every service,
+restores a disposable database, starts an **E2E environment** (API, frontend,
+images and PDF on ports 3060, 3000, 3001 and 3002) and runs the spec. It takes
+several minutes, mostly the Next.js build.
+
+The E2E environment then **stays running**. Every later `npm run e2e` joins it,
+which is **iteration**: with no changes, Playwright starts within seconds.
+
+```bash
+npm run e2e -- test/playwright/specs/smoke.spec.ts -g "switches language"
+npm run e2e -- test/playwright/specs/expenses --headed
+npm run e2e -- test/playwright/specs/smoke.spec.ts --ui
+npm run e2e -- test/playwright/specs/smoke.spec.ts --debug
+```
+
+Everything after `--` goes to `npx playwright test` unchanged, except the
+launcher options listed below. Editing a spec never needs a rebuild. After you
+change application code, the run warns that a service is stale and prints the
+command that rebuilds and restarts it:
+
+```bash
+npm run e2e -- --rebuild frontend test/playwright/specs/smoke.spec.ts
+```
+
+Iteration shares state: the database, cache, mail and files keep what earlier
+runs created. Journeys are written to tolerate that (see
+[Authoring independent Playwright fixtures](#authoring-independent-playwright-fixtures)).
+Start over from a restored database with `--fresh`, and stop the E2E
+environment when you are done:
+
+```bash
+npm run e2e -- --fresh test/playwright/specs/smoke.spec.ts
+npm run e2e:stop
+```
+
+`npm run test:playwright` and `npm run playwright:test` are aliases of
+`npm run e2e`. `npm run test:e2e` still runs Cypress.
+
+Postgres, Mailpit and an S3-compatible store (RustFS or MinIO) must already be
+running. When one is missing, the run prints the `docker compose` command that
+starts it.
+
+## Tweaking the behavior
+
+### Launcher options
+
+| Option                                   | Effect                                                                                                                     |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `--fresh`                                | Stop the E2E environment, restore the database and start it again (still left running).                                    |
+| `--rebuild <service>`                    | Rebuild one service (`frontend`, `api`, `images` or `pdf`) and restart only that service. Repeatable.                      |
+| `--stop`                                 | Stop the E2E environment (`npm run e2e:stop`). Refuses while another run uses it.                                          |
+| `--api-dir`, `--images-dir`, `--pdf-dir` | Explicit service checkout (same as the variables below).                                                                   |
+| `--pg-database <name>`                   | Disposable database, `opencollective_pw_e2e` (default) or `opencollective_pw_e2e_<suffix>`.                                |
+| anything else                            | Passed to `npx playwright test`: spec paths, `-g`, `--headed`, `--ui`, `--debug`, `--workers`, `--retries`, `--project`... |
+
+### Environment variables
+
+| Variable                                                  | Effect                                                                                              |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `API_FOLDER`, `IMAGES_FOLDER`, `PDF_FOLDER`               | Explicit service checkouts. `API_DIR`, `IMAGES_DIR`, `PDF_DIR` are accepted too.                    |
+| `PLAYWRIGHT_WORKERS`, `PLAYWRIGHT_RETRIES`                | Defaults for `--workers` (1) and `--retries` (0, at most 1).                                        |
+| `PG_HOST`, `MAILPIT_URL`, `AWS_S3_ENDPOINT`               | Infrastructure endpoints. Defaults: Compose service names when they resolve, otherwise `localhost`. |
+| `REDIS_URL`                                               | Use this Redis instead of starting a disposable one on `REDIS_PORT` (default 6380).                 |
+| `READY_TIMEOUT`                                           | Seconds each service may take to become ready (default 300).                                        |
+| `WEBSITE_URL`, `API_URL`, `IMAGES_URL`, `PDF_SERVICE_URL` | Service URLs. The ports are fixed at 3000, 3060, 3001 and 3002.                                     |
+
+### Service paths
+
+Each service checkout is resolved in this order:
+
+1. `API_FOLDER` / `--api-dir` (and the images and PDF equivalents), when set.
+   A path that does not exist is an error.
+2. The frontend's parent folder: `../opencollective-api`, `../opencollective-images`,
+   `../opencollective-pdf` (the monorepo layout, and matching worktrees).
+3. A subfolder of the frontend: `./opencollective-api`, ... (the CI layout).
+
+Every run prints the resolved path, branch and revision of each checkout. It
+warns when a service has a branch named like the frontend's but another one is
+checked out; it never switches branches. When nothing is found, the error lists
+every path tried. In a frontend-only Git worktree it also prints the
+`git worktree add` command that creates the matching service worktree next to
+it, for example `.worktrees/<feature>/opencollective-api` beside
+`.worktrees/<feature>/opencollective-frontend`.
+
+### Dependencies and builds
+
+- **Dependencies:** `npm ci` runs in a service whose `node_modules` is missing
+  or whose `package-lock.json` changed since the last install.
+- **Build stamps:** after each successful build, the launcher writes a build
+  stamp next to the build output (`.next/oc-e2e-build-stamp.json`,
+  `dist/.oc-e2e-build-stamp.json`). It records the Git HEAD, a hash of
+  uncommitted changes (`git diff HEAD` plus untracked, non-ignored files), the
+  lockfile hash and every build-time variable the launcher passes. The stamps
+  are copied into every replay manifest (`buildStamps`).
+- **What the stamps leave out:** unlike a plain `git diff HEAD`, the stamps
+  ignore the top-level `test/` and `docs/` folders, top-level Markdown files
+  and `README.md` files anywhere, so editing a spec or a doc never asks for a
+  rebuild. No service build reads them. Other Markdown counts (the frontend
+  bundles `components/static-pages/*.md`). Code that reads those paths at
+  runtime, such as the API's import-export sanitizer loading
+  `test/test-helpers/fake-data`, only changes after the service restarts: use
+  `--rebuild <service>` or `--fresh`.
+- **Rebuilds:** a missing or mismatched stamp triggers a rebuild through the
+  service's normal build script (`npm run build`, `npm run build:e2e` for the
+  API). Builds run in parallel, log to `test/playwright/.artifacts/<run-id>/build-<service>.log`,
+  and stay production builds: there is no hot-reload mode.
+- **One frontend build:** the frontend is built once, in the CI configuration
+  (`TZ=UTC OC_ENV=ci NODE_ENV=test DISABLE_MOCK_UPLOADS=1`, local service URLs),
+  in the normal `.next`. When that replaces your own production build, or your
+  `npm run build` replaced the E2E one, the run says so before rebuilding.
+  `npm run dev` uses `.next/dev` and is unaffected.
+- **Stale services during iteration:** each run recomputes the stamps. When
+  they match, nothing is built. When a running service is stale, the run warns,
+  keeps using it, and prints the `--rebuild <service>` command. A frontend
+  rebuild is a full Next.js build of a few minutes; API, images and PDF
+  rebuilds take well under a minute.
+- **Database:** iteration refuses, and points to `--fresh`, when the API
+  revision or its migrations changed since the database was restored.
+
+### Preflight
+
+Before changing anything, the run checks the tools it needs, the
+infrastructure and the fixed ports. A missing Postgres, Mailpit or object store
+prints the exact command, for example
+`docker compose -f ../opencollective-api/docker-compose/db.yml up -d`
+(`mail.yml`, `uploads.yml`). A busy port names the process holding it. Without
+`redis-server`, the run suggests starting Redis in Docker on port 6380. When
+it starts an E2E environment, the launcher also creates the
+`opencollective-e2e` bucket if it is missing.
+
+### Fresh runs and replay
+
+`test/playwright/run-local.sh` without `--iterate` keeps the fresh-run
+contract that CI uses: it checks that every service is already built, restores
+the database, starts the services, runs the spec and stops everything it
+started. Replay (`--replay <manifest>`) always runs fresh. Both are described
+below.
+
 ## Playwright fresh reproduction (Linux pilot)
 
 One shared launcher provisions a fresh disposable Linux environment and runs a
 selected Chromium journey through the real frontend, API, database, images and
-PDF services. Local runs and CI use the same contract.
+PDF services. CI uses this fresh run; for day-to-day work, prefer
+[`npm run e2e`](#run-a-spec), which builds what it needs and keeps the E2E
+environment running between runs.
 
 Prerequisites (one-time): Python 3, built frontend/API/images/PDF (`npm run build` in
 each repo, `npm run build:e2e` in the API), `npx playwright install chromium`, and running Postgres, Mailpit,
@@ -31,7 +180,10 @@ The object store must also contain the `opencollective-e2e` bucket. CI creates
 it in the workflow; locally run `scripts/dev/init-local-s3.ts` from the API
 with the launcher's `AWS_*` values once (it only adds missing buckets). Upload
 journeys fail with a message naming the mocked upload, or with the API's upload
-error in `api.log`, when either is missing.
+error in `api.log`, when either is missing. The same script gives the bucket the
+CORS rule of the production bucket, so the browser can read stored files (the
+PDF viewer fetches attachments); run it again on a bucket created before that
+rule existed. Without it the PDF preview journey shows "Failed to load PDF file.".
 
 ```bash
 cd opencollective-frontend
@@ -57,6 +209,12 @@ E2E_TEST=1`) and the established E2E stubs.
 Evidence per run lives under `test/playwright/.artifacts/<run-id>/`
 (manifest, owned service logs, and that attempt's HTML/JSON/JUnit reports
 plus traces/screenshots/videos on failure — no shared-path overwrite).
+Traces keep actions, logs, errors, sources and the screencast of every failed
+attempt, without DOM snapshots or the network log, which cost about 40% of
+the pilot's wall time on a 4-vCPU runner. The failure screenshot, video, page
+snapshot (`error-context.md`) and service logs complete them. To diagnose a
+failure that needs the network log or DOM snapshots, run it again with
+`PLAYWRIGHT_TRACE_SNAPSHOTS=1` (for example with `--replay`).
 `--keep-on-failure` retains owned processes for inspection and prints the
 explicit cleanup command.
 
@@ -75,17 +233,19 @@ provider resources — not historical provider state, and it cannot guarantee
 recurrence of an intermittent failure. Mismatched inputs fail with an
 expected-vs-actual list instead of overwriting local changes.
 
-Join the live owned environment for fast iteration (no database, cache, mail,
-or file reset; populated state stays shared; the run registers as an active
-user so the owner cannot tear the environment down underneath it):
+Join a running E2E environment from `run-local.sh` with `--reuse`. Unlike
+iteration (`npm run e2e`), it installs, builds and checks nothing; like
+iteration, it resets no database, cache, mail or files, so populated state stays
+shared. The run registers as an active user so the owner cannot tear the E2E
+environment down underneath it:
 
 ```bash
 ./test/playwright/run-local.sh --reuse --spec test/playwright/specs/smoke.spec.ts
 ```
 
-Retain a failed stack and clean it up explicitly (cleanup refuses while other
-runs still use the environment, and only affects the retained
-owned environment):
+Keep the E2E environment of a failed fresh run and stop it explicitly (cleanup
+refuses while other runs still use it, and only stops the E2E environment of
+`--pg-database`):
 
 ```bash
 ./test/playwright/run-local.sh --spec test/playwright/specs/smoke.spec.ts --keep-on-failure
@@ -107,14 +267,15 @@ until pilot adoption, and the Playwright job reports real
 test/setup/interruption outcomes without masking failures. Duplicate pilot
 cost is not steady-state cost.
 
-- Workers share one services stack (`PLAYWRIGHT_WORKERS`, default 1; raise
+- Workers share one E2E environment (`PLAYWRIGHT_WORKERS`, default 1; raise
   only from measured CPU/memory/service capacity). Retries default to 0
   locally and in benchmarks; routine CI allows at most 1
   (`PLAYWRIGHT_RETRIES`; larger values are rejected) so first-attempt
   failures, recoveries, and final failures stay distinguishable.
 - Every attempt uploads its run-specific `test/playwright/.artifacts/`
   directory (replay manifest, sanitized service logs, HTML/JSON/JUnit
-  reports, original traces/screenshots/videos). Failure/recovery evidence
+  reports, original traces (without DOM snapshots or network log, see
+  above)/screenshots/videos). Failure/recovery evidence
   is retained 14 days, successful evidence 7 days; expiry deletes only CI
   artifacts, never local scenario or provider records.
 - Later pilot journeys reuse the same job via its `spec`/`grep` inputs; no
@@ -201,7 +362,7 @@ test.describe('paying Collective subject to VAT', () => {
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `expense-submission`   | `collective: { country, vat }`, `secondCollective`, `payeeOrganization`, `priorExpense`, `priorExpenseType`, `invitee`, `inviteeOrganization`                                       | `hostAdmin`, `submitter` (administers nothing unless `payeeOrganization`), `invitee`, `inviteeAdmin`    | `host`, `collective`, `collective2`, `organization`, `inviteeOrganization` (administered by `inviteeAdmin` only); expense `prior` (pending, by the submitter on `collective`, with a saved payout method: an invoice, or with `priorExpenseType: 'RECEIPT'` a reimbursement whose item has a stored receipt); URLs `collective`, `newExpense`, `submittedExpenses`                                |
 | `expense-draft-invite` | `description`, `currency`, `items` (required)                                                                                                                                       | `hostAdmin`, `drafter` (Collective admin), `payeeAdmin`                                                 | `host`, `collective`, `payee` (Organization); expense `draft`; URL `draft` (the invitation link)                                                                                                                                                                                                                                                                                                  |
-| `expense-management`   | `expense: { description, items }`, `project`                                                                                                                                        | `hostAdmin`, `admin` (Collective admin; submitter and payee of the expense)                             | `host`, `collective` (no expense policy), `project` (under `collective`, same host); expense `pending` (invoice by `admin` on `collective`, with a saved payout method); URLs `expenses`, `policies`, `projectNewExpense`                                                                                                                                                                         |
+| `expense-management`   | `expense: { description, items, attachedPdf }`, `project`                                                                                                                           | `hostAdmin`, `admin` (Collective admin; submitter and payee of the expense)                             | `host`, `collective` (no expense policy), `project` (under `collective`, same host); expense `pending` (invoice by `admin` on `collective`, with a saved payout method); URLs `expenses`, `policies`, `projectNewExpense`                                                                                                                                                                         |
 | `vendor-host`          | `useVendorPolicy`, `grants`, `secondCollective`, `project`, `outsider`, `otherHost: { admin, collective }`, `vendors: [{ label, host, usableWith, useVendorPolicy, payoutMethod }]` | `hostAdmin`, `collectiveAdmin`, `outsider` (no role anywhere), `otherHostAdmin`, `otherCollectiveAdmin` | `host` (no vendor policy unless `useVendorPolicy`), `collective` (admin `collectiveAdmin`), `collective2` (admin `hostAdmin`), `project` (under `collective`), `otherHost` (unrelated host, administered by `hostAdmin` or `otherHostAdmin`), `otherCollective` (on `otherHost`); vendors by `label` in `scenario.vendors`; URLs `hostedCollectives`, `vendors`, `expectedFunds` (host dashboard) |
 
 Each request owns a new active fiscal host, so no journey adds Collectives or
@@ -305,9 +466,10 @@ an advisory transaction lock, with bounded database waits. A disconnected
 request rolls back when observed before commit; a response lost after commit
 recovers the durable receipt. Validation/setup failures roll back database
 writes. Side effects that cannot roll back must use scenario identities and
-report identifiable retained leftovers; do not add deletion registries. The
-stored receipt of a prior reimbursement (`createStoredReceipt`) is the one
-such side effect today.
+report identifiable retained leftovers; do not add deletion registries. Two
+such side effects exist today, both files written to the object store: the
+stored receipt of a prior reimbursement (`createStoredReceipt`) and the stored
+PDF attached to an expense (`attachStoredPdf`).
 
 Safe reuse is deliberate. Read-only journeys can use Playwright's base `test`
 and the existing public homepage or seeded Account pages without arranging a
@@ -324,8 +486,11 @@ identity when a journey needs them. Never reset the global database, cache,
 mail inbox or storage between tests, and retain scenario records after failures.
 
 The transport uses Node fetch to keep fixture authorization out of browser
-traces. Authentication is supplied through isolated browser storage, avoiding
-sign-in URL tokens and shared sign-in IP counters (the journeys about
+traces. Authentication is supplied through isolated browser storage (the
+access token in local storage and the two session cookies the API sets at
+sign-in, which requests outside the GraphQL client, such as protected files
+through `/api/files`, use), avoiding sign-in URL tokens and shared sign-in IP
+counters (the journeys about
 signing in use the sign-in form). Scenario attachments contain only named
 references and attempt metadata ([what is attached](#what-an-attempt-attaches)). The launcher redacts JWTs and fixture
 credentials from trace archives and textual reports/logs before handoff or
@@ -376,7 +541,7 @@ helper, or the same wait, in a new journey over the same form.
 
 ### Independence and interruption checks
 
-Run both journeys and the fixture protocol checks on one stack:
+Run both journeys and the fixture protocol checks in one E2E environment:
 
 ```bash
 ./test/playwright/run-local.sh --spec test/playwright/specs --workers 2
@@ -400,7 +565,7 @@ leaves behind>')` from `helpers/attempt.ts` right after its first real change;
 with one retry, the retried attempt must then pass on prerequisites of its own. Run each
 mutable spec with a fresh launcher as well to verify standalone reproduction.
 
-Focused API HTTP checks against a retained owned stack cover missing attempt
+Focused API HTTP checks against a retained E2E environment cover missing attempt
 identity, domain failure after partial creation, and a client disconnect while
 setup is blocked. The database lock is fault injection in the API test, followed
 by a corrected same-identity retry and independent peer request. It performs no
@@ -485,7 +650,7 @@ Focused reproduction:
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses/submit-first-expense.spec.ts --grep "first reimbursement"
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses/draft-currency.spec.ts
 
-# One journey against a retained populated stack
+# One journey against a retained populated E2E environment
 ./test/playwright/run-local.sh --reuse --spec test/playwright/specs/expenses/submit-returning-expense.spec.ts --grep "requests invoice payment"
 
 # First attempt fails after a real submission; the retry arranges a new host, users and prior expense
@@ -608,7 +773,7 @@ Focused reproduction:
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses/invite-new-user.spec.ts --grep "emailed invoice"
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses/invite-organization-logged-out.spec.ts --grep "emailed reimbursement"
 
-# One journey against a retained populated stack and inbox
+# One journey against a retained populated E2E environment and inbox
 ./test/playwright/run-local.sh --reuse --spec test/playwright/specs/expenses/invite-organization.spec.ts --grep "emailed reimbursement"
 
 # First attempt fails with its invitation delivered and unanswered; the retry
@@ -665,13 +830,14 @@ workers on such a machine; the cap is not a property of the journeys.
 `test/playwright/specs/expenses/` also carries the rest of the Cypress expense
 pilot (`test/cypress/integration/27-expenses.test.ts`: `Actions on expense`,
 `Recurring`, `Duplicate` and `Edit` blocks), which stays unchanged and
-runnable. Thirteen Cypress tests map to thirteen journeys:
+runnable. Fourteen Cypress tests map to fourteen journeys:
 
 | Cypress test                                                                            | Playwright journey (`specs/expenses/`)                                                                                             |
 | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | Actions on expense › Approve, unapprove, reject and pay actions on expense              | `process-expense.spec.ts` › Collective admin approves, unapproves and rejects an expense, leaving a comment for each reversal      |
 | Actions on expense › Delete expense                                                     | `process-expense.spec.ts` › Collective admin deletes a rejected expense, which is then no longer available                         |
 | Actions on expense › Downloads PDF                                                      | `process-expense.spec.ts` › Collective admin downloads the generated invoice of an expense as a PDF                                |
+| Actions on expense › Previews a PDF attachment                                          | `preview-attachment.spec.ts` › Collective admin previews the PDF attached to an expense                                            |
 | Actions on expense › Displays expense policy                                            | `expense-policy.spec.ts` › Collective admin writes expense policies in the dashboard and submitters see them on the expense form   |
 | Actions on expense › Projects inherit and display expense policy from parent collective | `expense-policy.spec.ts` › Collective with a Project › expense form of a Project shows the expense policy of its parent Collective |
 | Invoices › Edit invoice expense › Edits title                                           | `edit-expense.spec.ts` › pending invoice › submitter renames it                                                                    |
@@ -705,6 +871,17 @@ the suggested name (`Expense-<id>-<collective slug>-invoice-<date>.pdf`) and
 that the document names this attempt's expense number and title, Collective,
 payee, billed host, item line and total. The API's stub for PDFs attached to
 emails is untouched and not involved.
+
+The PDF preview journey opens an expense whose attachment is a real one-page
+PDF in the uploads bucket (`expense.attachedPdf` of the recipe, stored like a
+reimbursement receipt), clicks the attachment and checks that pdf.js renders
+the page and its text layer with the document's text, and that the viewer's
+error message is absent. It fails when the pdf.js worker is missing or does not
+match the library, which is what the Cypress test guards
+(opencollective/opencollective-frontend#12558). Cypress uploads the file
+through the API and creates the expense as the user; the recipe arranges both,
+since previewing is the behaviour under test. Cypress disables web security,
+so it does not need the bucket's CORS rule; Playwright does.
 
 Where the journeys differ from the Cypress source, and why:
 
@@ -769,15 +946,16 @@ Where the journeys differ from the Cypress source, and why:
 Focused reproduction:
 
 ```bash
-# The thirteen journeys, fresh
+# The fourteen journeys, fresh ("Collective admin" also selects the PDF preview)
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses --workers 3 \
   --grep "Collective admin|Project|pending (invoice|reimbursement)|recur every month|duplicates"
 
 # One journey, fresh
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses/process-expense.spec.ts --grep "downloads the generated invoice"
+./test/playwright/run-local.sh --spec test/playwright/specs/expenses/preview-attachment.spec.ts
 ./test/playwright/run-local.sh --spec test/playwright/specs/expenses/edit-expense.spec.ts --grep "pending reimbursement submitter edits"
 
-# One journey against a retained populated stack
+# One journey against a retained populated E2E environment
 ./test/playwright/run-local.sh --reuse --spec test/playwright/specs/expenses/expense-policy.spec.ts --grep "expense form of a Project"
 
 # First attempts fail after a real unapproval, download, policy save,
@@ -953,7 +1131,7 @@ Focused reproduction:
 ./test/playwright/run-local.sh --spec test/playwright/specs/vendors/vendor-foreign-host.spec.ts --grep "admin of two hosts"
 ./test/playwright/run-local.sh --spec test/playwright/specs/vendors/grant-beneficiary.spec.ts --grep "submits a grant request"
 
-# One journey against a retained populated stack
+# One journey against a retained populated E2E environment
 ./test/playwright/run-local.sh --reuse --spec test/playwright/specs/vendors/vendor-policy.spec.ts --grep "submitter without any role"
 
 # First attempts fail with a loaded picker or a submitted grant behind them;
@@ -1105,7 +1283,7 @@ Focused reproduction:
 ./test/playwright/run-local.sh --spec test/playwright/specs/vendors/vendor-creation.spec.ts --grep "recording expected funds"
 ./test/playwright/run-local.sh --spec test/playwright/specs/vendors/vendor-settings.spec.ts --grep "take up a vendor policy"
 
-# One journey against a retained populated stack
+# One journey against a retained populated E2E environment
 ./test/playwright/run-local.sh --reuse --spec test/playwright/specs/vendors/vendor-settings.spec.ts --grep "limits a vendor"
 
 # First attempts fail with a created vendor, an edited vendor or a changed host
@@ -1146,14 +1324,18 @@ journeys cover 16 of them and these journeys the other 7.
 ## Pilot coverage reconciliation
 
 Every `describe` and `it` of the two pilot Cypress files is accounted for by
-the journey tables above. Both files are unchanged and still run with Cypress.
+the journey tables above. "Actions on expense › Previews a PDF attachment",
+added to Cypress (opencollective/opencollective-frontend#12558) before the
+pilot merged, was first missed and is now carried. Both files are unchanged and
+still run with Cypress. `node test/playwright/evaluation/cli.ts inventory` checks
+this inventory against both sources (see `test/playwright/evaluation/README.md`).
 
-`27-expenses.test.ts` (28 tests):
+`27-expenses.test.ts` (29 tests):
 
 | Cypress block                                   | Tests | Journeys | Section            |
 | ----------------------------------------------- | ----- | -------- | ------------------ |
 | new expense when logged out                     | 2     | 2        | Expense submission |
-| Actions on expense                              | 5     | 5        | Expense management |
+| Actions on expense                              | 6     | 6        | Expense management |
 | Invoices › Create (new user, returning user)    | 2     | 2        | Expense submission |
 | Invoices › Create › Invite                      | 3     | 3        | Expense invitation |
 | Invoices › Create › Recurring, Duplicate        | 2     | 2        | Expense management |
@@ -1179,10 +1361,10 @@ the journey tables above. Both files are unchanged and still run with Cypress.
 | ---------------------------- | ------------- | ------------------- |
 | Expense submission           | 9             | 9                   |
 | Expense invitation           | 6             | 6                   |
-| Expense management           | 13            | 13                  |
+| Expense management           | 14            | 14                  |
 | Vendor picker                | 16            | 15                  |
 | Vendor creation and settings | 7             | 7                   |
-| Total                        | 51            | 50                  |
+| Total                        | 52            | 51                  |
 
 One consolidation and one partial mapping are recorded, each explained in its
 section:
@@ -1204,8 +1386,8 @@ journeys check the saved recurrence.
 Nothing else is left out. Steps the journeys do not repeat because the source
 does not test them (no expense is paid, no funds are added, no expected funds
 are recorded) are listed in the sections. With the six tests of the fixture,
-account and smoke specs, the Playwright selection holds 56 tests. On the
-8-CPU Linux VM used throughout, with retries disabled, it takes 110-123 s of
+account and smoke specs, the Playwright selection holds 57 tests. When it held
+56, on the 8-CPU Linux VM used throughout, with retries disabled, it took 110-123 s of
 Playwright time with three workers, 133 s with two and 217 s with one, after
 roughly 55 s of launcher startup on a fresh stack.
 

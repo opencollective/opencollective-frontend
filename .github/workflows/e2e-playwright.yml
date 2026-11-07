@@ -161,6 +161,10 @@ jobs:
         run: |
           aws --endpoint-url http://127.0.0.1:9000 s3api head-bucket --bucket opencollective-e2e 2>/dev/null ||
             aws --endpoint-url http://127.0.0.1:9000 s3api create-bucket --bucket opencollective-e2e
+          # Like the production bucket, let the website read stored files from the browser (the PDF viewer
+          # fetches attachments). Cypress hides a missing rule by disabling web security; Playwright does not.
+          aws --endpoint-url http://127.0.0.1:9000 s3api put-bucket-cors --bucket opencollective-e2e \
+            --cors-configuration '{"CORSRules":[{"AllowedOrigins":["http://localhost:3000"],"AllowedMethods":["GET","HEAD"],"AllowedHeaders":["*"],"MaxAgeSeconds":3600}]}'
 
       - name: Checkout (frontend)
         uses: actions/checkout@v7
@@ -262,9 +266,13 @@ jobs:
             next_root="${next_root}/frontend-next"
           fi
           mkdir -p .next
-          rsync -a "${next_root}/" .next/
+          rsync -a --exclude _generated-public/ "${next_root}/" .next/
           test -f .next/BUILD_ID
           test -f .next/routes-manifest.json
+          # Put back the files the build generated in public/ (the pdf.js worker and cMaps, see "Stage
+          # Next.js build" in ci.yml), as e2e.yml does: the PDF viewer loads its worker from there.
+          rsync -a "${next_root}/_generated-public/" public/
+          test -f public/static/scripts/pdf.worker.min.mjs
 
           stack_root=/tmp/e2e-service-dists
           if [ ! -d "${stack_root}/opencollective-api/dist" ] && [ -d "${stack_root}/e2e-service-dists/opencollective-api/dist" ]; then
