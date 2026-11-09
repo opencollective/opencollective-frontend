@@ -88,6 +88,9 @@ const IGNORED: Record<string, readonly string[]> = {
     'WWhVAU', // "Subtotal:" - idêntico
   ],
   fr: [
+    'FiscalHostNote.Type', // "Type" - même terme en français
+    'FiscalHostNote.Type.Positive', // "Positive" (une note) - même terme en français
+    'virtualCard.status.inactive', // "Inactive" (une carte) - même terme en français
     'qMePPG',
     'LseLoM',
     'Logo',
