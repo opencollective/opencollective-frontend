@@ -27207,6 +27207,15 @@ type Mutation {
   ): SetPasswordResponse!
 
   """
+  Request a change of the email address of the logged-in user. A confirmation link is sent to the new address, and the change is applied by `confirmEmail`. The pending address is returned in `emailWaitingForValidation`. Session only (OAuth/Personal tokens are not allowed). 2FA.
+  """
+  requestEmailChange(
+    """
+    The new email address. Sending the current address cancels any pending change.
+    """
+    email: EmailAddress!
+  ): Individual!
+  """
   Confirm email for Individual. Scope: "account".
   """
   confirmEmail(
