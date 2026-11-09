@@ -8,7 +8,7 @@ Tailwind+ShadCN (primary), Styled Components/Styled System (legacy; do not add n
 
 ## Rules
 
-- Reuse existing i18n strings (workspace skill `search-i18n-translations`). English source: `lang/en.json`. After i18n source changes, `npm run build:langs` and `npm run langs:check`.
+- Reuse existing i18n strings (workspace skill `i18n-frontend-search-translations`). English source: `lang/en.json`. After i18n source changes, `npm run build:langs` and `npm run langs:check`.
 - New UI: Tailwind/ShadCN and Lucide, not styled-components or Styled Icons.
 
 ## Cross-repository features
