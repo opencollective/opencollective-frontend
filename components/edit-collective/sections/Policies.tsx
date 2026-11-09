@@ -254,7 +254,8 @@ const Policies = ({ collective }) => {
   const { loading, data } = useQuery(collectiveSettingsEditQuery, {
     variables: { slug: collective.slug },
   });
-  const [updateCategories, { error: categoriesError }] = useMutation(updateFilterCategoriesMutation);
+  const [updateCategories, { loading: isSubmittingCategories, error: categoriesError }] =
+    useMutation(updateFilterCategoriesMutation);
   const [updateCollective, { loading: isSubmittingSettings, error: settingsError }] = useMutation(
     editCollectivePolicyMutation,
     { context: API_V1_CONTEXT },
@@ -1373,7 +1374,12 @@ const Policies = ({ collective }) => {
         )}
 
         <div className="mt-10 flex w-full justify-stretch">
-          <Button data-cy="submit-policy-btn" className="w-full" type="submit">
+          <Button
+            data-cy="submit-policy-btn"
+            className="w-full"
+            loading={isSubmittingSettings || isSubmittingCategories}
+            type="submit"
+          >
             <FormattedMessage id="save" defaultMessage="Save" />
           </Button>
         </div>

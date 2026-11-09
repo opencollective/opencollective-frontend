@@ -70,7 +70,7 @@ class EditUserEmailForm extends React.Component<EditUserEmailFormProps, EditUser
   render() {
     const { data, updateUserEmail } = this.props;
     const { loading, LoggedInUser = { email: '' } } = data;
-    const { step, newEmail, error, isTouched } = this.state;
+    const { step, newEmail, error, isTouched, isSubmitting, isResendingConfirmation } = this.state;
     const isValid = newEmail && isEmail(newEmail);
     const isDone = step === 'already-sent' || step === 'success';
 
@@ -100,6 +100,7 @@ class EditUserEmailForm extends React.Component<EditUserEmailFormProps, EditUser
             />
             <Button
               disabled={!isTouched || !newEmail || !isValid || isDone}
+              loading={isSubmitting}
               variant="outline"
               onClick={async () => {
                 this.setState({ isSubmitting: true });
@@ -122,6 +123,7 @@ class EditUserEmailForm extends React.Component<EditUserEmailFormProps, EditUser
             {step === 'success' && (
               <Button
                 disabled={(step as string) === 'already-sent'}
+                loading={isResendingConfirmation}
                 onClick={async () => {
                   this.setState({ isResendingConfirmation: true });
                   try {

@@ -194,7 +194,7 @@ class Host extends React.Component<HostProps, HostState> {
           {collective.stats.balance === 0 && (
             <Fragment>
               <p>
-                <Button onClick={() => this.changeHost()}>
+                <Button onClick={() => this.changeHost()} loading={this.state.isSubmitting}>
                   <FormattedMessage id="editCollective.selfHost.removeBtn" defaultMessage="Reset Fiscal Host" />
                 </Button>
               </p>

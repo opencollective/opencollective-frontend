@@ -285,7 +285,7 @@ class CollectiveGoals extends React.Component<CollectiveGoalsProps, CollectiveGo
 
   render() {
     const { intl, collective } = this.props;
-    const { goals, goalsInterpolation, collectivePage, submitted, isTouched, error } = this.state;
+    const { goals, goalsInterpolation, collectivePage, submitted, isTouched, error, isSubmitting } = this.state;
 
     if (collective.features[FEATURES.COLLECTIVE_GOALS] === 'UNSUPPORTED') {
       return <FeatureNotSupported />;
@@ -335,7 +335,7 @@ class CollectiveGoals extends React.Component<CollectiveGoalsProps, CollectiveGo
         )}
 
         <div className="flex flex-col gap-2 sm:justify-stretch">
-          <Button onClick={this.handleSubmit} disabled={submitted || !isTouched}>
+          <Button onClick={this.handleSubmit} loading={isSubmitting} disabled={submitted || !isTouched}>
             {submitted ? (
               <FormattedMessage id="saved" defaultMessage="Saved" />
             ) : (
