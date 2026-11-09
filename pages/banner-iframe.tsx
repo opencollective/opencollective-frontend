@@ -301,6 +301,14 @@ class BannerIframe extends React.Component<BannerIframeProps> {
               <Loading />
             ) : error ? (
               <MessageBoxGraphqlError error={error} />
+            ) : !data?.account ? (
+              <div
+                ref={node => {
+                  this.node = node;
+                }}
+              >
+                <FormattedMessage id="notFound" defaultMessage="Not found" />
+              </div>
             ) : (
               <Box>
                 <Flex flexDirection="column" alignItems="center" mb={3}>
@@ -308,7 +316,7 @@ class BannerIframe extends React.Component<BannerIframeProps> {
                     <FormattedMessage
                       id="NewContributionFlow.Join"
                       defaultMessage="Join {numberOfContributors} other fellow contributors"
-                      values={{ numberOfContributors: data?.account?.contributors?.totalCount ?? 0 }}
+                      values={{ numberOfContributors: data.account.contributors?.totalCount ?? 0 }}
                     />
                   </H3>
                   <StyledLink openInNewTab href={`https://opencollective.com/${this.props.collectiveSlug}`}>
