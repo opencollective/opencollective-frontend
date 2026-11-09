@@ -21,6 +21,7 @@ import type {
   InviteExpenseFromDashboardMutation,
   InviteExpenseFromDashboardMutationVariables,
 } from '../../lib/graphql/types/v2/graphql';
+import { useIsomorphicLayoutEffect } from '../../lib/hooks/useIsomorphicLayoutEffect';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import { NEW_PAYOUT_METHOD_ID } from '../expenses/lib/constants';
 import { type ExpenseSubmissionPlan, planExpenseSubmission } from './lib/expense-input';
@@ -331,7 +332,6 @@ export function useExpenseForm(opts: {
         : { ...derivedOptions, schema: buildFormSchema(derivedOptions, intl, startOptions.current.pickSchemaFields) },
     [derivedOptions, intl],
   );
-  formOptionsRef.current = formOptions;
 
   // The form is loading until the query answered and, when editing, the expense values were loaded
   const [hydrated, setHydrated] = React.useState(false);
@@ -339,7 +339,6 @@ export function useExpenseForm(opts: {
   // The options were derived from data fetched for other values (e.g. another account), and the data for
   // the current values is loading (or failed to load)
   const isLoadingOptions = !formQuery || formQuery.variables !== queryVariables;
-  isLoadingOptionsRef.current = isLoadingOptions;
   const [itemCurrencyChosen, setItemCurrencyChosen] = React.useState(false);
   const [exchangeRateRequests, setExchangeRateRequests] = React.useState<CurrencyExchangeRateRequest[]>([]);
 
@@ -396,7 +395,13 @@ export function useExpenseForm(opts: {
 
   // Fetch the exchange rates the rules asked for, and apply them through the same updates
   const latestValues = React.useRef(expenseForm.values);
-  latestValues.current = expenseForm.values;
+
+  // Callbacks (Formik's, async results) read the committed render's values through refs
+  useIsomorphicLayoutEffect(() => {
+    formOptionsRef.current = formOptions;
+    isLoadingOptionsRef.current = isLoadingOptions;
+    latestValues.current = expenseForm.values;
+  }, [formOptions, isLoadingOptions, expenseForm.values]);
   const expenseCurrency = formOptions.expenseCurrency;
   React.useEffect(() => {
     if (isEmpty(exchangeRateRequests)) {
