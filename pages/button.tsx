@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled, { createGlobalStyle } from 'styled-components';
 
 /**
@@ -12,7 +11,7 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-const CollectButton = styled.div`
+const CollectButton = styled.div<{ color?: string; verb?: string }>`
   background-color: transparent;
   background-image: ${({ color, verb }) => `url(/static/images/buttons/${verb}-button-${color}.svg)`};
   background-repeat: no-repeat;
@@ -38,7 +37,9 @@ const CollectButton = styled.div`
   }
 `;
 
-class ButtonPage extends React.Component {
+type ButtonPageProps = { color?: string; collectiveSlug?: string; verb?: string };
+
+class ButtonPage extends React.Component<ButtonPageProps> {
   static getInitialProps({ query: { color, collectiveSlug, verb }, res }) {
     // Allow to be embedded as Iframe everywhere
     if (res) {
@@ -46,12 +47,6 @@ class ButtonPage extends React.Component {
     }
     return { color, collectiveSlug, verb };
   }
-
-  static propTypes = {
-    color: PropTypes.string,
-    collectiveSlug: PropTypes.string,
-    verb: PropTypes.string,
-  };
 
   render() {
     const { color = 'white', collectiveSlug, verb = 'donate' } = this.props;

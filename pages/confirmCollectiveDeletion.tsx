@@ -14,10 +14,20 @@ const Icon = styled(PaperPlane)`
   color: ${themeGet('colors.primary.300')};
 `;
 
-class ConfirmCollectiveDeletion extends Component {
-  static async getInitialProps({ res, query = {}, router }) {
+type ConfirmCollectiveDeletionProps = { type?: string; logout?: () => void };
+
+class ConfirmCollectiveDeletion extends Component<ConfirmCollectiveDeletionProps> {
+  static async getInitialProps({
+    res,
+    query = {},
+    router,
+  }: {
+    res?: { statusCode?: number; setHeader?: (key: string, value: string) => void; end?: () => void };
+    query?: { type?: string | string[] };
+    router?: { push: (url: string) => void };
+  }) {
     if (query.type) {
-      return { type: query.type };
+      return { type: query.type as string };
     }
 
     if (res) {

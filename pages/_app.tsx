@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { ApolloProvider } from '@apollo/client';
 import { polyfill as PolyfillInterweaveSSR } from 'interweave-ssr';
 import App from 'next/app';
@@ -27,15 +26,21 @@ import 'trix/dist/trix.css';
 import '../public/static/styles/app.css';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
 
-Router.onRouteChangeStart = (url, { shallow }) => {
+const LegacyRouter = Router as typeof Router & {
+  onRouteChangeStart: (url: string, options: { shallow?: boolean }) => void;
+  onRouteChangeComplete: () => void;
+  onRouteChangeError: () => void;
+};
+
+LegacyRouter.onRouteChangeStart = (url, { shallow }) => {
   if (!shallow) {
     NProgress.start();
   }
 };
 
-Router.onRouteChangeComplete = () => NProgress.done();
+LegacyRouter.onRouteChangeComplete = () => NProgress.done();
 
-Router.onRouteChangeError = () => NProgress.done();
+LegacyRouter.onRouteChangeError = () => NProgress.done();
 
 import { getDataFromTree } from '@apollo/client/react/ssr';
 import { mergeDeep } from '@apollo/client/utilities';
@@ -48,6 +53,7 @@ import { loggedInUserQuery } from '../lib/graphql/v1/queries';
 import { WhitelabelProviderContext } from '../lib/hooks/useWhitelabel';
 import LoggedInUser from '../lib/LoggedInUser';
 import { withTwoFactorAuthentication } from '../lib/two-factor-authentication/TwoFactorAuthenticationContext';
+import type { WhitelabelProps } from '../lib/whitelabel';
 import { getWhitelabelProps } from '../lib/whitelabel';
 import { defaultShouldForwardProp } from '@/lib/styled_components_utils';
 import sentryLib, { Sentry } from '../server/sentry';
@@ -62,19 +68,38 @@ if (typeof window === 'undefined') {
   PolyfillInterweaveSSR();
 }
 
-class OpenCollectiveFrontendApp extends App {
-  static propTypes = {
-    twoFactorAuthContext: PropTypes.object,
-    pageProps: PropTypes.object.isRequired,
-    scripts: PropTypes.object.isRequired,
-    locale: PropTypes.string,
-    messages: PropTypes.object,
-  };
+type AppPageProps = {
+  skipDataFromTree?: boolean;
+  whitelabel?: { provider?: WhitelabelProps['provider'] };
+  scripts?: { googleMaps?: boolean };
+  [key: string]: unknown;
+};
 
-  constructor() {
-    super(...arguments);
-    this.state = { hasError: false, errorEventId: undefined };
-  }
+type AppProps = {
+  Component: React.ComponentType<Record<string, unknown>>;
+  pageProps: AppPageProps;
+  scripts: Record<string, string>;
+  locale?: string;
+  messages?: Record<string, string>;
+  LoggedInUserData?: Record<string, unknown>;
+  hasError?: boolean;
+  errorEventId?: string;
+  twoFactorAuthContext?: unknown;
+  apolloClient?: ReturnType<typeof initClient>;
+};
+
+type AppInitialProps = {
+  pageProps: AppPageProps;
+  scripts: Record<string, string>;
+  locale?: string;
+  messages?: Record<string, string>;
+  LoggedInUserData?: Record<string, unknown>;
+  hasError?: boolean;
+  errorEventId?: string;
+};
+
+class OpenCollectiveFrontendApp extends App<AppProps> {
+  state = { hasError: false, errorEventId: undefined };
 
   static async getInitialProps({ AppTree, Component, ctx }) {
     const apolloClient = initClient({
@@ -85,7 +110,7 @@ class OpenCollectiveFrontendApp extends App {
       ctx.req.apolloClient = apolloClient;
     }
 
-    const props = {
+    const props: AppInitialProps = {
       pageProps: { skipDataFromTree: true, whitelabel: getWhitelabelProps(ctx) },
       scripts: {},
       ...getIntlProps(ctx),
@@ -148,19 +173,20 @@ class OpenCollectiveFrontendApp extends App {
   }
 
   componentDidCatch(error, errorInfo) {
-    const errorEventId = sentryLib.captureException(error, { extra: { errorInfo } });
+    const errorEventId = sentryLib.captureException(error, { errorInfo: { ...errorInfo } });
     this.setState({ hasError: true, errorEventId });
   }
 
   componentDidMount() {
     Router.events.on('routeChangeComplete', url => {
-      if (window && window._paq) {
+      const paq = (window as Window & { _paq?: Array<unknown[]> })._paq;
+      if (paq) {
         if (url.match(/\/signin\/sent/)) {
-          window._paq.push(['setCustomUrl', '/signin/sent']);
+          paq.push(['setCustomUrl', '/signin/sent']);
         } else {
-          window._paq.push(['setCustomUrl', url]);
+          paq.push(['setCustomUrl', url]);
         }
-        window._paq.push(['trackPageView']);
+        paq.push(['trackPageView']);
       }
     });
 

@@ -74,7 +74,7 @@ const validate = (values: CreateConversationValues) => {
  *
  * /!\ Can only be used with data from API V2.
  */
-const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuccess, disabled, loading }) => {
+const CreateConversationForm = ({ collective, LoggedInUser, suggestedTags, onSuccess, disabled = false, loading }) => {
   const intl = useIntl();
   const { slug: collectiveSlug } = collective;
   const { formatMessage } = useIntl();

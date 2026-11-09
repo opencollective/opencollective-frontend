@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { CardElement } from '@stripe/react-stripe-js';
 import { get } from 'lodash-es';
@@ -45,32 +44,48 @@ const AlignedBullets = styled.ul`
   width: max-content;
 `;
 
-class UpdatePaymentPage extends React.Component {
+type UpdatePaymentPageProps = {
+  paymentMethodId?: number;
+  LoggedInUser?: { collective?: { id?: number } };
+  loadingLoggedInUser?: boolean;
+  intl?: import('react-intl').IntlShape;
+  replaceCreditCard?: (options: unknown) => Promise<{
+    data?: { replaceCreditCard?: Record<string, unknown> };
+  }>;
+  loadStripe?: () => Promise<unknown>;
+  data?: {
+    refetch?: (...args: unknown[]) => unknown;
+    loading?: boolean;
+    error?: unknown;
+    PaymentMethod?: {
+      id?: number;
+      orders?: Array<{
+        id?: number;
+        fromCollective?: { slug?: string; name?: string };
+        collective?: { slug?: string; name?: string };
+        totalAmount?: number;
+        currency?: string;
+        interval?: string;
+      }>;
+    };
+  };
+};
+
+type UpdatePaymentPageState = {
+  showCreditCardForm: boolean;
+  newCreditCardInfo: { value?: { error?: { message?: string } } };
+  error: string | null;
+  stripe: import('@stripe/stripe-js').Stripe;
+  stripeElements: import('@stripe/stripe-js').StripeElements;
+  submitting: boolean;
+  success: boolean;
+  showManualPaymentMethodForm?: boolean;
+};
+
+class UpdatePaymentPage extends React.Component<UpdatePaymentPageProps, UpdatePaymentPageState> {
   static getInitialProps({ query: { paymentMethodId } }) {
     return { paymentMethodId: parseInt(paymentMethodId) };
   }
-
-  static propTypes = {
-    paymentMethodId: PropTypes.number,
-    LoggedInUser: PropTypes.object,
-    loadingLoggedInUser: PropTypes.bool,
-    intl: PropTypes.object.isRequired,
-    replaceCreditCard: PropTypes.func.isRequired,
-    loadStripe: PropTypes.func.isRequired,
-    data: PropTypes.shape({
-      refetch: PropTypes.func,
-      loading: PropTypes.bool,
-      error: PropTypes.any,
-      PaymentMethod: PropTypes.shape({
-        id: PropTypes.number,
-        orders: PropTypes.arrayOf(
-          PropTypes.shape({
-            id: PropTypes.number,
-          }),
-        ),
-      }),
-    }),
-  };
 
   state = {
     showCreditCardForm: true,
@@ -87,7 +102,7 @@ class UpdatePaymentPage extends React.Component {
   }
 
   replaceCreditCard = async () => {
-    const data = get(this.state, 'newCreditCardInfo.value');
+    const data = get(this.state, 'newCreditCardInfo.value') as { error?: { message?: string } } | undefined;
 
     if (!data || !this.state.stripe) {
       this.setState({
@@ -111,13 +126,13 @@ class UpdatePaymentPage extends React.Component {
           variables: {
             collectiveId: this.props.LoggedInUser.collective.id,
             ...paymentMethod,
-            id: parseInt(this.props.paymentMethodId),
+            id: parseInt(String(this.props.paymentMethodId)),
           },
         });
         const updatedCreditCard = res.data.replaceCreditCard;
 
         if (updatedCreditCard.stripeError) {
-          this.handleStripeError(updatedCreditCard.stripeError);
+          this.handleStripeError(updatedCreditCard.stripeError as never);
         } else {
           this.handleSuccess();
         }
@@ -211,7 +226,7 @@ class UpdatePaymentPage extends React.Component {
               {Boolean(data.PaymentMethod && orders.length) && (
                 <React.Fragment>
                   <Box mt={3}>
-                    <Subtitle fontSize={['0.95rem', null, '1.25rem']} maxWidth={['90%', '640px']}>
+                    <Subtitle fontSize={['0.95rem', null, '1.25rem']}>
                       <Box>
                         <FormattedMessage
                           id="updatePaymentMethod.subtitle.line"
@@ -222,17 +237,21 @@ class UpdatePaymentPage extends React.Component {
                   </Box>
 
                   <Box mt={3}>
-                    <Subtitle fontSize={['0.95rem', null, '1.25rem']} maxWidth={['90%', '640px']}>
+                    <Subtitle fontSize={['0.95rem', null, '1.25rem']}>
                       <Box alignItems="left">
                         <AlignedBullets>
                           {orders.map(order => {
                             return (
                               <li key={order.id}>
                                 <LinkCollective collective={order.collective} openInNewTab />:{' '}
-                                {formatCurrency(order.totalAmount, order.currency, {
-                                  precision: 2,
-                                  locale: intl.locale,
-                                })}{' '}
+                                {formatCurrency(
+                                  order.totalAmount,
+                                  order.currency as Parameters<typeof formatCurrency>[1],
+                                  {
+                                    precision: 2,
+                                    locale: intl.locale,
+                                  },
+                                )}{' '}
                                 ({order.interval}ly)
                               </li>
                             );
@@ -318,7 +337,7 @@ class UpdatePaymentPage extends React.Component {
                     )}
                     {!hasForm && success && (
                       <Box mt={3}>
-                        <Link href={`/${contributingAccount.slug}`}>
+                        <Link href={`/${(contributingAccount as { slug?: string }).slug}`}>
                           <StyledButton
                             buttonStyle="primary"
                             buttonSize="large"
@@ -398,7 +417,7 @@ const addSubscriptionsData = graphql(subscriptionsQuery, {
   options: {
     context: API_V1_CONTEXT,
   },
-  skip: props => {
+  skip: (props: UpdatePaymentPageProps) => {
     return props.loadingLoggedInUser || !props.LoggedInUser;
   },
 });

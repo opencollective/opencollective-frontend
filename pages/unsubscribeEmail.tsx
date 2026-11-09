@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Email } from '@styled-icons/material/Email';
 import { FormattedMessage } from 'react-intl';
 
@@ -12,21 +11,19 @@ import { withUser } from '../components/UserProvider';
 /**
  * Email Unsubscription page.
  */
-class UnsubscribeEmail extends React.Component {
+type UnsubscribeEmailProps = {
+  email?: string;
+  slug?: string;
+  type?: string;
+  token?: string;
+};
+
+type UnsubscribeEmailState = { state?: string; errorMessage?: string };
+
+class UnsubscribeEmail extends React.Component<UnsubscribeEmailProps, UnsubscribeEmailState> {
   static getInitialProps({ query }) {
     return { email: query.email, slug: query.slug, type: query.type, token: query.token };
   }
-
-  static propTypes = {
-    /** Unsubscription email, given in URL */
-    email: PropTypes.string.isRequired,
-    /** Collective slug, given in URL */
-    slug: PropTypes.string.isRequired,
-    /** Emails type to unsubscribe ex:collective.monthlyReport, given in URL */
-    type: PropTypes.string.isRequired,
-    /** Unsubscription token, given in URL */
-    token: PropTypes.string.isRequired,
-  };
 
   constructor(props) {
     super(props);

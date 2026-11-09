@@ -40,7 +40,7 @@ export const isValidExternalRedirect = url => {
 const shouldRedirectDirectly = urlStr => {
   try {
     const parsedUrl = new URL(urlStr);
-    return isTrustedRedirectURL(parsedUrl.host);
+    return isTrustedRedirectURL(parsedUrl);
   } catch {
     return false;
   }
@@ -54,28 +54,29 @@ const shouldRedirectDirectly = urlStr => {
 const ExternalRedirectPage = () => {
   const router = useRouter();
   const [isReady, setReady] = React.useState(false);
-  const [pendingAction, setPendingAction] = React.useState(false);
+  const [pendingAction, setPendingAction] = React.useState<string | boolean>(false);
   const query = router?.query || {};
-  const fallback = getFallback(query.fallback);
-  const shouldRedirectParent = parseToBoolean(query.shouldRedirectParent);
+  const fallback = getFallback(query.fallback as string);
+  const shouldRedirectParent = parseToBoolean(query.shouldRedirectParent as string);
+  const url = query.url as string;
 
   React.useEffect(() => {
-    if (router && !query.url) {
+    if (router && !url) {
       router.push(fallback);
-    } else if (isValidRelativeUrl(query.url)) {
-      router.push(query.url);
-    } else if (!isValidExternalRedirect(query.url)) {
+    } else if (isValidRelativeUrl(url)) {
+      router.push(url);
+    } else if (!isValidExternalRedirect(url)) {
       router.push(fallback);
-    } else if (shouldRedirectDirectly(query.url)) {
+    } else if (shouldRedirectDirectly(url)) {
       if (shouldRedirectParent) {
-        window.parent.location.href = query.url;
+        window.parent.location.href = url;
       } else {
-        router.push(query.url);
+        router.push(url);
       }
     } else {
       setReady(true);
     }
-  }, [router, query.url]);
+  }, [router, url]);
 
   return (
     <Page noRobots>
@@ -100,12 +101,12 @@ const ExternalRedirectPage = () => {
             </Container>
             <Container display="flex" justifyContent="flex-end" backgroundColor="black.100" p={1}>
               <a
-                href={query.url}
+                href={url}
                 onClick={e => {
                   setPendingAction('REDIRECT');
                   if (shouldRedirectParent) {
                     e.preventDefault();
-                    window.parent.location.href = query.url;
+                    window.parent.location.href = url;
                   }
                 }}
               >
@@ -115,7 +116,7 @@ const ExternalRedirectPage = () => {
                   minWidth={140}
                   buttonStyle="primary"
                   loading={pendingAction === 'REDIRECT'}
-                  disabled={pendingAction}
+                  disabled={Boolean(pendingAction)}
                 >
                   <FormattedMessage id="actions.continue" defaultMessage="Continue" />
                 </StyledButton>
@@ -127,7 +128,7 @@ const ExternalRedirectPage = () => {
                   minWidth={140}
                   data-cy="confirmation-modal-cancel"
                   loading={pendingAction === 'CANCEL'}
-                  disabled={pendingAction}
+                  disabled={Boolean(pendingAction)}
                 >
                   <FormattedMessage id="actions.cancel" defaultMessage="Cancel" />
                 </StyledButton>

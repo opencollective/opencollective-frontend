@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -29,39 +28,43 @@ const CreateExpensePageUrlQueryHelper = new UrlQueryHelper({
   collectiveSlug: { type: 'string' },
   parentCollectiveSlug: { type: 'string' },
   customData: { type: 'json' },
-});
+} as never);
 
 const NAVBAR_CALLS_TO_ACTION = { hasSubmitExpense: false, hasRequestGrant: false };
 
-class CreateExpensePage extends React.Component {
+type CreateExpensePageProps = {
+  collectiveSlug: string;
+  parentCollectiveSlug?: string;
+  customData?: Record<string, unknown>;
+  LoggedInUser?: Record<string, unknown>;
+  loadingLoggedInUser?: boolean;
+  router?: import('next/router').NextRouter;
+  data?: {
+    loading?: boolean;
+    error?: unknown;
+    refetch?: (...args: unknown[]) => unknown;
+    account?: {
+      id?: number;
+      slug?: string;
+      type?: string;
+      isArchived?: boolean;
+      supportedExpenseTypes?: string[];
+      parentCollective?: { slug?: string };
+      parent?: { slug?: string };
+      [key: string]: unknown;
+    };
+  };
+};
+
+class CreateExpensePage extends React.Component<CreateExpensePageProps> {
   static getInitialProps({ query: query }) {
     return CreateExpensePageUrlQueryHelper.decode(query);
   }
 
-  static propTypes = {
-    /** from getInitialProps */
-    collectiveSlug: PropTypes.string.isRequired,
-    parentCollectiveSlug: PropTypes.string,
-    customData: PropTypes.object,
-    /** from withUser */
-    LoggedInUser: PropTypes.object,
-    /** from withUser */
-    loadingLoggedInUser: PropTypes.bool,
-    /** from withRouter */
-    router: PropTypes.object,
-    /** from apollo */
-    data: PropTypes.shape({
-      loading: PropTypes.bool,
-      error: PropTypes.any,
-      refetch: PropTypes.func,
-      account: PropTypes.object,
-    }).isRequired,
-  };
-
   componentDidMount() {
     const { router, data } = this.props;
     const account = data?.account;
-    addParentToURLIfMissing(router, account, '/expenses/new');
+    addParentToURLIfMissing(router, account as never, '/expenses/new');
 
     if (this.props.LoggedInUser) {
       this.props.data.refetch();
@@ -144,7 +147,7 @@ class CreateExpensePage extends React.Component {
               submitExpenseTo={collectiveSlug}
               customData={customData}
               onClose={() => {
-                router.push(`${getCollectivePageRoute(collective)}/expenses`);
+                router.push(`${getCollectivePageRoute(collective as never)}/expenses`);
               }}
             />
           </React.Fragment>

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { withRouter } from 'next/router';
 import { FormattedMessage } from 'react-intl';
@@ -30,35 +29,31 @@ import { withUser } from '../components/UserProvider';
  * The main page to display collectives. Wrap route parameters and GraphQL query
  * to render `components/collective-page` with everything needed.
  */
-class CreateConversationPage extends React.Component {
+type CreateConversationPageProps = {
+  collectiveSlug: string;
+  LoggedInUser?: Record<string, unknown>;
+  loadingLoggedInUser?: boolean;
+  router: import('next/router').NextRouter;
+  data?: {
+    loading?: boolean;
+    error?: unknown;
+    account?: {
+      id?: string;
+      name?: string;
+      description?: string;
+      type?: string;
+      twitterHandle?: string;
+      imageUrl?: string;
+      conversationsTags?: Array<{ tag?: string }>;
+      settings?: { collectivePage?: { primaryColor?: string } };
+    };
+  };
+};
+
+class CreateConversationPage extends React.Component<CreateConversationPageProps> {
   static getInitialProps({ query: { collectiveSlug, tag } }) {
     return { collectiveSlug, tag };
   }
-
-  static propTypes = {
-    /** @ignore from getInitialProps */
-    collectiveSlug: PropTypes.string.isRequired,
-    /** @ignore from withUser */
-    LoggedInUser: PropTypes.object,
-    /** @ignore from withUser */
-    loadingLoggedInUser: PropTypes.bool,
-    /** @ignore from withRouter */
-    router: PropTypes.object,
-    /** @ignore from apollo */
-    data: PropTypes.shape({
-      loading: PropTypes.bool,
-      error: PropTypes.any,
-      account: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-        description: PropTypes.string,
-        type: PropTypes.string.isRequired,
-        twitterHandle: PropTypes.string,
-        imageUrl: PropTypes.string,
-        conversationsTags: PropTypes.arrayOf(PropTypes.shape({ tag: PropTypes.string })),
-      }),
-    }).isRequired, // from withData
-  };
 
   getPageMetaData(collective) {
     const baseMetadata = getCollectivePageMetadata(collective);
@@ -178,7 +173,12 @@ const createConversationPageQuery = gql`
   ${collectiveNavbarFieldsFragment}
 `;
 
-const addCreateConversationPageData = graphql(createConversationPageQuery);
+const addCreateConversationPageData = graphql<
+  CreateConversationPageProps,
+  { account?: CreateConversationPageProps['data']['account']; loading?: boolean; error?: unknown },
+  { collectiveSlug?: string },
+  { data?: CreateConversationPageProps['data'] }
+>(createConversationPageQuery);
 
 // next.js export
 // ts-unused-exports:disable-next-line

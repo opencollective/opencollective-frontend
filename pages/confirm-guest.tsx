@@ -56,9 +56,9 @@ const ConfirmGuestPage = () => {
 
   const confirmGuestAccount = async () => {
     try {
-      const response = await callConfirmGuestAccount({ variables: { email, token } });
+      const response = await callConfirmGuestAccount({ variables: { email: email as string, token: token as string } });
       const { accessToken, account } = response.data.confirmGuestAccount;
-      removeGuestTokens([email]);
+      removeGuestTokens([email as string]);
       setStatus(STATUS.SUCCESS);
       await login(accessToken);
       router.push(`/${account.slug}`);

@@ -5,6 +5,7 @@ import type { Stripe } from '@stripe/stripe-js';
 import { getStripe } from '../lib/stripe';
 
 type Props = {
+  children?: React.ReactNode;
   /** If we should automatically load stripe JS on mount (useful for styledguidest) */
   loadOnMount?: boolean;
   token?: string;

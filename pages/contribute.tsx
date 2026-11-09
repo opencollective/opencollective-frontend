@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { get } from 'lodash-es';
 import memoizeOne from 'memoize-one';
 import { FormattedMessage } from 'react-intl';
@@ -37,17 +36,29 @@ import { withUser } from '../components/UserProvider';
 
 import Custom404 from './404';
 
-class ContributePage extends React.Component {
+type ContributePageProps = {
+  slug?: string;
+  verb?: string;
+  data?: {
+    loading?: boolean;
+    error?: unknown;
+    Collective?: {
+      slug: string;
+      name?: string;
+      type?: string;
+      parentCollective?: { slug?: string };
+      parent?: { slug?: string };
+      settings?: { collectivePage?: { primaryColor?: string } };
+      [key: string]: unknown;
+    };
+  };
+  LoggedInUser?: { isAdminOfCollective?: (account: unknown) => boolean };
+};
+
+class ContributePage extends React.Component<ContributePageProps> {
   static getInitialProps({ query: { collectiveSlug, verb } }) {
     return { slug: collectiveSlug, verb };
   }
-
-  static propTypes = {
-    slug: PropTypes.string, // from getInitialProps, for addContributePageData
-    verb: PropTypes.string, // from getInitialProps
-    data: PropTypes.object.isRequired, // from withData
-    LoggedInUser: PropTypes.object,
-  };
 
   getFinancialContributorsWithoutTier = memoizeOne(contributors => {
     return contributors.filter(c => c.isBacker && (c.tiersIds.length === 0 || c.tiersIds[0] === null));
@@ -467,7 +478,7 @@ const contributePageQuery = gqlV1 /* GraphQL */ `
 const addContributePageData = ssrGraphQLQuery({
   query: contributePageQuery,
   context: API_V1_CONTEXT,
-  getVariablesFromProps: props => ({
+  getVariablesFromProps: (props: ContributePageProps) => ({
     slug: props.slug,
     nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
     includeTiers: ['contribute', 'tiers'].includes(props.verb),

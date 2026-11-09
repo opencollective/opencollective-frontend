@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { get } from 'lodash-es';
 
 import Link from '../components/Link';
@@ -15,7 +14,17 @@ const getContent = (path, pageSlug) => {
   }
 };
 
-class StaticPage extends React.Component {
+type StaticPageProps = {
+  path?: string;
+  pageSlug?: string;
+  title?: string;
+  content?: string;
+  LoggedInUser?: unknown;
+  data?: unknown;
+  query?: unknown;
+};
+
+class StaticPage extends React.Component<StaticPageProps> {
   static async getInitialProps(props) {
     const { path, pageSlug } = props.query;
 
@@ -28,16 +37,6 @@ class StaticPage extends React.Component {
 
     return { title, content, path, pageSlug };
   }
-
-  static propTypes = {
-    path: PropTypes.string,
-    pageSlug: PropTypes.string,
-    title: PropTypes.string.isRequired,
-    content: PropTypes.string.isRequired,
-    LoggedInUser: PropTypes.object,
-    data: PropTypes.object,
-    query: PropTypes.object,
-  };
 
   render() {
     const { path, pageSlug, title } = this.props;

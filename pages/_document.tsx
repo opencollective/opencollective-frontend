@@ -37,7 +37,15 @@ const cache = createIntlCache();
 
 // next.js export
 // ts-unused-exports:disable-next-line
-export default class IntlDocument extends Document {
+type IntlDocumentProps = {
+  cspNonce?: string;
+  preconnectOrigins?: string[];
+  clientAnalytics?: { enabled?: boolean; domain?: string; exclusions?: string; scriptSrc?: string };
+  locale?: string;
+};
+
+// ts-unused-exports:disable-next-line
+export default class IntlDocument extends Document<IntlDocumentProps> {
   static async getInitialProps(ctx) {
     // Get the `locale` and `messages` from the request object on the server.
     // In the browser, use the same values that the server serialized.
@@ -177,7 +185,7 @@ export default class IntlDocument extends Document {
           <link rel="icon" href="/static/images/favicon.ico.png" />
         </Head>
         <body>
-          <Main nonce={this.props.cspNonce} />
+          <Main {...({ nonce: this.props.cspNonce } as Record<string, unknown>)} />
           <NextScript nonce={this.props.cspNonce} />
           {this.props.clientAnalytics.enabled && (
             <script

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 
 import { API_V1_CONTEXT } from '../lib/graphql/helpers';
@@ -13,21 +12,27 @@ import { withUser } from '../components/UserProvider';
 import AcceptContributionsThroughAFiscalHost from '@/components/accept-financial-contributions/AcceptContributionsThroughAFiscalHost';
 import { SuccessPage } from '@/components/accept-financial-contributions/SuccessPage';
 
-class AcceptFinancialContributionsPage extends React.Component {
-  static async getInitialProps({ query }) {
+type AcceptFinancialContributionsPageProps = {
+  slug?: string;
+  state?: string;
+  hostSlug?: string;
+  loadingLoggedInUser?: boolean;
+  LoggedInUser?: Record<string, unknown>;
+  data?: {
+    loading?: boolean;
+    error?: unknown;
+    Collective?: Record<string, unknown>;
+  };
+};
+
+class AcceptFinancialContributionsPage extends React.Component<AcceptFinancialContributionsPageProps> {
+  static async getInitialProps({ query }: { query: { slug?: string; state?: string; hostSlug?: string } }) {
     return {
       slug: query.slug,
       state: query.state,
       hostSlug: query.hostSlug,
     };
   }
-
-  static propTypes = {
-    slug: PropTypes.string,
-    data: PropTypes.object,
-    loadingLoggedInUser: PropTypes.bool,
-    LoggedInUser: PropTypes.object,
-  };
 
   render() {
     const { data, state, hostSlug } = this.props;
@@ -44,17 +49,22 @@ class AcceptFinancialContributionsPage extends React.Component {
             <Loading />
           </Container>
         ) : state === 'success' ? (
-          <SuccessPage collective={collective} hostSlug={hostSlug} />
+          <SuccessPage collective={collective as never} hostSlug={hostSlug} />
         ) : (
-          <AcceptContributionsThroughAFiscalHost collective={collective} />
+          <AcceptContributionsThroughAFiscalHost collective={collective as never} />
         )}
       </AuthenticatedPage>
     );
   }
 }
 
-const addCollectivePageData = graphql(collectivePageQuery, {
-  options: props => ({
+const addCollectivePageData = graphql<
+  AcceptFinancialContributionsPageProps,
+  { Collective?: Record<string, unknown>; loading?: boolean; error?: unknown },
+  { slug?: string },
+  { data?: AcceptFinancialContributionsPageProps['data'] }
+>(collectivePageQuery, {
+  options: (props: AcceptFinancialContributionsPageProps) => ({
     context: API_V1_CONTEXT,
     variables: { slug: props.slug },
   }),

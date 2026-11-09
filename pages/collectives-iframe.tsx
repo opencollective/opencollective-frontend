@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import Head from 'next/head';
 import { styled } from 'styled-components';
 
@@ -72,7 +71,15 @@ const CollectivesIframeContainer = styled.div`
   }
 `;
 
-class CollectivesIframe extends React.Component {
+type CollectivesIframeProps = {
+  collectiveSlug?: string;
+  id?: number;
+  role?: string;
+  limit?: number;
+  orderBy?: string;
+};
+
+class CollectivesIframe extends React.Component<CollectivesIframeProps> {
   static getInitialProps({ query: { collectiveSlug, id, role, orderBy, limit }, res }) {
     // Allow to be embedded as Iframe everywhere
     if (res) {
@@ -81,13 +88,7 @@ class CollectivesIframe extends React.Component {
     return { collectiveSlug, id, role, orderBy, limit: Number(limit) };
   }
 
-  static propTypes = {
-    collectiveSlug: PropTypes.string,
-    id: PropTypes.number,
-    role: PropTypes.string,
-    limit: PropTypes.number,
-    orderBy: PropTypes.string,
-  };
+  height: number;
 
   onChange = change => {
     if (!change) {
@@ -122,10 +123,9 @@ class CollectivesIframe extends React.Component {
         </Head>
         <MembershipsWithData
           onChange={this.onChange}
-          memberCollectiveSlug={collectiveSlug}
+          memberCollectiveSlug={collectiveSlug as string}
           role={role}
           orderBy={orderBy}
-          orderDirection="DESC"
           limit={limit || 20}
         />
       </CollectivesIframeContainer>

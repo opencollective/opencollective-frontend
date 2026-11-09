@@ -8,7 +8,7 @@ exports[`Donate Button Button links to /:collectiveSlug/donate" 1`] = `
     target="_blank"
   >
     <div
-      class="button__CollectButton-sc-c17d291-0 ilPmJM"
+      class="button__CollectButton-sc-3efcfa82-0 bNsRzJ"
       color="white"
       verb="donate"
     />

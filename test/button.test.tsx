@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Button from '../pages/button.js';
+import Button from '../pages/button';
 
 import { snapshot } from './snapshot-helpers';
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import * as Sentry from '@sentry/nextjs';
 
 import { generateNotFoundError } from '../lib/errors';
@@ -10,7 +9,9 @@ import ErrorPage from '../components/ErrorPage';
  * This page is shown when NextJS triggers a critical error during server-side
  * rendering, typically 404 errors.
  */
-class NextJSErrorPage extends React.Component {
+type NextJSErrorPageProps = { statusCode?: number; requestUrl?: string; err?: unknown };
+
+class NextJSErrorPage extends React.Component<NextJSErrorPageProps> {
   static getInitialProps(context) {
     const { res, err, req } = context;
 
@@ -21,12 +22,6 @@ class NextJSErrorPage extends React.Component {
     const statusCode = res ? res.statusCode : err ? err.statusCode : null;
     return { statusCode, err, requestUrl: req && req.originalUrl };
   }
-
-  static propTypes = {
-    statusCode: PropTypes.number.isRequired,
-    requestUrl: PropTypes.string,
-    err: PropTypes.object,
-  };
 
   render() {
     const { statusCode, requestUrl } = this.props;
