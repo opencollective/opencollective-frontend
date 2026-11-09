@@ -8,7 +8,6 @@ import { DefaultSelect } from '../ui/Select';
 
 interface SelectOwnFiscalHostProps {
   administratedHosts: GraphQLV1Collective[];
-  collective: GraphQLV1Collective;
   onSubmit: (host: GraphQLV1Collective) => void;
 }
 

@@ -3,19 +3,29 @@ import { ExternalLink } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 import { isURL } from 'validator';
 
-import type { GraphQLV1Collective } from '@/lib/custom_typings/GraphQLV1';
-
 import { Button } from './ui/Button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/Dialog';
 import Avatar from './Avatar';
 import HostPricingInfoRow from './HostPricingInfoRow';
 import HTMLContent, { isEmptyHTMLValue } from './HTMLContent';
 
-type HostInformationDialogProps = {
-  collective: GraphQLV1Collective;
+type HostInformationCollective = {
+  name: string;
+  type: string;
+  description?: string;
+  longDescription?: string;
+  settings?: Record<string, unknown>;
+  createdAt?: string;
+  currency?: string;
+  hostFeePercent?: number | null;
+  platformContributionAvailable?: boolean;
 };
 
-const getTos = (collective: GraphQLV1Collective) => {
+type HostInformationDialogProps = {
+  collective: HostInformationCollective;
+};
+
+const getTos = (collective: HostInformationCollective) => {
   const tos = collective.settings?.tos;
   if (typeof tos === 'string') {
     const cleanedTos = tos.trim();

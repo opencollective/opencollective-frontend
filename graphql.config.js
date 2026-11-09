@@ -7,9 +7,9 @@ module.exports = {
       documents: [
         // The following documents only use gqlV1
         // grep -rl " = gqlV1" ./components ./lib ./pages | xargs grep -rL "gql\`" | sort
-        'components/collective-page/graphql/fragments.js',
-        'components/collective-page/graphql/queries.js',
-        'components/collective-page/hero/HeroTotalCollectiveContributionsWithData.js',
+        'components/collective-page/graphql/fragments.ts',
+        'components/collective-page/graphql/queries.ts',
+        'components/collective-page/hero/HeroTotalCollectiveContributionsWithData.tsx',
         'components/CollectivePickerAsync.tsx',
         'components/CreateCollectiveMiniForm.tsx',
         'components/edit-collective/EditUserEmailForm.js',

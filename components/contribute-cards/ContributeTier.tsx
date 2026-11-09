@@ -116,7 +116,14 @@ const canContribute = (collective, LoggedInUser) => {
   }
 };
 
-const ContributeTier = ({ collective, tier, isPreview, supportedTierTypes = undefined, isAdmin = false, ...props }) => {
+const ContributeTier = ({
+  collective,
+  tier,
+  isPreview = false,
+  supportedTierTypes = undefined,
+  isAdmin = false,
+  ...props
+}) => {
   const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const { stats } = tier;

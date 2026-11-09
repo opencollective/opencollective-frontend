@@ -70,7 +70,7 @@ const periodSelectThemeBuilder = theme => ({ ...theme, spacing: { ...theme.spaci
 const PeriodFilterPresetsSelect = ({
   onChange,
   interval,
-  inputId,
+  inputId = undefined,
   formatDateFn = stripTime,
   SelectComponent = StyledSelectFilter,
   styles = PERIOD_FILTER_SELECT_STYLES,

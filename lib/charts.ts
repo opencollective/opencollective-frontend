@@ -26,7 +26,15 @@ export const alignSeries = (series, sort = (a, b) => +new Date(a.x) - +new Date(
   return series;
 };
 
-export const extractSeriesFromTimeSeries = (timeSeries, { x, y, group, groupNameTransformer = identity }) => {
+export const extractSeriesFromTimeSeries = (
+  timeSeries,
+  {
+    x,
+    y,
+    group,
+    groupNameTransformer = identity,
+  }: { x: string; y: string; group: string; groupNameTransformer?: (value: string) => string },
+) => {
   const groups = groupBy(timeSeries, group);
 
   const categories = Object.keys(groups);

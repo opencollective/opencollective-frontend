@@ -57,15 +57,15 @@ type ProjectsProps = {
     id: number;
     slug: string;
     name: string;
-    currency: string;
-    isActive: string;
+    currency?: string;
+    isActive?: boolean;
     settings?: {
       [PROJECTS_ORDER_KEY]?: number[];
     };
   };
   projects: { id: number; isArchived?: boolean; isActive?: boolean; contributors?: object[] }[];
   isAdmin: boolean;
-  showTitle: boolean;
+  showTitle?: boolean;
 };
 
 function getContributeCardsScrollDistance(width) {

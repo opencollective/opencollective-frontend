@@ -135,7 +135,7 @@ const getExpenseStatusTag = (expense, isRefund, isRefunded) => {
   );
 };
 
-const TransactionItem = ({ displayActions, collective, transaction }) => {
+const TransactionItem = ({ displayActions = false, collective, transaction }) => {
   const {
     toAccount,
     fromAccount,

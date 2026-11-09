@@ -26,7 +26,7 @@ const DownloadIcon = styled(Download)`
   opacity: 0;
 `;
 
-const CardContainer = styled(Container)`
+const CardContainer = styled(Container)<{ size?: number | number[] }>`
   position: relative;
   border-radius: 8px;
   padding: 4px;
@@ -80,7 +80,7 @@ const UploadedFilePreview = ({
   isLoading = false,
   isDownloading = false,
   url,
-  size = 88,
+  size = 88 as number | number[],
   maxHeight = undefined,
   alt = 'Uploaded file preview',
   fileName = undefined,

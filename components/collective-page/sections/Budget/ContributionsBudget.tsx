@@ -1,0 +1,242 @@
+import React from 'react';
+import { useQuery } from '@apollo/client';
+import { BarChart } from '@styled-icons/material/BarChart';
+import { FormatListBulleted } from '@styled-icons/material/FormatListBulleted';
+import { PieChart } from '@styled-icons/material/PieChart';
+import { Timeline } from '@styled-icons/material/Timeline';
+import { capitalize, sumBy } from 'lodash-es';
+import dynamic from 'next/dynamic';
+import { FormattedMessage, useIntl } from 'react-intl';
+
+import { alignSeries, extractSeriesFromTimeSeries } from '../../../../lib/charts';
+import { formatCurrency, formatValueAsCurrency } from '../../../../lib/currency-utils';
+import { gql } from '../../../../lib/graphql/helpers';
+import { getCollectivePageRoute } from '../../../../lib/url-helpers';
+
+import { Box, Flex } from '../../../Grid';
+import Link from '../../../Link';
+import LoadingPlaceholder from '../../../LoadingPlaceholder';
+import PeriodFilterPresetsSelect from '../../../PeriodFilterPresetsSelect';
+import StyledCard from '../../../StyledCard';
+import { P } from '../../../Text';
+
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
+
+import {
+  BudgetTable,
+  COLORS,
+  GRAPH_TYPES,
+  GraphTypeButton,
+  makeApexOptions,
+  makeBudgetTableRow,
+  StatsCardContent,
+  TagMarker,
+} from './common';
+
+export const budgetSectionContributionsQuery = gql`
+  query BudgetSectionContributions($slug: String!, $from: DateTime, $to: DateTime) {
+    account(slug: $slug) {
+      id
+      currency
+      stats {
+        id
+        totalAmountReceived(dateFrom: $from, dateTo: $to, includeChildren: false, kind: [CONTRIBUTION, ADDED_FUNDS]) {
+          value
+          currency
+        }
+        contributionsAmount(dateFrom: $from, dateTo: $to, includeChildren: false, kind: [CONTRIBUTION, ADDED_FUNDS]) {
+          label
+          count
+          amount {
+            value
+            valueInCents
+            currency
+          }
+        }
+        contributionsAmountTimeSeries(
+          dateFrom: $from
+          dateTo: $to
+          includeChildren: false
+          kind: [CONTRIBUTION, ADDED_FUNDS]
+        ) {
+          timeUnit
+          nodes {
+            date
+            amount {
+              value
+              currency
+            }
+            label
+          }
+        }
+      }
+    }
+  }
+`;
+const ContributionsBudget = ({ collective, defaultTimeInterval, ...props }) => {
+  const [tmpDateInterval, setTmpDateInterval] = React.useState(defaultTimeInterval);
+  const [graphType, setGraphType] = React.useState(GRAPH_TYPES.LIST);
+  const { data, loading } = useQuery(budgetSectionContributionsQuery, {
+    variables: { slug: collective.slug, ...tmpDateInterval },
+  });
+  const intl = useIntl();
+
+  const timeUnit = data?.account?.stats.contributionsAmountTimeSeries.timeUnit;
+  const { series } = extractSeriesFromTimeSeries(data?.account?.stats.contributionsAmountTimeSeries.nodes, {
+    x: 'date',
+    y: 'amount.value',
+    group: 'label',
+    groupNameTransformer: value => capitalize(value as string),
+  });
+
+  const defaultApexOptions = makeApexOptions(collective.currency, timeUnit, intl);
+
+  return (
+    <Flex {...props}>
+      <Flex justifyContent="space-between" alignItems="center" flexGrow={1} gap="8px" flexWrap="wrap">
+        <P fontSize="20px" lineHeight="20px" fontWeight="500">
+          <FormattedMessage id="Contributions" defaultMessage="Contributions" />
+        </P>
+        <Flex gap="8px" alignItems="center">
+          <PeriodFilterPresetsSelect
+            onChange={setTmpDateInterval}
+            interval={tmpDateInterval}
+            formatDateFn={v => v?.toISOString()}
+            disabled={loading}
+          />
+          <GraphTypeButton active={graphType === GRAPH_TYPES.LIST} onClick={() => setGraphType(GRAPH_TYPES.LIST)}>
+            <FormatListBulleted size="18px" />
+          </GraphTypeButton>
+          <GraphTypeButton active={graphType === GRAPH_TYPES.TIME} onClick={() => setGraphType(GRAPH_TYPES.TIME)}>
+            <Timeline size="18px" />
+          </GraphTypeButton>
+          <GraphTypeButton active={graphType === GRAPH_TYPES.BAR} onClick={() => setGraphType(GRAPH_TYPES.BAR)}>
+            <BarChart size="18px" />
+          </GraphTypeButton>
+          <GraphTypeButton active={graphType === GRAPH_TYPES.PIE} onClick={() => setGraphType(GRAPH_TYPES.PIE)}>
+            <PieChart size="18px" />
+          </GraphTypeButton>
+        </Flex>
+      </Flex>
+      {loading ? (
+        <LoadingPlaceholder mt="30px" height={100} />
+      ) : (
+        <StyledCard mt="30px">
+          <StatsCardContent>
+            <Box width="50%">
+              <P fontSize="12px" lineHeight="16px" fontWeight="500" textTransform="uppercase" color="black.700">
+                <FormattedMessage id="ContributionsReceived" defaultMessage="Contributions received" />
+              </P>
+              <P fontSize="16px" lineHeight="24px" fontWeight="500" mt="4px">
+                {sumBy(data?.account?.stats.contributionsAmount, 'count')}
+              </P>
+            </Box>
+            <Box width="50%">
+              <P fontSize="12px" lineHeight="16px" fontWeight="500" textTransform="uppercase" color="black.700">
+                <FormattedMessage id="Label.AmountCollected" defaultMessage="Amount collected" />
+              </P>
+              <P fontSize="16px" lineHeight="24px" fontWeight="500" mt="4px">
+                {formatValueAsCurrency(data?.account?.stats.totalAmountReceived)}
+              </P>
+            </Box>
+          </StatsCardContent>
+        </StyledCard>
+      )}
+
+      {loading ? (
+        <LoadingPlaceholder mt={4} height={300} />
+      ) : (
+        <React.Fragment>
+          {graphType === GRAPH_TYPES.LIST && (
+            <BudgetTable
+              mt={4}
+              cellPadding="10px"
+              headers={[
+                <FormattedMessage key={1} id="Tiers" defaultMessage="Tiers" />,
+                <FormattedMessage key={2} id="Label.NumberOfContributions" defaultMessage="# of Contributions" />,
+                <FormattedMessage key={3} id="Fields.amount" defaultMessage="Amount" />,
+              ]}
+              rows={data?.account?.stats.contributionsAmount.map((contribution, i) =>
+                makeBudgetTableRow(contribution.label + contribution.count, [
+                  <React.Fragment key={contribution.label}>
+                    <TagMarker color={COLORS[i % COLORS.length]} />
+                    {contribution.label}
+                  </React.Fragment>,
+                  contribution.count,
+                  formatCurrency(contribution.amount.valueInCents, contribution.amount.currency),
+                ]),
+              )}
+            />
+          )}
+          {graphType === GRAPH_TYPES.TIME && (
+            <Box mt={4}>
+              <Chart
+                type="area"
+                width="100%"
+                height="250px"
+                options={{
+                  ...defaultApexOptions,
+                  chart: {
+                    id: 'chart-budget-contributions-overview',
+                  },
+                }}
+                series={alignSeries(series)}
+              />
+            </Box>
+          )}
+          {graphType === GRAPH_TYPES.BAR && (
+            <Box mt={4}>
+              <Chart
+                type="bar"
+                width="100%"
+                height="250px"
+                options={{
+                  ...defaultApexOptions,
+                  chart: {
+                    id: 'chart-budget-expenses-stacked-bars',
+                    stacked: true,
+                  },
+                }}
+                series={alignSeries(series)}
+              />
+            </Box>
+          )}
+          {graphType === GRAPH_TYPES.PIE && (
+            <Box mt={4}>
+              <Chart
+                type="pie"
+                width="100%"
+                height="300px"
+                options={{
+                  labels: data?.account?.stats.contributionsAmount.map(contribution => capitalize(contribution.label)),
+                  colors: COLORS,
+                  chart: {
+                    id: 'chart-budget-expenses-pie',
+                  },
+                  legend: { ...defaultApexOptions.legend, position: 'left' },
+                  xaxis: defaultApexOptions.xaxis,
+                  yaxis: defaultApexOptions.yaxis,
+                }}
+                series={data?.account?.stats.contributionsAmount.map(contribution => contribution.amount.value)}
+              />
+            </Box>
+          )}
+        </React.Fragment>
+      )}
+      <P mt={3} textAlign="right">
+        <Link
+          href={`${getCollectivePageRoute(collective)}/transactions?kind=ADDED_FUNDS&kind=CONTRIBUTION`}
+          data-cy="view-all-contributions-link"
+        >
+          <FormattedMessage
+            id="CollectivePage.SectionBudget.ViewAllContributions"
+            defaultMessage="View all contributions"
+          />{' '}
+          &rarr;
+        </Link>
+      </P>
+    </Flex>
+  );
+};
+
+export default ContributionsBudget;

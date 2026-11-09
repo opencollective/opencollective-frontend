@@ -1,0 +1,231 @@
+import { gqlV1 } from '../../../lib/graphql/helpers';
+
+import { MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD } from '../../contribute-cards/constants';
+
+import * as fragments from './fragments';
+
+export const collectivePageQuery = gqlV1 /* GraphQL */ `
+  query CollectivePage($slug: String!, $nbContributorsPerContributeCard: Int) {
+    Collective(slug: $slug, throwIfMissing: false) {
+      id
+      idV2
+      slug
+      path
+      name
+      hasHosting
+      description
+      longDescription
+      backgroundImage
+      backgroundImageUrl
+      twitterHandle
+      repositoryUrl
+      website
+      socialLinks {
+        type
+        url
+      }
+      location {
+        id
+        country
+      }
+      tags
+      company
+      type
+      currency
+      createdAt
+      settings
+      isActive
+      isApproved
+      isVerified
+      isArchived
+      isFrozen
+      isSuspended
+      isHost
+      isIncognito
+      isGuest
+      isTrustedHost
+      isFirstPartyHost
+      hostFeePercent
+      platformFeePercent
+      platformContributionAvailable
+      image
+      imageUrl(height: 256)
+      canApply
+      canContact
+      supportedExpenseTypes
+      features {
+        id
+        ...NavbarFieldsV1
+      }
+      memberOf(onlyActiveCollectives: true, limit: 1) {
+        id
+      }
+      stats {
+        id
+        balance
+        yearlyBudget
+        backers {
+          id
+          all
+          users
+          organizations
+        }
+      }
+      connectedTo: memberOf(role: "CONNECTED_COLLECTIVE", limit: 1) {
+        id
+        collective {
+          id
+          name
+          type
+          slug
+        }
+      }
+      parentCollective {
+        id
+        name
+        slug
+        image
+        backgroundImageUrl
+        twitterHandle
+        type
+        coreContributors: contributors(roles: [ADMIN, MEMBER]) {
+          id
+          ...ContributorsFields
+        }
+      }
+      host {
+        id
+        name
+        slug
+        type
+        hasHosting
+        location {
+          id
+          country
+        }
+        settings
+        plan {
+          id
+          hostFees
+          hostFeeSharePercent
+        }
+        policies {
+          id
+          COLLECTIVE_MINIMUM_ADMINS {
+            freeze
+            numberOfAdmins
+          }
+        }
+      }
+      coreContributors: contributors(roles: [ADMIN, MEMBER]) {
+        id
+        ...ContributorsFields
+      }
+      financialContributors: contributors(roles: [BACKER], limit: 150) {
+        id
+        ...ContributorsFields
+      }
+      tiers {
+        id
+        ...ContributeCardTierFields
+      }
+      events(includePastEvents: true, includeInactive: true) {
+        id
+        ...ContributeCardEventFields
+      }
+      projects {
+        id
+        ...ContributeCardProjectFields
+      }
+      admins: members(role: "ADMIN") {
+        id
+      }
+      connectedCollectives: members(role: "CONNECTED_COLLECTIVE") {
+        id
+        collective: member {
+          id
+          slug
+          name
+          type
+          description
+          backgroundImageUrl(height: 208)
+          stats {
+            id
+            backers {
+              id
+              all
+              users
+              organizations
+            }
+          }
+          contributors(limit: $nbContributorsPerContributeCard) {
+            id
+            ...ContributeCardContributorFields
+          }
+        }
+      }
+      plan {
+        id
+        hostedCollectives
+      }
+
+      ... on Event {
+        timezone
+        startsAt
+        endsAt
+        location {
+          id
+          name
+          address
+          country
+          lat
+          long
+        }
+        privateInstructions
+        orders(status: PAID) {
+          id
+          description
+          createdAt
+          quantity
+          publicMessage
+          status
+          fromCollective {
+            id
+            type
+            name
+            company
+            image
+            isIncognito
+            imageUrl
+            slug
+            twitterHandle
+            description
+            ... on User {
+              email
+            }
+          }
+          tier {
+            id
+            name
+            type
+          }
+        }
+      }
+    }
+  }
+
+  ${fragments.contributorsFieldsFragment}
+  ${fragments.collectiveNavbarFieldsFragment}
+  ${fragments.contributeCardTierFieldsFragment}
+  ${fragments.contributeCardEventFieldsFragment}
+  ${fragments.contributeCardProjectFieldsFragment}
+`;
+
+export const getCollectivePageQueryVariables = (
+  slug: string,
+): { slug: string; nbContributorsPerContributeCard: number } => {
+  return {
+    slug: slug,
+    nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
+  };
+};
