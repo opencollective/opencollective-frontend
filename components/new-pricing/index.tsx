@@ -71,7 +71,7 @@ function TierPricePlansDisplay({ packages }) {
               <p className="font-medium text-slate-900">
                 <FormattedMessage defaultMessage="Crowdfunding contributions" id="Pricing-Crowdfunding" />
               </p>
-              <p className="flex items-center gap-1 text-xs text-slate-600">
+              <p className="text-xs text-slate-600">
                 <FormattedMessage
                   id="Pricing-Crowdfunding-Price"
                   defaultMessage="Free with <PlatformTipsLink>Platform Tips</PlatformTipsLink> activated"
@@ -92,7 +92,7 @@ function TierPricePlansDisplay({ packages }) {
             <div className="space-y-1">
               <p className="font-medium text-slate-900">
                 <FormattedMessage
-                  defaultMessage="{count} Active collectives"
+                  defaultMessage="{count, plural, one {# Active Collective} other {# Active Collectives}}"
                   id="AAWOc+"
                   values={{ count: selectedPackage?.pricing.includedCollectives }}
                 />
@@ -113,7 +113,7 @@ function TierPricePlansDisplay({ packages }) {
             <div className="space-y-1">
               <p className="font-medium text-slate-900">
                 <FormattedMessage
-                  defaultMessage="{count} Paid expenses monthly"
+                  defaultMessage="{count, plural, one {# Paid Expense per month} other {# Paid Expenses per month}}"
                   id="SZ0HfS"
                   values={{ count: selectedPackage?.pricing.includedExpensesPerMonth }}
                 />
