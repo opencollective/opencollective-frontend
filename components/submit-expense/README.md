@@ -1,83 +1,54 @@
 # Submit Expense Components Architecture
 
-This document explains the architecture and patterns used in the submit-expense components and how they're reused in the submit-grant flow.
+This document explains the architecture of the Expense form, used to submit an Expense, submit a Grant
+(`components/submit-grant`) and edit an existing Expense (`components/expenses/EditExpenseDialog.tsx`).
 
 ## Overview
 
-The submit-expense system is built around a sophisticated form management architecture that handles complex expense creation, editing, and invitation workflows. The system is designed for reusability, with the submit-grant flow leveraging the same underlying patterns and components.
+`useExpenseForm` is the form's public interface: it returns the Formik form, plus the form `options`,
+`actions`, `refresh`, `setItemCurrency` and `initialLoading`. Behind it, the form model is split into
+pure modules in `lib/`, each with a table test next to it:
 
-## Core Files
+| Module                 | Responsibility                                                                                                                                        |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lib/form-query.ts`    | The `ExpenseFormSchema` query, the form's only data fetch for options, and the variables it depends on.                                               |
+| `lib/form-options.ts`  | `deriveFormOptions`: query result + values + start options + logged-in user → form options (payout methods, currencies, Expense types, flags...).     |
+| `lib/form-schema.ts`   | `buildFormSchema`: the validation schema, built from the options only. Rules depending on other values read them from the value being validated.      |
+| `lib/reconcile.ts`     | `reconcileExpenseForm`: the named, ordered rules that keep dependent fields consistent (defaults, hydration, currencies, attachments, tax...).        |
+| `lib/payee-choice.ts`  | The only reader of the `payeeSlug` encoding (an Account slug or a `__` sentinel): kind of payee, slug to query, invitee and submission path.          |
+| `lib/form-steps.ts`    | The steps of each flow (Expense, Grant, edit sub-forms) and the form values they own. Error attribution, scroll targets and partial validation.       |
+| `lib/expense-input.ts` | `planExpenseSubmission`: form values → the mutation to run (create, invite or edit) and its variables. Edit sub-forms submit slices of the edit plan. |
+| `lib/types.ts`         | Form values, options and start options types.                                                                                                         |
 
-- **`useExpenseForm.ts`** - Central hook that manages form state, validation, data fetching, and submission
-- **`SubmitExpenseFlow.tsx`** - Main container component that manages the dialog and form lifecycle
-- **`SubmitExpenseFlowSteps.tsx`** - Step navigation and progress tracking
-- **`SubmitExpenseFlowForm.tsx`** - Form layout and section orchestration
-- **`form/`** - Individual form sections and components
+`useExpenseFormActions.ts` holds the mutations sections trigger (payout methods, payee Organization, legal
+name, US-entity status). Each action owns mutate → resync → select.
 
-## Validation
+## Data flow
 
-**Zod Schema Validation** (in `useExpenseForm`), where the core validation logic is implemented
+1. **Fetch**: the hook runs the form query per instance (through the Apollo cache) when its variables
+   change, or with `refresh()`. Only the result of the latest request is applied.
+2. **Derive**: options are derived synchronously from the query result and the current values, and the
+   schema from the options.
+3. **Reconcile**: after each change of values or options, the reconcile step returns a patch, applied in a
+   single update. A rule only runs when its dependencies changed since it last ran (like an effect). Context
+   is explicit: the loading phase, whether the expense was loaded, and whether the submitter picked an item
+   currency (`setItemCurrency`) or edited the title. The exchange rates it asks for are fetched by the hook
+   and applied through the same update.
+4. **Submit**: `planExpenseSubmission` builds the plan; the hook runs the matching mutation, or passes the
+   plan to the caller's `onSubmit` (edit dialog sub-forms).
 
-- Dynamic schema generation based on form options (see `buildFormSchema`)
-- Context-aware validation (e.g. different rules for different expense types)
+## Validation display
 
-**API Error Handling** (in `SubmitExpenseFlow`), where API errors from mutations are handled through callback functions (`onError`).
+- The `FormField` component checks `(meta.touched || form.submitCount)` to display errors inline.
+- Each step of a flow lists the form values it owns (`lib/form-steps.ts`). Step indicators show error
+  states, and the form scrolls to the first incomplete step on submit. A test ensures every validated value
+  belongs to exactly one Expense step.
+- API errors are displayed via toast notifications (`onError`).
 
-**Display logic**
+## Sections
 
-- Each step has defined validation fields through the `StepValues` object
-- Step indicators in the sidebar show error states with red coloring for incomplete/invalid steps
-- This tells the validation system which section to highlight and to scroll to when an error is encountered
-- The `FormField` component checks `(meta.touched || form.submitCount)` to display errors inline
-- If an error is not attributed to a specific step, a toast notification is displayed
-- API errors are displayed via toast notifications
-
-## Submit/Mutation Patterns
-
-The submission logic (in `useExpenseForm.ts`) handles three different scenarios:
-
-1. **Edit existing expense**: Uses `editExpense` mutation
-2. **Create new expense**: Uses `createExpense` mutation for direct submissions
-3. **Invite user**: Uses `draftExpenseAndInviteUser` for invitation workflows
-
-### Additional Mutations
-
-- **Payout Method Creation/Editing/Deletion** is directly implemented in `PayoutMethodSection`.
-
-## Data Fetching
-
-The main data fetching happens through the `ExpenseFormSchema` query, in `useExpenseForm`, which uses GraphQL `@include` directives for conditional fields (only fetches data when needed based on form state).
-
-The `useExpenseForm` hook also takes care of **Exchange Rate Fetching**, in `updateExchangeRates`, triggered when expense items use different currencies.
-
-## Performance tweaks
-
-- **Memoization**: Uses `memoizeOne` for caching and memoization of the query results
-- **buildFormOptions**: Memoize the individual option fields (like `availableReferenceCurrencies`), to prevent unnecessary re-renders in the sections
-- **Ref-based State**: Uses refs for values that don't need to trigger re-renders
-  **Examples:**
-  - `initialLoading.current` - Tracks loading state without triggering re-renders during initialization
-  - `startOptions.current` - Stores initial configuration that doesn't change
-  - `expenseFormValues.current` - Caches form values for comparison without re-rendering
-  - `setInitialExpenseValues.current` - Boolean flag to prevent duplicate initialization
-- **Effect Cleanup**: Proper cleanup of async operations (e.g. in `updateExchangeRates`, we stop the query if the component unmounts before completion using an `AbortController`)
-
-## Reuse in Submit Grant
-
-### Grant Flow Architecture
-
-The submit-grant flow (`SubmitGrantFlow.tsx`) reuses the expense form infrastructure:
-
-1. **Same Form Hook**: Uses `useExpenseForm` with `ExpenseType.GRANT`
-2. **Reused Components**: Leverages form sections like `WhoIsGettingPaidForm`, `PayoutMethodFormContent`, `ExpenseItemsForm`
-3. **Custom Steps**: Implements grant-specific step navigation (`SubmitGrantFlowSteps.tsx`)
-4. **Grant-specific Sections**: Adds grant-specific sections like `GrantProviderSection`, `InstructionSection`
-
-## Key Design Patterns
-
-### 1. Form Props Pattern
-
-Each form section uses a consistent pattern for prop extraction and memoization:
+Sections (`form/`) only keep presentation. They read what they need through the form props pattern and
+trigger changes with `setFieldValue` or form actions:
 
 ```typescript
 function getFormProps(form: ExpenseForm) {
@@ -94,19 +65,13 @@ export const ComponentName = memoWithGetFormProps(function ComponentName(props: 
 }, getFormProps);
 ```
 
-### 2. Step-based Navigation
+The payout-method components are also reused outside the form (the edit dialog's payout-method form and
+the payout methods settings): those build their own actions with `useExpenseFormActions`.
 
-The step system provides consistent navigation and validation:
+## Tests
 
-```typescript
-export enum Step {
-  WHO_IS_PAYING = 'WHO_IS_PAYING',
-  WHO_IS_GETTING_PAID = 'WHO_IS_GETTING_PAID',
-  // ... more steps
-}
-
-export const StepValues: Record<Step, Path<ExpenseFormValues>[]> = {
-  [Step.WHO_IS_PAYING]: ['accountSlug'],
-  // ... step to field mapping
-};
-```
+- `useExpenseForm.characterization.test.tsx`: the hook through its public interface, against a real Apollo
+  client answering operations from fixtures (`testing/`).
+- `useExpenseForm.actions.test.tsx`: the form actions, with mocked mutations.
+- `components/expenses/EditExpenseDialog.subforms.test.tsx`: the exact payload of each edit sub-form.
+- `lib/*.test.ts`: table tests for each module.

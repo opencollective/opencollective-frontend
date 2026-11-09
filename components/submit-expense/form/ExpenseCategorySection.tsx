@@ -10,7 +10,7 @@ import { FormField } from '@/components/FormField';
 
 import HTMLContent from '../../HTMLContent';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../ui/Collapsible';
-import { Step } from '../SubmitExpenseFlowSteps';
+import { getExpenseStepHeading, Step } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
@@ -57,8 +57,9 @@ export const ExpenseCategorySection = memoWithGetFormProps(function ExpenseCateg
 
   return (
     <FormSectionContainer
+      id={Step.EXPENSE_CATEGORY}
+      {...getExpenseStepHeading(Step.EXPENSE_CATEGORY)}
       title={<FormattedMessage defaultMessage="Select expense category" id="oNW1LD" />}
-      step={Step.EXPENSE_CATEGORY}
       inViewChange={props.inViewChange}
     >
       <FormField name="accountingCategoryId">

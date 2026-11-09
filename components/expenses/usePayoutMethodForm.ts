@@ -17,6 +17,7 @@ import { NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID, NEW_PAYOUT_METHOD_ID } from './li
 import { getAvailablePayoutMethods, getSupportedPayoutMethods } from './lib/payout-methods';
 
 import type { ExpenseFormValues } from '../submit-expense/useExpenseForm';
+import { useExpenseFormActions } from '../submit-expense/useExpenseFormActions';
 
 import { validatePayoutMethod } from './PayoutMethodForm';
 
@@ -221,19 +222,31 @@ export function usePayoutMethodForm(expense: Expense, onSubmit: (values: Expense
   const refresh = React.useCallback(async () => {
     await refetch();
   }, [refetch]);
-  const onPayoutMethodDeleted = React.useCallback(
-    (id: string) => {
-      // A removed method must stay removed even if it was attached to this expense.
-      if (id === expense.payoutMethod?.id) {
-        setIncludeCurrentMethod(false);
+  const { setFieldValue } = form;
+  const actions = useExpenseFormActions({
+    resync: refresh,
+    // Cross-host: new payout methods belong to the recipient Host
+    defaultPayoutMethodAccountSlug: payeeHost && host && payeeHost.id !== host.id ? payeeHost.slug : payeeSlug,
+    onPayoutMethodSaved: (payoutMethodId, { isNew }) => {
+      setFieldValue('payoutMethodId', payoutMethodId);
+      if (isNew) {
+        setFieldValue('newPayoutMethod', { data: {} });
       }
     },
-    [expense.payoutMethod?.id],
-  );
+    onPayoutMethodRemoved: payoutMethodId => {
+      // A removed method must stay removed even if it was attached to this expense.
+      if (payoutMethodId === expense.payoutMethod?.id) {
+        setIncludeCurrentMethod(false);
+      }
+      if (payoutMethodId === form.values.payoutMethodId) {
+        setFieldValue('payoutMethodId', '');
+      }
+    },
+  });
 
   return {
     ...form,
-    onPayoutMethodDeleted,
+    actions,
     initialLoading,
     error,
     refresh,

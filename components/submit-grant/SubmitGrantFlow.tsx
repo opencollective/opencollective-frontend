@@ -4,9 +4,9 @@ import { Field, FormikProvider, useFormikContext } from 'formik';
 import { isEmpty, pick } from 'lodash-es';
 import { X } from 'lucide-react';
 import { useRouter } from 'next/router';
-import { useInView } from 'react-intersection-observer';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { getFirstIncompleteStep, getGrantStepFields, GRANT_FLOW_STEPS } from '../submit-expense/lib/form-steps';
 import { CollectiveType } from '@/lib/constants/collectives';
 import { i18nGraphqlException } from '@/lib/errors';
 import type {
@@ -18,6 +18,7 @@ import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import { objectKeys } from '@/lib/utils';
 
 import { AdditionalAttachments, ExpenseItemsForm } from '../submit-expense/form/ExpenseItemsSection';
+import { FormSectionContainer } from '../submit-expense/form/FormSectionContainer';
 import { PayoutMethodFormContent } from '../submit-expense/form/PayoutMethodSection';
 import { SummarySectionContent } from '../submit-expense/form/SummarySection';
 import { WhoIsGettingPaidForm } from '../submit-expense/form/WhoIsGettingPaidSection';
@@ -38,7 +39,7 @@ import { useToast } from '../ui/useToast';
 import { GrantProviderSection } from './sections/GrantProviderSection';
 import { InstructionSection } from './sections/InstructionsSection';
 import { InvitationNoteSection } from './sections/InvitationNoteSection';
-import SubmitGrantFlowSteps, { isExpenseFormStepCompleted, Step, useExpenseFormSteps } from './SubmitGrantFlowSteps';
+import SubmitGrantFlowSteps, { Step, useExpenseFormSteps } from './SubmitGrantFlowSteps';
 
 type SubmitGrantFlowProps = {
   account: { slug: string; name?: string };
@@ -230,7 +231,6 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
   const { toast } = useToast();
   const [nextClickCount, setNextClickCount] = React.useState(0); // This form has not been designed to use `formik.submitCount`, so we keep track of submissions in a different variables to surfacee validation issues.
   const intl = useIntl();
-  const formRef = React.useRef<HTMLFormElement>(undefined);
 
   const startOptions = React.useRef<ExpenseForm['startOptions']>({
     expenseId: props.expenseId,
@@ -258,7 +258,6 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
   );
 
   const expenseForm = useExpenseForm({
-    formRef,
     initialValues: {
       accountSlug: props.accountSlug,
       title: '',
@@ -285,7 +284,6 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
       },
     },
     startOptions: startOptions.current,
-    handleOnSubmit: true,
     onSuccess,
     onError,
   });
@@ -300,12 +298,12 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
           {
             name: Step.GRANT_PROVIDER,
             hidden: true,
-            formValues: ['accountSlug', 'expenseTypeOption'],
+            formValues: getGrantStepFields(Step.GRANT_PROVIDER),
           },
           {
             name: Step.INSTRUCTIONS,
             hidden: true,
-            formValues: ['acknowledgedCollectiveGrantExpensePolicy', 'acknowledgedHostGrantExpensePolicy'],
+            formValues: getGrantStepFields(Step.INSTRUCTIONS),
           },
           {
             name: Step.INVITATION_NOTE,
@@ -322,17 +320,17 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
           {
             name: Step.WHO_WILL_RECEIVE_FUNDS,
             title: <FormattedMessage defaultMessage="Who will receive the funds?" id="CAYwc2" />,
-            formValues: ['payeeSlug', 'inviteeNewIndividual', 'inviteeNewOrganization'],
+            formValues: getGrantStepFields(Step.WHO_WILL_RECEIVE_FUNDS),
           },
           {
             name: Step.PAYOUT_METHOD,
             title: <FormattedMessage defaultMessage="Payout Method" id="PayoutMethod" />,
-            formValues: ['payoutMethodId', 'newPayoutMethod', 'payoutMethodNameDiscrepancyReason'],
+            formValues: getGrantStepFields(Step.PAYOUT_METHOD),
           },
           {
             name: Step.DESCRIPTION,
             title: <FormattedMessage defaultMessage="Description" id="Fields.description" />,
-            formValues: ['title', 'expenseItems'],
+            formValues: getGrantStepFields(Step.DESCRIPTION),
           },
         ],
       },
@@ -395,7 +393,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
   ]);
 
   // Scroll to first step with error
-  const firstIncompleteSection = Object.values(Step).find(s => !isExpenseFormStepCompleted(expenseForm, s));
+  const firstIncompleteSection = getFirstIncompleteStep(GRANT_FLOW_STEPS, expenseForm)?.id;
   React.useEffect(() => {
     if (firstIncompleteSection && nextClickCount) {
       document.querySelector(`#${firstIncompleteSection}`)?.scrollIntoView({ behavior: 'smooth' });
@@ -408,7 +406,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
         <div className="hidden w-64 min-w-44 sm:block">
           <SubmitGrantFlowSteps steps={steps.steps} />
         </div>
-        <form className="flex w-full flex-col sm:max-w-3xl" ref={formRef} onSubmit={e => e.preventDefault()}>
+        <form className="flex w-full flex-col sm:max-w-3xl" onSubmit={e => e.preventDefault()}>
           <div className="grow basis-1 sm:px-0">
             <div className="px-4 pb-4">
               <FormContainer activeHeader={steps.activeHeaderName} onVisibleSectionChange={onVisibleSectionChange} />
@@ -425,7 +423,7 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
                 {steps.activeHeader.nextButtonMessage && (
                   <Button
                     onClick={onNextStepClick}
-                    disabled={expenseForm.initialLoading}
+                    disabled={expenseForm.initialLoading || expenseForm.isLoadingOptions}
                     loading={expenseForm.isSubmitting}
                   >
                     {steps.activeHeader.nextButtonMessage}
@@ -572,36 +570,6 @@ function FormContainer(props: FormContainerProps) {
           </FormSectionContainer>
         </React.Fragment>
       )}
-    </div>
-  );
-}
-
-type FormSectionContainerProps = {
-  children: React.ReactNode;
-  id: string;
-  title?: React.ReactNode;
-  subtitle?: React.ReactNode;
-  inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
-  error?: React.ReactNode;
-};
-
-function FormSectionContainer(props: FormSectionContainerProps) {
-  const { ref } = useInView({
-    onChange: props.inViewChange,
-    rootMargin: '-50px 0px -70% 0px',
-  });
-
-  return (
-    <div ref={ref} id={props.id} className="scroll-m-8">
-      <div className="rounded-lg border border-white bg-white p-4 sm:p-6">
-        {props.title && (
-          <div className="mb-4">
-            <div className="text-xl font-bold text-[#0F1729]">{props.title}</div>
-            {props.subtitle && <div className="text-sm text-muted-foreground">{props.subtitle}</div>}
-          </div>
-        )}
-        {props.children}
-      </div>
     </div>
   );
 }
