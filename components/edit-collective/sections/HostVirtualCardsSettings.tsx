@@ -310,8 +310,10 @@ const HostVirtualCards = props => {
             </Box>
           }
         >
-          {() => (
+          {inputProps => (
             <RichTextEditor
+              id={inputProps.id}
+              inputName={inputProps.name}
               withBorders
               showCount
               maxLength={VIRTUAL_CARDS_POLICY_MAX_LENGTH}

@@ -953,7 +953,7 @@ class ContributionFlow extends React.Component<ContributionFlowProps, Contributi
         name: 'summary',
         label: intl.formatMessage(STEP_LABELS.summary),
         isCompleted: Boolean(get(stepSummary, 'isReady', false)),
-        validate: () => true,
+        validate: async action => action === 'prev' || Boolean(get(stepSummary, 'isReady', false)),
       });
     }
 

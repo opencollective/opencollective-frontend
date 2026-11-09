@@ -348,7 +348,7 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
                   ]}
                   render={(ref, props) => (
                     <StyledInputGroup
-                      prepend={<CreditCard size="18px" style={{ marginTop: '-1px' }} />}
+                      prepend={<CreditCard size={26} height="18px" style={{ marginTop: '-1px' }} />}
                       prependProps={{ bg: 'transparent', ml: 2 }}
                       innerRef={ref}
                       {...props}
@@ -405,7 +405,7 @@ const AssignVirtualCardModal = ({ collective = undefined, host, onSuccess, onClo
           </Box>
         </ModalBody>
         <ModalFooter isFullWidth>
-          <Container display="flex" justifyContent={['center', 'flex-end']}>
+          <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="wrap">
             <StyledButton
               my={1}
               minWidth={140}

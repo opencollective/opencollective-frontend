@@ -226,10 +226,6 @@ const RequestVirtualCardModal = props => {
                   {...inputProps}
                   inputId="spendingLimitInterval"
                   data-cy="spendingLimitInterval"
-                  error={
-                    (formik.touched as Record<string, boolean>).limitAmount &&
-                    Boolean((formik.errors as Record<string, string>).limitAmount)
-                  }
                   onBlur={() => formik.setFieldTouched('spendingLimitInterval', true)}
                   onChange={({ value }) => formik.setFieldValue('spendingLimitInterval', value)}
                   disabled={isCreating}
@@ -302,7 +298,7 @@ const RequestVirtualCardModal = props => {
           )}
         </ModalBody>
         <ModalFooter isFullWidth>
-          <Container display="flex" justifyContent={['center', 'flex-end']}>
+          <Container display="flex" justifyContent={['center', 'flex-end']} flexWrap="wrap">
             <StyledButton
               my={1}
               minWidth={140}
