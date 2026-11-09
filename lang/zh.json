@@ -3378,7 +3378,6 @@
   "Payouts": "Payouts",
   "PayPal.ConnectSuccess": "Your PayPal account has been connected.",
   "Paypal.Email": "PayPal 电子邮箱",
-  "Paypal.Payment": "PayPal Payment",
   "PayPal.Unverified.Tooltip": "This PayPal account has not been verified via 'Log in with PayPal'.{canEdit, select, true { Edit this payout method to connect and verify.} other {}}",
   "PaypalConnectButton.popupOverlay.cta": "Click to Continue",
   "pB1jn6": "No future charges will be made for this contribution.",

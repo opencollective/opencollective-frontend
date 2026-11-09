@@ -3378,7 +3378,6 @@
   "Payouts": "Versements",
   "PayPal.ConnectSuccess": "Votre compte PayPal a été connecté.",
   "Paypal.Email": "E-mail PayPal",
-  "Paypal.Payment": "PayPal Payment",
   "PayPal.Unverified.Tooltip": "Ce compte PayPal n'a pas été vérifié via « Se connecter avec PayPal ».{canEdit, select, true { Modifiez ce mode de versement pour vous connecter et vérifier.} other {}}",
   "PaypalConnectButton.popupOverlay.cta": "Cliquez pour continuer",
   "pB1jn6": "Aucun prélèvement futur ne sera effectué pour cette contribution.",
