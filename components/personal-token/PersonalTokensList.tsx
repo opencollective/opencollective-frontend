@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
+import type { ColumnDef } from '@tanstack/react-table';
 import { KeyRound, Plus } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -15,6 +16,14 @@ import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 
 import CreatePersonalTokenModal from './CreatePersonalTokenModal';
+
+type PersonalTokenRow = {
+  id: string;
+  publicId: string;
+  name?: string | null;
+  scope?: string[] | null;
+  expiresAt?: string | null;
+};
 
 const personalTokenQuery = gql`
   query PersonalTokens($slug: String!, $limit: Int, $offset: Int) {
@@ -45,7 +54,7 @@ const PersonalTokensList = ({ account, onPersonalTokenCreated, offset = 0 }) => 
   const { data, loading, error } = useQuery(personalTokenQuery, { variables });
   const tokens = data?.individual?.personalTokens;
 
-  const columns = [
+  const columns: ColumnDef<PersonalTokenRow>[] = [
     {
       header: intl.formatMessage({ defaultMessage: 'Name', id: 'Fields.name' }),
       accessorKey: 'name',

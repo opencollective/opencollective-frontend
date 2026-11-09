@@ -1,5 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
+import type { ColumnDef } from '@tanstack/react-table';
 import { AppWindow, Plus } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -13,6 +14,8 @@ import CreateOauthApplicationModal from '../oauth/CreateOauthApplicationModal';
 import Pagination from '../Pagination';
 import { DataTable } from '../table/DataTable';
 import { Button } from '../ui/Button';
+
+type OAuthApplicationRow = { id: string; publicId: string; name: string; description?: string | null };
 
 const applicationsQuery = gql`
   query Applications($slug: String!, $limit: Int, $offset: Int) {
@@ -42,7 +45,7 @@ const OAuthApplicationsList = ({ account, onApplicationCreated, offset = 0 }) =>
   const { data, loading, error } = useQuery(applicationsQuery, { variables });
   const applications = data?.account?.oAuthApplications;
 
-  const columns = [
+  const columns: ColumnDef<OAuthApplicationRow>[] = [
     {
       header: intl.formatMessage({ defaultMessage: 'Name', id: 'Fields.name' }),
       accessorKey: 'name',
