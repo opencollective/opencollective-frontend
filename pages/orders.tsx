@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import { addCollectiveNavbarData } from '../lib/graphql/queries';
 import { isHiddenAccount } from '@/lib/collective';
@@ -13,21 +12,18 @@ import { withUser } from '../components/UserProvider';
 
 import Custom404 from './404';
 
-class OrdersPage extends React.Component {
+type OrdersPageProps = {
+  slug?: string;
+  filter?: string;
+  value?: string;
+  data?: { account?: Record<string, unknown>; loading?: boolean };
+  LoggedInUser?: { isAdminOfCollective?: (account: unknown) => boolean };
+};
+
+class OrdersPage extends React.Component<OrdersPageProps> {
   static getInitialProps({ query: { collectiveSlug, filter, value } }) {
     return { slug: collectiveSlug, filter, value };
   }
-
-  static propTypes = {
-    slug: PropTypes.string, // for addCollectiveNavbarData
-    filter: PropTypes.string,
-    value: PropTypes.string,
-    data: PropTypes.shape({
-      account: PropTypes.object,
-      loading: PropTypes.bool,
-    }).isRequired, // from withData
-    LoggedInUser: PropTypes.object,
-  };
 
   render() {
     const { slug, data, LoggedInUser } = this.props;

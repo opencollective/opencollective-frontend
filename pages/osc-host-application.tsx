@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@apollo/client';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
+import type { MessageDescriptor } from 'react-intl';
 import { defineMessages, useIntl } from 'react-intl';
 
 import { CollectiveType, IGNORED_TAGS } from '../lib/constants/collectives';
@@ -77,7 +78,26 @@ const messages = defineMessages({
   },
 });
 
-const formValues = {
+type ApplicationData = {
+  typeOfProject?: string;
+  repositoryUrl?: string;
+  licenseSpdxId?: string;
+  extraLicenseInfo?: string;
+  amountOfMembers?: string;
+  linksToPreviousEvents?: string;
+  hasLegalEntity?: boolean;
+  useGithubValidation?: boolean;
+};
+
+type FormValues = {
+  user: { name: string; email: string };
+  collective: { name: string; slug: string; description: string; tags: string[] };
+  applicationData: ApplicationData;
+  termsOfServiceOC: boolean;
+  inviteMembers: unknown[];
+};
+
+const formValues: FormValues = {
   user: {
     name: '',
     email: '',
@@ -108,7 +128,7 @@ const formatNameFromSlug = repoName => {
 
 const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedInUser }) => {
   const [checkedTermsOfFiscalSponsorship, setCheckedTermsOfFiscalSponsorship] = useState(false);
-  const [initialValues, setInitialValues] = useState(formValues);
+  const [initialValues, setInitialValues] = useState<FormValues>(formValues);
 
   const resetApplicationFormValues = () => {
     setInitialValues({
@@ -153,11 +173,13 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
         message: hasHost
           ? intl.formatMessage(
               collective.isActive
-                ? messages['error.existingHost.description']
-                : messages['error.existingHostApplication.description'],
+                ? (messages['error.existingHost.description'] as MessageDescriptor)
+                : (messages['error.existingHostApplication.description'] as MessageDescriptor),
               { hostName: collective.host.name },
             )
-          : intl.formatMessage(messages['error.unauthorized.description'], { name: collective.name }),
+          : intl.formatMessage(messages['error.unauthorized.description'] as MessageDescriptor, {
+              name: collective.name,
+            }),
       });
     }
   }, [collectiveSlug, collective]);
@@ -175,7 +197,7 @@ const OSCHostApplication = ({ loadingLoggedInUser, LoggedInUser, refetchLoggedIn
       )}
       {step === 'pick-repo' && (
         <ConnectGithub
-          setGithubInfo={({ handle, licenseSpdxId } = {}) => {
+          setGithubInfo={({ handle, licenseSpdxId }: { handle?: string; licenseSpdxId?: string } = {}) => {
             const [owner, repo] = handle?.split('/') || [];
 
             setInitialValues({

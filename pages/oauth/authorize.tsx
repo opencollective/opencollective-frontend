@@ -54,14 +54,14 @@ const OAuthAuthorizePage = () => {
   const { query } = useRouter();
   const { loadingLoggedInUser, LoggedInUser } = useLoggedInUser();
   const missingParams = REQUIRED_URL_PARAMS.filter(key => !query[key]);
-  const skipQuery = missingParams.length;
-  const queryVariables = { clientId: query['client_id'] };
+  const skipQuery = missingParams.length > 0;
+  const queryVariables = { clientId: query['client_id'] as string };
   const queryParams = { skip: skipQuery, variables: queryVariables };
   const { data, error, loading: isLoadingAuthorization } = useQuery(applicationQuery, queryParams);
   const isLoading = loadingLoggedInUser || isLoadingAuthorization;
   // Accept whitespace (OAuth 2.0 compliance) or comma (retro-compatibility)
   const requestedScopes = query.scope
-    ? query.scope
+    ? (query.scope as string)
         .split(/[\s,]+/)
         .map(s => s.trim())
         .filter(Boolean)

@@ -452,7 +452,7 @@ const CollectiveNavbar = ({
   isAdmin = undefined,
   isLoading = false,
   sections: sectionsFromParent = undefined,
-  selectedCategory,
+  selectedCategory = undefined,
   callsToAction = {},
   onCollectiveClick = undefined,
   isInHero = false,
