@@ -12,7 +12,8 @@ import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 
 import { Pagination } from '../../../filters/Pagination';
 import TimelineItem from '../../overview/TimelineItem';
-import { communityAccountActivitiesQuery } from '../queries';
+import { isHostedAccountData } from '../common';
+import { communityAccountActivitiesQuery, hostedAccountActivitiesQuery } from '../queries';
 
 export function Activities({ account, host, setOpenExpenseId }) {
   const pagination = useQueryFilter({
@@ -21,26 +22,39 @@ export function Activities({ account, host, setOpenExpenseId }) {
     skipRouter: true,
   });
 
-  const { data, loading, error } = useQuery(communityAccountActivitiesQuery, {
-    variables: {
-      accountId: account?.id,
-      host: getAccountReferenceInput(host),
-      ...pagination.variables,
-    },
-    skip: !account || !host,
+  const isHostedAccount = isHostedAccountData(account);
+  const variables = {
+    accountId: account?.id,
+    host: getAccountReferenceInput(host),
+    ...pagination.variables,
+  };
+
+  const communityQuery = useQuery(communityAccountActivitiesQuery, {
+    variables,
+    skip: !account || !host || isHostedAccount,
+  });
+  const hostedQuery = useQuery(hostedAccountActivitiesQuery, {
+    variables,
+    skip: !account || !host || !isHostedAccount,
   });
 
+  const { loading, error } = isHostedAccount ? hostedQuery : communityQuery;
   if (error) {
     return <MessageBoxGraphqlError error={error} />;
   }
 
-  const activities = (data?.account?.communityStats?.activities.nodes || []).map(activity => ({
+  const rawActivities = isHostedAccount
+    ? hostedQuery.data?.activities?.nodes || []
+    : communityQuery.data?.account?.communityStats?.activities.nodes || [];
+  const activities = rawActivities.map(activity => ({
     ...activity,
     individual: activity.individual?.mainProfile ?? activity.individual,
     fromAccount: activity.fromAccount?.mainProfile ?? activity.fromAccount,
     account: activity.account?.mainProfile ?? activity.account,
   }));
-  const total = data?.account?.communityStats?.activities.totalCount;
+  const total = isHostedAccount
+    ? hostedQuery.data?.activities?.totalCount
+    : communityQuery.data?.account?.communityStats?.activities.totalCount;
   return (
     <div className="flex flex-col gap-4">
       <h1 className="flex items-center font-medium">

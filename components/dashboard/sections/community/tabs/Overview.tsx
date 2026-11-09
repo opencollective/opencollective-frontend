@@ -20,6 +20,7 @@ import { getCollectivePageCanonicalURL } from '@/lib/url-helpers';
 
 import { CopyID } from '@/components/CopyId';
 import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
+import { FiscalHostNoteBlock } from '@/components/FiscalHostNoteBadge';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 import I18nCollectiveTags from '@/components/I18nCollectiveTags';
 import LinkCollective from '@/components/LinkCollective';
@@ -891,6 +892,7 @@ export const Overview = ({
 
   return (
     <div className="flex flex-col gap-4">
+      {account?.fiscalHostNote && <FiscalHostNoteBlock note={account.fiscalHostNote} />}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {isHostedAccount ? (
           <HostedAccountDetailsCard account={account} host={host} onEditSettings={onEditSettings} />

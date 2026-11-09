@@ -138,6 +138,42 @@ export const dashboardOrdersQuery = gql`
         nodes {
           id
           ...ManagedOrderFields
+          fromAccount {
+            fiscalHostNote(host: { slug: $slug }) {
+              type
+              note
+              updatedAt
+              updatedBy {
+                id
+                name
+                slug
+              }
+            }
+          }
+          toAccount {
+            fiscalHostNote(host: { slug: $slug }) {
+              type
+              note
+              updatedAt
+              updatedBy {
+                id
+                name
+                slug
+              }
+            }
+          }
+          createdByAccount {
+            fiscalHostNote(host: { slug: $slug }) {
+              type
+              note
+              updatedAt
+              updatedBy {
+                id
+                name
+                slug
+              }
+            }
+          }
         }
       }
     }

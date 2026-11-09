@@ -15,6 +15,7 @@ import { OrderBalanceAccountingCategoryPill } from '../accounting/BalanceAccount
 import { accountingCategorySelectFieldsFragment } from '../AccountingCategorySelect';
 import Avatar from '../Avatar';
 import { CopyIDDropdown } from '../CopyId';
+import { DashboardContext } from '../dashboard/DashboardContext';
 import DateTime from '../DateTime';
 import DrawerHeader from '../DrawerHeader';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -34,7 +35,7 @@ import { ContributionCharges } from './ContributionCharges';
 import ContributionTimeline from './ContributionTimeline';
 
 const contributionDrawerQuery = gql`
-  query ContributionDrawer($orderId: Int!) {
+  query ContributionDrawer($orderId: Int!, $hostSlug: String, $includeFiscalHostNote: Boolean! = false) {
     order(order: { legacyId: $orderId }) {
       id
       legacyId
@@ -76,6 +77,16 @@ const contributionDrawerQuery = gql`
       }
       fromAccount {
         ...ContributionDrawerAccountFields
+        fiscalHostNote(host: { slug: $hostSlug }) @include(if: $includeFiscalHostNote) {
+          type
+          note
+          updatedAt
+          updatedBy {
+            id
+            name
+            slug
+          }
+        }
         ... on AccountWithHost {
           host {
             id
@@ -86,6 +97,16 @@ const contributionDrawerQuery = gql`
       }
       toAccount {
         ...ContributionDrawerAccountFields
+        fiscalHostNote(host: { slug: $hostSlug }) @include(if: $includeFiscalHostNote) {
+          type
+          note
+          updatedAt
+          updatedBy {
+            id
+            name
+            slug
+          }
+        }
       }
       platformTipEligible
       platformTipAmount {
@@ -314,10 +335,13 @@ type ContributionDrawerProps = {
 export function ContributionDrawer({ open, onClose, orderId, getActions }: ContributionDrawerProps) {
   const intl = useIntl();
   const hasBalanceCategoriesPreview = useHasBalanceCategoriesPreview();
+  const dashboardAccount = React.useContext(DashboardContext)?.account;
 
   const query = useQuery<ContributionDrawerQuery, ContributionDrawerQueryVariables>(contributionDrawerQuery, {
     variables: {
       orderId,
+      hostSlug: dashboardAccount?.slug,
+      includeFiscalHostNote: Boolean(dashboardAccount?.slug),
     },
     skip: !open || !orderId,
   });
@@ -442,7 +466,7 @@ export function ContributionDrawer({ open, onClose, orderId, getActions }: Contr
                   )}
               </div>
               <div className="text-sm">
-                <InfoList className="mt-4 mb-6 sm:grid-cols-2">
+                <InfoList className="mt-4 mb-6 gap-2 sm:grid-cols-2">
                   <InfoListItem
                     className="border-t-0 border-b"
                     title={<FormattedMessage defaultMessage="Contributor" id="Contributor" />}
@@ -457,7 +481,7 @@ export function ContributionDrawer({ open, onClose, orderId, getActions }: Contr
                         >
                           <div className="flex min-w-0 items-center gap-1">
                             <Avatar radius={24} collective={query.data.order.fromAccount} />
-                            <span className="min-w-0">
+                            <span className="min-w-0 truncate">
                               {contributorAccount.name}
                               {contributorLegalName && (
                                 <span className="text-muted-foreground group-hover:text-primary">{` (${contributorLegalName})`}</span>

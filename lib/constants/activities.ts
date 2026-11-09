@@ -68,6 +68,8 @@ export const ActivityTypes = {
   DEACTIVATED_HOSTING: 'deactivated.hosting',
   DEACTIVATED_MONEY_MANAGEMENT: 'deactivated.moneyManagement',
   EXPENSE_COMMENT_CREATED: 'expense.comment.created',
+  FISCAL_HOST_NOTE_SET: 'fiscal.host.note.set',
+  FISCAL_HOST_NOTE_REMOVED: 'fiscal.host.note.removed',
   ORDER_CANCELED_ARCHIVED_COLLECTIVE: 'order.canceled.archived.collective',
   ORDER_PENDING_CONTRIBUTION_NEW: 'order.new.pendingFinancialContribution',
   ORDER_PENDING_CONTRIBUTION_REMINDER: 'order.reminder.pendingFinancialContribution',
