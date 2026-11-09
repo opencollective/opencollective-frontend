@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Query } from '@apollo/client/react/components';
 import { graphql } from '@apollo/client/react/hoc';
 import { partition } from 'lodash-es';
@@ -76,7 +75,7 @@ const ContributeButton = styled.div`
   }
 `;
 
-const IFrameContainer = styled.div`
+const IFrameContainer = styled.div<{ linkColor?: unknown; a?: { color?: string } }>`
   display: block;
   height: 100%;
   overflow: hidden;
@@ -185,7 +184,7 @@ const IFrameContainer = styled.div`
 
   a {
     text-decoration: none;
-    color: ${style => (style.a && style.a.color) || '#46b0ed'}
+    color: ${props => (props.a && props.a.color) || '#46b0ed'}
     cursor: pointer;
     font-size: 14px;
   }
@@ -207,7 +206,27 @@ const IFrameContainer = styled.div`
   }
 `;
 
-class BannerIframe extends React.Component {
+type BannerContributor = { id?: string | number; type?: string };
+
+import type { Currency } from '../lib/graphql/types/v2/graphql';
+
+type BannerAccount = {
+  slug: string;
+  name?: string;
+  currency?: Currency;
+  contributors?: { totalCount?: number; nodes?: BannerContributor[] };
+  stats?: { backers?: { organizations?: number; collectives?: number; users?: number } };
+};
+
+type BannerIframeProps = {
+  collectiveSlug?: string;
+  id?: string;
+  style?: string;
+  data?: { loading?: boolean; account?: BannerAccount; Collective?: BannerAccount };
+  useNewFormat?: boolean;
+};
+
+class BannerIframe extends React.Component<BannerIframeProps> {
   static getInitialProps({ query: { collectiveSlug, id, style, useNewFormat }, req, res }) {
     // Allow to be embedded as Iframe everywhere
     if (res) {
@@ -220,14 +239,6 @@ class BannerIframe extends React.Component {
 
     return { collectiveSlug, id, style, useNewFormat: parseToBoolean(useNewFormat) };
   }
-
-  static propTypes = {
-    collectiveSlug: PropTypes.string, // from getInitialProps, for addCollectiveBannerIframeData
-    id: PropTypes.string, // from getInitialProps
-    style: PropTypes.string, // from getInitialProps
-    data: PropTypes.object.isRequired, // from withData
-    useNewFormat: PropTypes.bool,
-  };
 
   componentDidMount() {
     this.onSizeUpdate();
@@ -243,6 +254,9 @@ class BannerIframe extends React.Component {
     window.removeEventListener('resize', this.onSizeUpdate);
     clearInterval(this.updateSizeInterval);
   }
+
+  node: HTMLDivElement;
+  updateSizeInterval: ReturnType<typeof setInterval>;
 
   onSizeUpdate = () => {
     // Wait for the render to be completed by the browser
@@ -265,14 +279,18 @@ class BannerIframe extends React.Component {
     window.parent.postMessage(message, '*');
   };
 
-  renderTopContributors = collective => {
-    const [orgs, individuals] = partition(collective.contributors.nodes, c => c.type !== CollectiveType.USER);
+  renderTopContributors = (collective: BannerAccount) => {
+    const [orgs, individuals] = partition(collective.contributors?.nodes ?? [], c => c.type !== CollectiveType.USER);
     return <TopContributors organizations={orgs} individuals={individuals} currency={collective.currency} />;
   };
 
   renderNewFormat = () => {
     return (
-      <div ref={node => (this.node = node)}>
+      <div
+        ref={node => {
+          this.node = node;
+        }}
+      >
         <Query
           query={topContributorsQuery}
           variables={{ collectiveSlug: this.props.collectiveSlug }}
@@ -290,7 +308,7 @@ class BannerIframe extends React.Component {
                     <FormattedMessage
                       id="NewContributionFlow.Join"
                       defaultMessage="Join {numberOfContributors} other fellow contributors"
-                      values={{ numberOfContributors: data.account.contributors.totalCount }}
+                      values={{ numberOfContributors: data?.account?.contributors?.totalCount ?? 0 }}
                     />
                   </H3>
                   <StyledLink openInNewTab href={`https://opencollective.com/${this.props.collectiveSlug}`}>
@@ -325,7 +343,11 @@ class BannerIframe extends React.Component {
 
     if (data.loading) {
       return (
-        <div ref={node => (this.node = node)}>
+        <div
+          ref={node => {
+            this.node = node;
+          }}
+        >
           <FormattedMessage id="loading" defaultMessage="loading" />
         </div>
       );
@@ -334,7 +356,11 @@ class BannerIframe extends React.Component {
     const collective = data.Collective;
     if (!collective) {
       return (
-        <div ref={node => (this.node = node)}>
+        <div
+          ref={node => {
+            this.node = node;
+          }}
+        >
           <FormattedMessage id="notFound" defaultMessage="Not found" />
         </div>
       );
@@ -343,7 +369,12 @@ class BannerIframe extends React.Component {
     const { backers } = collective.stats;
 
     return (
-      <IFrameContainer linkColor={style} ref={node => (this.node = node)}>
+      <IFrameContainer
+        linkColor={style}
+        ref={node => {
+          this.node = node;
+        }}
+      >
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <title>{`${collectiveSlug} collectives`}</title>
@@ -428,9 +459,14 @@ class BannerIframe extends React.Component {
   }
 }
 
-const addCollectiveBannerIframeData = graphql(collectiveBannerIframeQuery, {
-  options({ collectiveSlug, useNewFormat }) {
-    return { context: API_V1_CONTEXT, skip: !collectiveSlug || useNewFormat };
+const addCollectiveBannerIframeData = graphql<
+  BannerIframeProps,
+  { loading?: boolean; account?: BannerAccount; Collective?: BannerAccount },
+  { collectiveSlug?: string },
+  { data?: BannerIframeProps['data'] }
+>(collectiveBannerIframeQuery, {
+  options: (props: BannerIframeProps) => {
+    return { context: API_V1_CONTEXT, skip: !props.collectiveSlug || props.useNewFormat };
   },
 });
 

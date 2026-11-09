@@ -9,10 +9,18 @@ import OpenEmailProviderButton from '../components/OpenEmailProviderButton';
 import Page from '../components/Page';
 import { P } from '../components/Text';
 
-class SignInLinkSent extends Component {
-  static async getInitialProps({ res, query = {}, router }) {
+class ResetPasswordSent extends Component<{ email?: string }> {
+  static async getInitialProps({
+    res,
+    query = {},
+    router,
+  }: {
+    res?: { statusCode?: number; setHeader?: (key: string, value: string) => void; end?: () => void };
+    query?: { email?: string | string[] };
+    router?: { push: (url: string) => void };
+  }) {
     if (query.email) {
-      return { email: query.email };
+      return { email: query.email as string };
     }
 
     if (res) {
@@ -29,11 +37,11 @@ class SignInLinkSent extends Component {
     const { email } = this.props;
     const isValidEmail = email && isEmail(email);
     return (
-      <Page title="Login Link Sent" noRobots showFooter={false}>
+      <Page noRobots showFooter={false}>
         <div className="flex flex-col items-center px-4 pt-8 pb-32 text-center sm:pt-16">
           <Image src="/static/images/sign-in-illustration.png" width={624} height={372} />
-          <P fontSize="32px" lineHeight="40px" fontWeight={700} color="black.900">
-            <FormattedMessage id="SignIn.LinkSent" defaultMessage="Your magic link is on its way!" />
+          <P fontSize="32px" lineHeight="40px" color="black.900" fontWeight={700}>
+            <FormattedMessage defaultMessage="Your reset password email is on its way." id="tSQ2Fc" />
           </P>
           {isValidEmail && (
             <P fontSize="20px" lineHeight="28px" color="black.800" fontWeight={500} mt={4}>
@@ -45,12 +53,7 @@ class SignInLinkSent extends Component {
             </P>
           )}
           <OpenEmailProviderButton email={email}>{button => <Box mt={3}>{button}</Box>}</OpenEmailProviderButton>
-          <P color="black.800" fontSize="16px" fontWeight={500} lineHeight="24px" my={4}>
-            <FormattedMessage
-              id="SignIn.SuccessDetails"
-              defaultMessage="You’ll be redirected from the link in the email, you can safely close this tab."
-            />
-            <br />
+          <P fontSize="16px" lineHeight="24px" color="black.800" fontWeight={500} my={4}>
             <FormattedMessage
               id="signinLinkSent."
               defaultMessage="<Link>Learn more</Link> about our login system."
@@ -70,4 +73,4 @@ class SignInLinkSent extends Component {
 
 // next.js export
 // ts-unused-exports:disable-next-line
-export default SignInLinkSent;
+export default ResetPasswordSent;

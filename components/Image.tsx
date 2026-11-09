@@ -19,16 +19,25 @@ if (process.env.NEXT_IMAGES_URL) {
   };
 }
 
+type Props = Omit<ImageProps, 'alt'> & {
+  /**
+   * Optional for legacy decorative illustrations that used to render without an `alt` attribute.
+   * New usages should pass `alt=""` for decorative images, or a meaningful description otherwise.
+   */
+  alt?: string;
+};
+
 /**
  * We delegate static images loading to Vercel, as it has static images optimizations
  * that would be difficult to match with Heroku (at the time of writing, the default loader
  * uses Squoosh, which is a pure-JS solution up to 25x slower than Sharp)
  */
-const Image = ({ ...props }: ImageProps) => {
+const Image = ({ alt, ...props }: Props) => {
   return (
     <NextImage
       loader={loader}
       {...props}
+      alt={alt as string}
       style={{
         maxWidth: '100%',
         height: 'auto',

@@ -10,7 +10,13 @@ import { P } from '../components/Text';
 import { Button } from '../components/ui/Button';
 import { withUser } from '../components/UserProvider';
 
-const ResetPasswordCompleted = ({ LoggedInUser, loadingLoggedInUser }) => {
+const ResetPasswordCompleted = ({
+  LoggedInUser,
+  loadingLoggedInUser,
+}: {
+  LoggedInUser?: unknown;
+  loadingLoggedInUser?: boolean;
+}) => {
   return (
     <Page noRobots showFooter={false}>
       <div

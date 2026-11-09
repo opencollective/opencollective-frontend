@@ -36,7 +36,7 @@ const createProjectPageParentAccountQuery = gql`
 
 const CreateProjectPage = ({ loadingLoggedInUser, LoggedInUser }) => {
   const router = useRouter();
-  const slug = router.query.parentCollectiveSlug;
+  const slug = [router.query.parentCollectiveSlug].flat()[0];
   const skipQuery = !LoggedInUser;
   const { loading, error, data } = useQuery(createProjectPageParentAccountQuery, {
     skip: skipQuery,

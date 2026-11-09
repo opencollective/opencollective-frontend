@@ -13,7 +13,7 @@ export default function Custom404() {
   return (
     <Page data-cy="error-page">
       <Container py={[5, 6]}>
-        <NotFound searchTerm={router.query?.slug} />
+        <NotFound searchTerm={[router.query?.slug].flat()[0]} />
       </Container>
     </Page>
   );
