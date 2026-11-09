@@ -9,7 +9,7 @@ import LinkCollective from '../LinkCollective';
 import StyledLink from '../StyledLink';
 import { Span } from '../Text';
 
-import { ACTIVITIES_INFO, getActivityColors } from './activity-helpers';
+import { ACTIVITIES_INFO, getActivityColors, getActivityMessage } from './activity-helpers';
 
 const ActivityParagraph = styled(Container)<{ activityColor?: string }>`
   padding: 10px 12px;
@@ -28,7 +28,7 @@ const ThreadActivity = ({ activity }) => {
   const intl = useIntl();
   const theme = useTheme();
   const activityColors = getActivityColors(activity.type, theme);
-  const message = ACTIVITIES_INFO[activity.type]?.message;
+  const message = getActivityMessage(activity);
   const details =
     ACTIVITIES_INFO[activity.type]?.renderDetails?.(activity.data) ||
     activity.data?.message ||
