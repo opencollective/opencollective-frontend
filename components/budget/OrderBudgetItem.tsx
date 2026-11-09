@@ -3,6 +3,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { GQLV2_PAYMENT_METHOD_LEGACY_TYPES } from '../../lib/constants/payment-methods';
+import { PaymentMethodService } from '../../lib/graphql/types/v2/graphql';
 import { i18nPaymentMethodProviderType } from '../../lib/i18n/payment-method-provider-type';
 import { i18nPaymentMethodType } from '../../lib/i18n/payment-method-type';
 import { toPx } from '../../lib/theme/helpers';
@@ -20,6 +21,7 @@ import LoadingPlaceholder from '../LoadingPlaceholder';
 import { OrderAdminAccountingCategoryPill } from '../orders/OrderAccountingCategoryPill';
 import OrderStatusTag from '../orders/OrderStatusTag';
 import ProcessOrderButtons from '../orders/ProcessOrderButtons';
+import { PaymentMethodLabel } from '../PaymentMethodLabel';
 import StyledLink from '../StyledLink';
 import StyledTag from '../StyledTag';
 import StyledTooltip from '../StyledTooltip';
@@ -194,15 +196,19 @@ const OrderBudgetItem = ({
               <LoadingPlaceholder height={16} />
             ) : (
               <Span fontSize="11px" lineHeight="16px" color="black.700">
-                {order.paymentMethod?.type
-                  ? i18nPaymentMethodType(intl, order.paymentMethod.type)
-                  : i18nPaymentMethodProviderType(
-                      intl,
-                      // TODO(paymentMethodType): migrate to service+type
-                      order.paymentMethod?.providerType ||
-                        order.pendingContributionData?.paymentMethod ||
-                        GQLV2_PAYMENT_METHOD_LEGACY_TYPES.BANK_TRANSFER,
-                    )}
+                {order.paymentMethod?.service === PaymentMethodService.PAYPAL ? (
+                  <PaymentMethodLabel service={order.paymentMethod.service} type={order.paymentMethod.type} />
+                ) : order.paymentMethod?.type ? (
+                  i18nPaymentMethodType(intl, order.paymentMethod.type)
+                ) : (
+                  i18nPaymentMethodProviderType(
+                    intl,
+                    // TODO(paymentMethodType): migrate to service+type
+                    order.paymentMethod?.providerType ||
+                      order.pendingContributionData?.paymentMethod ||
+                      GQLV2_PAYMENT_METHOD_LEGACY_TYPES.BANK_TRANSFER,
+                  )
+                )}
               </Span>
             )}
           </Flex>
