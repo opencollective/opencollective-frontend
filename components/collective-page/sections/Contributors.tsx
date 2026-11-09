@@ -40,7 +40,7 @@ type Contributor = {
 };
 
 type SectionContributorsProps = {
-  collective?: { id: number; name: string; type: string; currency?: string };
+  collective?: { id: number; slug?: string; name: string; type: string; currency?: string };
   stats: { backers?: { all?: number } };
   coreContributors?: Contributor[];
   financialContributors?: Contributor[];
