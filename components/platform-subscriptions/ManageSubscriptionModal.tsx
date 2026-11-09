@@ -409,7 +409,7 @@ export function PlatformSubscriptionTierCard(props: PlatformSubscriptionTierCard
         <FormattedMessage {...tagLineMessage} />
       </div>
 
-      <div className="mt-2 mb-6 flex justify-center text-center text-sm text-muted-foreground">
+      <div className="mt-2 mb-6 flex min-h-[3lh] justify-center text-center text-sm text-muted-foreground">
         <FormattedMessage {...descriptionMessage} />
       </div>
       {props.children}

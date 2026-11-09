@@ -62,7 +62,7 @@ export const PlatformSubscriptionTierDescription = defineMessages<(typeof Platfo
     id: 's5kZlm',
   },
   Pro: {
-    defaultMessage: 'Increase legal compliance and accounting reconciliation with our most advanced features',
+    defaultMessage: 'Increase legal compliance and accounting reconciliation with our most advanced features.',
     id: 'PjbVJ8',
   },
 });
