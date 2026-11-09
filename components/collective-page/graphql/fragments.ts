@@ -1,4 +1,4 @@
-import { gqlV1 } from '../../../lib/graphql/helpers';
+import { gql, gqlV1 } from '../../../lib/graphql/helpers';
 
 /**
  * Fields fetched for contributors
@@ -29,7 +29,7 @@ export const contributorsFieldsFragment = gqlV1 /* GraphQL */ `
 /**
  * Fields fetched for all possible collective page features
  */
-export const collectiveNavbarFieldsFragment = gqlV1 /* GraphQL */ `
+export const collectiveNavbarFieldsFragment = gql /* GraphQL */ `
   fragment NavbarFieldsV1 on CollectiveFeatures {
     id
     ABOUT

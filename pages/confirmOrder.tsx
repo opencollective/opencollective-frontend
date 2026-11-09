@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash-es';
 import { withRouter } from 'next/router';
@@ -15,23 +14,33 @@ import MessageBox from '../components/MessageBox';
 import { Button } from '../components/ui/Button';
 import { withUser } from '../components/UserProvider';
 
-class ConfirmOrderPage extends React.Component {
+type ConfirmOrderPageProps = {
+  id: number;
+  confirmOrder?: (options: unknown) => Promise<{
+    data?: {
+      confirmOrder?: {
+        stripeError?: unknown;
+        order?: { fromAccount?: { slug?: string } };
+        [key: string]: unknown;
+      };
+    };
+  }>;
+  loadingLoggedInUser?: boolean;
+  LoggedInUser?: Record<string, unknown>;
+  router: import('next/router').NextRouter;
+};
+
+type ConfirmOrderPageState = {
+  status: number | string;
+  isRequestSent: boolean;
+  error: unknown;
+  showDashboardLinkForOrder: unknown;
+};
+
+class ConfirmOrderPage extends React.Component<ConfirmOrderPageProps, ConfirmOrderPageState> {
   static getInitialProps({ query }) {
     return { id: parseInt(query.id) };
   }
-
-  static propTypes = {
-    /** OrderId */
-    id: PropTypes.number.isRequired,
-    /** @ignore from graphql */
-    confirmOrder: PropTypes.func.isRequired,
-    /** @ignore from withUser */
-    loadingLoggedInUser: PropTypes.bool.isRequired,
-    /** @ignore from withUser */
-    LoggedInUser: PropTypes.object,
-    /** @ignore from withRouter */
-    router: PropTypes.object,
-  };
 
   state = {
     status: ConfirmOrderPage.SUBMITTING,
@@ -61,7 +70,7 @@ class ConfirmOrderPage extends React.Component {
       const res = await this.props.confirmOrder({ variables: { order: { legacyId: this.props.id } } });
       const orderConfirmed = res.data.confirmOrder;
       if (orderConfirmed.stripeError) {
-        this.handleStripeError(orderConfirmed);
+        this.handleStripeError(orderConfirmed as never);
       } else {
         this.props.router.replace(
           `/dashboard/${orderConfirmed.order.fromAccount.slug}/payment-methods?successType=payment`,
@@ -81,7 +90,6 @@ class ConfirmOrderPage extends React.Component {
     if (response.paymentIntent) {
       const stripe = await getStripe(null, account);
       const result = await stripe.handleCardAction(response.paymentIntent.client_secret);
-      result.error = 'An error occurred while processing your payment. Please try again.';
       if (result.error) {
         this.setState({
           status: ConfirmOrderPage.ERROR,
@@ -157,7 +165,12 @@ const confirmOrderPageMutation = gql`
   }
 `;
 
-const addConfirmOrderMutation = graphql(confirmOrderPageMutation, {
+const addConfirmOrderMutation = graphql<
+  Omit<ConfirmOrderPageProps, 'router'>,
+  { confirmOrder?: ConfirmOrderPageProps['confirmOrder'] extends (...args: never[]) => Promise<infer T> ? T : never },
+  Record<string, unknown>,
+  { confirmOrder?: ConfirmOrderPageProps['confirmOrder'] }
+>(confirmOrderPageMutation, {
   name: 'confirmOrder',
 });
 

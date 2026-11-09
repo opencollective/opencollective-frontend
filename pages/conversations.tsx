@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { get } from 'lodash-es';
 import { withRouter } from 'next/router';
@@ -33,39 +32,28 @@ import { withUser } from '../components/UserProvider';
  * The main page to display collectives. Wrap route parameters and GraphQL query
  * to render `components/collective-page` with everything needed.
  */
-class ConversationsPage extends React.Component {
+type ConversationsPageProps = {
+  collectiveSlug: string;
+  tag?: string;
+  data?: {
+    loading?: boolean;
+    error?: unknown;
+    account?: {
+      name?: string;
+      type?: string;
+      canContact?: boolean;
+      conversations?: { nodes?: Array<Record<string, unknown>> };
+      conversationsTags?: Array<{ tag: string }>;
+      settings?: { collectivePage?: { primaryColor?: string } };
+    };
+  };
+  router: import('next/router').NextRouter;
+};
+
+class ConversationsPage extends React.Component<ConversationsPageProps> {
   static getInitialProps({ query: { collectiveSlug, tag } }) {
     return { collectiveSlug, tag };
   }
-
-  static propTypes = {
-    /** @ignore from getInitialProps */
-    collectiveSlug: PropTypes.string.isRequired,
-    /** @ignore from getInitialProps */
-    tag: PropTypes.string,
-    /** @ignore from apollo */
-    data: PropTypes.shape({
-      loading: PropTypes.bool,
-      error: PropTypes.any,
-      account: PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        description: PropTypes.string,
-        type: PropTypes.string.isRequired,
-        twitterHandle: PropTypes.string,
-        imageUrl: PropTypes.string,
-        canContact: PropTypes.bool,
-        conversations: PropTypes.shape({
-          nodes: PropTypes.arrayOf(PropTypes.object),
-        }).isRequired,
-        conversationsTags: PropTypes.arrayOf(
-          PropTypes.shape({
-            tag: PropTypes.string.isRequired,
-          }),
-        ).isRequired,
-      }),
-    }).isRequired, // from withData
-    router: PropTypes.object,
-  };
 
   getPageMetaData(collective) {
     const baseMetadata = getCollectivePageMetadata(collective);
@@ -249,7 +237,16 @@ const conversationsPageQuery = gql`
   ${collectiveNavbarFieldsFragment}
 `;
 
-const addConversationsPageData = graphql(conversationsPageQuery, {
+const addConversationsPageData = graphql<
+  ConversationsPageProps,
+  {
+    loading?: boolean;
+    error?: unknown;
+    account?: ConversationsPageProps['data']['account'];
+  },
+  { collectiveSlug?: string; tag?: string },
+  { data?: ConversationsPageProps['data'] }
+>(conversationsPageQuery, {
   options: {
     // Because this list is updated often, using this option ensures that the list gets
     // properly updated when doing things like redirecting after a conversation delete.

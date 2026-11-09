@@ -1,10 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql } from '@apollo/client/react/hoc';
 import { ShareAlt } from '@styled-icons/boxicons-regular/ShareAlt';
 import copy from 'copy-to-clipboard';
 import { differenceWith, isNil, pickBy, toLower, truncate, uniqBy } from 'lodash-es';
 import { withRouter } from 'next/router';
+import type { MessageDescriptor } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import styled, { css } from 'styled-components';
 import { padding } from 'styled-system';
@@ -87,7 +87,7 @@ const SearchFormContainer = styled(Box)`
   min-width: 6.25rem;
 `;
 
-const FilterLabel = styled.label`
+const FilterLabel = styled.label<{ pb?: number; textTransform?: 'capitalize' | 'lowercase' | 'uppercase' | 'none' }>`
   font-weight: 500;
   font-size: 12px;
   line-height: 16px;
@@ -114,7 +114,7 @@ const constructSortByQuery = sortByValue => {
   return query;
 };
 
-const FilterButton = styled(StyledButton).attrs({
+const FilterButton = styled(StyledButton).attrs<{ $isSelected?: boolean }>({
   buttonSize: 'tiny',
   buttonStyle: 'standard',
 })`
@@ -155,7 +155,34 @@ const getDefaultSortBy = ({ sortBy, term, isHost }) => {
   }
 };
 
-class SearchPage extends React.Component {
+type SearchPageProps = {
+  term?: string;
+  country?: string[] | null;
+  sortBy?: string;
+  tag?: string[];
+  limit?: number;
+  offset?: number;
+  router: import('next/router').NextRouter;
+  data?: {
+    error?: unknown;
+    loading?: boolean;
+    accounts?: {
+      limit?: number;
+      offset?: number;
+      totalCount?: number;
+      nodes?: Array<{ id?: string; slug?: string; [key: string]: unknown }>;
+    };
+    tagStats?: { nodes?: Array<{ tag: string }> };
+  };
+  intl: import('react-intl').IntlShape;
+  isHost?: boolean;
+  type: string[];
+  onlyOpenToApplications?: boolean;
+};
+
+type SearchPageState = { filter: string; term: string };
+
+class SearchPage extends React.Component<SearchPageProps, SearchPageState> {
   static getInitialProps({ query }) {
     const isHost = isNil(query.isHost) ? undefined : parseToBoolean(query.isHost);
     return {
@@ -170,21 +197,6 @@ class SearchPage extends React.Component {
       offset: Number(query.offset) || 0,
     };
   }
-
-  static propTypes = {
-    term: PropTypes.string, // for addSearchQueryData
-    country: PropTypes.arrayOf(PropTypes.string), // for addSearchQueryData
-    sortBy: PropTypes.string, // for addSearchQueryData
-    tag: PropTypes.array, // for addSearchQueryData
-    limit: PropTypes.number, // for addSearchQueryData
-    offset: PropTypes.number, // for addSearchQueryData
-    router: PropTypes.object, // from next.js
-    data: PropTypes.object.isRequired, // from withData
-    intl: PropTypes.object,
-    isHost: PropTypes.bool,
-    type: PropTypes.array,
-    onlyOpenToApplications: PropTypes.bool,
-  };
 
   constructor(props) {
     super(props);
@@ -207,16 +219,24 @@ class SearchPage extends React.Component {
 
   changeCountry = country => {
     const { router, term } = this.props;
-    const query = { q: term, type: router.query.type, sortBy: router.query.sortBy, tag: router.query.tag };
+    const query: Record<string, unknown> = {
+      q: term,
+      type: router.query.type,
+      sortBy: router.query.sortBy,
+      tag: router.query.tag,
+    };
     if (country !== 'ALL') {
       query.country = [country];
     }
-    router.push({ pathname: router.pathname, query: pickBy(query, value => !isNil(value)) });
+    router.push({
+      pathname: router.pathname,
+      query: pickBy(query, value => !isNil(value)) as Record<string, string | string[] | number | boolean>,
+    });
   };
 
   changeSort = sortBy => {
     const { router, term } = this.props;
-    const query = {
+    const query: Record<string, unknown> = {
       q: term,
       type: router.query.type,
       isHost: router.query.isHost,
@@ -224,12 +244,15 @@ class SearchPage extends React.Component {
       tag: router.query.tag,
       sortBy: sortBy.value,
     };
-    router.push({ pathname: router.pathname, query: pickBy(query, value => !isNil(value)) });
+    router.push({
+      pathname: router.pathname,
+      query: pickBy(query, value => !isNil(value)) as Record<string, string | string[] | number | boolean>,
+    });
   };
 
   changeTags = tag => {
     const { router, term } = this.props;
-    let tags = router.query.tag?.split(',');
+    let tags = (router.query.tag as string)?.split(',');
     if (!tags || router.query.tag?.length === 0) {
       tags = [tag];
     } else if (tags.includes(tag)) {
@@ -238,11 +261,19 @@ class SearchPage extends React.Component {
       tags.push(tag);
     }
 
-    const query = { q: term, type: router.query.type, country: router.query.country, sortBy: router.query.sortBy };
+    const query: Record<string, unknown> = {
+      q: term,
+      type: router.query.type,
+      country: router.query.country,
+      sortBy: router.query.sortBy,
+    };
     if (tags.length > 0) {
       query.tag = tags.join();
     }
-    router.push({ pathname: router.pathname, query: pickBy(query, value => !isNil(value)) });
+    router.push({
+      pathname: router.pathname,
+      query: pickBy(query, value => !isNil(value)) as Record<string, string | string[] | number | boolean>,
+    });
   };
 
   refetch = event => {
@@ -258,7 +289,10 @@ class SearchPage extends React.Component {
       country: router.query.country,
       sortBy: q.value === '' && router.query.sortBy === 'RANK' ? 'ACTIVITY' : router.query.sortBy,
     };
-    router.push({ pathname: router.pathname, query: pickBy(query, value => !isNil(value)) });
+    router.push({
+      pathname: router.pathname,
+      query: pickBy(query, value => !isNil(value)) as Record<string, string | string[] | number | boolean>,
+    });
   };
 
   handleClearFilter = () => {
@@ -290,7 +324,10 @@ class SearchPage extends React.Component {
 
     query.sortBy = router.query.sortBy;
 
-    router.push({ pathname: '/search', query: pickBy(query, value => !isNil(value)) });
+    router.push({
+      pathname: '/search',
+      query: pickBy(query, value => !isNil(value)) as Record<string, string | string[] | number | boolean>,
+    });
   };
 
   handleCopy = async () => {
@@ -317,7 +354,7 @@ class SearchPage extends React.Component {
 
     const { limit = 20, offset, totalCount = 0 } = accounts || {};
     const showTagFilterSection = (accounts?.nodes?.length > 0 || tags.length > 0) && tagStats?.nodes?.length > 0;
-    const getSortOption = value => ({ label: i18nSearchSortingOptions(intl, value), value });
+    const getSortOption = value => ({ label: i18nSearchSortingOptions(intl, value as 'user' | 'community'), value });
     const sortOptions = [
       this.props.isHost ? getSortOption('HOST_RANK') : undefined,
       getSortOption('ACTIVITY'),
@@ -341,7 +378,7 @@ class SearchPage extends React.Component {
           backgroundPosition="center top"
           backgroundSize="cover"
           backgroundRepeat="no-repeat"
-          height={['136px', '230px']}
+          height={['136px', '230px'] as never}
           data-cy="search-banner"
           alignItems="center"
           display="flex"
@@ -374,7 +411,7 @@ class SearchPage extends React.Component {
             <Hide xs sm>
               <StyledFilters
                 filters={Object.keys(FILTERS)}
-                getLabel={key => intl.formatMessage(I18nFilters[key], { count: 10 })}
+                getLabel={key => intl.formatMessage(I18nFilters[key] as MessageDescriptor, { count: 10 })}
                 selected={selectedTypeFilter}
                 minButtonWidth="95px"
                 onChange={filter => {
@@ -460,7 +497,7 @@ class SearchPage extends React.Component {
                     tagStats?.nodes.map(node => node.tag),
                     toLower,
                   )
-                    ?.filter(tag => !IGNORED_TAGS.includes(tag))
+                    ?.filter(tag => !IGNORED_TAGS.includes(tag as 'user' | 'community'))
                     .map(tag => (
                       <FilterButton
                         as={StyledTag}
@@ -503,7 +540,7 @@ class SearchPage extends React.Component {
                 : accounts?.nodes?.map(collective => (
                     <Box key={collective.slug} my={3} mx={2}>
                       <CollectiveCardContainer key={collective.id}>
-                        <SearchCollectiveCard collective={collective} />
+                        <SearchCollectiveCard collective={collective as never} />
                       </CollectiveCardContainer>
                     </Box>
                   ))}
@@ -586,7 +623,7 @@ class SearchPage extends React.Component {
           )}
           {accounts?.nodes?.length !== 0 && (
             <Flex py={3} width={1} justifyContent="center" flexDirection="column" alignItems="center">
-              <P pt={3} pb={3} borderTop="1px solid #E6E6E6">
+              <P pt={3} pb={3}>
                 <em>
                   <FormattedMessage
                     defaultMessage="Can't find what you're looking for? Check our <Link>Docs & Help!</Link>"
@@ -710,8 +747,18 @@ const searchPageQuery = gql`
   }
 `;
 
-const addSearchPageData = graphql(searchPageQuery, {
-  options: props => ({
+const addSearchPageData = graphql<
+  SearchPageProps,
+  {
+    accounts?: SearchPageProps['data']['accounts'];
+    tagStats?: { nodes?: Array<{ tag: string }> };
+    loading?: boolean;
+    error?: unknown;
+  },
+  Record<string, unknown>,
+  { data?: SearchPageProps['data'] }
+>(searchPageQuery, {
+  options: (props: SearchPageProps) => ({
     variables: {
       term: props.term,
       type: props.type,

@@ -23,8 +23,8 @@ module.exports = {
         'lib/graphql/v1/fragments.ts',
         'lib/graphql/v1/mutations.ts',
         'lib/graphql/v1/queries.ts',
-        'pages/contribute.js',
-        'pages/updatePaymentMethod.js',
+        'pages/contribute.tsx',
+        'pages/updatePaymentMethod.tsx',
         // The following documents use gql and gqlV1 at the same time, gqlV1 will not be linted
         // grep -rl " = gqlV1" ./components ./lib ./pages | xargs grep -rl "gql\`" | sort
         // No file anymore and it should stay like that!

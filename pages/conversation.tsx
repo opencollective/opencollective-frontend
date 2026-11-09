@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { graphql, withApollo } from '@apollo/client/react/hoc';
 import { cloneDeep, get, isEmpty, uniqBy, update } from 'lodash-es';
 import { withRouter } from 'next/router';
@@ -13,7 +12,6 @@ import { stripHTML } from '../lib/html';
 
 import CollectiveNavbar from '../components/collective-navbar';
 import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
-import { Sections } from '../components/collective-page/_constants';
 import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
 import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
 import Container from '../components/Container';
@@ -122,66 +120,35 @@ const editConversationMutation = gql`
  * The main page to display collectives. Wrap route parameters and GraphQL query
  * to render `components/collective-page` with everything needed.
  */
-class ConversationPage extends React.Component {
+type ConversationPageProps = {
+  collectiveSlug: string;
+  id: string;
+  router: import('next/router').NextRouter;
+  client?: import('@apollo/client').ApolloClient<unknown>;
+  LoggedInUser?: {
+    canEditComment?: (comment: unknown) => boolean;
+    isAdminOfCollective?: (account: unknown) => boolean;
+  };
+  data?: {
+    loading?: boolean;
+    error?: unknown;
+    refetch?: (...args: unknown[]) => unknown;
+    fetchMore?: (options: unknown) => Promise<unknown>;
+    account?: Record<string, unknown>;
+    conversation?: {
+      body?: Record<string, unknown>;
+      comments?: { nodes?: Array<Record<string, unknown>>; totalCount?: number };
+      followers?: { nodes?: unknown[]; totalCount?: number };
+      tags?: string[];
+      [key: string]: unknown;
+    };
+  };
+};
+
+class ConversationPage extends React.Component<ConversationPageProps, { replyingToComment?: unknown }> {
   static getInitialProps({ query: { collectiveSlug, id } }) {
     return { collectiveSlug, id };
   }
-
-  static propTypes = {
-    /** @ignore from getInitialProps */
-    collectiveSlug: PropTypes.string.isRequired,
-    /** @ignore from getInitialProps */
-    id: PropTypes.string.isRequired,
-    /** @ignore from withApollo */
-    client: PropTypes.object.isRequired,
-    /** @ignore from withUser */
-    LoggedInUser: PropTypes.object,
-    /** @ignore from apollo */
-    data: PropTypes.shape({
-      loading: PropTypes.bool,
-      error: PropTypes.any,
-      refetch: PropTypes.func,
-      fetchMore: PropTypes.func,
-      account: PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        description: PropTypes.string,
-        type: PropTypes.string.isRequired,
-        twitterHandle: PropTypes.string,
-        imageUrl: PropTypes.string,
-        conversationsTags: PropTypes.arrayOf(
-          PropTypes.shape({
-            id: PropTypes.string,
-            tag: PropTypes.string,
-          }),
-        ),
-      }),
-      conversation: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        title: PropTypes.string.isRequired,
-        slug: PropTypes.string.isRequired,
-        tags: PropTypes.arrayOf(PropTypes.string),
-        body: PropTypes.shape({
-          id: PropTypes.string,
-        }),
-        comments: PropTypes.shape({
-          nodes: PropTypes.arrayOf(
-            PropTypes.shape({
-              id: PropTypes.string,
-            }),
-          ),
-        }),
-        followers: PropTypes.shape({
-          totalCount: PropTypes.number,
-          nodes: PropTypes.arrayOf(
-            PropTypes.shape({
-              id: PropTypes.string,
-            }),
-          ),
-        }),
-      }),
-    }).isRequired, // from withData
-    router: PropTypes.object,
-  };
 
   constructor(props) {
     super(props);
@@ -205,11 +172,15 @@ class ConversationPage extends React.Component {
     }
   }
 
-  clonePageQueryCacheData() {
+  clonePageQueryCacheData(): [
+    Record<string, unknown>,
+    typeof conversationPageQuery,
+    { collectiveSlug: string; id: string },
+  ] {
     const { client, id, collectiveSlug } = this.props;
     const query = conversationPageQuery;
     const variables = { collectiveSlug, id };
-    const data = cloneDeep(client.readQuery({ query, variables }));
+    const data = cloneDeep(client.readQuery({ query, variables })) as Record<string, unknown>;
     return [data, query, variables];
   }
 
@@ -253,7 +224,7 @@ class ConversationPage extends React.Component {
       // Remove user
       update(data, followersCountPath, count => count - 1);
       update(data, followersPath, followers => followers.filter(c => c.id !== account.id));
-    } else if (get(data, followersPath, []).findIndex(c => c.id === account.id) === -1) {
+    } else if ((get(data, followersPath, []) as Array<{ id?: string }>).findIndex(c => c.id === account.id) === -1) {
       // Add user (if not already there)
       update(data, followersCountPath, count => count + 1);
       update(data, followersPath, followers => {
@@ -302,7 +273,7 @@ class ConversationPage extends React.Component {
 
         const newValues = {};
 
-        newValues.conversation = {
+        (newValues as Record<string, unknown>).conversation = {
           ...prev.conversation,
           comments: {
             ...fetchMoreResult.conversation.comments,
@@ -332,9 +303,9 @@ class ConversationPage extends React.Component {
     const conversation = data && data.conversation;
     const body = conversation && conversation.body;
     const conversationReactions = get(conversation, 'body.reactions', []);
-    const comments = get(conversation, 'comments.nodes', []);
-    const totalCommentsCount = get(conversation, 'comments.totalCount', 0);
-    const followers = get(conversation, 'followers');
+    const comments = get(conversation, 'comments.nodes', []) as Array<Record<string, unknown>>;
+    const totalCommentsCount = get(conversation, 'comments.totalCount', 0) as number;
+    const followers = get(conversation, 'followers') as { nodes?: unknown[]; totalCount?: number };
     const hasFollowers = followers && followers.nodes && followers.nodes.length > 0;
     const canEdit = LoggedInUser && body && LoggedInUser.canEditComment(body);
     const canDelete = canEdit || (LoggedInUser && LoggedInUser.isAdminOfCollective(collective));
@@ -347,11 +318,7 @@ class ConversationPage extends React.Component {
         ) : (
           <CollectiveThemeProvider collective={collective}>
             <Container data-cy="conversation-page">
-              <CollectiveNavbar
-                collective={collective}
-                selected={Sections.CONVERSATIONS}
-                selectedCategory={NAVBAR_CATEGORIES.CONNECT}
-              />
+              <CollectiveNavbar collective={collective} selectedCategory={NAVBAR_CATEGORIES.CONNECT} />
               <Box maxWidth={1160} m="0 auto" px={2} py={[4, 5]}>
                 <StyledLink as={Link} color="black.600" href={`/${collectiveSlug}/conversations`}>
                   &larr; <FormattedMessage id="Conversations.GoBack" defaultMessage="Back to conversations" />
@@ -510,7 +477,19 @@ class ConversationPage extends React.Component {
   }
 }
 
-const addConversationPageQuery = graphql(conversationPageQuery, {
+const addConversationPageQuery = graphql<
+  Omit<ConversationPageProps, 'router' | 'client'>,
+  {
+    loading?: boolean;
+    error?: unknown;
+    refetch?: (...args: unknown[]) => unknown;
+    fetchMore?: (options: unknown) => Promise<unknown>;
+    account?: Record<string, unknown>;
+    conversation?: ConversationPageProps['data']['conversation'];
+  },
+  { collectiveSlug?: string; id?: string },
+  { data?: ConversationPageProps['data'] }
+>(conversationPageQuery, {
   options: {
     pollInterval: 60000, // Will refresh the data every 60s to get new comments
   },
@@ -518,4 +497,4 @@ const addConversationPageQuery = graphql(conversationPageQuery, {
 
 // next.js export
 // ts-unused-exports:disable-next-line
-export default withUser(addConversationPageQuery(withRouter(withApollo(ConversationPage))));
+export default withUser(addConversationPageQuery(withRouter(withApollo<ConversationPageProps>(ConversationPage))));
