@@ -1,12 +1,9 @@
 import React from 'react';
 import { gql } from '@apollo/client';
 import { HandCoinsIcon, MessageCircle, ReceiptIcon, ShapesIcon } from 'lucide-react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
-import {
-  PlatformSubscriptionTiers,
-  PlatformSubscriptionTierTitles,
-} from '@/components/platform-subscriptions/constants';
+import { PlatformSubscriptionTiers } from '@/components/platform-subscriptions/constants';
 import { Button } from '@/components/ui/Button';
 
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
@@ -15,7 +12,7 @@ import I18nFormatters from '../I18nFormatters';
 import Link from '../Link';
 import { PlatformSubscriptionTierCard } from '../platform-subscriptions/ManageSubscriptionModal';
 import { Card, CardContent } from '../ui/Card';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../ui/Dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 
 export const pricingPageQuery = gql`
   query PlatformSubscriptionTiers {
@@ -43,10 +40,10 @@ export const pricingPageQuery = gql`
   }
 `;
 
-function TierPricePlansDisplay({ tier, packages }) {
-  const [selectedPackage, setSelectedPackage] = React.useState(packages?.[0]);
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-  const titleMessage = PlatformSubscriptionTierTitles[tier];
+function TierPricePlansDisplay({ packages }) {
+  const intl = useIntl();
+  const [selectedPackageId, setSelectedPackageId] = React.useState<string>();
+  const selectedPackage = packages?.find(pkg => pkg.id === selectedPackageId) ?? packages?.[0];
 
   return (
     <div>
@@ -133,107 +130,30 @@ function TierPricePlansDisplay({ tier, packages }) {
           </div>
         </div>
 
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline" className="mt-4 w-full rounded-full">
-              <FormattedMessage defaultMessage="See more plans" id="M/MOBU" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-4xl" onOpenAutoFocus={e => e.preventDefault()}>
-            <DialogHeader>
-              <DialogTitle>
-                <FormattedMessage
-                  defaultMessage="{tierName} Plans"
-                  id="wW6jUC"
-                  values={{ tierName: <FormattedMessage {...titleMessage} /> }}
-                />
-              </DialogTitle>
-              <DialogDescription>
-                <FormattedMessage defaultMessage="Choose the perfect plan for your organization's needs." id="z6QtJg" />
-              </DialogDescription>
-            </DialogHeader>
-            <div className="">
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="border-b border-border text-sm">
-                      <th className="px-4 py-3 text-left font-medium text-foreground">
-                        <FormattedMessage defaultMessage="Active Collectives" id="b4gw3f" />
-                      </th>
-                      <th className="px-4 py-3 text-left font-medium text-foreground">
-                        <FormattedMessage defaultMessage="Monthly Expenses" id="PduKvv" />
-                      </th>
-                      <th className="px-4 py-3 text-left font-medium text-foreground">
-                        <FormattedMessage defaultMessage="Monthly Price" id="BYbiJx" />
-                      </th>
-                      <th className="px-4 py-3 text-center font-medium text-foreground"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {packages?.map(pkg => (
-                      <tr key={pkg.id} className="border-b border-border hover:bg-muted/50">
-                        <td className="px-4 py-3 text-foreground">{pkg.pricing.includedCollectives}</td>
-                        <td className="px-4 py-3 text-foreground">{pkg.pricing.includedExpensesPerMonth}</td>
-                        <td className="px-4 py-3 text-foreground">
-                          <FormattedMoneyAmount
-                            amount={pkg.pricing.pricePerMonth.valueInCents}
-                            currency={pkg.pricing.pricePerMonth.currency}
-                            showCurrencyCode={false}
-                          />
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <Button
-                            variant={selectedPackage.id === pkg.id ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => {
-                              setSelectedPackage(pkg);
-                              setIsDialogOpen(false);
-                            }}
-                            className="min-w-[80px]"
-                          >
-                            {selectedPackage.id === pkg.id ? (
-                              <FormattedMessage defaultMessage="Selected" id="byP6IC" />
-                            ) : (
-                              <FormattedMessage defaultMessage="Select" id="kQAf2d" />
-                            )}
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className="mt-6 rounded-lg bg-muted p-4">
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">
-                      <FormattedMessage defaultMessage="Price per additional collective" id="XiljWt" />
-                    </span>
-                    <span className="font-medium text-foreground">
-                      <FormattedMoneyAmount
-                        amount={selectedPackage?.pricing.pricePerAdditionalCollective.valueInCents}
-                        currency={selectedPackage?.pricing.pricePerAdditionalCollective.currency}
-                        showCurrencyCode={false}
-                      />
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">
-                      <FormattedMessage defaultMessage="Price per additional expense" id="C5odKt" />
-                    </span>
-                    <span className="font-medium text-foreground">
-                      <FormattedMoneyAmount
-                        amount={selectedPackage?.pricing.pricePerAdditionalExpense.valueInCents}
-                        currency={selectedPackage?.pricing.pricePerAdditionalExpense.currency}
-                        showCurrencyCode={false}
-                      />
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+        {packages?.length > 1 && (
+          <Select value={selectedPackage?.id} onValueChange={setSelectedPackageId}>
+            <SelectTrigger
+              className="mt-4 w-full bg-white text-left text-sm [&>span]:line-clamp-1"
+              aria-label={intl.formatMessage({ defaultMessage: 'Select a plan', id: 'Pricing-SelectPlan' })}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {packages.map(pkg => (
+                <SelectItem key={pkg.id} value={pkg.id}>
+                  <FormattedMessage
+                    defaultMessage="{collectives, plural, one {# Active Collective} other {# Active Collectives}} / {expenses} Expenses per month"
+                    id="Pricing-PackageOption"
+                    values={{
+                      collectives: pkg.pricing.includedCollectives,
+                      expenses: pkg.pricing.includedExpensesPerMonth,
+                    }}
+                  />
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
     </div>
   );
@@ -279,7 +199,6 @@ export default function Pricing({ data }) {
               <CardContent>
                 <PlatformSubscriptionTierCard key={tier} tier={tier}>
                   <TierPricePlansDisplay
-                    tier={tier}
                     packages={data?.platformSubscriptionTiers.filter(plan => plan.type === tier)}
                   />
                 </PlatformSubscriptionTierCard>
