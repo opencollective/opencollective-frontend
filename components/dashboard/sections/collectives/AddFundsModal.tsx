@@ -27,7 +27,10 @@ import { i18nTaxType } from '../../../../lib/i18n/taxes';
 import { require2FAForAdmins } from '../../../../lib/policies';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
-import { OrderEditStrategyPicker } from '@/components/contributions/OrderEditStrategyPicker';
+import {
+  isOrderEditStrategyConfirmationRequired,
+  OrderEditStrategyPicker,
+} from '@/components/contributions/OrderEditStrategyPicker';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { FormSectionTitle } from '@/components/ui/FormSectionTitle';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -425,13 +428,15 @@ const getInitialValues = (values): AddFundsFormValues => ({
   ...values,
 });
 
-const validate = (intl, values) => {
+const validate = (intl, values, { isEdit }) => {
+  // When editing, an acknowledgment is only needed for the strategies that require it
+  const requiresConfirmation = !isEdit || isOrderEditStrategyConfirmationRequired(values.strategy);
   const errors = requireFields(values, [
     'amount',
     'fromAccount',
     'description',
     'processedAt',
-    'add-funds-confirm-checkbox',
+    ...(requiresConfirmation ? ['add-funds-confirm-checkbox'] : []),
   ]);
   const taxErrors = validateTaxInput(intl, values.tax, { requireTaxIdNumber: false });
   if (!isEmpty(taxErrors)) {
@@ -607,7 +612,7 @@ const AddFundsModalContentWithCollective = ({
         ...initialValues,
       })}
       enableReinitialize={true}
-      validate={values => validate(intl, values)}
+      validate={values => validate(intl, values, { isEdit })}
       onSubmit={async (values, formik) => {
         if (!fundDetails.showSuccessModal) {
           const defaultInvoiceTemplate = receiptTemplateTitles.length > 0 ? receiptTemplateTitles[0].value : null;

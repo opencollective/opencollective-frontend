@@ -23,7 +23,7 @@ import StyledTooltip from '../StyledTooltip';
 import { Label, P, Span } from '../Text';
 import { useToast } from '../ui/useToast';
 
-import { OrderEditStrategyPicker } from './OrderEditStrategyPicker';
+import { isOrderEditStrategyConfirmationRequired, OrderEditStrategyPicker } from './OrderEditStrategyPicker';
 
 export const confirmContributionFieldsFragment = gql`
   fragment ConfirmContributionFields on Order {
@@ -228,8 +228,8 @@ export const ConfirmContributionForm = ({
           return;
         }
 
-        // When editing, the admin must acknowledge how the ledger gets updated
-        if (isEdit && !isEditStrategyConfirmed) {
+        // Editing in place requires the admin to acknowledge the consequences
+        if (isEdit && isOrderEditStrategyConfirmationRequired(editStrategy) && !isEditStrategyConfirmed) {
           setEditStrategyError(true);
           return;
         }
@@ -550,7 +550,10 @@ export const ConfirmContributionForm = ({
           <div className="mt-6 border-t border-slate-100 pt-4">
             <OrderEditStrategyPicker
               strategy={editStrategy}
-              onStrategyChange={setEditStrategy}
+              onStrategyChange={strategy => {
+                setEditStrategy(strategy);
+                setEditStrategyError(false);
+              }}
               isConfirmed={isEditStrategyConfirmed}
               onConfirmedChange={isConfirmed => {
                 setEditStrategyConfirmed(isConfirmed);
