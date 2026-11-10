@@ -16,6 +16,7 @@ import { DEFAULT_MINIMUM_AMOUNT, DEFAULT_PRESETS } from '../../lib/tier-utils';
 
 import { NewPlatformTipSelector } from '../contribution-flow/NewPlatformTipContainer';
 import { PlatformTipOption } from '../contribution-flow/PlatformTipContainer';
+import { getTargetTier, PendingTierChangeNotice } from '../contributions/PendingTierChangeNotice';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import { Box, Flex } from '../Grid';
 import I18nFormatters from '../I18nFormatters';
@@ -78,6 +79,14 @@ const updateOrderMutation = gql`
         id
         name
       }
+      nextChargeDate
+      pendingTierChange {
+        requestedAt
+        tier {
+          id
+          name
+        }
+      }
     }
   }
 `;
@@ -132,7 +141,7 @@ export const useUpdateOrder = ({ contribution, onSuccess }) => {
       platformTipAmount = null,
     ) => {
       try {
-        await submitUpdateOrder({
+        const result = await submitUpdateOrder({
           variables: {
             order: { id: contribution.id },
             paypalSubscriptionId,
@@ -152,9 +161,17 @@ export const useUpdateOrder = ({ contribution, onSuccess }) => {
                   },
           },
         });
+        const updatedOrder = result.data?.updateOrder;
+        const pendingTier = updatedOrder?.pendingTierChange?.tier;
         toast({
           variant: 'success',
-          message: (
+          message: pendingTier ? (
+            <FormattedMessage
+              defaultMessage="Your recurring contribution has been <strong>updated</strong>. You will move to {tierName} after your next payment at the new amount."
+              id="subscription.updatedWithPendingTier"
+              values={{ ...I18nFormatters, tierName: pendingTier.name }}
+            />
+          ) : (
             <FormattedMessage
               id="subscription.createSuccessUpdated"
               defaultMessage="Your recurring contribution has been <strong>updated</strong>."
@@ -271,12 +288,14 @@ const getContributeOptions = (intl, contribution, tiers, disableCustomContributi
 const geSelectedContributeOption = (contribution, tiersOptions) => {
   const defaultContribution =
     tiersOptions.find(option => option.isCustom) || tiersOptions.find(option => option.interval);
-  if (!contribution.tier) {
+  // An upgrade waiting for a payment is what the contributor last chose
+  const targetTier = getTargetTier(contribution);
+  if (!targetTier) {
     return defaultContribution;
   } else {
     // for some collectives if a tier has been deleted it won't have moved the contribution
     // to the custom 'null' tier so we have to check for that
-    const matchedTierOption = tiersOptions.find(option => option.id === contribution.tier.id);
+    const matchedTierOption = tiersOptions.find(option => option.id === targetTier.id);
     return !matchedTierOption ? defaultContribution : matchedTierOption;
   }
 };
@@ -312,7 +331,7 @@ export const useContributeOptions = (order, tiers, tiersLoading, disableCustomCo
       setAmountOptions(options);
 
       let option;
-      if ((selectedContributeOption.id || null) !== (order.tier?.id || null)) {
+      if ((selectedContributeOption.id || null) !== (getTargetTier(order)?.id || null)) {
         // Just pick first if tier is different than current one
         option = first(options);
       } else {
@@ -412,6 +431,11 @@ const UpdateOrderPopUp = ({ contribution, onCloseEdit }) => {
           <StyledHr width="100%" mx={2} />
         </Flex>
       </Flex>
+      <PendingTierChangeNotice
+        className="mx-4 mb-2"
+        pendingTierChange={contribution.pendingTierChange}
+        nextChargeDate={contribution.nextChargeDate}
+      />
       {tiersLoading || contributeOptionsState.loading ? (
         <LoadingPlaceholder height={100} />
       ) : (
