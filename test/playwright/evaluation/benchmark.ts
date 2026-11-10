@@ -320,9 +320,12 @@ export function summarizeBenchmark(runs: BenchmarkRun[]) {
   return { groups, paired, reliability };
 }
 
-/** Outcome of one runner invocation from its exit code and the pilot tests its report holds (null: no report). */
+/**
+ * Outcome of one runner invocation from its exit code and the pilot tests its report holds (null: no report).
+ * A run where every pilot test was skipped ran nothing in the browser, so it is not a pass.
+ */
 export function runStatus(exitCode: number, tests: TestSample[] | null): BenchmarkRun['status'] {
-  if (!tests?.length) {
+  if (!tests?.some(test => test.status !== 'skipped')) {
     return exitCode === 130 || exitCode === 143 ? 'interrupted' : 'setup-failed';
   }
   return exitCode === 0 && tests.every(test => test.status !== 'failed') ? 'passed' : 'failed';

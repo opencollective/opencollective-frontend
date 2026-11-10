@@ -260,6 +260,8 @@ describe('runStatus', () => {
     expect(runStatus(1, [passed, { ...passed, status: 'failed' }])).toBe('failed');
     // A clean exit with no pilot test is not a pass: the selection ran nothing.
     expect(runStatus(0, [])).toBe('setup-failed');
+    // Nor is a clean exit where every pilot test was skipped: the browser ran nothing.
+    expect(runStatus(0, [{ ...passed, status: 'skipped' }])).toBe('setup-failed');
   });
   it('separates interruptions from setup failures when no report was written', () => {
     expect(runStatus(1, null)).toBe('setup-failed');
