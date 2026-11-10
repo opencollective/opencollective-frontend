@@ -1781,6 +1781,9 @@ join_environment() {
       exit 2
     fi
     export_runtime_env
+    # Restarted services need the Redis the E2E environment started with.
+    REDIS_URL="${REDIS_URL:-$(jq -r '.redisUrl // empty' "$RECORD_FILE")}"
+    [[ -z "$REDIS_URL" ]] || export REDIS_URL
     build_services "${REBUILD_SERVICES[@]}"
     for svc in "${REBUILD_SERVICES[@]}"; do
       restart_service "$svc"
