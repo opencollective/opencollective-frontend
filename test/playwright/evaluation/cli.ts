@@ -25,12 +25,25 @@ const CYPRESS_PILOTS = ['27-expenses.test.ts', '41-vendor-visibility.test.ts'];
 const [command, ...rest] = process.argv.slice(2);
 const option = (name: string) => {
   const index = rest.indexOf(`--${name}`);
-  return index === -1 ? undefined : rest[index + 1];
+  if (index === -1) {
+    return undefined;
+  }
+  if (index + 1 >= rest.length) {
+    throw new Error(`--${name} requires a value`);
+  }
+  return rest[index + 1];
 };
 const required = (name: string) => {
   const value = option(name);
   if (value === undefined) {
     throw new Error(`--${name} is required`);
+  }
+  return value;
+};
+const requiredInteger = (name: string) => {
+  const value = Number(required(name));
+  if (!Number.isInteger(value)) {
+    throw new Error(`--${name} must be an integer`);
   }
   return value;
 };
@@ -84,7 +97,10 @@ function inventory() {
 }
 
 function collectRun() {
-  const runner = required('runner') as BenchmarkRun['runner'];
+  const runner = required('runner');
+  if (runner !== 'playwright' && runner !== 'cypress') {
+    throw new Error(`--runner must be playwright or cypress, got ${runner}`);
+  }
   const reportFile = required('report');
   const report = fs.existsSync(reportFile) ? JSON.parse(fs.readFileSync(reportFile, 'utf8')) : null;
   const tests = report ? (runner === 'playwright' ? playwrightTests(report) : cypressTests(report)) : null;
@@ -102,14 +118,14 @@ function collectRun() {
           const full = path.join(dir, item.name);
           return total + (item.isDirectory() ? artifactBytes(full) : fs.statSync(full).size);
         }, 0);
-  const exitCode = Number(required('exit-code'));
+  const exitCode = requiredInteger('exit-code');
   const run: BenchmarkRun = {
     batch: required('batch'),
-    pair: Number(required('pair')),
+    pair: requiredInteger('pair'),
     mode: required('mode'),
     runner,
-    position: Number(required('position')),
-    concurrency: Number(required('concurrency')),
+    position: requiredInteger('position'),
+    concurrency: requiredInteger('concurrency'),
     status: runStatus(exitCode, tests),
     phases: phasesFromTimeline(fs.readFileSync(required('log'), 'utf8'), browser),
     tests: tests ?? [],
