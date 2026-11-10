@@ -64,7 +64,7 @@ npm run dev
 To run the tests:
 
 - for pages and components use `npm test`
-- for end-to-end (e2e) tests using [Cypress](https://www.cypress.io/) see [our dedicated guide](docs/e2e.md).
+- for end-to-end (E2E) tests, see the [E2E guide](docs/e2e.md): [Run a spec](docs/e2e.md#run-a-spec) (`npm run e2e -- <spec>`, Playwright) and the existing [Cypress](https://www.cypress.io/) suite.
 
 To update:
 

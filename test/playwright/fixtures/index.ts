@@ -18,9 +18,23 @@ export { expect } from '@playwright/test';
 
 type AccountRecipe = 'account-profile' | 'account-conversation';
 
-/** Browser storage of a visitor holding this session token, or of a logged-out visitor. */
+/**
+ * Session cookies as the API sets them at sign-in (`setAuthCookie`): the token's header and payload, and its
+ * signature in an HTTP-only cookie. Requests that bypass the GraphQL client, such as protected file content
+ * through `/api/files`, authenticate with these.
+ */
+const sessionCookies = (session: string, baseURL: string) => {
+  const [header, payload, signature] = session.split('.');
+  const common = { domain: new URL(baseURL).hostname, path: '/', expires: -1, secure: true, sameSite: 'Lax' as const };
+  return [
+    { ...common, name: 'accessTokenPayload', value: `${header}.${payload}`, httpOnly: false },
+    { ...common, name: 'accessTokenSignature', value: signature, httpOnly: true },
+  ];
+};
+
+/** Browser storage of a visitor signed in with this session token, or of a logged-out visitor. */
 const storageFor = (session: string | null, baseURL: string) => ({
-  cookies: [],
+  cookies: session ? sessionCookies(session, baseURL) : [],
   origins: session
     ? [{ origin: new URL(baseURL).origin, localStorage: [{ name: LOCAL_STORAGE_KEYS.ACCESS_TOKEN, value: session }] }]
     : [],
