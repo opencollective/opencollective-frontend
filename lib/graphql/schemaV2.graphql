@@ -6002,6 +6002,7 @@ enum ActivityType {
   ORDER_DISPUTE_CLOSED
   ORDER_UPDATED
   ADDED_FUNDS_EDITED
+  ORDER_PAID_MANUALLY_EDITED
   VENDOR_CREATED
   VENDOR_EDITED
   VENDOR_DELETED
@@ -6034,7 +6035,6 @@ enum ActivityType {
   USER_CARD_INVITED
   WEBHOOK_STRIPE_RECEIVED
   WEBHOOK_PAYPAL_RECEIVED
-  COLLECTIVE_MONTHLY_REPORT
   ACTIVATED_COLLECTIVE_AS_HOST
   ACTIVATED_COLLECTIVE_AS_INDEPENDENT
   DEACTIVATED_COLLECTIVE_AS_HOST
@@ -7638,6 +7638,7 @@ type CollectiveFeatures {
   PROJECTS: CollectiveFeatureStatus
   USE_EXPENSES: CollectiveFeatureStatus
   RECEIVE_EXPENSES: CollectiveFeatureStatus
+  RECEIVE_GRANTS: CollectiveFeatureStatus
   MULTI_CURRENCY_EXPENSES: CollectiveFeatureStatus
   COLLECTIVE_GOALS: CollectiveFeatureStatus
   TOP_FINANCIAL_CONTRIBUTORS: CollectiveFeatureStatus
@@ -8017,7 +8018,6 @@ enum ActivityClassType {
   ACTIVITIES_UPDATES
   VIRTUAL_CARDS
   FUND_EVENTS
-  REPORTS
 }
 
 """
@@ -10593,6 +10593,11 @@ type OrderPermissions {
   Whether the current user can edit this pending order
   """
   canEdit: Boolean!
+
+  """
+  Whether the current user can edit this contribution after it was manually marked as paid (see `editPaidManualOrder`)
+  """
+  canEditPaidManualOrder: Boolean!
 
   """
   Whether the current user can comment on this order
@@ -23047,6 +23052,7 @@ enum ActivityAndClassesType {
   ORDER_DISPUTE_CLOSED
   ORDER_UPDATED
   ADDED_FUNDS_EDITED
+  ORDER_PAID_MANUALLY_EDITED
   VENDOR_CREATED
   VENDOR_EDITED
   VENDOR_DELETED
@@ -23079,7 +23085,6 @@ enum ActivityAndClassesType {
   USER_CARD_INVITED
   WEBHOOK_STRIPE_RECEIVED
   WEBHOOK_PAYPAL_RECEIVED
-  COLLECTIVE_MONTHLY_REPORT
   ACTIVATED_COLLECTIVE_AS_HOST
   ACTIVATED_COLLECTIVE_AS_INDEPENDENT
   DEACTIVATED_COLLECTIVE_AS_HOST
@@ -23113,7 +23118,6 @@ enum ActivityAndClassesType {
   ACTIVITIES_UPDATES
   VIRTUAL_CARDS
   FUND_EVENTS
-  REPORTS
 }
 
 """
@@ -26797,7 +26801,7 @@ type Mutation {
   ): Order!
 
   """
-  Add funds to the given account. Scope: "host".
+  Edit funds that were previously added to an account. Scope: "host".
   """
   editAddedFunds(
     """
@@ -26869,6 +26873,11 @@ type Mutation {
     The balance/clearing accounting category the funds were received through
     """
     balanceAccountingCategory: AccountingCategoryReferenceInput
+
+    """
+    How the ledger should be updated to reflect the changes
+    """
+    strategy: OrderEditStrategy! = REVERSE
   ): Order!
   createApplication(application: ApplicationCreateInput!): Application
   updateApplication(application: ApplicationUpdateInput!): Application
@@ -27798,6 +27807,21 @@ type Mutation {
     The action to take on the order
     """
     action: ProcessOrderAction!
+  ): Order!
+
+  """
+  Edit the amounts or the date of a contribution that was manually marked as paid by a host admin (bank transfer, expected funds...). Scope: "orders".
+  """
+  editPaidManualOrder(
+    """
+    The order to edit, with its new values. `transactionsImportRow` is not supported.
+    """
+    order: OrderUpdateInput!
+
+    """
+    How the ledger should be updated to reflect the changes
+    """
+    strategy: OrderEditStrategy! = REVERSE
   ): Order!
 
   """
@@ -29543,6 +29567,21 @@ input TransactionsImportRowReferenceInput {
   The id of the row (ie: tir_xxxxxxxx)
   """
   id: NonEmptyString!
+}
+
+"""
+How the ledger is updated when editing funds that were recorded manually by a host admin
+"""
+enum OrderEditStrategy {
+  """
+  Reverse the existing transactions and record new ones. The ledger keeps track of the previous values.
+  """
+  REVERSE
+
+  """
+  Replace the existing transactions with the new values, without recording a reversal. Transactions that were already exported or reconciled will not match the ledger anymore.
+  """
+  IN_PLACE
 }
 
 """

@@ -21,7 +21,12 @@ import {
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import type { ContributionDrawerQuery, ManagedOrderFieldsFragment } from '../../lib/graphql/types/v2/graphql';
-import { ActivityType, ContributionFrequency, OrderStatus } from '../../lib/graphql/types/v2/graphql';
+import {
+  ActivityType,
+  ContributionFrequency,
+  OrderEditStrategy,
+  OrderStatus,
+} from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import type LoggedInUser from '../../lib/LoggedInUser';
 import { getDashboardRoute } from '../../lib/url-helpers';
@@ -169,6 +174,7 @@ const getIcon = (type: ActivityType) => {
     case ActivityType.ORDER_PENDING_CONTRIBUTION_REMINDER:
       return <Hourglass size={16} />;
     case ActivityType.ADDED_FUNDS_EDITED:
+    case ActivityType.ORDER_PAID_MANUALLY_EDITED:
       return <Pencil size={16} />;
     default:
       return <Info size={16} />;
@@ -188,6 +194,7 @@ const getActivityStyle = (type: ActivityType) => {
     case ActivityType.ORDER_PENDING_CONTRIBUTION_REMINDER:
     case ActivityType.PAYMENT_CREDITCARD_CONFIRMATION:
     case ActivityType.ADDED_FUNDS_EDITED:
+    case ActivityType.ORDER_PAID_MANUALLY_EDITED:
       return 'warning';
     default:
       return 'info';
@@ -224,9 +231,29 @@ function ContributionTimeline(props: OrderTimelineProps) {
       ]),
     )
     .map(a => {
-      const details =
+      const diff =
         a.data?.previousData &&
         formatSimpleDiff(a.data.previousData, a.data.newData, { currency: props.order.totalAmount.currency });
+      const details = !a.data?.strategy ? (
+        diff
+      ) : (
+        <div className="flex flex-col">
+          <div className="font-medium" data-cy="order-edit-strategy-label">
+            {a.data.strategy === OrderEditStrategy.IN_PLACE ? (
+              <FormattedMessage
+                defaultMessage="Transactions edited in place (no reversal)"
+                id="OrderEditStrategy.inPlace.activity"
+              />
+            ) : (
+              <FormattedMessage
+                defaultMessage="Transactions reversed and recorded again"
+                id="OrderEditStrategy.reverse.activity"
+              />
+            )}
+          </div>
+          {diff}
+        </div>
+      );
 
       const normalizedActivity = {
         ...a,
@@ -239,7 +266,11 @@ function ContributionTimeline(props: OrderTimelineProps) {
       return {
         id: a.id,
         title: <ActivityDescription activity={normalizedActivity} />,
-        collapsable: [ActivityType.PAYMENT_FAILED, ActivityType.ADDED_FUNDS_EDITED].includes(a.type),
+        collapsable: [
+          ActivityType.PAYMENT_FAILED,
+          ActivityType.ADDED_FUNDS_EDITED,
+          ActivityType.ORDER_PAID_MANUALLY_EDITED,
+        ].includes(a.type),
         icon: getIcon(a.type),
         date: a.createdAt,
         details,

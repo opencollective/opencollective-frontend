@@ -115,6 +115,10 @@ const contributionDrawerQuery = gql`
         currency
       }
       hostFeePercent
+      paymentProcessorFee {
+        valueInCents
+        currency
+      }
       tags
       tax {
         type
@@ -179,6 +183,7 @@ const contributionDrawerQuery = gql`
         canMarkAsPaid
         canCancel
         canEdit
+        canEditPaidManualOrder
         canComment
         canSeePrivateActivities
         canSetTags

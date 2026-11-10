@@ -73,6 +73,7 @@ export const managedOrderFieldsFragment = gql`
       canMarkAsPaid
       canCancel
       canEdit
+      canEditPaidManualOrder
       canComment
       canSeePrivateActivities
       canSetTags

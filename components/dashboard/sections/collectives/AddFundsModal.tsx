@@ -21,11 +21,13 @@ import type {
   TierReferenceInput,
   TransactionReferenceInput,
 } from '../../../../lib/graphql/types/v2/graphql';
+import { OrderEditStrategy } from '../../../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../../../lib/hooks/useLoggedInUser';
 import { i18nTaxType } from '../../../../lib/i18n/taxes';
 import { require2FAForAdmins } from '../../../../lib/policies';
 import { getCollectivePageRoute } from '../../../../lib/url-helpers';
 
+import { OrderEditStrategyPicker } from '@/components/contributions/OrderEditStrategyPicker';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { FormSectionTitle } from '@/components/ui/FormSectionTitle';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -220,6 +222,7 @@ const editAddedFundsMutation = gql`
     $tax: TaxInput
     $accountingCategory: AccountingCategoryReferenceInput
     $balanceAccountingCategory: AccountingCategoryReferenceInput
+    $strategy: OrderEditStrategy
   ) {
     editAddedFunds(
       order: $order
@@ -236,6 +239,7 @@ const editAddedFundsMutation = gql`
       tax: $tax
       accountingCategory: $accountingCategory
       balanceAccountingCategory: $balanceAccountingCategory
+      strategy: $strategy
     ) {
       id
       ...AddFundsOrderFields
@@ -401,6 +405,8 @@ type AddFundsFormValues = {
   balanceAccountingCategory?: { value: string; label: string } | null;
   hasHostFee?: boolean;
   hasPaymentProcessorFee?: boolean;
+  /** Only when editing: how the ledger gets updated */
+  strategy?: OrderEditStrategy;
 };
 
 const getInitialValues = (values): AddFundsFormValues => ({
@@ -413,6 +419,7 @@ const getInitialValues = (values): AddFundsFormValues => ({
   fromAccount: null,
   tier: null,
   tax: null,
+  strategy: OrderEditStrategy.REVERSE,
   hasHostFee: !!values.hostFeePercent,
   hasPaymentProcessorFee: !!values.paymentProcessorFee,
   ...values,
@@ -622,7 +629,7 @@ const AddFundsModalContentWithCollective = ({
               balanceAccountingCategory: values.balanceAccountingCategory
                 ? { id: values.balanceAccountingCategory.value }
                 : null,
-              ...(isEdit && { order: { id: editOrderId } }),
+              ...(isEdit ? { order: { id: editOrderId }, strategy: values.strategy } : { strategy: undefined }),
             },
           });
 
@@ -1223,32 +1230,18 @@ const AddFundsModalContentWithCollective = ({
                   )}
                 </AddFundsFormSection>
 
-                <P fontSize="12px" lineHeight="18px" color="black.700" mt={2}>
-                  {isEdit ? (
-                    <Field
-                      type="checkbox"
-                      id="add-funds-confirm-checkbox"
-                      name="add-funds-confirm-checkbox"
-                      required
-                      data-cy="add-funds-confirm-checkbox"
-                    >
-                      {({ field }) => (
-                        <div className="flex items-start gap-2">
-                          <Checkbox
-                            id={field.id}
-                            checked={field.value}
-                            onCheckedChange={checked => formik.setFieldValue(field.name, checked === true)}
-                          />
-                          <label htmlFor={field.id} className="flex cursor-pointer items-start gap-2 select-none">
-                            <FormattedMessage
-                              id="AddFundsModal.editDisclaimer"
-                              defaultMessage="By clicking edit funds, you're reverting the existing related transactions (including any fees incurred by them) and creating new ones."
-                            />
-                          </label>
-                        </div>
-                      )}
-                    </Field>
-                  ) : (
+                {isEdit ? (
+                  <OrderEditStrategyPicker
+                    strategy={values.strategy}
+                    onStrategyChange={strategy => formik.setFieldValue('strategy', strategy)}
+                    isConfirmed={Boolean(values['add-funds-confirm-checkbox'])}
+                    onConfirmedChange={isConfirmed => formik.setFieldValue('add-funds-confirm-checkbox', isConfirmed)}
+                    hasConfirmationError={Boolean(formik.submitCount && formik.errors['add-funds-confirm-checkbox'])}
+                    confirmCheckboxId="add-funds-confirm-checkbox"
+                    disabled={loading}
+                  />
+                ) : (
+                  <P fontSize="12px" lineHeight="18px" color="black.700" mt={2}>
                     <Field
                       type="checkbox"
                       id="add-funds-confirm-checkbox"
@@ -1273,8 +1266,8 @@ const AddFundsModalContentWithCollective = ({
                         </div>
                       )}
                     </Field>
-                  )}
-                </P>
+                  </P>
+                )}
                 {fundError && <MessageBoxGraphqlError error={fundError} mt={3} fontSize="13px" />}
               </div>
               <div className="border-t-dark-400 flex justify-between gap-4 border-t border-solid pt-4">

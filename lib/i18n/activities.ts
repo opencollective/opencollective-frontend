@@ -647,6 +647,10 @@ export const ActivityDescriptionI18n = defineMessages({
     defaultMessage: '<Individual></Individual> edited added funds',
     id: 'nxtsKq',
   },
+  ORDER_PAID_MANUALLY_EDITED: {
+    defaultMessage: '<Individual></Individual> edited the contribution',
+    id: 'Activity.ORDER_PAID_MANUALLY_EDITED',
+  },
   ACTIVATED_HOSTING: {
     defaultMessage: 'Activated "Fiscal Hosting" on <Account></Account>',
     id: 'jBr7+k',
