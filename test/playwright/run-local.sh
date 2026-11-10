@@ -311,6 +311,22 @@ print_checkouts() {
 FRONTEND_DIR="$FRONTEND_DIR_RESOLVED"
 PG_DATABASE="$PG_DATABASE_INPUT"
 
+# Database flag for the recovery commands the launcher prints, so they target
+# the same E2E environment when it was selected with --pg-database.
+db_flag() {
+  if [[ "$PG_DATABASE" != "opencollective_pw_e2e" ]]; then
+    printf ' --pg-database %q' "$PG_DATABASE"
+  fi
+}
+
+stop_command() {
+  if [[ "$PG_DATABASE" == "opencollective_pw_e2e" ]]; then
+    printf 'npm run e2e:stop'
+  else
+    printf 'npm run e2e:stop --%s' "$(db_flag)"
+  fi
+}
+
 # --- Disposable-database guard (fail closed before changing state) ---
 guard_pg_database() {
   local name="$1"
@@ -1315,7 +1331,7 @@ ensure_dependencies() {
       owner_pid="$(record_owner_pid)"
       if registry_record_is_live; then
         fail "$svc needs npm ci ($reason), but the E2E environment '$PG_DATABASE' runs from $dir/node_modules.
-  Restart it with: npm run e2e -- --fresh <spec> (or stop it first with: npm run e2e:stop)"
+  Restart it with: npm run e2e -- --fresh$(db_flag) <spec> (or stop it first with: $(stop_command))"
         exit 2
       fi
       if [[ "$owner_pid" != "0" ]] && kill -0 "$owner_pid" 2>/dev/null; then
@@ -1724,7 +1740,7 @@ check_database_identity() {
   fi
   if [[ ${#changes[@]} -gt 0 ]]; then
     fail "the E2E environment's database was restored for another API ($(IFS=';'; echo "${changes[*]}" | sed 's/;/; /g')).
-  Iteration cannot reuse it. Restart from a restored database with: npm run e2e -- --fresh <spec>"
+  Iteration cannot reuse it. Restart from a restored database with: npm run e2e -- --fresh$(db_flag) <spec>"
     exit 2
   fi
 }
@@ -1768,7 +1784,7 @@ join_environment() {
   API_URL="$api"
   MAILPIT_URL="$(jq -r '.mailpitUrl // empty' "$RECORD_FILE")"
   if [[ ! -r "$FIXTURE_OWNER_FILE" ]]; then
-    fail "fixture ownership proof missing for the running E2E environment. Restart it with: npm run e2e -- --fresh <spec>"
+    fail "fixture ownership proof missing for the running E2E environment. Restart it with: npm run e2e -- --fresh$(db_flag) <spec>"
     exit 2
   fi
   check_database_identity
@@ -1836,7 +1852,7 @@ start_environment() {
   update_record_phase "ready"
   # From here the E2E environment outlives this run (Ctrl-C included).
   DETACH=true
-  echo "> E2E environment '$PG_DATABASE' is ready and stays running (stop it with npm run e2e:stop)."
+  echo "> E2E environment '$PG_DATABASE' is ready and stays running (stop it with $(stop_command))."
 }
 
 iterate_main() {
@@ -1897,7 +1913,7 @@ iterate_main() {
   else
     write_manifest "$pw_exit" "failed"
   fi
-  echo "> The E2E environment keeps running for the next npm run e2e. Stop it with: npm run e2e:stop"
+  echo "> The E2E environment keeps running for the next npm run e2e. Stop it with: $(stop_command)"
   exit "$pw_exit"
 }
 

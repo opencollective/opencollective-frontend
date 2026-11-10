@@ -104,7 +104,10 @@ it, for example `.worktrees/<feature>/opencollective-api` beside
   or whose `package-lock.json` changed since the last install. While an E2E
   environment is running from those `node_modules`, the run refuses to install
   instead: restart it with `--fresh` (which stops it before installing) or stop
-  it with `npm run e2e:stop`.
+  it with `npm run e2e:stop`. If the E2E environment uses another database,
+  pass the same `--pg-database <name>` to both commands
+  (`npm run e2e:stop -- --pg-database <name>`); the launcher prints them that
+  way.
 - **Build stamps:** after each successful build, the launcher writes a build
   stamp next to the build output (`.next/oc-e2e-build-stamp.json`,
   `dist/.oc-e2e-build-stamp.json`). It records the Git HEAD, a hash of
