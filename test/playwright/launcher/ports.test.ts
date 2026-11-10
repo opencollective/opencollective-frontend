@@ -2,7 +2,10 @@ import net from 'node:net';
 
 import { portOwner } from './ports';
 
-describe('portOwner', () => {
+// portOwner reads /proc, which only Linux has (the launcher is Linux-only too).
+const describeOnLinux = process.platform === 'linux' ? describe : describe.skip;
+
+describeOnLinux('portOwner', () => {
   it('names the process listening on a port', async () => {
     const server = net.createServer();
     await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
