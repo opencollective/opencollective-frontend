@@ -1309,6 +1309,20 @@ ensure_dependencies() {
     dir="$(service_dir "$svc")"
     reason="$(launcher_cli install-reason "$dir")"
     [[ -n "$reason" ]] || continue
+    # npm ci deletes node_modules, which the running services load from.
+    if [[ -f "$RECORD_FILE" ]]; then
+      local owner_pid
+      owner_pid="$(record_owner_pid)"
+      if registry_record_is_live; then
+        fail "$svc needs npm ci ($reason), but the E2E environment '$PG_DATABASE' runs from $dir/node_modules.
+  Restart it with: npm run e2e -- --fresh <spec> (or stop it first with: npm run e2e:stop)"
+        exit 2
+      fi
+      if [[ "$owner_pid" != "0" ]] && kill -0 "$owner_pid" 2>/dev/null; then
+        fail "$svc needs npm ci ($reason), but another run (pid $owner_pid) is starting the E2E environment '$PG_DATABASE' from $dir/node_modules. Retry when it is ready."
+        exit 2
+      fi
+    fi
     echo "> Installing $svc dependencies with npm ci ($reason); log: $ARTIFACTS_DIR/install-$svc.log"
     # The API postinstall restores the development database; E2E has its own.
     if ! (cd "$dir" && SKIP_POSTINSTALL=1 npm ci --no-audit --no-fund) >"$ARTIFACTS_DIR/install-$svc.log" 2>&1; then
@@ -1832,13 +1846,13 @@ iterate_main() {
   print_checkouts
   preflight_tools
   preflight_infra
-  ensure_dependencies
-  preflight_browser
-
+  # Stop before installing: npm ci must not run under live services.
   if [[ "$FRESH_REQUESTED" == true && -f "$RECORD_FILE" ]]; then
     echo "> --fresh: stopping the E2E environment '$PG_DATABASE'"
     run_cleanup
   fi
+  ensure_dependencies
+  preflight_browser
 
   compute_stamps
   if [[ -f "$RECORD_FILE" ]] && registry_record_is_live; then

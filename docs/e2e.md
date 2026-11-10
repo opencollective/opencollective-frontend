@@ -101,7 +101,10 @@ it, for example `.worktrees/<feature>/opencollective-api` beside
 ### Dependencies and builds
 
 - **Dependencies:** `npm ci` runs in a service whose `node_modules` is missing
-  or whose `package-lock.json` changed since the last install.
+  or whose `package-lock.json` changed since the last install. While an E2E
+  environment is running from those `node_modules`, the run refuses to install
+  instead: restart it with `--fresh` (which stops it before installing) or stop
+  it with `npm run e2e:stop`.
 - **Build stamps:** after each successful build, the launcher writes a build
   stamp next to the build output (`.next/oc-e2e-build-stamp.json`,
   `dist/.oc-e2e-build-stamp.json`). It records the Git HEAD, a hash of
