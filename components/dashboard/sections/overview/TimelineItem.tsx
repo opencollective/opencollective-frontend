@@ -92,7 +92,7 @@ const TimelineItem = ({ activity, openExpense }: ActivityListItemProps) => {
   const hasTimeLineMessage = Boolean(timelineMessage);
   const description = i18nMsg
     ? intl.formatMessage(i18nMsg, getActivityVariables(intl, activity, { onClickExpense: openExpense }))
-    : capitalize(activity?.type.replace('_', ' '));
+    : capitalize(activity?.type.replaceAll('_', ' '));
 
   // Pick which account to use as the avatar
   let avatar = 'individual';
