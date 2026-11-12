@@ -20,10 +20,24 @@ function contributeWithNewUsBankAccount({ name } = {}) {
     })
     .within(() => {
       cy.get('[data-testid="agree-button"]').click();
+      // Stripe may offer to sign up or log in with Link before the account picker (since 2026-11-12)
+      cy.get('[data-testid="success"], button:contains("Continue as guest")')
+        .first()
+        .then($el => {
+          if (!$el.is('[data-testid="success"]')) {
+            cy.wrap($el).click();
+          }
+        });
       cy.get('[data-testid="success"]').click(); // Bank account with name 'Success'
       cy.get('[data-testid="select-button"]').click();
-      // Stripe now offers to save the bank account with Link before the done screen
-      cy.contains('Finish without saving').click();
+      // Stripe may offer to save the bank account with Link before the done screen (not after "Continue as guest")
+      cy.get('[data-testid="done-button"], button:contains("Finish without saving")')
+        .first()
+        .then($el => {
+          if (!$el.is('[data-testid="done-button"]')) {
+            cy.wrap($el).click();
+          }
+        });
       cy.get('[data-testid="done-button"]').click();
     });
 

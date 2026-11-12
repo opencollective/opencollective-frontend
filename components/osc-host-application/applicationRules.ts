@@ -291,12 +291,16 @@ export function getUsage(repository?: EcosystemsRepositorySnapshot | null): numb
   return counts.length > 0 ? Math.max(...counts) : null;
 }
 
-/** Project age in months, from the oldest of the repository creation and the first package release */
+/** Project age in months, from the oldest of the first commit, the repository creation and the first package release */
 export function getProjectAgeInMonths(
   repository?: EcosystemsRepositorySnapshot | null,
   now: number = Date.now(),
 ): number | null {
-  const timestamps = [repository?.createdAt, ...(repository?.packages || []).map(pkg => pkg.firstReleasePublishedAt)]
+  const timestamps = [
+    repository?.firstCommitAt,
+    repository?.createdAt,
+    ...(repository?.packages || []).map(pkg => pkg.firstReleasePublishedAt),
+  ]
     .map(value => (value ? new Date(value).getTime() : NaN))
     .filter(time => !isNaN(time));
   if (timestamps.length === 0) {
