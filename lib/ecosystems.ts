@@ -56,8 +56,20 @@ type EcosystemsCommitsRepository = {
   total_bot_committers?: number;
   past_year_total_committers?: number;
   past_year_total_bot_committers?: number;
+  /** URL of the commits list for the repository, used by the API to fetch the first commit */
+  commits_url?: string | null;
   committers?: EcosystemsCommitter[] | null;
   past_year_committers?: EcosystemsCommitter[] | null;
+};
+
+type EcosystemsCommit = {
+  sha: string;
+  message?: string | null;
+  author?: string | null;
+  committer?: string | null;
+  timestamp: string;
+  merge?: boolean;
+  html_url?: string | null;
 };
 
 type EcosystemsIssuesRepository = {
@@ -80,6 +92,8 @@ export type EcosystemsRepoSummary = {
   contributors: EcosystemsCommitsRepository | null;
   issues: EcosystemsIssuesRepository | null;
   owner: EcosystemsOwner | null;
+  /** Oldest commit of the default branch, from the commits API (null when unavailable) */
+  firstCommit?: EcosystemsCommit | null;
 };
 
 /** Compact projection of a `EcosystemsRepoSummary`, stored as `applicationData.ecosystemsRepositoryInfo` */
@@ -98,6 +112,9 @@ export type EcosystemsRepositorySnapshot = {
   archived: boolean | null;
   /** Repository creation date */
   createdAt: string | null;
+  /** Date of the first commit on the default branch (may differ from the repository creation date) */
+  firstCommitAt: string | null;
+  firstCommitSha: string | null;
   /** Date of the last commit/push activity */
   lastCommitAt: string | null;
   lastCommitSha: string | null;
@@ -215,6 +232,8 @@ export function toRepositorySnapshot(
     ownerKind: entry.owner?.kind ?? null,
     archived: repository?.archived ?? null,
     createdAt: repository?.created_at ?? null,
+    firstCommitAt: entry.firstCommit?.timestamp ?? null,
+    firstCommitSha: entry.firstCommit?.sha ?? null,
     lastCommitAt: repository?.pushed_at ?? null,
     lastCommitSha: repository?.commit_stats?.last_synced_commit ?? null,
     commitStats: hasCommitStats

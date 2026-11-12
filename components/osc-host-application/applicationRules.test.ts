@@ -39,6 +39,8 @@ const repository = (overrides: Partial<EcosystemsRepositorySnapshot> = {}): Ecos
   topics: ['opencollective'],
   archived: false,
   createdAt: '2020-01-01T00:00:00.000Z',
+  firstCommitAt: overrides.createdAt ?? '2020-01-01T00:00:00.000Z',
+  firstCommitSha: 'firstcommit',
   lastCommitAt: RECENT_DATE,
   lastCommitSha: 'abc123',
   commitStats: { totalCommits: 120, totalCommitters: 8 },
@@ -120,20 +122,26 @@ describe('applicationRules - metrics', () => {
     expect(getUsage(null)).toBeNull();
   });
 
-  it('gets the project age from the oldest of repository creation and first release', () => {
+  it('gets the project age from the oldest of first commit, repository creation and first release', () => {
     const now = new Date('2026-10-01T00:00:00.000Z').getTime();
     const daysAgo = (days: number) => new Date(now - days * 24 * 60 * 60 * 1000).toISOString();
-    expect(getProjectAgeInMonths(repository({ createdAt: daysAgo(90), packages: [] }), now)).toBe(3);
+    expect(
+      getProjectAgeInMonths(repository({ createdAt: daysAgo(90), firstCommitAt: daysAgo(85), packages: [] }), now),
+    ).toBe(3);
     expect(
       getProjectAgeInMonths(
         repository({
           createdAt: daysAgo(30),
+          firstCommitAt: daysAgo(30),
           packages: [{ ...repository().packages[0], firstReleasePublishedAt: daysAgo(180) }],
         }),
         now,
       ),
     ).toBe(6); // the first release is the oldest timestamp
-    expect(getProjectAgeInMonths(repository({ createdAt: null, packages: [] }), now)).toBeNull();
+    expect(
+      getProjectAgeInMonths(repository({ createdAt: daysAgo(30), firstCommitAt: daysAgo(120), packages: [] }), now),
+    ).toBe(4); // the first commit is the oldest timestamp
+    expect(getProjectAgeInMonths(repository({ createdAt: null, firstCommitAt: null, packages: [] }), now)).toBeNull();
   });
 });
 

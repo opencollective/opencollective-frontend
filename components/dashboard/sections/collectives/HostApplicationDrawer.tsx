@@ -36,9 +36,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import { type Toast, useToast } from '../../../ui/useToast';
 
 import AcceptRejectButtons from './AcceptRejectButtons';
-import { EcosystemsRepositoryInfo, HostApplicationCustomData } from './hostApplicationCustomData';
+import { HostApplicationCustomData } from './hostApplicationCustomData';
 import { hostApplicationFieldsFragment, processApplicationMutation } from './queries';
-import ValidatedRepositoryInfo from './ValidatedRepositoryInfo';
+import RepositoryInformation from './RepositoryInformation';
 
 const msg = defineMessages({
   approved: {
@@ -481,19 +481,7 @@ export default function HostApplicationDrawer({
                 </section>
               )}
 
-              {customData?.validatedRepositoryInfo && (
-                <section className="text-sm">
-                  <FormSectionTitle>
-                    <FormattedMessage
-                      id="PendingApplication.RepoInfo.Header"
-                      defaultMessage="Validated repository information"
-                    />
-                  </FormSectionTitle>
-                  <ValidatedRepositoryInfo customData={customData} />
-                </section>
-              )}
-
-              {ecosystemsRepository && (
+              {(customData?.validatedRepositoryInfo || ecosystemsRepository) && (
                 <section className="text-sm">
                   <FormSectionTitle>
                     <FormattedMessage
@@ -501,10 +489,7 @@ export default function HostApplicationDrawer({
                       defaultMessage="Repository information"
                     />
                   </FormSectionTitle>
-                  <EcosystemsRepositoryInfo
-                    repository={ecosystemsRepository}
-                    repositoryUrl={customData?.repositoryUrl}
-                  />
+                  <RepositoryInformation customData={customData} />
                 </section>
               )}
 
