@@ -15,6 +15,7 @@ import { useImageUploader } from '@/lib/hooks/useImageUploader';
 import { cn } from '@/lib/utils';
 
 import { DROPZONE_ACCEPT_IMAGES } from './Dropzone';
+import { FiscalHostNoteIndicator, FiscalHostNoteTooltip } from './FiscalHostNoteBadge';
 import type { FlexProps } from './Grid';
 import { Flex } from './Grid';
 
@@ -101,6 +102,7 @@ const Avatar = ({
     image?: string;
     isIncognito?: boolean;
     isGuest?: boolean;
+    fiscalHostNote?: { type: 'WARNING' | 'INFO' | 'POSITIVE'; note?: string | null } | null;
   };
   src?: string;
   type?: string;
@@ -145,10 +147,48 @@ const Avatar = ({
     }
   }
 
-  return (
+  const fiscalHostNote = collective?.fiscalHostNote;
+  const avatar = (
     <StyledAvatar size={radius} type={type} src={src} title={displayTitle ? name : undefined} {...styleProps}>
       {child}
     </StyledAvatar>
+  );
+
+  if (!fiscalHostNote?.note) {
+    return avatar;
+  }
+
+  // `size` (styled-system) takes precedence over `radius` when both are passed.
+  const avatarSize =
+    typeof styleProps.size === 'number' ? styleProps.size : typeof radius === 'number' ? radius : undefined;
+  // Tiny avatars (inline with text) read better as a plain colour dot than a scaled-down icon.
+  const isSmallAvatar = avatarSize !== undefined && avatarSize <= 20;
+  const indicatorSize = isSmallAvatar
+    ? Math.max(3, Math.round(avatarSize * 0.2))
+    : avatarSize !== undefined
+      ? Math.max(12, Math.min(18, Math.round(avatarSize * 0.3)))
+      : 12;
+
+  return (
+    <FiscalHostNoteTooltip note={fiscalHostNote}>
+      <span className="relative inline-flex shrink-0">
+        {avatar}
+        <span
+          aria-hidden="true"
+          className={
+            isSmallAvatar
+              ? 'absolute -right-0.5 -bottom-0.5 rounded-full'
+              : 'absolute -right-1 -bottom-1 rounded-full bg-background p-0.5 shadow-sm'
+          }
+        >
+          <FiscalHostNoteIndicator
+            note={fiscalHostNote}
+            size={indicatorSize}
+            variant={isSmallAvatar ? 'dot' : 'icon'}
+          />
+        </span>
+      </span>
+    </FiscalHostNoteTooltip>
   );
 };
 

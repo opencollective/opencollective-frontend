@@ -72,6 +72,8 @@ const accountOrdersQuery = gql`
         paymentMethod {
           id
           providerType
+          service
+          type
         }
         fromAccount {
           id

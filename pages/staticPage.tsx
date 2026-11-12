@@ -1,0 +1,62 @@
+import React from 'react';
+import { get } from 'lodash-es';
+
+import Link from '../components/Link';
+import NewsletterContainer from '../components/NewsletterContainer';
+import Page from '../components/Page';
+import staticPages from '../components/static-pages';
+
+const getContent = (path, pageSlug) => {
+  if (path) {
+    return get(staticPages, [path, pageSlug || 'index']);
+  } else {
+    return get(staticPages, pageSlug);
+  }
+};
+
+type StaticPageProps = {
+  path?: string;
+  pageSlug?: string;
+  title?: string;
+  content?: string;
+  LoggedInUser?: unknown;
+  data?: unknown;
+  query?: unknown;
+};
+
+class StaticPage extends React.Component<StaticPageProps> {
+  static async getInitialProps(props) {
+    const { path, pageSlug } = props.query;
+
+    const content = getContent(path, pageSlug);
+
+    // get the title from the html of the markdown
+    // e.g., <h1 id="about-open-collective">About Open Collective</h1> => About Open Collective
+    let title = content.substr(content.indexOf('<h1'), content.indexOf('</h1>'));
+    title = title.substr(title.indexOf('>') + 1);
+
+    return { title, content, path, pageSlug };
+  }
+
+  render() {
+    const { path, pageSlug, title } = this.props;
+    return (
+      <Page title={title}>
+        <div className="markdown mx-auto mt-10 max-w-(--breakpoint-lg) px-4 py-2 sm:px-6 sm:py-4">
+          {path && pageSlug && (
+            <div className="mt-3 text-gray-400 uppercase">
+              <Link href={`/${path}`}>{path}</Link>
+            </div>
+          )}
+          {/* We control the pages content, since it's defined in markdown files we host in this codebase */}
+          <div dangerouslySetInnerHTML={{ __html: this.props.content }} />
+        </div>
+        <NewsletterContainer />
+      </Page>
+    );
+  }
+}
+
+// next.js export
+// ts-unused-exports:disable-next-line
+export default StaticPage;

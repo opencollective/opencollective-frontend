@@ -272,8 +272,6 @@ function ExpenseFormikContainer(props: {
   onSuccess: (result, type: 'edit' | 'new' | 'invite') => void;
   onExpenseInviteDeclined: () => void;
 }) {
-  const formRef = React.useRef<HTMLFormElement>(undefined);
-
   const startOptions = React.useRef({
     draftKey: props.draftKey,
     duplicateExpense: props.duplicateExpense,
@@ -284,7 +282,6 @@ function ExpenseFormikContainer(props: {
   const onVisibleSectionChange = React.useCallback(v => setActiveStep(v as Step), []);
 
   const expenseForm = useExpenseForm({
-    formRef,
     initialValues: {
       accountSlug: props.submitExpenseTo,
       payeeSlug: props.payeeSlug,
@@ -312,7 +309,6 @@ function ExpenseFormikContainer(props: {
       },
     },
     startOptions: startOptions.current,
-    handleOnSubmit: true,
     customData: props.customData,
     onSuccess: props.onSuccess,
     onError: props.onError,
@@ -323,7 +319,7 @@ function ExpenseFormikContainer(props: {
       <SubmitExpenseFlowSteps className="sticky top-0 hidden w-64 min-w-44 sm:block" activeStep={activeStep} />
 
       <div className="h-max w-full pb-4 sm:max-w-3xl sm:overflow-x-hidden">
-        <form ref={formRef} onSubmit={e => e.preventDefault()}>
+        <form onSubmit={e => e.preventDefault()}>
           <SubmitExpenseFlowForm
             onNextClick={() => setActiveStep(Step.SUMMARY)}
             onVisibleSectionChange={onVisibleSectionChange}

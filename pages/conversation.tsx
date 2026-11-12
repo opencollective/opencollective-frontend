@@ -1,0 +1,500 @@
+import React from 'react';
+import { graphql, withApollo } from '@apollo/client/react/hoc';
+import { cloneDeep, get, isEmpty, uniqBy, update } from 'lodash-es';
+import { withRouter } from 'next/router';
+import { FormattedMessage } from 'react-intl';
+
+import hasFeature, { FEATURES } from '../lib/allowed-features';
+import { getCollectivePageMetadata, isHiddenAccount, shouldIndexAccountOnSearchEngines } from '../lib/collective';
+import { generateNotFoundError } from '../lib/errors';
+import { gql } from '../lib/graphql/helpers';
+import { stripHTML } from '../lib/html';
+
+import CollectiveNavbar from '../components/collective-navbar';
+import { NAVBAR_CATEGORIES } from '../components/collective-navbar/constants';
+import { collectiveNavbarFieldsFragment } from '../components/collective-page/graphql/fragments';
+import CollectiveThemeProvider from '../components/CollectiveThemeProvider';
+import Container from '../components/Container';
+import Comment from '../components/conversations/Comment';
+import CommentForm from '../components/conversations/CommentForm';
+import FollowConversationButton from '../components/conversations/FollowConversationButton';
+import FollowersAvatars from '../components/conversations/FollowersAvatars';
+import { commentFieldsFragment, isUserFollowingConversationQuery } from '../components/conversations/graphql';
+import Thread from '../components/conversations/Thread';
+import EditTags from '../components/EditTags';
+import ErrorPage from '../components/ErrorPage';
+import { Box, Flex } from '../components/Grid';
+import CommentIcon from '../components/icons/CommentIcon';
+import InlineEditField from '../components/InlineEditField';
+import Link from '../components/Link';
+import Loading from '../components/Loading';
+import MessageBox from '../components/MessageBox';
+import Page from '../components/Page';
+import PageFeatureNotSupported from '../components/PageFeatureNotSupported';
+import StyledButton from '../components/StyledButton';
+import StyledLink from '../components/StyledLink';
+import StyledTag from '../components/StyledTag';
+import { H2, H4 } from '../components/Text';
+import { withUser } from '../components/UserProvider';
+
+const conversationPageQuery = gql`
+  query ConversationPage($collectiveSlug: String!, $id: String!, $offset: Int) {
+    account(slug: $collectiveSlug, throwIfMissing: false) {
+      id
+      legacyId
+      slug
+      name
+      type
+      description
+      settings
+      imageUrl
+      twitterHandle
+      backgroundImageUrl
+      isSuspended
+      ... on AccountWithParent {
+        parent {
+          id
+          imageUrl
+          backgroundImageUrl
+          twitterHandle
+        }
+      }
+      features {
+        id
+        ...NavbarFieldsV1
+      }
+      conversationsTags {
+        id
+        tag
+      }
+
+      ... on Collective {
+        isApproved
+      }
+    }
+    conversation(id: $id) {
+      id
+      slug
+      summary
+      title
+      createdAt
+      tags
+      body {
+        id
+        ...CommentFields
+      }
+      comments(limit: 100, offset: $offset) {
+        totalCount
+        nodes {
+          id
+          ...CommentFields
+        }
+      }
+      followers(limit: 50) {
+        totalCount
+        nodes {
+          id
+          slug
+          type
+          name
+          imageUrl(height: 64)
+        }
+      }
+    }
+  }
+  ${commentFieldsFragment}
+  ${collectiveNavbarFieldsFragment}
+`;
+
+const editConversationMutation = gql`
+  mutation EditConversation($id: String!, $title: String!, $tags: [String]) {
+    editConversation(id: $id, title: $title, tags: $tags) {
+      id
+      title
+      tags
+    }
+  }
+`;
+
+/**
+ * The main page to display collectives. Wrap route parameters and GraphQL query
+ * to render `components/collective-page` with everything needed.
+ */
+type ConversationPageProps = {
+  collectiveSlug: string;
+  id: string;
+  router: import('next/router').NextRouter;
+  client?: import('@apollo/client').ApolloClient<unknown>;
+  LoggedInUser?: {
+    canEditComment?: (comment: unknown) => boolean;
+    isAdminOfCollective?: (account: unknown) => boolean;
+  };
+  data?: {
+    loading?: boolean;
+    error?: unknown;
+    refetch?: (...args: unknown[]) => unknown;
+    fetchMore?: (options: unknown) => Promise<unknown>;
+    account?: Record<string, unknown>;
+    conversation?: {
+      body?: Record<string, unknown>;
+      comments?: { nodes?: Array<Record<string, unknown>>; totalCount?: number };
+      followers?: { nodes?: unknown[]; totalCount?: number };
+      tags?: string[];
+      [key: string]: unknown;
+    };
+  };
+};
+
+class ConversationPage extends React.Component<ConversationPageProps, { replyingToComment?: unknown }> {
+  static getInitialProps({ query: { collectiveSlug, id } }) {
+    return { collectiveSlug, id };
+  }
+
+  constructor(props) {
+    super(props);
+    this.state = { replyingToComment: null };
+  }
+
+  static MAX_NB_FOLLOWERS_AVATARS = 4;
+
+  getPageMetaData(collective, conversation) {
+    const baseMetadata = getCollectivePageMetadata(collective);
+    if (collective && conversation) {
+      return {
+        ...baseMetadata,
+        title: conversation.title,
+        description: stripHTML(conversation.summary),
+        noRobots: !shouldIndexAccountOnSearchEngines(collective),
+        metaTitle: `${conversation.title} - ${collective.name}`,
+      };
+    } else {
+      return { ...baseMetadata, title: 'Conversations' };
+    }
+  }
+
+  clonePageQueryCacheData(): [
+    Record<string, unknown>,
+    typeof conversationPageQuery,
+    { collectiveSlug: string; id: string },
+  ] {
+    const { client, id, collectiveSlug } = this.props;
+    const query = conversationPageQuery;
+    const variables = { collectiveSlug, id };
+    const data = cloneDeep(client.readQuery({ query, variables })) as Record<string, unknown>;
+    return [data, query, variables];
+  }
+
+  onCommentAdded = comment => {
+    // Add comment to cache if not already fetched
+    const [data, query, variables] = this.clonePageQueryCacheData();
+    update(data, 'conversation.comments.nodes', comments => uniqBy([...comments, comment], 'id'));
+    update(data, 'conversation.comments.totalCount', totalCount => totalCount + 1);
+    this.props.client.writeQuery({ query, variables, data });
+
+    // Commenting subscribes the user, update Follow button to reflect that
+    this.updateLoggedInUserFollowing(true);
+
+    // Add user to the conversation subscribers
+    this.onFollowChange(true, comment.fromAccount);
+  };
+
+  updateLoggedInUserFollowing = isFollowing => {
+    const query = isUserFollowingConversationQuery;
+    const variables = { id: this.props.id };
+    const userFollowingData = cloneDeep(this.props.client.readQuery({ query, variables }));
+    if (userFollowingData && userFollowingData.loggedInAccount) {
+      userFollowingData.loggedInAccount.isFollowingConversation = isFollowing;
+      this.props.client.writeQuery({ query, variables, data: userFollowingData });
+    }
+  };
+
+  onCommentDeleted = comment => {
+    const [data, query, variables] = this.clonePageQueryCacheData();
+    update(data, 'conversation.comments.nodes', comments => comments.filter(c => c.id !== comment.id));
+    update(data, 'conversation.comments.totalCount', totalCount => totalCount - 1);
+    this.props.client.writeQuery({ query, variables, data });
+  };
+
+  onFollowChange = (isFollowing, account) => {
+    const [data, query, variables] = this.clonePageQueryCacheData();
+    const followersPath = 'conversation.followers.nodes';
+    const followersCountPath = 'conversation.followers.totalCount';
+
+    if (!isFollowing) {
+      // Remove user
+      update(data, followersCountPath, count => count - 1);
+      update(data, followersPath, followers => followers.filter(c => c.id !== account.id));
+    } else if ((get(data, followersPath, []) as Array<{ id?: string }>).findIndex(c => c.id === account.id) === -1) {
+      // Add user (if not already there)
+      update(data, followersCountPath, count => count + 1);
+      update(data, followersPath, followers => {
+        followers.splice(ConversationPage.MAX_NB_FOLLOWERS_AVATARS - 1, 0, account);
+        return followers;
+      });
+    } else {
+      return;
+    }
+
+    this.props.client.writeQuery({ query, variables, data });
+  };
+
+  onConversationDeleted = () => {
+    return this.props.router.push(`/${this.props.collectiveSlug}/conversations`);
+  };
+
+  getSuggestedTags(collective) {
+    const tagsStats = (collective && collective.conversationsTags) || null;
+    return tagsStats && tagsStats.map(({ tag }) => tag);
+  }
+
+  handleTagsChange = (options, setValue) => {
+    if (isEmpty(options)) {
+      setValue([]);
+    } else {
+      setValue(options.map(i => i.value));
+    }
+  };
+
+  handleSetClickedComment = value => {
+    this.setState({ replyingToComment: value });
+  };
+
+  fetchMore = async () => {
+    const { collectiveSlug, id, data } = this.props;
+
+    // refetch before fetching more as comments added to the cache can change the offset
+    await data.refetch();
+    await data.fetchMore({
+      variables: { collectiveSlug, id, offset: get(data, 'conversation.comments.nodes', []).length },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult) {
+          return prev;
+        }
+
+        const newValues = {};
+
+        (newValues as Record<string, unknown>).conversation = {
+          ...prev.conversation,
+          comments: {
+            ...fetchMoreResult.conversation.comments,
+            nodes: [...prev.conversation.comments.nodes, ...fetchMoreResult.conversation.comments.nodes],
+          },
+        };
+
+        return Object.assign({}, prev, newValues);
+      },
+    });
+  };
+
+  render() {
+    const { collectiveSlug, data, LoggedInUser } = this.props;
+
+    if (!data.loading) {
+      if (!data || data.error) {
+        return <ErrorPage data={data} />;
+      } else if (!data.account || isHiddenAccount(data.account)) {
+        return <ErrorPage error={generateNotFoundError()} log={false} />;
+      } else if (!hasFeature(data.account, FEATURES.CONVERSATIONS)) {
+        return <PageFeatureNotSupported />;
+      }
+    }
+
+    const collective = data && data.account;
+    const conversation = data && data.conversation;
+    const body = conversation && conversation.body;
+    const conversationReactions = get(conversation, 'body.reactions', []);
+    const comments = get(conversation, 'comments.nodes', []) as Array<Record<string, unknown>>;
+    const totalCommentsCount = get(conversation, 'comments.totalCount', 0) as number;
+    const followers = get(conversation, 'followers') as { nodes?: unknown[]; totalCount?: number };
+    const hasFollowers = followers && followers.nodes && followers.nodes.length > 0;
+    const canEdit = LoggedInUser && body && LoggedInUser.canEditComment(body);
+    const canDelete = canEdit || (LoggedInUser && LoggedInUser.isAdminOfCollective(collective));
+    return (
+      <Page collective={collective} {...this.getPageMetaData(collective, conversation)}>
+        {data.loading ? (
+          <Container>
+            <Loading />
+          </Container>
+        ) : (
+          <CollectiveThemeProvider collective={collective}>
+            <Container data-cy="conversation-page">
+              <CollectiveNavbar collective={collective} selectedCategory={NAVBAR_CATEGORIES.CONNECT} />
+              <Box maxWidth={1160} m="0 auto" px={2} py={[4, 5]}>
+                <StyledLink as={Link} color="black.600" href={`/${collectiveSlug}/conversations`}>
+                  &larr; <FormattedMessage id="Conversations.GoBack" defaultMessage="Back to conversations" />
+                </StyledLink>
+                <Box mt={4}>
+                  {!conversation || !body ? (
+                    <MessageBox type="error" withIcon>
+                      <FormattedMessage
+                        id="conversation.notFound"
+                        defaultMessage="This conversation doesn't exist or has been removed."
+                      />
+                    </MessageBox>
+                  ) : (
+                    <Flex flexDirection={['column', null, null, 'row']} justifyContent="space-between">
+                      <Box flex="1 1 50%" maxWidth={700} mb={5}>
+                        <Container borderBottom="1px solid" borderColor="black.300" pb={3}>
+                          <H2 fontSize="24px" lineHeight="32px" mb={4} wordBreak="break-word">
+                            <InlineEditField
+                              mutation={editConversationMutation}
+                              canEdit={canEdit}
+                              values={conversation}
+                              field="title"
+                              maxLength={255}
+                              required
+                              placeholder={
+                                <FormattedMessage
+                                  id="CreateConversation.Title.Placeholder"
+                                  defaultMessage="Start with a title for your conversation here"
+                                />
+                              }
+                            />
+                          </H2>
+                          <Comment
+                            comment={body}
+                            reactions={conversationReactions}
+                            canEdit={canEdit}
+                            canDelete={canDelete}
+                            onDelete={this.onConversationDeleted}
+                            canReply={Boolean(LoggedInUser)}
+                            isConversationRoot
+                            onReplyClick={this.handleSetClickedComment}
+                          />
+                        </Container>
+                        {comments.length > 0 && (
+                          <Box mb={3} pt={3}>
+                            <Thread
+                              collective={collective}
+                              items={comments}
+                              hasMore={totalCommentsCount > comments.length}
+                              fetchMore={this.fetchMore}
+                              onCommentDeleted={this.onCommentDeleted}
+                              getClickedComment={this.handleSetClickedComment}
+                            />
+                          </Box>
+                        )}
+                        <Flex mt="40px">
+                          <Box display={['none', null, 'block']} flex="0 0" p={3}>
+                            <CommentIcon size={24} color="lightgrey" />
+                          </Box>
+                          <Box flex="1 1" maxWidth={[null, null, 'calc(100% - 56px)']}>
+                            <CommentForm
+                              id="new-comment"
+                              ConversationId={conversation.id}
+                              onSuccess={this.onCommentAdded}
+                              replyingToComment={this.state.replyingToComment}
+                            />
+                          </Box>
+                        </Flex>
+                      </Box>
+                      <Box display={['none', null, 'block']} flex="0 0 330px" ml={[null, null, null, 4, 5]} mb={4}>
+                        <Box my={2} mx={2}>
+                          <Link href={`/${collectiveSlug}/conversations/new`}>
+                            <StyledButton buttonStyle="primary" width="100%" minWidth={170}>
+                              <FormattedMessage id="conversations.create" defaultMessage="Create a Conversation" />
+                            </StyledButton>
+                          </Link>
+                        </Box>
+
+                        <Box mt={4}>
+                          <H4 px={2} mb={3} fontWeight="normal">
+                            <FormattedMessage id="Conversation.Followers" defaultMessage="Conversation followers" />
+                          </H4>
+                          <Flex mb={3} alignItems="center">
+                            {hasFollowers && (
+                              <Box mr={3}>
+                                <FollowersAvatars
+                                  followers={followers.nodes}
+                                  totalCount={followers.totalCount}
+                                  maxNbDisplayed={ConversationPage.MAX_NB_FOLLOWERS_AVATARS}
+                                  avatarRadius={32}
+                                />
+                              </Box>
+                            )}
+                            <Box flex="1">
+                              <FollowConversationButton
+                                conversationId={conversation.id}
+                                onChange={this.onFollowChange}
+                                isCompact={hasFollowers && followers.nodes.length > 2}
+                              />
+                            </Box>
+                          </Flex>
+                        </Box>
+                        {!(isEmpty(conversation.tags) && !canEdit) && (
+                          <Box mt={4}>
+                            <InlineEditField
+                              topEdit={2}
+                              field="tags"
+                              buttonsMinWidth={145}
+                              canEdit={canEdit}
+                              values={conversation}
+                              mutation={editConversationMutation}
+                              prepareVariables={(value, draft) => ({
+                                ...value,
+                                tags: draft,
+                              })}
+                            >
+                              {({ isEditing, setValue }) => (
+                                <React.Fragment>
+                                  <H4 px={2} mb={2} fontWeight="normal">
+                                    <FormattedMessage id="Tags" defaultMessage="Tags" />
+                                  </H4>
+                                  {!isEditing ? (
+                                    !isEmpty(conversation.tags) && (
+                                      <Flex flexWrap="wrap" mx={2}>
+                                        {conversation.tags.map(tag => (
+                                          <StyledTag key={tag} variant="rounded-right" mb="4px" mr="4px">
+                                            {tag}
+                                          </StyledTag>
+                                        ))}
+                                      </Flex>
+                                    )
+                                  ) : (
+                                    <Box mx={2}>
+                                      <EditTags
+                                        suggestedTags={this.getSuggestedTags(collective)}
+                                        defaultValue={conversation.tags}
+                                        onChange={options => this.handleTagsChange(options, setValue)}
+                                      />
+                                    </Box>
+                                  )}
+                                </React.Fragment>
+                              )}
+                            </InlineEditField>
+                          </Box>
+                        )}
+                      </Box>
+                    </Flex>
+                  )}
+                </Box>
+              </Box>
+            </Container>
+          </CollectiveThemeProvider>
+        )}
+      </Page>
+    );
+  }
+}
+
+const addConversationPageQuery = graphql<
+  Omit<ConversationPageProps, 'router' | 'client'>,
+  {
+    loading?: boolean;
+    error?: unknown;
+    refetch?: (...args: unknown[]) => unknown;
+    fetchMore?: (options: unknown) => Promise<unknown>;
+    account?: Record<string, unknown>;
+    conversation?: ConversationPageProps['data']['conversation'];
+  },
+  { collectiveSlug?: string; id?: string },
+  { data?: ConversationPageProps['data'] }
+>(conversationPageQuery, {
+  options: {
+    pollInterval: 60000, // Will refresh the data every 60s to get new comments
+  },
+});
+
+// next.js export
+// ts-unused-exports:disable-next-line
+export default withUser(addConversationPageQuery(withRouter(withApollo<ConversationPageProps>(ConversationPage))));

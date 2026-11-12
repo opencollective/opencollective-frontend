@@ -1,0 +1,565 @@
+import React, { memo } from 'react';
+import { useMutation, useQuery } from '@apollo/client';
+import { closestCenter, DndContext, DragOverlay } from '@dnd-kit/core';
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { InfoCircle } from '@styled-icons/fa-solid/InfoCircle';
+import { DragIndicator } from '@styled-icons/material/DragIndicator';
+import { cloneDeep, flatten, get, isEqual, set } from 'lodash-es';
+import { FormattedMessage, useIntl } from 'react-intl';
+import styled, { css } from 'styled-components';
+
+import { getCollectiveSections, getSectionPath } from '../../../lib/collective-sections';
+import { CollectiveType } from '../../../lib/constants/collectives';
+import { formatErrorMessage, getErrorFromGraphqlException } from '../../../lib/errors';
+import { API_V1_CONTEXT, gql } from '../../../lib/graphql/helpers';
+import { collectiveSettingsQuery } from '../../../lib/graphql/v1/queries';
+import i18nNavbarCategory from '../../../lib/i18n/navbar-categories';
+import i18nCollectivePageSection from '../../../lib/i18n-collective-page-section';
+import { FEATURES } from '@/lib/allowed-features';
+import { CollectiveFeatureStatus } from '@/lib/graphql/types/v2/graphql';
+
+import FeatureNotSupported from '@/components/FeatureNotSupported';
+
+import { Sections } from '../../collective-page/_constants';
+import Container from '../../Container';
+import EditCollectivePageFAQ from '../../faqs/EditCollectivePageFAQ';
+import { Box, Flex } from '../../Grid';
+import Link from '../../Link';
+import MessageBox from '../../MessageBox';
+import StyledCard from '../../StyledCard';
+import StyledHr from '../../StyledHr';
+import StyledSelect from '../../StyledSelect';
+import StyledTooltip from '../../StyledTooltip';
+import { P, Span } from '../../Text';
+import { Button } from '../../ui/Button';
+import { Skeleton } from '../../ui/Skeleton';
+import { editAccountSettingsMutation } from '../mutations';
+import SettingsSubtitle from '../SettingsSubtitle';
+
+export const collectiveSettingsEditQuery = gql`
+  query CollectiveSettingsEdit($slug: String!) {
+    account(slug: $slug) {
+      id
+      type
+      currency
+      isActive
+      isHost
+      settings
+      policies {
+        id
+        EXPENSE_AUTHOR_CANNOT_APPROVE {
+          enabled
+          amountInCents
+          appliesToHostedCollectives
+          appliesToSingleAdminCollectives
+        }
+        COLLECTIVE_MINIMUM_ADMINS {
+          numberOfAdmins
+          applies
+          freeze
+        }
+        COLLECTIVE_ADMINS_CAN_REFUND
+        EXPENSE_CATEGORIZATION {
+          requiredForExpenseSubmitters
+          requiredForCollectiveAdmins
+        }
+        USE_VENDOR_POLICY
+        EXPENSE_POLICIES {
+          invoicePolicy
+          receiptPolicy
+          titlePolicy
+          grantPolicy
+        }
+        CONTRIBUTOR_INFO_THRESHOLDS {
+          legalName
+          address
+        }
+        TAX_FORM_THRESHOLDS {
+          US
+          NON_US
+          includePayPalExpenses
+        }
+      }
+      ... on AccountWithHost {
+        host {
+          id
+          policies {
+            id
+            EXPENSE_AUTHOR_CANNOT_APPROVE {
+              enabled
+              amountInCents
+              appliesToHostedCollectives
+              appliesToSingleAdminCollectives
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+const ItemContainer = styled.div<{ isDragging?: boolean; isDragOverlay?: boolean; isSubSection?: boolean }>`
+  ${props =>
+    props.isDragging &&
+    css`
+      border-color: #99c9ff;
+      background: #f0f8ff;
+      & > * {
+        opacity: 0;
+      }
+    `}
+
+  background: ${props =>
+    props.isDragging
+      ? '#f0f8ff'
+      : !props.isDragOverlay
+        ? 'transparent'
+        : props.isSubSection
+          ? props.theme.colors.black[100]
+          : 'white'};
+
+  ${props =>
+    props.isDragOverlay &&
+    css`
+      box-shadow: 0px 4px 6px rgba(26, 27, 31, 0.16);
+    `}
+`;
+
+const CollectiveSectionEntry = ({
+  isEnabled,
+  version,
+  restrictedTo,
+  section,
+  onSectionToggle,
+  collectiveType,
+  isSubSection,
+  hasData = undefined,
+  showMissingDataWarning = undefined,
+  showDragIcon,
+  dragHandleProps,
+}: {
+  isEnabled: boolean;
+  version?: number;
+  restrictedTo?: string[];
+  section: string;
+  onSectionToggle: (section: string, options: unknown) => void;
+  collectiveType?: string;
+  isSubSection?: boolean;
+  hasData?: boolean;
+  showMissingDataWarning?: boolean;
+  showDragIcon?: boolean;
+  dragHandleProps?: Record<string, unknown>;
+}) => {
+  const intl = useIntl();
+
+  let options = [
+    {
+      label: <FormattedMessage id="EditCollectivePage.ShowSection.AlwaysVisible" defaultMessage="Always visible" />,
+      value: 'ALWAYS',
+    },
+    {
+      label: <FormattedMessage id="EditCollectivePage.ShowSection.OnlyAdmins" defaultMessage="Only for admins" />,
+      value: 'ADMIN',
+    },
+    {
+      label: <FormattedMessage defaultMessage="Disabled" id="tthToS" />,
+      value: 'DISABLED',
+    },
+  ];
+
+  // Remove the "Only for admins" option if it's not a FUND or PROJECT
+  // That can be re-considered later
+  if (collectiveType !== CollectiveType.FUND && collectiveType !== CollectiveType.PROJECT) {
+    options = options.filter(({ value }) => value !== 'ADMIN');
+  }
+  // Can't hide the budget, except if already hidden
+  if (section === 'budget') {
+    if (isEnabled && !isEqual(restrictedTo, ['ADMIN'])) {
+      options = options.filter(({ value }) => value !== 'ADMIN' && value !== 'DISABLED');
+    }
+    // New budget version not available for
+    if (collectiveType !== CollectiveType.USER) {
+      options.push({
+        label: (
+          <FormattedMessage id="EditCollectivePage.ShowSection.AlwaysVisibleV2" defaultMessage="New version visible" />
+        ),
+        value: 'ALWAYS_V2',
+      });
+    }
+  }
+
+  let defaultValue;
+  if (!isEnabled) {
+    defaultValue = options.find(({ value }) => value === 'DISABLED');
+  } else if (restrictedTo && restrictedTo.includes('ADMIN')) {
+    defaultValue = options.find(({ value }) => value === 'ADMIN');
+  } else if (version === 2) {
+    defaultValue = options.find(({ value }) => value === 'ALWAYS_V2');
+  } else {
+    defaultValue = options.find(({ value }) => value === 'ALWAYS');
+  }
+
+  return (
+    <Flex justifyContent="space-between" alignItems="center" padding="4px 16px">
+      {showDragIcon && (
+        <Container mr={3} cursor="move" {...dragHandleProps}>
+          <DragIndicator size={14} />
+        </Container>
+      )}
+      <P
+        letterSpacing={isSubSection ? undefined : 0}
+        fontSize="14px"
+        fontWeight={isSubSection ? '500' : '700'}
+        css={{ flex: '1' }}
+      >
+        {i18nCollectivePageSection(intl, section)}
+      </P>
+
+      <StyledSelect
+        inputId={`section-select-${section}`}
+        fontSize="11px"
+        name={`show-section-${section}`}
+        defaultValue={defaultValue}
+        options={options}
+        minWidth={150}
+        isSearchable={false}
+        onChange={({ value }) => {
+          const isEnabled = value !== 'DISABLED' || value === 'ALWAYS_V2';
+          const restrictedTo = value === 'ADMIN' ? ['ADMIN'] : [];
+          const version = value === 'ALWAYS_V2' ? 2 : 1;
+          onSectionToggle(section, { isEnabled, restrictedTo, version });
+        }}
+        formatOptionLabel={option => <Span fontSize="11px">{option.label}</Span>}
+      />
+      {/**
+        Our query uses GQLV2, but the `filterSectionsByData` helper only work with GQLV1 at the moment.
+        We'll switch this flag once either https://github.com/opencollective/opencollective/issues/2807
+        or https://github.com/opencollective/opencollective/issues/3275 will be resolved.
+      */}
+      {showMissingDataWarning && (
+        <Box width={16} ml={2}>
+          {!hasData && (
+            <StyledTooltip
+              content={() => (
+                <FormattedMessage
+                  id="EditCollectivePage.EmptySection"
+                  defaultMessage="This section does not appear to have any associated data and will not appear publicly until it does."
+                />
+              )}
+            >
+              <InfoCircle size={16} />
+            </StyledTooltip>
+          )}
+        </Box>
+      )}
+    </Flex>
+  );
+};
+
+const MenuCategory = ({ item, collective, onSectionToggle, setSubSections, dragHandleProps }) => {
+  const intl = useIntl();
+
+  const [draggingId, setDraggingId] = React.useState(null);
+  function handleDragStart(event) {
+    setDraggingId(event.active.id);
+  }
+  function handleDragEnd(event) {
+    const { active, over } = event;
+    setDraggingId(null);
+    if (active.id !== over.id) {
+      const oldSubsections = item.sections;
+      const oldIndex = oldSubsections.findIndex(item => item.name === active.id);
+      const newIndex = oldSubsections.findIndex(item => item.name === over.id);
+
+      const newSections = arrayMove(oldSubsections, oldIndex, newIndex);
+      setSubSections(newSections);
+    }
+  }
+
+  const draggingItem = item.sections.find(item => item.name === draggingId);
+
+  return (
+    <React.Fragment>
+      <Container
+        display="flex"
+        px={3}
+        py="10px"
+        fontSize="14px"
+        fontWeight="bold"
+        boxShadow="0 3px 4px 0px #6b6b6b38"
+        alignItems="center"
+      >
+        <Container display="inline-block" mr={3} cursor="move" {...dragHandleProps}>
+          <DragIndicator size={14} />
+        </Container>
+        <Container>{i18nNavbarCategory(intl, item.name)}</Container>
+      </Container>
+      <Container>
+        <DndContext collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <SortableContext items={item.sections?.map(item => item.name)} strategy={verticalListSortingStrategy}>
+            {item.sections?.map(section => (
+              <Container key={section.name} pl={1} borderLeft="8px solid" borderColor="black.200" bg="black.100">
+                <DraggableItem
+                  id={section.name}
+                  item={section}
+                  collective={collective}
+                  onSectionToggle={onSectionToggle}
+                  showDragIcon={item.sections.length > 1}
+                  isSubSection
+                />
+              </Container>
+            ))}
+          </SortableContext>
+          <DragOverlay>
+            {draggingItem ? (
+              <Item item={draggingItem} collective={collective} showDragIcon isDragOverlay isSubSection />
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      </Container>
+    </React.Fragment>
+  );
+};
+
+type SectionNode = {
+  name: string;
+  type?: string;
+  isEnabled?: boolean;
+  version?: number;
+  restrictedTo?: string[];
+  sections?: SectionNode[];
+};
+
+type ItemProps = {
+  dragHandleProps?: Record<string, unknown>;
+  isDragging?: boolean;
+  isDragOverlay?: boolean;
+  style?: React.CSSProperties;
+  setSubSections?: (sections: SectionNode[]) => void;
+  onSectionToggle?: (section: string, options: unknown) => void;
+  collective?: { type: string; slug: string; [key: string]: unknown };
+  item?: SectionNode;
+  isSubSection?: boolean;
+  showDragIcon?: boolean;
+};
+
+const Item = React.forwardRef<HTMLDivElement, ItemProps>(
+  (
+    {
+      dragHandleProps,
+      isDragging,
+      isDragOverlay,
+      style,
+      setSubSections,
+      onSectionToggle,
+      collective,
+      item,
+      isSubSection,
+      showDragIcon,
+    },
+    ref,
+  ) => {
+    return (
+      <ItemContainer
+        ref={ref}
+        style={style}
+        isDragging={isDragging}
+        isDragOverlay={isDragOverlay}
+        isSubSection={isSubSection}
+      >
+        {item.type === 'CATEGORY' ? (
+          <MenuCategory
+            item={item}
+            collective={collective}
+            onSectionToggle={onSectionToggle}
+            setSubSections={setSubSections}
+            dragHandleProps={dragHandleProps}
+          />
+        ) : item.type === 'SECTION' ? (
+          <CollectiveSectionEntry
+            section={item.name}
+            isEnabled={item.isEnabled}
+            version={item.version}
+            collectiveType={collective.type}
+            restrictedTo={item.restrictedTo}
+            onSectionToggle={onSectionToggle}
+            isSubSection={isSubSection}
+            showDragIcon={showDragIcon}
+            dragHandleProps={dragHandleProps}
+          />
+        ) : null}
+      </ItemContainer>
+    );
+  },
+);
+
+Item.displayName = 'Item';
+
+const MemoizedItem = memo(Item);
+
+const DraggableItem = (props: { id: string } & ItemProps) => {
+  const { attributes, listeners, isDragging, setNodeRef, transform, transition } = useSortable({ id: props.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <MemoizedItem
+      ref={setNodeRef}
+      style={style}
+      dragHandleProps={{ ...attributes, ...listeners }}
+      isDragging={isDragging}
+      {...props}
+    />
+  );
+};
+
+const EditCollectivePage = ({ collective }: { collective: { slug: string; type: string; [key: string]: unknown } }) => {
+  const intl = useIntl();
+  const [isDirty, setDirty] = React.useState(false);
+  const [sections, setSections] = React.useState([]);
+  const [draggingId, setDraggingId] = React.useState(null);
+
+  const { loading, data } = useQuery(collectiveSettingsEditQuery, {
+    variables: { slug: collective.slug },
+  });
+
+  const [submitSetting, { loading: isSubmitting, error }] = useMutation(editAccountSettingsMutation, {
+    // Refresh the settings for GQLV1 cache, to refresh the navbar
+    refetchQueries: [{ query: collectiveSettingsQuery, variables: { slug: collective.slug }, context: API_V1_CONTEXT }],
+  });
+
+  // Load sections from fetched collective
+  React.useEffect(() => {
+    if (data?.account) {
+      const sections = getCollectiveSections(data.account);
+      setSections(sections);
+    }
+  }, [data?.account]);
+
+  const onSectionToggle = (selectedSection, { isEnabled, restrictedTo, version }) => {
+    const newSections = cloneDeep(sections);
+    const sectionPath = getSectionPath(sections, selectedSection);
+    set(newSections, `${sectionPath}`, { ...get(newSections, sectionPath), isEnabled, restrictedTo, version });
+    setSections(newSections);
+    setDirty(true);
+  };
+
+  function handleDragStart(event) {
+    setDraggingId(event.active.id);
+  }
+
+  function handleDragEnd(event) {
+    const { active, over } = event;
+    setDraggingId(null);
+    if (active.id !== over.id) {
+      const oldIndex = sections.findIndex(item => item.name === active.id);
+      const newIndex = sections.findIndex(item => item.name === over.id);
+      const newSections = arrayMove(sections, oldIndex, newIndex);
+      setSections(newSections);
+      setDirty(true);
+    }
+  }
+
+  const draggingSection = sections.find(section => section.name === draggingId);
+
+  if (collective.features[FEATURES.PUBLIC_PROFILE] === CollectiveFeatureStatus.UNSUPPORTED) {
+    return <FeatureNotSupported />;
+  }
+
+  return (
+    <DndContext collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <SettingsSubtitle>
+        <FormattedMessage
+          id="EditCollectivePage.SectionsDescription"
+          defaultMessage="Drag and drop to reorder sections. Toggle on and off with the visibility setting dropdown. Remember to click save at the bottom!"
+        />
+      </SettingsSubtitle>
+      <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:gap-8">
+        <div className="max-w-md grow">
+          {loading ? (
+            <Skeleton className="h-[400px] w-full" />
+          ) : (
+            <div>
+              <StyledCard mb={4} overflowX={'visible'} overflowY="visible" position="relative">
+                <SortableContext items={sections.map(item => item.name)} strategy={verticalListSortingStrategy}>
+                  {sections.map((item, index) => {
+                    return (
+                      <React.Fragment key={item.name}>
+                        {index !== 0 && <StyledHr borderColor="black.200" />}
+
+                        <DraggableItem
+                          id={item.name}
+                          item={item}
+                          collective={collective}
+                          onSectionToggle={onSectionToggle}
+                          showDragIcon
+                          setSubSections={subSections => {
+                            const newSections = cloneDeep(sections);
+                            const subSectionsIdx = newSections.findIndex(
+                              e => e.type === 'CATEGORY' && e.name === item.name,
+                            );
+                            newSections[subSectionsIdx] = { ...newSections[subSectionsIdx], sections: subSections };
+                            setSections(newSections);
+                            setDirty(true);
+                          }}
+                        />
+                      </React.Fragment>
+                    );
+                  })}
+                </SortableContext>
+                <DragOverlay>
+                  {draggingSection ? (
+                    <Item item={draggingSection} collective={collective} isDragOverlay showDragIcon />
+                  ) : null}
+                </DragOverlay>
+              </StyledCard>
+              {error && (
+                <MessageBox type="error" fontSize="14px" withIcon my={2}>
+                  {formatErrorMessage(intl, getErrorFromGraphqlException(error))}
+                </MessageBox>
+              )}
+            </div>
+          )}
+        </div>
+        <div className="mb-8 grow">
+          <EditCollectivePageFAQ withNewButtons withBorderLeft />
+        </div>
+      </div>
+      <div className="flex flex-col gap-2 sm:justify-stretch">
+        <Button
+          className="grow"
+          loading={isSubmitting}
+          disabled={!isDirty}
+          onClick={async () => {
+            await submitSetting({
+              variables: {
+                account: { id: data?.account?.id },
+                key: 'collectivePage',
+                value: {
+                  ...data?.account?.settings.collectivePage,
+                  sections,
+                  showGoals: flatten(sections).some(({ name, isEnabled }) => name === Sections.GOALS && isEnabled),
+                },
+              },
+            });
+
+            setDirty(false);
+          }}
+        >
+          <FormattedMessage id="save" defaultMessage="Save" />
+        </Button>
+        <Button className="grow" variant="link" asChild>
+          <Link href={`/${collective.slug}`}>
+            <FormattedMessage id="ViewPublicProfile" defaultMessage="View Public Profile" />
+          </Link>
+        </Button>
+      </div>
+    </DndContext>
+  );
+};
+
+export default EditCollectivePage;

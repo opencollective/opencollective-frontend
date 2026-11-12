@@ -1,7 +1,7 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import hasFeature, { FEATURES, requiresUpgrade } from '../../../lib/allowed-features';
+import type { Account } from '@/lib/graphql/types/v2/graphql';
 
 import { DashboardContext } from '@/components/dashboard/DashboardContext';
 import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanCTA';
@@ -11,7 +11,17 @@ import EditTransferWiseAccount from '../EditTransferWiseAccount';
 
 import SettingsSectionTitle from './SettingsSectionTitle';
 
-const SendingMoney = ({ collective }) => {
+type SendingMoneyProps = {
+  collective: {
+    id: number;
+    slug: string;
+    name: string;
+    settings?: Record<string, unknown>;
+    connectedAccounts?: Array<{ service?: string }>;
+  };
+};
+
+const SendingMoney = ({ collective }: SendingMoneyProps) => {
   const { account } = React.useContext(DashboardContext);
 
   if (requiresUpgrade(account, FEATURES.TRANSFERWISE)) {
@@ -30,14 +40,10 @@ const SendingMoney = ({ collective }) => {
 
       <div>
         <SettingsSectionTitle>Wise</SettingsSectionTitle>
-        <EditTransferWiseAccount collective={collective} />
+        <EditTransferWiseAccount collective={collective as unknown as Account} />
       </div>
     </div>
   );
-};
-
-SendingMoney.propTypes = {
-  collective: PropTypes.object.isRequired,
 };
 
 export default SendingMoney;

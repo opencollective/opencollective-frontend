@@ -316,7 +316,7 @@ const getDefaultCallsToActions = (collective, sections, isAdmin, LoggedInUser, i
       isAdmin && get(features, 'RECURRING_CONTRIBUTIONS') === 'ACTIVE' && isIndividualAccount(collective),
     hasDashboard: isAdmin && isFeatureAvailable(collective, 'HOST_DASHBOARD'),
     hasRequestGrant:
-      isFeatureAvailable(collective, 'FUNDS_GRANTS_MANAGEMENT') && expenseSubmissionAllowed(collective, LoggedInUser),
+      isFeatureAvailable(collective, 'RECEIVE_GRANTS') && expenseSubmissionAllowed(collective, LoggedInUser),
     addFunds: isAllowedAddFunds,
   };
 };
@@ -452,7 +452,7 @@ const CollectiveNavbar = ({
   isAdmin = undefined,
   isLoading = false,
   sections: sectionsFromParent = undefined,
-  selectedCategory,
+  selectedCategory = undefined,
   callsToAction = {},
   onCollectiveClick = undefined,
   isInHero = false,

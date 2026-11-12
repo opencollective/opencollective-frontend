@@ -72,6 +72,16 @@ export const peopleHostDashboardQuery = gql`
             creditCount
           }
         }
+        fiscalHostNote(host: { slug: $slug }) {
+          type
+          note
+          updatedAt
+          updatedBy {
+            id
+            name
+            slug
+          }
+        }
       }
     }
   }
@@ -184,7 +194,7 @@ const communityAccountDetailActivityFieldsFragment = gql`
 `;
 
 export const communityAccountDetailQuery = gql`
-  query CommunityAccountDetail($accountId: String!, $hostSlug: String!) {
+  query CommunityAccountDetail($accountId: String!, $hostSlug: String!, $includeFiscalHostNote: Boolean! = false) {
     account(id: $accountId) {
       id
       publicId
@@ -220,6 +230,16 @@ export const communityAccountDetailQuery = gql`
       communityStats(host: { slug: $hostSlug }) {
         id
         relations
+      }
+      fiscalHostNote(host: { slug: $hostSlug }) {
+        type
+        note
+        updatedAt
+        updatedBy {
+          id
+          name
+          slug
+        }
       }
       ... on Individual {
         email
@@ -318,7 +338,18 @@ export const communityAccountDetailQuery = gql`
           ...LegalDocumentFields
         }
       }
+      features {
+        id
+        MULTI_CURRENCY_EXPENSES
+      }
       requiredLegalDocuments
+      currency
+      transferwise {
+        id
+        availableCurrencies
+      }
+      supportedPayoutMethods
+      isTrustedHost
       policies {
         id
         USE_VENDOR_POLICY
@@ -421,6 +452,21 @@ export const communityAccountActivitiesQuery = gql`
             ...CommunityAccountDetailActivityFields
           }
         }
+      }
+    }
+  }
+  ${accountHoverCardFieldsFragment}
+  ${communityAccountDetailActivityFieldsFragment}
+`;
+
+export const hostedAccountActivitiesQuery = gql`
+  query HostedAccountActivities($accountId: String!, $host: AccountReferenceInput!, $limit: Int!, $offset: Int!) {
+    activities(account: { id: $accountId }, host: $host, limit: $limit, offset: $offset) {
+      totalCount
+      limit
+      offset
+      nodes {
+        ...CommunityAccountDetailActivityFields
       }
     }
   }

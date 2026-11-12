@@ -55,7 +55,7 @@ const collectivePageQueryHelper = getSSRQueryHelpers<
   ReturnType<typeof getVariablesFromContext>,
   ReturnType<typeof getPropsFromContext>,
   // TODO: Use the query auto-generated type when we move this to V2
-  { Collective: { slug: string; id: number; name: string; isHost: boolean; host?: { slug: string } } }
+  { Collective: { slug: string; id: number; name: string; type: string; isHost: boolean; host?: { slug: string } } }
 >({
   query: collectivePageQuery,
   context: API_V1_CONTEXT,

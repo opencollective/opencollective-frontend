@@ -1,15 +1,22 @@
 import React from 'react';
-import type { Path } from 'dot-path-value';
 import { useFormikContext } from 'formik';
-import { get, isEmpty, startCase } from 'lodash-es';
+import { isEmpty, startCase } from 'lodash-es';
 import type { MessageDescriptor } from 'react-intl';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 
 import { cn } from '../../lib/utils';
+import {
+  EXPENSE_FLOW_STEPS,
+  ExpenseStep as Step,
+  getFirstIncompleteStep,
+  getVisibleSteps,
+  isStepComplete,
+  isStepTouched,
+} from './lib/form-steps';
 
 import { useToast } from '../ui/useToast';
 
-import type { ExpenseForm, ExpenseFormValues } from './useExpenseForm';
+import type { ExpenseForm } from './useExpenseForm';
 
 type SubmitExpenseFlowStepsProps = {
   className?: string;
@@ -17,48 +24,7 @@ type SubmitExpenseFlowStepsProps = {
   activeStep: Step;
 };
 
-export enum Step {
-  INVITE_WELCOME = 'INVITE_WELCOME',
-  WHO_IS_PAYING = 'WHO_IS_PAYING',
-  WHO_IS_GETTING_PAID = 'WHO_IS_GETTING_PAID',
-  PAYOUT_METHOD = 'PAYOUT_METHOD',
-  TYPE_OF_EXPENSE = 'TYPE_OF_EXPENSE',
-  EXPENSE_CATEGORY = 'EXPENSE_CATEGORY',
-  EXPENSE_ITEMS = 'EXPENSE_ITEMS',
-  ADDITIONAL_DETAILS = 'ADDITIONAL_DETAILS',
-  SUMMARY = 'SUMMARY',
-}
-
-/**
- * Maps each step to the form fields that need validation for that step.
- * Used for step-based validation and auto-scroll to error functionality.
- *
- * @see README.md - Validation section
- */
-export const StepValues: Record<Step, Path<ExpenseFormValues>[]> = {
-  [Step.WHO_IS_PAYING]: ['accountSlug'],
-  [Step.WHO_IS_GETTING_PAID]: ['payeeSlug', 'inviteeNewIndividual', 'inviteeNewOrganization'],
-  [Step.PAYOUT_METHOD]: ['payoutMethodId', 'newPayoutMethod', 'payoutMethodNameDiscrepancyReason'],
-  [Step.TYPE_OF_EXPENSE]: [
-    'expenseTypeOption',
-    'acknowledgedCollectiveInvoiceExpensePolicy',
-    'acknowledgedCollectiveReceiptExpensePolicy',
-    'acknowledgedHostInvoiceExpensePolicy',
-    'acknowledgedHostReceiptExpensePolicy',
-    'invoiceFile',
-    'invoiceNumber',
-  ],
-  [Step.EXPENSE_CATEGORY]: ['accountingCategoryId'],
-  [Step.EXPENSE_ITEMS]: ['expenseItems', 'tax', 'referenceCurrency'],
-  [Step.ADDITIONAL_DETAILS]: [
-    'title',
-    'acknowledgedCollectiveTitleExpensePolicy',
-    'acknowledgedHostTitleExpensePolicy',
-    'privateMessage',
-  ],
-  [Step.SUMMARY]: [],
-  [Step.INVITE_WELCOME]: [],
-};
+export { ExpenseStep as Step } from './lib/form-steps';
 
 export const StepTitles: Record<Step, MessageDescriptor> = {
   [Step.INVITE_WELCOME]: defineMessage({
@@ -99,7 +65,7 @@ export const StepTitles: Record<Step, MessageDescriptor> = {
   }),
 };
 
-export const StepSubtitles: Partial<Record<Step, MessageDescriptor>> = {
+const StepSubtitles: Partial<Record<Step, MessageDescriptor>> = {
   [Step.PAYOUT_METHOD]: defineMessage({
     defaultMessage: 'Where do you want to receive the money',
     id: 'CNCPij',
@@ -114,32 +80,12 @@ export const StepSubtitles: Partial<Record<Step, MessageDescriptor>> = {
   }),
 };
 
-function isExpenseFormStepCompleted(form: ExpenseForm, step: Step): boolean {
-  if (form.initialLoading) {
-    return false;
-  }
-
-  const valueKeys = StepValues[step];
-  if (isEmpty(valueKeys)) {
-    return true;
-  }
-  return valueKeys.map(valueKey => isEmpty(get(form.errors, valueKey))).every(Boolean);
-}
-
-function expenseFormStepHasError(form: ExpenseForm, step: Step): boolean {
-  return !isExpenseFormStepCompleted(form, step);
-}
-
-function isExpenseFormStepTouched(form: ExpenseForm, step: Step): boolean {
-  if (form.initialLoading) {
-    return false;
-  }
-
-  const valueKeys = StepValues[step];
-  if (isEmpty(valueKeys)) {
-    return true;
-  }
-  return valueKeys.map(valueKey => get(form.touched, valueKey)).some(Boolean);
+/** The title and subtitle of the section of an Expense step */
+export function getExpenseStepHeading(step: Step): { title: React.ReactNode; subtitle?: React.ReactNode } {
+  return {
+    title: <FormattedMessage {...StepTitles[step]} />,
+    subtitle: StepSubtitles[step] && <FormattedMessage {...StepSubtitles[step]} />,
+  };
 }
 
 /**
@@ -152,30 +98,18 @@ function isExpenseFormStepTouched(form: ExpenseForm, step: Step): boolean {
  */
 export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
   const form = useFormikContext() as ExpenseForm;
-  const hasErrors = Object.values(Step).some(step => expenseFormStepHasError(form, step));
+  const hasErrors = EXPENSE_FLOW_STEPS.some(step => !isStepComplete(step, form));
   const { toast } = useToast();
   const intl = useIntl();
 
-  const stepOrder = [
-    Step.WHO_IS_PAYING,
-    Step.WHO_IS_GETTING_PAID,
-    Step.PAYOUT_METHOD,
-    Step.TYPE_OF_EXPENSE,
-    Step.EXPENSE_CATEGORY,
-    Step.EXPENSE_ITEMS,
-    Step.ADDITIONAL_DETAILS,
-  ].filter(step => {
-    if (step === Step.EXPENSE_CATEGORY) {
-      return form.options.isAccountingCategoryRequired && form.options.accountingCategories?.length;
-    }
-
-    return true;
-  });
-
-  const firstIncompleteIdx = stepOrder.findIndex(s => !isExpenseFormStepCompleted(form, s));
+  // The welcome and summary steps are not listed
+  const listedSteps = getVisibleSteps(EXPENSE_FLOW_STEPS, form.options).filter(
+    step => step.id !== Step.INVITE_WELCOME && step.id !== Step.SUMMARY,
+  );
+  const firstIncompleteIdx = listedSteps.findIndex(step => !isStepComplete(step, form));
 
   // Scroll to first step with error
-  const firstIncompleteSection = stepOrder.find(s => !isExpenseFormStepCompleted(form, s));
+  const firstIncompleteSection = getFirstIncompleteStep(EXPENSE_FLOW_STEPS, form)?.id;
   const submitCount = form.submitCount;
 
   /**
@@ -187,7 +121,7 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
       if (firstIncompleteSection) {
         document.querySelector(`#${firstIncompleteSection}`)?.scrollIntoView({ behavior: 'smooth' });
       } else if (!hasErrors && !isEmpty(form.errors)) {
-        // If we can't scroll to the error (usually, because the fields are missing from StepValues), we add a toast instead
+        // If we can't scroll to the error (the fields are missing from the steps), we add a toast instead
         toast({
           variant: 'error',
           title: intl.formatMessage({ defaultMessage: 'Form validation failed', id: 'Wb0E1r' }),
@@ -213,17 +147,15 @@ export function SubmitExpenseFlowSteps(props: SubmitExpenseFlowStepsProps) {
           <FormattedMessage defaultMessage="Expense Details" id="+5Kafe" />
         </StepHeader>
         {(props.activeStep !== Step.SUMMARY || hasErrors) &&
-          stepOrder.map((step, i) => (
+          listedSteps.map((step, i) => (
             <StepItem
-              key={step}
-              isActive={props.activeStep === step}
-              hasError={
-                expenseFormStepHasError(form, step) && isExpenseFormStepTouched(form, step) && form.submitCount > 0
-              }
-              isComplete={isExpenseFormStepCompleted(form, step)}
+              key={step.id}
+              isActive={props.activeStep === step.id}
+              hasError={!isStepComplete(step, form) && isStepTouched(step, form) && form.submitCount > 0}
+              isComplete={isStepComplete(step, form)}
               isCompletedPath={i < firstIncompleteIdx - 1 || firstIncompleteIdx < 0}
             >
-              <FormattedMessage {...StepTitles[step]} />
+              <FormattedMessage {...StepTitles[step.id]} />
             </StepItem>
           ))}
         <StepHeader isActive={props.activeStep === Step.SUMMARY} stepNumber={2}>

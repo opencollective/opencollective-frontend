@@ -9,7 +9,7 @@ export const CONTRIBUTOR_FILTERS = {
   FINANCIAL: 'FINANCIAL',
 } as const;
 
-type ContributorsFilter = (typeof CONTRIBUTOR_FILTERS)[keyof typeof CONTRIBUTOR_FILTERS];
+export type ContributorsFilter = (typeof CONTRIBUTOR_FILTERS)[keyof typeof CONTRIBUTOR_FILTERS];
 
 export const FILTERS_LIST = Object.values(CONTRIBUTOR_FILTERS);
 
@@ -89,6 +89,8 @@ interface ContributorsFilterProps {
   onChange: (filter: ContributorsFilter) => void;
   /** An optional list of active filters */
   filters?: ContributorsFilter[];
+  /** Forwarded to the filters container */
+  px?: React.ComponentProps<typeof StyledFilters>['px'];
   /** @ignore from injectIntl */
   intl?: object;
 }

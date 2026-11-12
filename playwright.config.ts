@@ -57,7 +57,12 @@ export default defineConfig({
   outputDir: resultsDir,
   use: {
     baseURL: process.env.WEBSITE_URL || 'http://localhost:3000',
-    trace: 'retain-on-failure',
+    // Every attempt is traced and the trace kept when it fails (the original attempt included). DOM snapshots,
+    // which also carry the network log, are off by default: they cost about 40% of the pilot's wall time on a
+    // 4-vCPU CI runner (opencollective/opencollective#8969). Actions, logs, errors, sources and the screencast
+    // stay in the trace, next to the failure screenshot, video, page snapshot (error-context.md) and service
+    // logs. Set PLAYWRIGHT_TRACE_SNAPSHOTS=1 to record full traces when re-running a failure to diagnose it.
+    trace: { mode: 'retain-on-failure', snapshots: process.env.PLAYWRIGHT_TRACE_SNAPSHOTS === '1' },
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     viewport: { width: 1200, height: 1660 },

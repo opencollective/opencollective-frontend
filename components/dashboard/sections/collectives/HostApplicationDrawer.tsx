@@ -36,9 +36,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../../../ui/Tooltip';
 import { type Toast, useToast } from '../../../ui/useToast';
 
 import AcceptRejectButtons from './AcceptRejectButtons';
-import { EcosystemsRepositoryInfo, HostApplicationCustomData } from './hostApplicationCustomData';
+import { HostApplicationCustomData } from './hostApplicationCustomData';
 import { hostApplicationFieldsFragment, processApplicationMutation } from './queries';
-import ValidatedRepositoryInfo from './ValidatedRepositoryInfo';
+import RepositoryInformation from './RepositoryInformation';
 
 const msg = defineMessages({
   approved: {
@@ -131,6 +131,7 @@ type HostApplicationDrawerProps = {
   open: boolean;
   onClose: () => void;
   applicationId: string;
+  hostSlug?: string;
   editCollectiveMutation?: (collective: { id: number; HostCollectiveId?: number }) => Promise<void>;
 };
 
@@ -138,6 +139,7 @@ export default function HostApplicationDrawer({
   open,
   onClose,
   applicationId,
+  hostSlug,
   editCollectiveMutation,
 }: HostApplicationDrawerProps) {
   const { LoggedInUser } = useLoggedInUser();
@@ -178,7 +180,13 @@ export default function HostApplicationDrawer({
 
   const applicationQuery = useQuery<HostApplicationThreadQuery, HostApplicationThreadQueryVariables>(
     gql`
-      query HostApplicationThread($hostApplication: HostApplicationReferenceInput!, $offset: Int!, $limit: Int!) {
+      query HostApplicationThread(
+        $hostApplication: HostApplicationReferenceInput!
+        $offset: Int!
+        $limit: Int!
+        $hostSlug: String
+        $includeFiscalHostNote: Boolean! = false
+      ) {
         hostApplication(hostApplication: $hostApplication) {
           ...HostApplicationFields
           threadComments: comments(limit: $limit, offset: $offset, orderBy: { field: CREATED_AT, direction: ASC }) {
@@ -201,6 +209,8 @@ export default function HostApplicationDrawer({
         hostApplication: {
           id: applicationId,
         },
+        hostSlug,
+        includeFiscalHostNote: Boolean(hostSlug),
         offset: threadOffset,
         limit: 100,
       },
@@ -471,19 +481,7 @@ export default function HostApplicationDrawer({
                 </section>
               )}
 
-              {customData?.validatedRepositoryInfo && (
-                <section className="text-sm">
-                  <FormSectionTitle>
-                    <FormattedMessage
-                      id="PendingApplication.RepoInfo.Header"
-                      defaultMessage="Validated repository information"
-                    />
-                  </FormSectionTitle>
-                  <ValidatedRepositoryInfo customData={customData} />
-                </section>
-              )}
-
-              {ecosystemsRepository && (
+              {(customData?.validatedRepositoryInfo || ecosystemsRepository) && (
                 <section className="text-sm">
                   <FormSectionTitle>
                     <FormattedMessage
@@ -491,10 +489,7 @@ export default function HostApplicationDrawer({
                       defaultMessage="Repository information"
                     />
                   </FormSectionTitle>
-                  <EcosystemsRepositoryInfo
-                    repository={ecosystemsRepository}
-                    repositoryUrl={customData?.repositoryUrl}
-                  />
+                  <RepositoryInformation customData={customData} />
                 </section>
               )}
 

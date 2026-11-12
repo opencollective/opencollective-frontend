@@ -1,4 +1,4 @@
-/** Filter keys for /search ?type= — must match I18nFilters in pages/search.js */
+/** Filter keys for /search ?type= — must match I18nFilters in pages/search.tsx */
 export const FILTERS = {
   ALL: 'ALL',
   COLLECTIVE: 'COLLECTIVE',

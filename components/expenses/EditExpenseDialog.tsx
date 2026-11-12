@@ -2,25 +2,17 @@ import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { Form, FormikProvider, useFormikContext } from 'formik';
-import { pick } from 'lodash-es';
 import { AlertCircle, Pen } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { i18nGraphqlException } from '../../lib/errors';
-import { standardizeExpenseItemIncurredAt } from '../../lib/expenses';
-import {
-  type Currency,
-  type CurrencyExchangeRateInput,
-  type Expense,
-  ExpenseLockableFields,
-  ExpenseStatus,
-  ExpenseType,
-  PayoutMethodType,
-} from '../../lib/graphql/types/v2/graphql';
+import { type Expense, ExpenseLockableFields, ExpenseStatus, ExpenseType } from '../../lib/graphql/types/v2/graphql';
 import { cn } from '../../lib/utils';
-import { NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID, NEW_PAYOUT_METHOD_ID } from './lib/constants';
+import { type ExpenseSubmissionPlan, getExpenseEditInputSlice } from '../submit-expense/lib/expense-input';
+import { EDIT_EXPENSE_STEPS } from '../submit-expense/lib/form-steps';
+import { getPayeeKind, PayeeKind } from '../submit-expense/lib/payee-choice';
 import { getAccountReferenceInput, isSameAccount } from '@/lib/collective';
 
 import CollectivePicker from '../CollectivePicker';
@@ -193,68 +185,17 @@ const EditPaidBy = ({ expense, handleClose }) => {
 };
 
 const EditPayee = ({ expense, onSubmit }) => {
-  const formRef = React.useRef<HTMLFormElement>(undefined);
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
-    pickSchemaFields: {
-      expenseItems: true,
-      hasTax: true,
-      tax: true,
-      payoutMethodId: true,
-      payeeSlug: true,
-      accountSlug: true,
-    },
+    pickSchemaFields: EDIT_EXPENSE_STEPS.payee.fields,
   });
   const transformedOnSubmit = React.useCallback(
-    async (values, h, formOptions) => {
-      const editValues = {
-        payee: {
-          slug: formOptions.payee?.slug,
-        },
-        ...(formOptions.payee?.slug !== expense.payee.slug && {
-          payeeLocation: values.payeeLocation,
-          currency: formOptions.expenseCurrency,
-          items: values.expenseItems.map(ei => ({
-            id: ei.id,
-            description: ei.description,
-            amountV2: {
-              valueInCents: ei.amount.valueInCents,
-              currency: ei.amount.currency as Currency,
-              exchangeRate: ei.amount.exchangeRate
-                ? ({
-                    ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                    date: standardizeExpenseItemIncurredAt(ei.amount.exchangeRate.date || ei.incurredAt),
-                  } as CurrencyExchangeRateInput)
-                : null,
-            },
-            incurredAt: new Date(ei.incurredAt),
-            url: typeof ei.attachment === 'string' ? ei.attachment : ei.attachment?.url,
-          })),
-          payoutMethod:
-            !values.payoutMethodId || values.payoutMethodId === NEW_PAYOUT_METHOD_ID
-              ? { ...values.newPayoutMethod, isSaved: false }
-              : values.payoutMethodId === NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID
-                ? {
-                    type: PayoutMethodType.ACCOUNT_BALANCE,
-                    data: {},
-                  }
-                : {
-                    id: values.payoutMethodId,
-                  },
-          tax:
-            values.hasTax && values.tax && formOptions.taxType
-              ? [{ type: formOptions.taxType, rate: values.tax.rate, idNumber: values.tax.idNumber }]
-              : [],
-        }),
-      };
-      return onSubmit(editValues);
-    },
-    [expense.payee.slug, onSubmit],
+    (plan: ExpenseSubmissionPlan) => onSubmit(getExpenseEditInputSlice(plan, EDIT_EXPENSE_STEPS.payee.inputFields)),
+    [onSubmit],
   );
 
   const expenseForm = useExpenseForm({
-    formRef,
     initialValues: {
       inviteeAccountType: InviteeAccountType.INDIVIDUAL,
       accountSlug: expense.account.slug,
@@ -281,12 +222,11 @@ const EditPayee = ({ expense, onSubmit }) => {
   });
 
   const hasChangedPayee =
-    expenseForm.values.payeeSlug &&
-    expenseForm.values.payeeSlug !== expense.payee.slug &&
-    !expenseForm.values.payeeSlug.startsWith('__');
+    getPayeeKind(expenseForm.values.payeeSlug) === PayeeKind.ACCOUNT &&
+    expenseForm.values.payeeSlug !== expense.payee.slug;
   return (
     <FormikProvider value={expenseForm}>
-      <form className="space-y-6" ref={formRef} onSubmit={e => e.preventDefault()}>
+      <form className="space-y-6" onSubmit={e => e.preventDefault()}>
         <WhoIsGettingPaidForm {...WhoIsGettingPaidForm.getFormProps(expenseForm)} />
         <Collapsible open={hasChangedPayee}>
           <CollapsibleContent>
@@ -300,7 +240,7 @@ const EditPayee = ({ expense, onSubmit }) => {
         </Collapsible>
 
         <EditExpenseActionButtons
-          disabled={!hasChangedPayee || expenseForm.initialLoading}
+          disabled={!hasChangedPayee || expenseForm.initialLoading || expenseForm.isLoadingOptions}
           handleSubmit={expenseForm.handleSubmit}
         />
       </form>
@@ -323,67 +263,18 @@ const EditPayoutMethod = ({ expense, onSubmit }) => {
 };
 
 const EditDraftPayoutMethod = ({ expense, onSubmit }) => {
-  const formRef = React.useRef<HTMLFormElement>(undefined);
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
-    pickSchemaFields: {
-      expenseItems: true,
-      hasTax: true,
-      tax: true,
-      payoutMethodId: true,
-      payee: true,
-      payeeLocation: true,
-      referenceCurrency: true,
-    },
+    pickSchemaFields: EDIT_EXPENSE_STEPS.draftPayoutMethod.fields,
   });
   const transformedOnSubmit = React.useCallback(
-    async (values, h, formOptions) => {
-      const editValues = {
-        payoutMethod:
-          !values.payoutMethodId || values.payoutMethodId === NEW_PAYOUT_METHOD_ID
-            ? { ...values.newPayoutMethod, isSaved: false }
-            : values.payoutMethodId === NEW_ACCOUNT_BALANCE_PAYOUT_METHOD_ID
-              ? {
-                  type: PayoutMethodType.ACCOUNT_BALANCE,
-                  data: {},
-                }
-              : {
-                  id: values.payoutMethodId,
-                },
-        payee: {
-          slug: formOptions.payee?.slug,
-        },
-        payeeLocation: values.payeeLocation,
-        currency: values.referenceCurrency || formOptions.expenseCurrency,
-        items: values.expenseItems.map(ei => ({
-          id: ei.id,
-          description: ei.description,
-          amountV2: {
-            valueInCents: ei.amount.valueInCents,
-            currency: ei.amount.currency as Currency,
-            exchangeRate: ei.amount.exchangeRate
-              ? ({
-                  ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                  date: standardizeExpenseItemIncurredAt(ei.amount.exchangeRate.date || ei.incurredAt),
-                } as CurrencyExchangeRateInput)
-              : null,
-          },
-          incurredAt: new Date(ei.incurredAt),
-          url: typeof ei.attachment === 'string' ? ei.attachment : ei.attachment?.url,
-        })),
-        tax:
-          values.hasTax && values.tax && formOptions.taxType
-            ? [{ type: formOptions.taxType, rate: values.tax.rate, idNumber: values.tax.idNumber }]
-            : [],
-      };
-      return onSubmit(editValues);
-    },
+    (plan: ExpenseSubmissionPlan) =>
+      onSubmit(getExpenseEditInputSlice(plan, EDIT_EXPENSE_STEPS.draftPayoutMethod.inputFields)),
     [onSubmit],
   );
 
   const expenseForm = useExpenseForm({
-    formRef,
     initialValues: {
       inviteeAccountType: InviteeAccountType.INDIVIDUAL,
       referenceCurrency: expense.currency,
@@ -410,78 +301,27 @@ const EditDraftPayoutMethod = ({ expense, onSubmit }) => {
 
   return (
     <FormikProvider value={expenseForm}>
-      <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
+      <form className="space-y-4" onSubmit={e => e.preventDefault()}>
         <PayoutMethodFormContent {...PayoutMethodFormContent.getFormProps(expenseForm)} />
-        <EditExpenseActionButtons disabled={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
+        <EditExpenseActionButtons
+          disabled={expenseForm.initialLoading || expenseForm.isLoadingOptions}
+          handleSubmit={expenseForm.handleSubmit}
+        />
       </form>
     </FormikProvider>
   );
 };
 
 const EditExpenseDetails = ({ expense, onSubmit }) => {
-  const formRef = React.useRef<HTMLFormElement>(undefined);
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
-    pickSchemaFields: {
-      expenseItems: true,
-      hasTax: true,
-      tax: true,
-      expenseAttachedFiles: true,
-      invoiceFile: true,
-      invoiceNumber: true,
-      invoiceInfo: true,
-      referenceCurrency: true,
-    },
+    pickSchemaFields: EDIT_EXPENSE_STEPS.expenseDetails.fields,
   });
-  const transformedOnSubmit = (values, h, formOptions) => {
-    let invoiceFile;
-    if (values.hasInvoiceOption === YesNoOption.YES && values.invoiceFile) {
-      invoiceFile = { url: typeof values.invoiceFile === 'string' ? values.invoiceFile : values.invoiceFile.url };
-    } else if (values.hasInvoiceOption === YesNoOption.NO) {
-      invoiceFile = null;
-    }
-
-    const editValues = {
-      items: values.expenseItems.map(ei => ({
-        id: ei.id,
-        description: ei.description,
-        amountV2: {
-          valueInCents: ei.amount.valueInCents,
-          currency: ei.amount.currency as Currency,
-          exchangeRate: ei.amount.exchangeRate
-            ? ({
-                ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                date: standardizeExpenseItemIncurredAt(ei.amount.exchangeRate.date || ei.incurredAt),
-              } as CurrencyExchangeRateInput)
-            : null,
-        },
-        incurredAt: new Date(ei.incurredAt),
-        url: typeof ei.attachment === 'string' ? ei.attachment : (ei.attachment?.url ?? null),
-      })),
-      attachedFiles: values.additionalAttachments.map(a => ({
-        url: typeof a === 'string' ? a : a?.url,
-      })),
-      invoiceInfo: values.invoiceInfo,
-      invoiceFile,
-      reference: values.invoiceNumber,
-      currency: values.referenceCurrency || formOptions.expenseCurrency,
-      tax:
-        values.hasTax && values.tax
-          ? [
-              {
-                rate: values.tax.rate,
-                type: formOptions.taxType,
-                idNumber: values.tax.idNumber,
-              },
-            ]
-          : [],
-    };
-    return onSubmit(editValues);
-  };
+  const transformedOnSubmit = (plan: ExpenseSubmissionPlan) =>
+    onSubmit(getExpenseEditInputSlice(plan, EDIT_EXPENSE_STEPS.expenseDetails.inputFields));
 
   const expenseForm = useExpenseForm({
-    formRef,
     initialValues: {
       inviteeAccountType: InviteeAccountType.INDIVIDUAL,
       expenseItems: [
@@ -509,54 +349,31 @@ const EditExpenseDetails = ({ expense, onSubmit }) => {
 
   return (
     <FormikProvider value={expenseForm}>
-      <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
+      <form className="space-y-4" onSubmit={e => e.preventDefault()}>
         <ExpenseItemsForm {...ExpenseItemsForm.getFormProps(expenseForm)} />
         {expenseForm.values.expenseTypeOption === ExpenseType.INVOICE && (
           <InvoiceFormOption {...InvoiceFormOption.getFormProps(expenseForm)} />
         )}
         <AdditionalAttachments {...AdditionalAttachments.getFormProps(expenseForm)} />
-        <EditExpenseActionButtons disabled={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
+        <EditExpenseActionButtons
+          disabled={expenseForm.initialLoading || expenseForm.isLoadingOptions}
+          handleSubmit={expenseForm.handleSubmit}
+        />
       </form>
     </FormikProvider>
   );
 };
 
 const AttachReceipts = ({ expense, onSubmit }) => {
-  const formRef = React.useRef<HTMLFormElement>(undefined);
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
-    pickSchemaFields: {
-      expenseItems: true,
-    },
+    pickSchemaFields: EDIT_EXPENSE_STEPS.attachReceipts.fields,
   });
-  const transformedOnSubmit = values => {
-    const editValues = {
-      items: values.expenseItems.map(ei => ({
-        id: ei.id,
-        description: ei.description,
-        amountV2: {
-          valueInCents: ei.amount.valueInCents,
-          currency: ei.amount.currency as Currency,
-          exchangeRate: ei.amount.exchangeRate
-            ? ({
-                ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                date: standardizeExpenseItemIncurredAt(ei.amount.exchangeRate.date || ei.incurredAt),
-              } as CurrencyExchangeRateInput)
-            : null,
-        },
-        incurredAt: new Date(ei.incurredAt),
-        url: typeof ei.attachment === 'string' ? ei.attachment : (ei.attachment?.url ?? null),
-      })),
-      attachedFiles: values.additionalAttachments.map(a => ({
-        url: typeof a === 'string' ? a : a?.url,
-      })),
-    };
-    return onSubmit(editValues);
-  };
+  const transformedOnSubmit = (plan: ExpenseSubmissionPlan) =>
+    onSubmit(getExpenseEditInputSlice(plan, EDIT_EXPENSE_STEPS.attachReceipts.inputFields));
 
   const expenseForm = useExpenseForm({
-    formRef,
     initialValues: {
       inviteeAccountType: InviteeAccountType.INDIVIDUAL,
       expenseItems: [
@@ -585,7 +402,7 @@ const AttachReceipts = ({ expense, onSubmit }) => {
 
   return (
     <FormikProvider value={expenseForm}>
-      <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
+      <form className="space-y-4" onSubmit={e => e.preventDefault()}>
         {expenseForm.initialLoading ? (
           <Skeleton className="h-42 w-full" />
         ) : (
@@ -602,7 +419,10 @@ const AttachReceipts = ({ expense, onSubmit }) => {
           </div>
         )}
 
-        <EditExpenseActionButtons disabled={expenseForm.initialLoading} handleSubmit={expenseForm.handleSubmit} />
+        <EditExpenseActionButtons
+          disabled={expenseForm.initialLoading || expenseForm.isLoadingOptions}
+          handleSubmit={expenseForm.handleSubmit}
+        />
       </form>
     </FormikProvider>
   );
@@ -624,67 +444,15 @@ const getEditExpenseTypeSteps = (intl: IntlShape): StepItem[] => {
 const EditExpenseType = ({ expense, onSubmit }) => {
   const intl = useIntl();
 
-  const formRef = React.useRef<HTMLFormElement>(undefined);
   const startOptions = React.useRef({
     expenseId: expense.legacyId,
     isInlineEdit: true,
-    pickSchemaFields: {
-      expenseItems: true,
-      hasTax: true,
-      tax: true,
-      expenseAttachedFiles: true,
-      invoiceFile: true,
-      invoiceNumber: true,
-      invoiceInfo: true,
-      expenseTypeOption: true,
-    },
+    pickSchemaFields: EDIT_EXPENSE_STEPS.type.fields,
   });
-  const transformedOnSubmit = (values, h, formOptions) => {
-    const editValues = {
-      items: values.expenseItems.map(ei => ({
-        id: ei.id,
-        description: ei.description,
-        amountV2: {
-          valueInCents: ei.amount.valueInCents,
-          currency: ei.amount.currency as Currency,
-          exchangeRate: ei.amount.exchangeRate
-            ? ({
-                ...pick(ei.amount.exchangeRate, ['source', 'rate', 'value', 'fromCurrency', 'toCurrency']),
-                date: standardizeExpenseItemIncurredAt(ei.amount.exchangeRate.date || ei.incurredAt),
-              } as CurrencyExchangeRateInput)
-            : null,
-        },
-        incurredAt: new Date(ei.incurredAt),
-        url: typeof ei.attachment === 'string' ? ei.attachment : (ei.attachment?.url ?? null),
-      })),
-      attachedFiles: values.additionalAttachments.map(a => ({
-        url: typeof a === 'string' ? a : a?.url,
-      })),
-      invoiceFile:
-        values.hasInvoiceOption === YesNoOption.NO
-          ? null
-          : values.invoiceFile
-            ? { url: typeof values.invoiceFile === 'string' ? values.invoiceFile : values.invoiceFile.url }
-            : undefined,
-      invoiceInfo: values.invoiceInfo,
-      reference: values.invoiceNumber,
-      type: values.expenseTypeOption,
-      tax:
-        values.hasTax && values.tax
-          ? [
-              {
-                rate: values.tax.rate,
-                type: formOptions.taxType,
-                idNumber: values.tax.idNumber,
-              },
-            ]
-          : [],
-    };
-    return onSubmit(editValues);
-  };
+  const transformedOnSubmit = (plan: ExpenseSubmissionPlan) =>
+    onSubmit(getExpenseEditInputSlice(plan, EDIT_EXPENSE_STEPS.type.inputFields));
 
   const expenseForm = useExpenseForm({
-    formRef,
     initialValues: {
       inviteeAccountType: InviteeAccountType.INDIVIDUAL,
       expenseItems: [
@@ -714,7 +482,7 @@ const EditExpenseType = ({ expense, onSubmit }) => {
 
   return (
     <FormikProvider value={expenseForm}>
-      <form className="space-y-4" ref={formRef} onSubmit={e => e.preventDefault()}>
+      <form className="space-y-4" onSubmit={e => e.preventDefault()}>
         <Stepper initialStep={0} steps={steps} orientation="horizontal" className="mb-4">
           {steps.map(stepProps => {
             return (
@@ -888,7 +656,7 @@ const EditTypeDetailsStep = ({ expenseForm }) => {
         </Button>
 
         <Button
-          disabled={expenseForm.initialLoading}
+          disabled={expenseForm.initialLoading || expenseForm.isLoadingOptions}
           type="submit"
           loading={expenseForm.isSubmitting}
           onClick={expenseForm.handleSubmit}

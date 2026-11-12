@@ -14,12 +14,17 @@ runs:
         check-latest: true
         cache: 'npm'
 
+    - name: Get Node major version
+      id: node-major
+      shell: bash
+      run: echo "version=$(node -p 'process.versions.node.split(`.`)[0]')" >> "$GITHUB_OUTPUT"
+
     - name: Restore node_modules
       uses: actions/cache@v6
       id: node-modules
       with:
         path: node_modules
-        key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}-${{ inputs.CACHE_VERSION }}
+        key: ${{ runner.os }}-node${{ steps.node-major.outputs.version }}-node-modules-${{ hashFiles('package-lock.json') }}-${{ inputs.CACHE_VERSION }}
 
     - name: Install dependencies
       shell: bash

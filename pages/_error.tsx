@@ -1,0 +1,42 @@
+import React from 'react';
+import * as Sentry from '@sentry/nextjs';
+
+import { generateNotFoundError } from '../lib/errors';
+
+import ErrorPage from '../components/ErrorPage';
+
+/**
+ * This page is shown when NextJS triggers a critical error during server-side
+ * rendering, typically 404 errors.
+ */
+type NextJSErrorPageProps = { statusCode?: number; requestUrl?: string; err?: unknown };
+
+class NextJSErrorPage extends React.Component<NextJSErrorPageProps> {
+  static getInitialProps(context) {
+    const { res, err, req } = context;
+
+    // In case this is running in a serverless function, await this in order to give Sentry
+    // time to send the error before the lambda exits
+    Sentry.captureUnderscoreErrorException(context);
+
+    const statusCode = res ? res.statusCode : err ? err.statusCode : null;
+    return { statusCode, err, requestUrl: req && req.originalUrl };
+  }
+
+  render() {
+    const { statusCode, requestUrl } = this.props;
+
+    if (statusCode === 404 && requestUrl) {
+      const slugRegex = /^\/([^/?]+)/;
+      const parsedUrl = slugRegex.exec(requestUrl);
+      const pageSlug = parsedUrl && parsedUrl[1];
+      return <ErrorPage log={false} error={generateNotFoundError(pageSlug)} />;
+    } else {
+      return <ErrorPage />;
+    }
+  }
+}
+
+// next.js export
+// ts-unused-exports:disable-next-line
+export default NextJSErrorPage;

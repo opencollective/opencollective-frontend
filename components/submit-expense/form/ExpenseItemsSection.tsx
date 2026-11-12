@@ -49,7 +49,7 @@ import { Button } from '../../ui/Button';
 import { Input, InputGroup } from '../../ui/Input';
 import { Label } from '../../ui/Label';
 import { useToast } from '../../ui/useToast';
-import { Step } from '../SubmitExpenseFlowSteps';
+import { getExpenseStepHeading, Step } from '../SubmitExpenseFlowSteps';
 import { type ExpenseForm } from '../useExpenseForm';
 
 import { FormSectionContainer } from './FormSectionContainer';
@@ -64,7 +64,8 @@ type ExpenseItemsSectionProps = {
 export function ExpenseItemsSection(props: ExpenseItemsSectionProps) {
   return (
     <FormSectionContainer
-      step={Step.EXPENSE_ITEMS}
+      id={Step.EXPENSE_ITEMS}
+      {...getExpenseStepHeading(Step.EXPENSE_ITEMS)}
       inViewChange={props.inViewChange}
       subtitle={<FormattedMessage defaultMessage="Add the expense items that you’d like to be paid for" id="ox+mWM" />}
     >
@@ -296,7 +297,7 @@ function getExpenseItemProps(form: ExpenseForm) {
   return {
     payeeType: form.options.payee?.type,
     isDraft: form.options.expense?.status === ExpenseStatus.DRAFT,
-    ...pick(form, ['setFieldValue', 'isSubmitting', 'setFieldTouched']),
+    ...pick(form, ['setFieldValue', 'isSubmitting', 'setItemCurrency']),
     ...pick(form.options, [
       'allowExpenseItemAttachment',
       'isAdminOfPayee',
@@ -337,15 +338,9 @@ const ExpenseItem = memoWithGetFormProps(function ExpenseItem(props: ExpenseItem
   const hasAttachment = props.allowExpenseItemAttachment;
   const attachmentId = useId();
 
-  const { setFieldValue, setFieldTouched } = props;
+  const { setFieldValue, setItemCurrency } = props;
 
-  const onCurrencyChange = React.useCallback(
-    v => {
-      setFieldTouched('expenseItems');
-      setFieldValue(`expenseItems.${props.index}.amount.currency`, v);
-    },
-    [props.index, setFieldValue, setFieldTouched],
-  );
+  const onCurrencyChange = React.useCallback(v => setItemCurrency(props.index, v), [props.index, setItemCurrency]);
 
   const onGraphQLSuccess = React.useCallback(
     uploadResults => {

@@ -25,7 +25,7 @@ type EditTagsProps = {
   suggestedTags?: string[];
   searchFunc?: (term?: string) => void;
   loading?: boolean;
-  value: string[];
+  value?: string[];
   onChange: (value: { label: string; value: string }[]) => void;
   defaultValue?: string[];
   disabled?: boolean;

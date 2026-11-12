@@ -1,5 +1,4 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
 import type { FieldMetaProps } from 'formik';
 import { Field, useFormikContext } from 'formik';
 import { isEmpty, isNil, pick } from 'lodash-es';
@@ -9,13 +8,14 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
 import { AccountType, ExpenseStatus, ExpenseType } from '../../../lib/graphql/types/v2/graphql';
+import { getPayeeChoice, getPayeeKind, PayeeKind } from '../lib/payee-choice';
+import { getLastUsedPayoutProfile } from '../lib/reconcile';
 import {
   PAYEE_SLUG_CREATE_LEGAL_ENTITY,
   PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER,
   PAYEE_SLUG_INVITE,
   PAYEE_SLUG_INVITE_EXISTING_USER,
   PAYEE_SLUG_INVITE_SOMEONE,
-  PAYEE_SLUG_NEW_VENDOR,
   PAYEE_SLUG_VENDOR,
 } from '@/components/expenses/lib/constants';
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
@@ -39,7 +39,7 @@ import { Label } from '../../ui/Label';
 import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
 import { Separator } from '../../ui/Separator';
 import { useToast } from '../../ui/useToast';
-import { Step } from '../SubmitExpenseFlowSteps';
+import { getExpenseStepHeading, Step } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
 
 import { CreateLegalEntityPayeeForm } from './CreateLegalEntityPayeeForm';
@@ -47,7 +47,6 @@ import { ExpenseAccountItem } from './ExpenseAccountItem';
 import { FormSectionContainer } from './FormSectionContainer';
 import { memoWithGetFormProps } from './helper';
 import { InviteUserOption } from './InviteUserOption';
-import { updateAccountLegalNameMutation, updateAccountUSEntityMutation } from './mutations';
 
 type WhoIsGettingPaidSectionProps = {
   inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
@@ -55,7 +54,7 @@ type WhoIsGettingPaidSectionProps = {
 
 function getFormProps(form: ExpenseForm) {
   return {
-    ...pick(form, 'initialLoading', 'setFieldValue', 'setFieldTouched', 'refresh', 'isSubmitting'),
+    ...pick(form, 'initialLoading', 'setFieldValue', 'setFieldTouched', 'actions', 'isSubmitting'),
     ...pick(form.options, [
       'payoutProfiles',
       'recentlySubmittedExpenses',
@@ -76,7 +75,11 @@ export const WhoIsGettingPaidSection = memoWithGetFormProps(function WhoIsGettin
 ) {
   const { inViewChange, ...rest } = props;
   return (
-    <FormSectionContainer step={Step.WHO_IS_GETTING_PAID} inViewChange={inViewChange}>
+    <FormSectionContainer
+      id={Step.WHO_IS_GETTING_PAID}
+      {...getExpenseStepHeading(Step.WHO_IS_GETTING_PAID)}
+      inViewChange={inViewChange}
+    >
       <WhoIsGettingPaidForm {...rest} />
     </FormSectionContainer>
   );
@@ -86,10 +89,12 @@ export const WhoIsGettingPaidSection = memoWithGetFormProps(function WhoIsGettin
 export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPaidForm(
   props: ReturnType<typeof getFormProps>,
 ) {
-  const [isLoading, setIsLoading] = React.useState(true);
   const intl = useIntl();
-  const [lastUsedProfile, setLastUsedProfile] = React.useState<ExpenseForm['options']['payoutProfiles'][number]>(null);
-  const [isMyOtherProfilesSelected, setIsMyOtherProfilesSelected] = React.useState(false);
+  const isLoading = props.initialLoading;
+  const lastUsedProfile = React.useMemo(
+    () => getLastUsedPayoutProfile(pick(props, ['payoutProfiles', 'recentlySubmittedExpenses'])),
+    [props.payoutProfiles, props.recentlySubmittedExpenses],
+  );
 
   const myProfiles = React.useMemo(() => props.payoutProfiles || [], [props.payoutProfiles]);
   const personalProfile = React.useMemo(() => myProfiles.find(p => p.type === AccountType.INDIVIDUAL), [myProfiles]);
@@ -105,9 +110,8 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
   const singleOtherProfile = administeredProfiles.length === 1 ? otherProfiles[0] : null;
   const hasMultipleOtherProfiles = administeredProfiles.length > 1 && otherProfiles.length > 0;
   const hasAdministeredProfiles = administeredProfiles.length > 0;
-  const isInvite = [PAYEE_SLUG_INVITE_SOMEONE, PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_EXISTING_USER].includes(
-    props.payeeSlug,
-  );
+  const payeeKind = getPayeeKind(props.payeeSlug);
+  const isInvite = getPayeeChoice({ payeeSlug: props.payeeSlug }).isInvite;
 
   const isUSHostWithTaxFormsEnabled =
     props.host?.location?.country === 'US' && isFeatureEnabled(props.host, FEATURES.TAX_FORMS);
@@ -122,54 +126,13 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
     [isUSHostWithTaxFormsEnabled],
   );
 
+  // The payee defaults to the last used profile, or the personal profile (see the form reconcile rules)
   const { setFieldValue, setFieldTouched } = props;
-  React.useEffect(() => {
-    const myProfileSlugs = myProfiles.map(m => m.slug);
-    const recentExpensesToMyProfiles = props.recentlySubmittedExpenses?.nodes?.filter(
-      e => e?.payee?.slug && myProfileSlugs.includes(e.payee.slug),
-    );
-
-    const lastUsedProfileId = recentExpensesToMyProfiles?.length > 0 && recentExpensesToMyProfiles.at(0).payee?.id;
-
-    const lastUsed = props.payoutProfiles?.find(p => p.id === lastUsedProfileId);
-
-    if (lastUsed) {
-      setLastUsedProfile(lastUsed);
-    } else {
-      setLastUsedProfile(null);
-    }
-
-    let newPayeeSlug = props.payeeSlug;
-    if (!newPayeeSlug) {
-      if (recentExpensesToMyProfiles?.length > 0) {
-        newPayeeSlug = recentExpensesToMyProfiles.at(0).payee.slug;
-      } else if (personalProfile) {
-        newPayeeSlug = personalProfile.slug;
-      }
-      setFieldValue('payeeSlug', newPayeeSlug);
-    }
-
-    const otherProfileSelection = otherProfiles.find(p => p.slug === newPayeeSlug);
-    const isMyOtherProfilesSelected =
-      hasMultipleOtherProfiles &&
-      (!newPayeeSlug || newPayeeSlug === PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER || !!otherProfileSelection);
-    setIsMyOtherProfilesSelected(isMyOtherProfilesSelected);
-
-    if (!props.initialLoading) {
-      setIsLoading(false);
-    }
-  }, [
-    props.payoutProfiles,
-    props.recentlySubmittedExpenses,
-    myProfiles,
-    setFieldValue,
-    props.payeeSlug,
-    personalProfile,
-    otherProfiles,
-    hasMultipleOtherProfiles,
-    lastUsedProfile?.slug,
-    props.initialLoading,
-  ]);
+  const isMyOtherProfilesSelected =
+    hasMultipleOtherProfiles &&
+    (!props.payeeSlug ||
+      payeeKind === PayeeKind.FIND_ACCOUNT_I_ADMINISTER ||
+      otherProfiles.some(p => p.slug === props.payeeSlug));
 
   return (
     <React.Fragment>
@@ -195,10 +158,13 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
             subContent={
               <div className="flex flex-col gap-2">
                 {isEmpty(lastUsedProfile?.legalName) && (
-                  <LegalNameWarning account={lastUsedProfile} onLegalNameUpdate={props.refresh} />
+                  <LegalNameWarning account={lastUsedProfile} updateLegalName={props.actions.updateLegalName} />
                 )}
                 {isUSEntityRequired(lastUsedProfile) && (
-                  <USPersonWarning account={lastUsedProfile} onUSPersonUpdate={props.refresh} />
+                  <USPersonWarning
+                    account={lastUsedProfile}
+                    updateUSEntityStatus={props.actions.updateUSEntityStatus}
+                  />
                 )}
               </div>
             }
@@ -222,10 +188,13 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
             subContent={
               <div className="flex flex-col gap-2">
                 {isEmpty(personalProfile?.legalName) && (
-                  <LegalNameWarning account={personalProfile} onLegalNameUpdate={props.refresh} />
+                  <LegalNameWarning account={personalProfile} updateLegalName={props.actions.updateLegalName} />
                 )}
                 {isUSEntityRequired(personalProfile) && (
-                  <USPersonWarning account={personalProfile} onUSPersonUpdate={props.refresh} />
+                  <USPersonWarning
+                    account={personalProfile}
+                    updateUSEntityStatus={props.actions.updateUSEntityStatus}
+                  />
                 )}
               </div>
             }
@@ -246,10 +215,13 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
             subContent={
               <div className="flex flex-col gap-2">
                 {isEmpty(singleOtherProfile.legalName) && (
-                  <LegalNameWarning account={singleOtherProfile} onLegalNameUpdate={props.refresh} />
+                  <LegalNameWarning account={singleOtherProfile} updateLegalName={props.actions.updateLegalName} />
                 )}
                 {isUSEntityRequired(singleOtherProfile) && (
-                  <USPersonWarning account={singleOtherProfile} onUSPersonUpdate={props.refresh} />
+                  <USPersonWarning
+                    account={singleOtherProfile}
+                    updateUSEntityStatus={props.actions.updateUSEntityStatus}
+                  />
                 )}
               </div>
             }
@@ -272,7 +244,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
                   <CollectivePicker
                     disabled={props.isSubmitting}
                     collectives={otherProfiles}
-                    collective={props.payeeSlug === PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER ? null : props.payee}
+                    collective={payeeKind === PayeeKind.FIND_ACCOUNT_I_ADMINISTER ? null : props.payee}
                     onChange={e => {
                       const slug = e.value.slug;
                       setFieldValue('payeeSlug', !slug ? PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER : slug);
@@ -282,10 +254,13 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
                 {props.payee && props.payeeSlug === props.payee.slug && (
                   <React.Fragment>
                     {isEmpty(props.payee.legalName) && (
-                      <LegalNameWarning account={props.payee} onLegalNameUpdate={props.refresh} />
+                      <LegalNameWarning account={props.payee} updateLegalName={props.actions.updateLegalName} />
                     )}
                     {isUSEntityRequired(props.payee) && (
-                      <USPersonWarning account={props.payee} onUSPersonUpdate={props.refresh} />
+                      <USPersonWarning
+                        account={props.payee}
+                        updateUSEntityStatus={props.actions.updateUSEntityStatus}
+                      />
                     )}
                   </React.Fragment>
                 )}
@@ -299,16 +274,14 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
         {!isLoading && !hasAdministeredProfiles && props.loggedInAccount && (
           <RadioGroupCard
             value={PAYEE_SLUG_CREATE_LEGAL_ENTITY}
-            checked={props.payeeSlug === PAYEE_SLUG_CREATE_LEGAL_ENTITY}
-            showSubcontent={props.payeeSlug === PAYEE_SLUG_CREATE_LEGAL_ENTITY}
+            checked={payeeKind === PayeeKind.NEW_LEGAL_ENTITY}
+            showSubcontent={payeeKind === PayeeKind.NEW_LEGAL_ENTITY}
             disabled={props.isSubmitting}
             className="min-w-0"
             subContent={
               <CreateLegalEntityPayeeForm
                 isSubmitting={props.isSubmitting}
-                refresh={props.refresh}
-                setFieldValue={props.setFieldValue}
-                setFieldTouched={props.setFieldTouched}
+                createPayeeOrganization={props.actions.createPayeeOrganization}
               />
             }
           >
@@ -334,7 +307,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
                   onFocus={() => props.setFieldValue('payeeSlug', PAYEE_SLUG_INVITE_SOMEONE)}
                   invitable
                   expenseType={props.expenseTypeOption}
-                  collective={props.payeeSlug === PAYEE_SLUG_INVITE_EXISTING_USER ? props.payee : null}
+                  collective={payeeKind === PayeeKind.INVITE_EXISTING_USER ? props.payee : null}
                   types={[
                     CollectiveType.COLLECTIVE,
                     CollectiveType.EVENT,
@@ -354,7 +327,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
                   }}
                 />
 
-                {props.payeeSlug === PAYEE_SLUG_INVITE_EXISTING_USER && props.payee && (
+                {payeeKind === PayeeKind.INVITE_EXISTING_USER && props.payee && (
                   <React.Fragment>
                     <Separator className="mt-3" />
                     <div className="mt-3">
@@ -371,7 +344,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
                   </React.Fragment>
                 )}
 
-                {props.payeeSlug === PAYEE_SLUG_INVITE && (
+                {payeeKind === PayeeKind.INVITE_NEW && (
                   <React.Fragment>
                     <Separator className="mt-3" />
                     <div className="mt-3">
@@ -425,7 +398,7 @@ export const WhoIsGettingPaidForm = memoWithGetFormProps(function WhoIsGettingPa
       </RadioGroup>
       <Field name="payeeSlug">
         {({ meta }: { meta: FieldMetaProps<string> }) => {
-          if (!meta.error || !meta.value || meta.value.startsWith('__')) {
+          if (!meta.error || getPayeeKind(meta.value) !== PayeeKind.ACCOUNT) {
             return null;
           }
           return (
@@ -481,9 +454,10 @@ const VendorOption = React.memo(function VendorOption(props: {
   });
   // Setting a state variable to keep the Vendor option open when a vendor that is not part of the preloaded vendors is selected
   const [selectedVendor, setSelectedVendor] = React.useState(undefined);
+  const payeeKind = getPayeeKind(props.payeeSlug);
+  const isPickingVendor = payeeKind === PayeeKind.VENDOR_PICKER || payeeKind === PayeeKind.NEW_VENDOR;
   const isVendorSelected =
-    props.payeeSlug === PAYEE_SLUG_VENDOR ||
-    props.payeeSlug === PAYEE_SLUG_NEW_VENDOR ||
+    isPickingVendor ||
     props.vendorsForAccount.some(v => v.slug === props.payeeSlug) ||
     selectedVendor?.slug === props.payeeSlug;
 
@@ -506,11 +480,7 @@ const VendorOption = React.memo(function VendorOption(props: {
             includeVendorsForHostId={props.host.legacyId}
             disabled={props.isSubmitting}
             defaultCollectives={props.vendorsForAccount}
-            collective={
-              props.payeeSlug === PAYEE_SLUG_VENDOR || props.payeeSlug === PAYEE_SLUG_NEW_VENDOR
-                ? null
-                : selectedVendor || props.payee
-            }
+            collective={isPickingVendor ? null : selectedVendor || props.payee}
             {...(isHostAdmin
               ? quickCreateVendorCollectivePickerOptions(createVendorFromSearch, { isBeneficiary })
               : {})}
@@ -536,48 +506,30 @@ const VendorOption = React.memo(function VendorOption(props: {
 
 function LegalNameWarning(props: {
   account: ExpenseForm['options']['payoutProfiles'][number] | ExpenseForm['options']['payee'];
-  onLegalNameUpdate: () => void;
+  updateLegalName: ExpenseForm['actions']['updateLegalName'];
 }) {
   const intl = useIntl();
   const { toast } = useToast();
   const [legalName, setLegalName] = React.useState('');
   const [legalNameUpdated, setLegalNameUpdated] = React.useState(false);
-  const timeoutRef = React.useRef(null);
+  const [loading, setLoading] = React.useState(false);
 
-  const [submitLegalNameMutation, { loading }] = useMutation(updateAccountLegalNameMutation, {
-    variables: {
-      account: {
-        id: props.account.id,
-        legalName,
-      },
-    },
-  });
-
-  const { onLegalNameUpdate } = props;
-  const handleLegalNameUpdate = React.useCallback(() => {
-    const timeout = setTimeout(() => {
-      onLegalNameUpdate();
-    }, 5000);
-    setLegalNameUpdated(true);
-    timeoutRef.current = timeout;
-  }, [onLegalNameUpdate]);
-
-  React.useEffect(() => {
-    return () => timeoutRef.current && clearTimeout(timeoutRef.current);
-  }, []);
-
+  const { updateLegalName } = props;
   const onSubmitLegalName = React.useCallback(async () => {
     try {
-      await submitLegalNameMutation();
-      handleLegalNameUpdate();
+      setLoading(true);
+      await updateLegalName(props.account.id, legalName);
+      setLegalNameUpdated(true);
       toast({
         variant: 'success',
         message: intl.formatMessage({ defaultMessage: 'Legal name updated', id: 'aLu6aT' }),
       });
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+    } finally {
+      setLoading(false);
     }
-  }, [submitLegalNameMutation, toast, intl, handleLegalNameUpdate]);
+  }, [updateLegalName, props.account.id, legalName, toast, intl]);
 
   if (legalNameUpdated) {
     return (
@@ -620,48 +572,30 @@ function LegalNameWarning(props: {
 
 function USPersonWarning(props: {
   account: ExpenseForm['options']['payoutProfiles'][number] | ExpenseForm['options']['payee'];
-  onUSPersonUpdate: () => void;
+  updateUSEntityStatus: ExpenseForm['actions']['updateUSEntityStatus'];
 }) {
   const intl = useIntl();
   const { toast } = useToast();
   const [isUSEntity, setIsUSEntity] = React.useState<boolean | null>(null);
   const [usPersonUpdated, setUsPersonUpdated] = React.useState(false);
-  const timeoutRef = React.useRef(null);
+  const [loading, setLoading] = React.useState(false);
 
-  const [submitUSPersonMutation, { loading }] = useMutation(updateAccountUSEntityMutation, {
-    variables: {
-      account: {
-        id: props.account.id,
-        isUSEntity,
-      },
-    },
-  });
-
-  const { onUSPersonUpdate } = props;
-  const handleUSPersonUpdate = React.useCallback(() => {
-    const timeout = setTimeout(() => {
-      onUSPersonUpdate();
-    }, 5000);
-    setUsPersonUpdated(true);
-    timeoutRef.current = timeout;
-  }, [onUSPersonUpdate]);
-
-  React.useEffect(() => {
-    return () => timeoutRef.current && clearTimeout(timeoutRef.current);
-  }, []);
-
+  const { updateUSEntityStatus } = props;
   const onSubmitUSPerson = React.useCallback(async () => {
     try {
-      await submitUSPersonMutation();
-      handleUSPersonUpdate();
+      setLoading(true);
+      await updateUSEntityStatus(props.account.id, isUSEntity);
+      setUsPersonUpdated(true);
       toast({
         variant: 'success',
         message: intl.formatMessage({ defaultMessage: 'Tax information updated', id: 'NeqwR2' }),
       });
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+    } finally {
+      setLoading(false);
     }
-  }, [submitUSPersonMutation, toast, intl, handleUSPersonUpdate]);
+  }, [updateUSEntityStatus, props.account.id, isUSEntity, toast, intl]);
 
   if (usPersonUpdated) {
     return (

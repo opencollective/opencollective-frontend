@@ -25,7 +25,7 @@ const ForDevelopers = ({ account }) => {
     return <PersonalTokenSettings id={id} backPath={router.asPath.replace(/\/personal-tokens\/.+/, '')} />;
   } else {
     return (
-      <React.Fragment>
+      <div className="flex flex-col gap-10">
         <OAuthApplicationsList
           account={account}
           offset={query.offset ? parseInt(query.offset as string) : 0}
@@ -38,7 +38,7 @@ const ForDevelopers = ({ account }) => {
             onPersonalTokenCreated={(app, account) => router.push(getPersonalTokenSettingsRoute(account, app))}
           />
         )}
-      </React.Fragment>
+      </div>
     );
   }
 };

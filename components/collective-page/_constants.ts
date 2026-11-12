@@ -1,10 +1,10 @@
 /**
  * Shared dimensions between collective page's components
  */
-export const Dimensions = {
+export const Dimensions: { PADDING_X: number[]; MAX_SECTION_WIDTH: number } = {
   PADDING_X: [15, 30],
   MAX_SECTION_WIDTH: 1260,
-} as const;
+};
 
 export const Sections = {
   TOP_FINANCIAL_CONTRIBUTORS: 'top-financial-contributors',

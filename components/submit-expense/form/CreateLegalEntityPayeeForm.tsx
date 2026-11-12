@@ -1,5 +1,4 @@
 import React from 'react';
-import { useMutation } from '@apollo/client';
 import type { FormikHelpers } from 'formik';
 import { useFormikContext } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -8,13 +7,7 @@ import { z } from 'zod';
 import { suggestSlug } from '@/lib/collective';
 import { getCurrencyForCountry } from '@/lib/currency-utils';
 import { formatErrorMessage, getErrorFromGraphqlException } from '@/lib/errors';
-import {
-  CountryIso,
-  type CreateOrganizationFromExpenseFlowMutation,
-  type CreateOrganizationFromExpenseFlowMutationVariables,
-  Currency,
-} from '@/lib/graphql/types/v2/graphql';
-import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
+import { CountryIso, Currency } from '@/lib/graphql/types/v2/graphql';
 import { getCountryCodeFromLocalBrowserLanguage } from '@/lib/i18n/countries';
 
 import { FormField } from '@/components/FormField';
@@ -27,13 +20,10 @@ import { useToast } from '@/components/ui/useToast';
 import { Button } from '../../ui/Button';
 import { type ExpenseForm } from '../useExpenseForm';
 
-import { createOrganizationFromExpenseFlowMutation } from './mutations';
-
 type CreateLegalEntityPayeeFormProps = {
   isSubmitting: ExpenseForm['isSubmitting'];
-  refresh: ExpenseForm['refresh'];
-  setFieldValue: ExpenseForm['setFieldValue'];
-  setFieldTouched: ExpenseForm['setFieldTouched'];
+  /** Creates the Organization and selects it as the payee */
+  createPayeeOrganization: ExpenseForm['actions']['createPayeeOrganization'];
 };
 
 const getCreateLegalEntitySchema = (requiredMessage: string) =>
@@ -60,36 +50,24 @@ const initialFormValues = {
 export function CreateLegalEntityPayeeForm(props: CreateLegalEntityPayeeFormProps) {
   const intl = useIntl();
   const { toast } = useToast();
-  const { refetchLoggedInUser } = useLoggedInUser();
-  const [createOrganization, { loading }] = useMutation<
-    CreateOrganizationFromExpenseFlowMutation,
-    CreateOrganizationFromExpenseFlowMutationVariables
-  >(createOrganizationFromExpenseFlowMutation);
+  const [loading, setLoading] = React.useState(false);
 
   const requiredMessage = intl.formatMessage({ defaultMessage: 'Required', id: 'Seanpx' });
   const schema = React.useMemo(() => getCreateLegalEntitySchema(requiredMessage), [requiredMessage]);
 
-  const { refresh, setFieldValue, setFieldTouched } = props;
+  const { createPayeeOrganization } = props;
   const onSubmit = React.useCallback(
     async (values: LegalEntityFormValues, helpers: FormikHelpers<LegalEntityFormValues>) => {
       try {
-        const result = await createOrganization({
-          variables: {
-            organization: {
-              name: values.name,
-              legalName: values.legalName,
-              slug: values.slug,
-              countryISO: values.countryISO,
-              currency: values.currency,
-            },
-          },
+        setLoading(true);
+        const newOrganization = await createPayeeOrganization({
+          name: values.name,
+          legalName: values.legalName,
+          slug: values.slug,
+          countryISO: values.countryISO,
+          currency: values.currency,
         });
-        const newOrganization = result.data?.createOrganization;
         if (newOrganization?.slug) {
-          await refetchLoggedInUser();
-          await refresh();
-          setFieldValue('payeeSlug', newOrganization.slug);
-          setFieldTouched('payeeSlug', true);
           toast({
             variant: 'success',
             message: intl.formatMessage({
@@ -104,9 +82,11 @@ export function CreateLegalEntityPayeeForm(props: CreateLegalEntityPayeeFormProp
           helpers.setFieldError('slug', formatErrorMessage(intl, gqlError));
         }
         toast({ variant: 'error', message: formatErrorMessage(intl, gqlError) });
+      } finally {
+        setLoading(false);
       }
     },
-    [createOrganization, intl, refetchLoggedInUser, refresh, setFieldValue, setFieldTouched, toast],
+    [createPayeeOrganization, intl, toast],
   );
 
   return (

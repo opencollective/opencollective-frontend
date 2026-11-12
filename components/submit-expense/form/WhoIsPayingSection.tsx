@@ -6,13 +6,14 @@ import { AlertCircle } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
+import { getAccountQuerySlug } from '../lib/payee-choice';
 
 import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 import CollectivePickerAsync from '../../CollectivePickerAsync';
 import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
-import { Step, StepTitles } from '../SubmitExpenseFlowSteps';
+import { getExpenseStepHeading, Step, StepTitles } from '../SubmitExpenseFlowSteps';
 import type { ExpenseForm } from '../useExpenseForm';
 
 import { ExpenseAccountItem } from './ExpenseAccountItem';
@@ -30,7 +31,6 @@ function getFormProps(form: ExpenseForm) {
     initialLoading: form.initialLoading,
     ...pick(form.options, ['recentlySubmittedExpenses', 'account', 'canChangeAccount']),
     ...pick(form.values, ['accountSlug']),
-    accountSlugTouched: form.touched.accountSlug,
     isSubmitting: form.isSubmitting,
   };
 }
@@ -38,9 +38,6 @@ function getFormProps(form: ExpenseForm) {
 // eslint-disable-next-line prefer-arrow-callback
 export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSection(props: WhoIsPayingSectionProps) {
   const intl = useIntl();
-  const [isLoading, setIsLoading] = React.useState(true);
-  const lastSubmittedExpense = props.recentlySubmittedExpenses?.nodes?.at?.(0);
-  const lastSubmittedAccount = lastSubmittedExpense && lastSubmittedExpense.account;
 
   const recentlySubmittedAccounts = React.useMemo(
     () => uniqBy((props.recentlySubmittedExpenses?.nodes || []).map(e => e?.account).filter(Boolean), 'slug'),
@@ -48,22 +45,8 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
   );
 
   const { setFieldValue, setFieldTouched } = props;
-  React.useEffect(() => {
-    if (lastSubmittedAccount && !props.accountSlug && !props.accountSlugTouched) {
-      setFieldValue('accountSlug', lastSubmittedAccount.slug);
-    }
-
-    if (!props.initialLoading) {
-      setIsLoading(false);
-    }
-  }, [
-    lastSubmittedAccount,
-    setFieldValue,
-    props.accountSlug,
-    props.accountSlugTouched,
-    props.initialLoading,
-    setFieldTouched,
-  ]);
+  // The last submitted account is selected by default (see the form reconcile rules)
+  const isLoading = props.initialLoading;
 
   const isFindSelected =
     !props.accountSlug ||
@@ -72,7 +55,8 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
 
   return (
     <FormSectionContainer
-      step={Step.WHO_IS_PAYING}
+      id={Step.WHO_IS_PAYING}
+      {...getExpenseStepHeading(Step.WHO_IS_PAYING)}
       inViewChange={props.inViewChange}
       title={intl.formatMessage(StepTitles[Step.WHO_IS_PAYING])}
     >
@@ -123,7 +107,7 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
                   CollectiveType.ORGANIZATION,
                   CollectiveType.PROJECT,
                 ]}
-                collective={props.accountSlug === '__find' ? null : props.account}
+                collective={getAccountQuerySlug(props.accountSlug) ? props.account : null}
                 onChange={e => setFieldValue('accountSlug', e.value.slug)}
               />
             }
@@ -139,7 +123,7 @@ export const WhoIsPayingSection = memoWithGetFormProps(function WhoIsPayingSecti
         )}
       </RadioGroup>
       {/** Show errors for account field (usually unsupported expense types) */}
-      {Boolean(props.accountSlug && !props.accountSlug.startsWith('__')) && (
+      {Boolean(getAccountQuerySlug(props.accountSlug)) && (
         <Field name="accountSlug">
           {({ meta }: { meta: FieldMetaProps<string> }) => {
             if (!meta.error) {

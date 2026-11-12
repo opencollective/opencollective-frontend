@@ -1,5 +1,4 @@
 import React from 'react';
-import { gql, useMutation } from '@apollo/client';
 import { Formik, useFormikContext } from 'formik';
 import { get, isEmpty, omit, pick, truncate } from 'lodash-es';
 import { BadgeCheck, Pencil, ShieldAlert, Trash2 } from 'lucide-react';
@@ -8,21 +7,11 @@ import { FormattedMessage, useIntl } from 'react-intl';
 
 import { AccountTypesWithHost, CollectiveType } from '../../../lib/constants/collectives';
 import { i18nGraphqlException } from '../../../lib/errors';
-import {
-  type EditPayoutMethodMutation,
-  type EditPayoutMethodMutationVariables,
-  ExpenseStatus,
-  type SavePayoutMethodMutation,
-  type SavePayoutMethodMutationVariables,
-} from '../../../lib/graphql/types/v2/graphql';
+import { ExpenseStatus } from '../../../lib/graphql/types/v2/graphql';
 import { ExpenseType, PayoutMethodType } from '../../../lib/graphql/types/v2/graphql';
-import {
-  NEW_PAYOUT_METHOD_ID,
-  PAYEE_SLUG_CREATE_LEGAL_ENTITY,
-  PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER,
-  PAYEE_SLUG_NEW_VENDOR,
-  PAYEE_SLUG_VENDOR,
-} from '@/components/expenses/lib/constants';
+import { getPayeeChoice, getPayeeKind, PayeeKind } from '../lib/payee-choice';
+import { getLastUsedPayoutMethod } from '../lib/reconcile';
+import { NEW_PAYOUT_METHOD_ID } from '@/components/expenses/lib/constants';
 import type { PayPalSupportedCurrencies } from '@/lib/constants/currency';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import i18nPayoutMethodType from '@/lib/i18n/payout-method-type';
@@ -46,15 +35,24 @@ import { Button } from '../../ui/Button';
 import { RadioGroup, RadioGroupCard } from '../../ui/RadioGroup';
 import { useToast } from '../../ui/useToast';
 import { PayoutMethodDetailsContainer } from '../PayoutMethodDetails';
-import { Step } from '../SubmitExpenseFlowSteps';
+import { getExpenseStepHeading, Step } from '../SubmitExpenseFlowSteps';
 import { type ExpenseForm } from '../useExpenseForm';
+import type { ExpenseFormActions } from '../useExpenseFormActions';
 
 import { FormSectionContainer } from './FormSectionContainer';
 import { memoWithGetFormProps } from './helper';
-import { updateAccountLegalNameMutation } from './mutations';
 import { privateInfoYouAndHost, privateInfoYouCollectiveAndHost } from './PrivateInfoMessages';
 
 const getPayoutMethodHTMLId = (payoutMethodId: string) => `payout-method-option-${payoutMethodId}`;
+
+/** Scrolls to a payout method, as it might end up in a different place after being saved */
+const scrollToPayoutMethod = (payoutMethodId: string) => {
+  setTimeout(() => {
+    document
+      .getElementById(getPayoutMethodHTMLId(payoutMethodId))
+      ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 100);
+};
 
 type PayoutMethodSectionProps = {
   inViewChange: (inView: boolean, entry: IntersectionObserverEntry) => void;
@@ -64,8 +62,7 @@ type PayoutMethodFormContext = ExpenseForm | ReturnType<typeof usePayoutMethodFo
 
 function getFormProps(form: PayoutMethodFormContext) {
   return {
-    ...pick(form, ['setFieldTouched', 'setFieldValue', 'initialLoading', 'refresh', 'isSubmitting']),
-    onPayoutMethodDeleted: 'onPayoutMethodDeleted' in form ? form.onPayoutMethodDeleted : undefined,
+    ...pick(form, ['setFieldTouched', 'setFieldValue', 'initialLoading', 'actions', 'isSubmitting']),
     ...pick(form.values, ['payeeSlug', 'payoutMethodId', 'expenseTypeOption']),
     ...pick(form.startOptions, ['isInlineEdit']),
     ...pick(form.options, [
@@ -91,7 +88,8 @@ export const PayoutMethodSection = memoWithGetFormProps(function PayoutMethodSec
   const { inViewChange, ...rest } = props;
   return (
     <FormSectionContainer
-      step={Step.PAYOUT_METHOD}
+      id={Step.PAYOUT_METHOD}
+      {...getExpenseStepHeading(Step.PAYOUT_METHOD)}
       inViewChange={inViewChange}
       title={<FormattedMessage defaultMessage="Select a payout method" id="Ri4REE" />}
     >
@@ -104,15 +102,16 @@ export const PayoutMethodSection = memoWithGetFormProps(function PayoutMethodSec
 export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMethodFormContent(
   props: ReturnType<typeof getFormProps>,
 ) {
-  const [lastUsedPayoutMethod, setLastUsedPayoutMethod] =
-    React.useState<ExpenseForm['options']['payoutMethods'][number]>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const isLoading = props.initialLoading;
+  const lastUsedPayoutMethod = React.useMemo(
+    () => getLastUsedPayoutMethod(pick(props, ['payoutMethods', 'recentlySubmittedExpenses']), props.payeeSlug),
+    [props.payoutMethods, props.recentlySubmittedExpenses, props.payeeSlug],
+  );
   const { LoggedInUser } = useLoggedInUser();
 
-  const isLoadingPayee = props.payeeSlug && !props.payeeSlug.startsWith('__') && props.payee?.slug !== props.payeeSlug;
-  const isPickingProfileAdministered = [PAYEE_SLUG_FIND_ACCOUNT_I_ADMINISTER, PAYEE_SLUG_CREATE_LEGAL_ENTITY].includes(
-    props.payeeSlug,
-  );
+  const payeeChoice = getPayeeChoice({ payeeSlug: props.payeeSlug });
+  const isLoadingPayee = payeeChoice.kind === PayeeKind.ACCOUNT && props.payee?.slug !== props.payeeSlug;
+  const isPickingProfileAdministered = payeeChoice.isAdministeredAccountPicker;
 
   const payoutMethods = React.useMemo(() => {
     if (!props.payoutMethods) {
@@ -126,54 +125,11 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
     return [lastUsedPayoutMethod, ...(props.payoutMethods?.filter(p => p.id !== lastUsedPayoutMethod.id) || [])];
   }, [props.payoutMethods, lastUsedPayoutMethod]);
 
-  const { setFieldValue, setFieldTouched, refresh, onPayoutMethodDeleted } = props;
-  React.useEffect(() => {
-    const lastSubmittedExpenseByPayee = (props.recentlySubmittedExpenses?.nodes || [])
-      .filter(e => e && e.payee.slug === props.payeeSlug && e.payoutMethod?.id)
-      .find(() => true);
-    const lastUsedPayoutMethodId = lastSubmittedExpenseByPayee?.payoutMethod?.id;
-    const lastUsed = lastUsedPayoutMethodId && (props.payoutMethods || []).find(p => p.id === lastUsedPayoutMethodId);
-
-    if (lastUsed) {
-      setLastUsedPayoutMethod(lastUsed);
-    } else {
-      setLastUsedPayoutMethod(null);
-    }
-
-    const expensePayoutMethodId = props.expense?.payoutMethod?.id;
-    const isEditingExistingExpensePayoutMethod =
-      expensePayoutMethodId &&
-      (props.payeeSlug === props.expense?.payee?.slug || (props.isInlineEdit && !props.payeeSlug));
-
-    if (!isEditingExistingExpensePayoutMethod) {
-      if (!props.payoutMethodId && lastUsed) {
-        setFieldValue('payoutMethodId', lastUsed?.id);
-      } else if (
-        props.payoutMethodId !== NEW_PAYOUT_METHOD_ID &&
-        (!props.payoutMethodId || !payoutMethods.some(p => p.id === props.payoutMethodId))
-      ) {
-        setFieldValue('payoutMethodId', payoutMethods.at(0)?.id ?? '');
-      }
-    }
-
-    if (!props.initialLoading) {
-      setIsLoading(false);
-    }
-  }, [
-    props.initialLoading,
-    props.isInlineEdit,
-    props.payeeSlug,
-    props.recentlySubmittedExpenses,
-    props.expense?.payee?.slug,
-    props.expense?.payoutMethod?.id,
-    setFieldValue,
-    props.payoutMethodId,
-    props.payoutMethods,
-    payoutMethods,
-  ]);
+  // The selection defaults to the last used payout method, or the first one (see the form reconcile rules)
+  const { setFieldValue, setFieldTouched } = props;
 
   const isNewPayoutMethodSelected = !isLoadingPayee && props.payoutMethodId === NEW_PAYOUT_METHOD_ID;
-  const isVendor = props.payeeSlug === PAYEE_SLUG_VENDOR || props.payee?.type === CollectiveType.VENDOR;
+  const isVendor = payeeChoice.kind === PayeeKind.VENDOR_PICKER || props.payee?.type === CollectiveType.VENDOR;
   const hasInviteeInfo =
     props.invitee &&
     (('email' in props.invitee && props.invitee.email) ||
@@ -185,32 +141,6 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
   const payeeIsSameHost = props.payee && props.host && 'host' in props.payee && props.payee.host?.id === props.host.id;
   const hasSuitablePayoutMethodOption = payoutMethods?.length > 0;
   const payeeHostIsTrusted = props.payee && 'host' in props.payee && props.payee.host?.isTrustedHost;
-
-  const onPaymentMethodDeleted = React.useCallback(
-    async deletedPayoutMethodId => {
-      onPayoutMethodDeleted?.(deletedPayoutMethodId);
-      if (deletedPayoutMethodId === props.payoutMethodId) {
-        setFieldValue('payoutMethodId', '');
-      }
-      await refresh();
-    },
-    [props.payoutMethodId, refresh, setFieldValue, onPayoutMethodDeleted],
-  );
-
-  const onPaymentMethodEdited = React.useCallback(
-    async newPayoutMethodId => {
-      await refresh();
-      setFieldValue('payoutMethodId', newPayoutMethodId);
-      // Scroll to the payout method, as it might end up in a different place
-      setTimeout(() => {
-        const payoutMethodElement = document.getElementById(getPayoutMethodHTMLId(newPayoutMethodId));
-        if (payoutMethodElement) {
-          payoutMethodElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 100);
-    },
-    [refresh, setFieldValue],
-  );
 
   if (isVendor && !props.isHostAdmin) {
     if (!props.payee || props.payee?.['hasPayoutMethod']) {
@@ -281,7 +211,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
       !isLoadingPayee &&
       !isPickingProfileAdministered &&
       !isVendor &&
-      props.payeeSlug !== PAYEE_SLUG_NEW_VENDOR &&
+      payeeChoice.kind !== PayeeKind.NEW_VENDOR &&
       !props.isAdminOfPayee &&
       !props.isAdminOfPayeeHost &&
       !(props.expense?.status === ExpenseStatus.DRAFT && !props.loggedInAccount) ? (
@@ -298,7 +228,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
             />
           )}
         </MessageBox>
-      ) : props.payeeSlug === PAYEE_SLUG_NEW_VENDOR ? (
+      ) : payeeChoice.kind === PayeeKind.NEW_VENDOR ? (
         <MessageBox type="info">
           <FormattedMessage defaultMessage="Save the vendor information to create a payout method" id="E8oTcs" />
         </MessageBox>
@@ -321,10 +251,9 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
                 payee={props.payee}
                 isChecked={p.id === props.payoutMethodId}
                 isEditable
-                onPaymentMethodDeleted={onPaymentMethodDeleted}
-                onPaymentMethodEdited={onPaymentMethodEdited}
+                actions={props.actions}
+                onPayoutMethodSaved={scrollToPayoutMethod}
                 setNameMismatchReason={reason => setFieldValue('payoutMethodNameDiscrepancyReason', reason)}
-                refresh={props.refresh}
                 account={props.account}
                 disableWarningMessages={
                   payeeIsCollectiveFamilyType && !LoggedInUser.isAdminOfCollective(props.payee['host'])
@@ -400,16 +329,16 @@ function generatePayoutMethodName(intl: IntlShape, type: PayoutMethodType, data)
   }
 }
 
-export function NewPayoutMethodOptionWrapper(props?: Partial<NewPayoutMethodOptionProps>) {
+function NewPayoutMethodOptionWrapper() {
   const form = useFormikContext() as PayoutMethodFormContext;
-  return <NewPayoutMethodOption {...props} {...NewPayoutMethodOption.getFormProps(form)} />;
+  return <NewPayoutMethodOption {...NewPayoutMethodOption.getFormProps(form)} />;
 }
 
 type NewPayoutMethodOptionProps = ReturnType<typeof getNewPayoutMethodOptionFormProps>;
 
 function getNewPayoutMethodOptionFormProps(form: PayoutMethodFormContext) {
   return {
-    ...pick(form, ['setFieldValue', 'setFieldTouched', 'validateForm', 'refresh', 'isSubmitting']),
+    ...pick(form, ['setFieldValue', 'setFieldTouched', 'validateForm', 'actions', 'isSubmitting']),
     ...pick(form.values, ['newPayoutMethod', 'payeeSlug']),
     ...pick(form.options, [
       'account',
@@ -424,13 +353,15 @@ function getNewPayoutMethodOptionFormProps(form: PayoutMethodFormContext) {
 }
 
 // eslint-disable-next-line prefer-arrow-callback
-const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOption(props: NewPayoutMethodOptionProps) {
+export const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOption(
+  props: NewPayoutMethodOptionProps,
+) {
   const intl = useIntl();
   const { toast } = useToast();
   const [creatingPayoutMethod, setIsCreatingPayoutMethod] = React.useState(false);
   const disabled = props.isSubmitting;
 
-  const { setFieldValue, setFieldTouched, validateForm, refresh } = props;
+  const { setFieldValue, setFieldTouched, validateForm, actions } = props;
 
   const isNewPaypalConnect = props.isPaypalConnectEnabled && props.newPayoutMethod?.type === PayoutMethodType.PAYPAL;
 
@@ -439,22 +370,6 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
   const payeeHost = props.payee && 'host' in props.payee ? props.payee.host : null;
   const isCrossHostPayee = Boolean(payeeHost && props.host && payeeHost.id !== props.host.id);
   const payoutMethodAccount = isCrossHostPayee ? payeeHost : props.payee;
-
-  const [createPayoutMethod] = useMutation<SavePayoutMethodMutation, SavePayoutMethodMutationVariables>(
-    gql`
-      mutation SavePayoutMethod($payoutMethod: PayoutMethodInput!, $payeeSlug: String!) {
-        createPayoutMethod(payoutMethod: $payoutMethod, account: { slug: $payeeSlug }) {
-          id
-        }
-      }
-    `,
-    {
-      variables: {
-        payoutMethod: { ...props.newPayoutMethod },
-        payeeSlug: isCrossHostPayee ? payeeHost.slug : props.payeeSlug,
-      },
-    },
-  );
 
   const onSaveButtonClick = React.useCallback(async () => {
     try {
@@ -479,11 +394,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
         return;
       }
       setIsCreatingPayoutMethod(true);
-      const response = await createPayoutMethod();
-      const newPayoutMethodId = response.data.createPayoutMethod.id;
-      await refresh();
-      setFieldValue('payoutMethodId', newPayoutMethodId);
-      setFieldValue('newPayoutMethod', { data: {} });
+      await actions.savePayoutMethod({ ...props.newPayoutMethod });
       toast({
         variant: 'success',
         message: intl.formatMessage({ defaultMessage: 'Payout method created', id: 'RHYtWe' }),
@@ -493,23 +404,14 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
     } finally {
       setIsCreatingPayoutMethod(false);
     }
-  }, [createPayoutMethod, intl, props.newPayoutMethod, refresh, setFieldTouched, setFieldValue, toast, validateForm]);
+  }, [actions, intl, props.newPayoutMethod, props.isPaypalConnectEnabled, setFieldTouched, toast, validateForm]);
 
   const onPaypalConnectSuccess = React.useCallback(
     async ({ payoutMethodId }: { payoutMethodId: string }) => {
       try {
         setIsCreatingPayoutMethod(true);
-        await refresh();
-        setFieldValue('payoutMethodId', payoutMethodId);
-        setFieldValue('newPayoutMethod', { data: {} });
-
-        // Scroll to the payout method, as it might end up in a different place
-        setTimeout(() => {
-          const payoutMethodElement = document.getElementById(getPayoutMethodHTMLId(payoutMethodId));
-          if (payoutMethodElement) {
-            payoutMethodElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-        }, 100);
+        await actions.selectConnectedPayoutMethod(payoutMethodId);
+        scrollToPayoutMethod(payoutMethodId);
 
         toast({
           variant: 'success',
@@ -523,7 +425,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
         setIsCreatingPayoutMethod(false);
       }
     },
-    [intl, setFieldValue, toast, refresh],
+    [intl, toast, actions],
   );
 
   const onPaypalConnectError = React.useCallback(
@@ -560,7 +462,7 @@ const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMethodOptio
     props.newPayoutMethod.data?.accountHolderName?.length &&
     props.newPayoutMethod.type === PayoutMethodType.BANK_ACCOUNT &&
     props.payeeSlug &&
-    !props.payeeSlug.startsWith('__') &&
+    getPayeeKind(props.payeeSlug) === PayeeKind.ACCOUNT &&
     props.payeeSlug === props.payee?.slug &&
     !isLegalNameFuzzyMatched;
 
@@ -697,10 +599,14 @@ type PayoutMethodRadioGroupItemProps = {
   disableWarningMessages?: boolean;
   /** Hide the legal name mismatch warning (e.g. cross-host payments where the payout method belongs to the recipient Host, not the payee) */
   disableNameMismatchWarning?: boolean;
-  onPaymentMethodDeleted: (deletedPayoutMethodId) => void;
-  onPaymentMethodEdited: (newPayoutMethodId: string) => void;
+  /** The payout method mutations, which resync and select their result */
+  actions: Pick<
+    ExpenseFormActions,
+    'savePayoutMethod' | 'selectConnectedPayoutMethod' | 'removePayoutMethod' | 'updateLegalName'
+  >;
+  /** Called once the payout method was edited or reconnected */
+  onPayoutMethodSaved?: (payoutMethodId: string) => void;
   setNameMismatchReason?: (reason: string) => void;
-  refresh?: () => void;
   Component?: React.ComponentType<{
     value?: string;
     showSubcontent?: boolean;
@@ -738,7 +644,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
   const hasLegalNameMismatch =
     props.payoutMethod.type === PayoutMethodType.BANK_ACCOUNT &&
     props.payeeSlug &&
-    !props.payeeSlug.startsWith('__') &&
+    getPayeeKind(props.payeeSlug) === PayeeKind.ACCOUNT &&
     props.payeeSlug === props.payee?.slug &&
     !isLegalNameFuzzyMatched;
   const isOpen = props.isChecked;
@@ -748,21 +654,12 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
   const [keepNameDifferent, setKeepNameDifferent] = React.useState(false);
   const [legalNameUpdated, setLegalNameUpdated] = React.useState(false);
 
-  const [submitLegalNameMutation, { loading }] = useMutation(updateAccountLegalNameMutation, {
-    variables: {
-      account: {
-        id: props.payee?.id,
-        legalName: props.payoutMethod.data?.accountHolderName,
-      },
-    },
-    onCompleted: () => {
-      props.refresh?.();
-    },
-  });
-
+  const [loading, setLoading] = React.useState(false);
+  const { actions, onPayoutMethodSaved } = props;
   const onUpdateLegalNameToMatch = React.useCallback(async () => {
     try {
-      await submitLegalNameMutation();
+      setLoading(true);
+      await actions.updateLegalName(props.payee?.id, props.payoutMethod.data?.accountHolderName);
       setLegalNameUpdated(true);
       toast({
         variant: 'success',
@@ -770,29 +667,10 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
       });
     } catch (e) {
       toast({ variant: 'error', message: i18nGraphqlException(intl, e) });
+    } finally {
+      setLoading(false);
     }
-  }, [submitLegalNameMutation, toast, intl]);
-
-  // Connect/edit/delete callbacks
-  const [deletePayoutMethod] = useMutation(gql`
-    mutation DeletePayoutMethod($payoutMethodId: String!) {
-      removePayoutMethod(payoutMethodId: $payoutMethodId) {
-        id
-      }
-    }
-  `);
-
-  const [editPayoutMethod] = useMutation<EditPayoutMethodMutation, EditPayoutMethodMutationVariables>(gql`
-    mutation EditPayoutMethod($payoutMethod: PayoutMethodInput!) {
-      editPayoutMethod(payoutMethod: $payoutMethod) {
-        id
-        name
-        data
-        isSaved
-        type
-      }
-    }
-  `);
+  }, [actions, props.payee?.id, props.payoutMethod.data?.accountHolderName, toast, intl]);
 
   const { showConfirmationModal } = useModal();
 
@@ -823,12 +701,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
         children: <PayoutMethodLabel showIcon payoutMethod={props.payoutMethod} />,
         onConfirm: async () => {
           try {
-            await deletePayoutMethod({
-              variables: {
-                payoutMethodId: props.payoutMethod?.id,
-              },
-            });
-            await props.onPaymentMethodDeleted(props.payoutMethod.id);
+            await actions.removePayoutMethod(props.payoutMethod.id);
             toast({
               variant: 'success',
               message: props.payoutMethod?.canBeDeleted ? (
@@ -850,7 +723,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
         variant: 'destructive',
       });
     },
-    [intl, deletePayoutMethod, props, showConfirmationModal, toast],
+    [intl, actions, props.payoutMethod, showConfirmationModal, toast],
   );
 
   const onEditClick = React.useCallback(e => {
@@ -859,21 +732,18 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
     setIsEditingPayoutMethod(true);
   }, []);
 
-  const { onPaymentMethodEdited } = props;
   const onSaveClick = React.useCallback(
     async values => {
       try {
         setIsLoadingEditPayoutMethod(true);
-        const response = await editPayoutMethod({
-          variables: {
-            payoutMethod: pick(values.editingPayoutMethod, ['id', 'isSaved', 'name', 'data', 'type']),
-          },
-        });
+        const payoutMethodId = await actions.savePayoutMethod(
+          pick(values.editingPayoutMethod, ['id', 'isSaved', 'name', 'data', 'type']),
+        );
         toast({
           variant: 'success',
           message: <FormattedMessage defaultMessage="Payout Method edit successfully" id="cFfn2l" />,
         });
-        await onPaymentMethodEdited(response.data.editPayoutMethod.id);
+        onPayoutMethodSaved?.(payoutMethodId);
         setIsEditingPayoutMethod(false);
         return CONFIRMATION_MODAL_TERMINATE;
       } catch (e) {
@@ -885,7 +755,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
         setIsLoadingEditPayoutMethod(false);
       }
     },
-    [editPayoutMethod, intl, onPaymentMethodEdited, toast],
+    [actions, intl, onPayoutMethodSaved, toast],
   );
 
   return (
@@ -974,7 +844,8 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                           const hasCreatedNewPayoutMethod = values.editingPayoutMethod.id !== payoutMethodId;
                           setIsLoadingEditPayoutMethod(true);
                           setIsEditingPayoutMethod(false);
-                          await onPaymentMethodEdited(payoutMethodId);
+                          await actions.selectConnectedPayoutMethod(payoutMethodId);
+                          onPayoutMethodSaved?.(payoutMethodId);
                           toast({
                             variant: 'success',
                             title: (

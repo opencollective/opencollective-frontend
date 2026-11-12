@@ -8,7 +8,7 @@ import { AccountHoverCard } from '../AccountHoverCard';
 import Avatar from '../Avatar';
 import DateTime from '../DateTime';
 
-import { ACTIVITIES_INFO, getActivityColors, getActivityIcon } from './activity-helpers';
+import { ACTIVITIES_INFO, getActivityColors, getActivityIcon, getActivityMessage } from './activity-helpers';
 
 type SmallThreadActivityProps = {
   activity: Partial<Activity>;
@@ -23,7 +23,7 @@ export default function SmallThreadActivity(props: SmallThreadActivityProps) {
   }
 
   const activityColors = getActivityColors(props.activity.type, theme);
-  const message = ACTIVITIES_INFO[props.activity.type]?.message;
+  const message = getActivityMessage(props.activity);
   const details =
     ACTIVITIES_INFO[props.activity.type]?.renderDetails?.(props.activity.data) ||
     props.activity.data?.message ||

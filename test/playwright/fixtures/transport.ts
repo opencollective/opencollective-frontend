@@ -102,12 +102,18 @@ type Contracts = {
   };
   /**
    * Actors `hostAdmin`, `admin` (Collective admin; submitter and payee of the expense). Accounts `host`,
-   * `collective` (no expense policy), optional `project` under it. Expenses: optional `pending` (invoice).
+   * `collective` (no expense policy), optional `project` under it. Expenses: optional `pending` (invoice,
+   * optionally with a stored PDF attached file).
    * URLs `expenses`, `policies`, optional `projectNewExpense`.
    */
   'expense-management': {
     inputs: {
-      expense?: { description: string; items: Array<{ description: string; amount: number }> };
+      expense?: {
+        description: string;
+        items: Array<{ description: string; amount: number }>;
+        /** A real PDF stored in the uploads bucket and attached to the expense, showing `text`. */
+        attachedPdf?: { name: string; text: string };
+      };
       project?: boolean;
     };
     scenario: GraphScenario;
