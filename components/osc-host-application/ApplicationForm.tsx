@@ -1115,6 +1115,29 @@ const ApplicationForm = ({
                           </FormField>
                           <div className="flex flex-col gap-1">
                             <h4 className="text-sm font-semibold text-foreground">
+                              <FormattedMessage {...i18nLabels.legalEntityTitle} />
+                            </h4>
+                            <p className="text-sm leading-5 text-muted-foreground">
+                              <FormattedMessage {...i18nLabels.hasLegalEntityNotice} />
+                            </p>
+
+                            <FormField name="applicationData.hasLegalEntity">
+                              {({ field }) => (
+                                <label className="flex cursor-pointer items-center gap-2 text-sm leading-normal">
+                                  <Checkbox
+                                    name={field.name}
+                                    checked={Boolean(field.value)}
+                                    onCheckedChange={checked => setFieldValue(field.name, checked === true)}
+                                  />
+                                  <span>
+                                    <FormattedMessage {...i18nLabels.hasLegalEntity} />
+                                  </span>
+                                </label>
+                              )}
+                            </FormField>
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <h4 className="text-sm font-semibold text-foreground">
                               <FormattedMessage defaultMessage="Terms of service" id="company.termsOfService" />
                             </h4>
                             <FormField name="termsOfServiceOC" required>
@@ -1142,29 +1165,6 @@ const ApplicationForm = ({
                                         ),
                                       }}
                                     />
-                                  </span>
-                                </label>
-                              )}
-                            </FormField>
-                          </div>
-                          <div className="flex flex-col gap-1">
-                            <h4 className="text-sm font-semibold text-foreground">
-                              <FormattedMessage {...i18nLabels.legalEntityTitle} />
-                            </h4>
-                            <p className="text-sm leading-5 text-muted-foreground">
-                              <FormattedMessage {...i18nLabels.hasLegalEntityNotice} />
-                            </p>
-
-                            <FormField name="applicationData.hasLegalEntity">
-                              {({ field }) => (
-                                <label className="flex cursor-pointer items-center gap-2 text-sm leading-normal">
-                                  <Checkbox
-                                    name={field.name}
-                                    checked={Boolean(field.value)}
-                                    onCheckedChange={checked => setFieldValue(field.name, checked === true)}
-                                  />
-                                  <span>
-                                    <FormattedMessage {...i18nLabels.hasLegalEntity} />
                                   </span>
                                 </label>
                               )}
