@@ -23,6 +23,8 @@ describe('isTrustedRedirectHost', () => {
     expect(isTrustedRedirectURL(new URL('https://documentation.opencollective.com'))).toBe(true);
     expect(isTrustedRedirectURL(new URL('https://app.papertree.earth'))).toBe(true);
     expect(isTrustedRedirectURL(new URL('https://gatherfor.org'))).toBe(true);
+    expect(isTrustedRedirectURL(new URL('https://thephp.foundation/blog/'))).toBe(true);
+    expect(isTrustedRedirectURL(new URL('https://w3techs.com/technologies/overview/programming_language'))).toBe(true);
   });
 
   it('returns false for invalid domains', () => {
