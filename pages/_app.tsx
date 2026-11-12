@@ -48,6 +48,7 @@ import memoizeOne from 'memoize-one';
 
 import { APOLLO_STATE_PROP_NAME, initClient } from '../lib/apollo-client';
 import { getTokenFromCookie } from '../lib/auth';
+import { forceFullPageLoad } from '../lib/full-page-load';
 import { getGoogleMapsScriptUrl, loadGoogleMaps } from '../lib/google-maps';
 import { loggedInUserQuery } from '../lib/graphql/v1/queries';
 import { WhitelabelProviderContext } from '../lib/hooks/useWhitelabel';
@@ -178,6 +179,7 @@ class OpenCollectiveFrontendApp extends App<AppProps> {
   }
 
   componentDidMount() {
+    Router.events.on('routeChangeStart', forceFullPageLoad);
     Router.events.on('routeChangeComplete', url => {
       const paq = (window as Window & { _paq?: Array<unknown[]> })._paq;
       if (paq) {
