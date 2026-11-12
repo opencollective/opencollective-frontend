@@ -2283,6 +2283,11 @@ type Order {
   nextChargeDate: DateTime
   lastChargedAt: DateTime
   tier: Tier
+
+  """
+  A tier change waiting for a payment to take effect (e.g. upgrade to a more expensive tier). Only visible to the admins of the contributor, the collective and its host.
+  """
+  pendingTierChange: OrderPendingTierChange
   fromAccount: Account
   toAccount: Account
 
@@ -2405,6 +2410,17 @@ type Order {
   [Host admins only] If the order was associated with a transactions import row, this field will reference it
   """
   transactionImportRow: TransactionsImportRow
+}
+
+"""
+A tier change requested on a recurring contribution. It takes effect once a charge pays for the new tier, typically on the next charge date.
+"""
+type OrderPendingTierChange {
+  """
+  The tier the contribution will move to. Null if the tier was deleted.
+  """
+  tier: Tier
+  requestedAt: DateTime!
 }
 
 """
