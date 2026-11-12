@@ -538,9 +538,9 @@ export function AccountDetails(props: AccountDetailsProps) {
                 <FormattedMessage defaultMessage="Flag account" id="FiscalHostNote.FlagAccount" />
               </Button>
             )}
-            {!account?.isPrivate && (
+            {account?.slug && !account.isPrivate && (
               <Button variant="outline" size="sm" asChild>
-                <Link href={`/${account?.slug}`}>
+                <Link href={`/${account.slug}`}>
                   <FormattedMessage defaultMessage="View Profile" id="viewProfile" />
                 </Link>
               </Button>
