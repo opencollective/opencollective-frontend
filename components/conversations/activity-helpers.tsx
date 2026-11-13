@@ -181,8 +181,10 @@ export const ACTIVITIES_INFO = {
       id: 'Expense.Activity.Error',
       defaultMessage: 'Expense error',
     }),
-    renderDetails: ({ error }) => {
-      const message = error?.message || (
+    renderDetails: ({ error }: { error?: { name?: string; message?: string; details?: { issue: string }[] } }) => {
+      // `error` holds the API-sanitized summary (see `sanitizeActivityData`); newer rows written by
+      // provider webhooks may only carry an error name.
+      const message = error?.message || error?.name || (
         <FormattedMessage defaultMessage="An unknown error occurred" id="Error.Unknown" />
       );
       let details = null;

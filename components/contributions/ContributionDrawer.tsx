@@ -33,6 +33,7 @@ import { Skeleton } from '../ui/Skeleton';
 
 import { ContributionCharges } from './ContributionCharges';
 import ContributionTimeline from './ContributionTimeline';
+import { PendingTierChangeNotice } from './PendingTierChangeNotice';
 
 const contributionDrawerQuery = gql`
   query ContributionDrawer($orderId: Int!, $hostSlug: String, $includeFiscalHostNote: Boolean! = false) {
@@ -71,6 +72,13 @@ const contributionDrawerQuery = gql`
         id
         name
         description
+      }
+      pendingTierChange {
+        requestedAt
+        tier {
+          id
+          name
+        }
       }
       individual: createdByAccount {
         ...AccountHoverCardFields
@@ -677,12 +685,24 @@ export function ContributionDrawer({ open, onClose, orderId, getActions }: Contr
                     </React.Fragment>
                   )}
 
-                  {query.data?.order?.tier && (
+                  {(query.data?.order?.tier || query.data?.order?.pendingTierChange?.tier) && (
                     <DataListItem>
                       <DataListItemLabel>
                         <FormattedMessage defaultMessage="Tier" id="b07w+D" />
                       </DataListItemLabel>
-                      <DataListItemValue>{query.data.order.tier.name}</DataListItemValue>
+                      <DataListItemValue>
+                        <div className="flex flex-col gap-2">
+                          <span>
+                            {query.data.order.tier?.name || <FormattedMessage defaultMessage="No tier" id="ozkv/Y" />}
+                          </span>
+                          {query.data.order.status !== OrderStatus.CANCELLED && (
+                            <PendingTierChangeNotice
+                              pendingTierChange={query.data.order.pendingTierChange}
+                              nextChargeDate={query.data.order.nextChargeDate}
+                            />
+                          )}
+                        </div>
+                      </DataListItemValue>
                     </DataListItem>
                   )}
 

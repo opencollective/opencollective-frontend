@@ -47,6 +47,11 @@ export const ActivityTimelineMessageI18n = defineMessages<string, TimelineMessag
     id: 'wciHmV',
     avatar: 'fromAccount',
   },
+  COLLECTIVE_EXPENSE_PAYMENT_ERROR: {
+    defaultMessage: '<FromAccount></FromAccount> expense <Expense>{expenseDescription}</Expense> payment failed',
+    id: 'wciHmV',
+    avatar: 'fromAccount',
+  },
   COLLECTIVE_EXPENSE_MARKED_AS_INCOMPLETE: {
     defaultMessage: '<Individual></Individual> marked <Expense>{expenseDescription}</Expense> as incomplete',
     id: 'Uzut+A',
@@ -367,6 +372,10 @@ export const ActivityDescriptionI18n = defineMessages({
     id: 'e1Zd2a',
   },
   COLLECTIVE_EXPENSE_ERROR: {
+    defaultMessage: 'Expense <Expense>{expenseDescription}</Expense> payment failed',
+    id: 'M4DHuK',
+  },
+  COLLECTIVE_EXPENSE_PAYMENT_ERROR: {
     defaultMessage: 'Expense <Expense>{expenseDescription}</Expense> payment failed',
     id: 'M4DHuK',
   },
@@ -799,6 +808,10 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
   COLLECTIVE_EXPENSE_ERROR: {
     id: 'Expense.Activity.Error',
     defaultMessage: 'Expense error',
+  },
+  COLLECTIVE_EXPENSE_PAYMENT_ERROR: {
+    id: 'Expense.Activity.PaymentError',
+    defaultMessage: 'Expense payment error',
   },
   COLLECTIVE_EXPENSE_MARKED_AS_SPAM: {
     id: 'Expense.Activity.MarkedAsSpam',

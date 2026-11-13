@@ -37,6 +37,11 @@ const REPO_ENTRY: EcosystemsRepoSummary = {
   contributors: { total_committers: 8, total_bot_committers: 2 },
   issues: { issues_count: 3 },
   owner: { login: 'foo', kind: 'organization' },
+  firstCommit: {
+    sha: 'first123',
+    message: 'first commit',
+    timestamp: '2016-12-12T05:10:07.000Z',
+  },
 };
 
 describe('lib/ecosystems', () => {
@@ -55,6 +60,8 @@ describe('lib/ecosystems', () => {
         ownerKind: 'organization',
         archived: true,
         createdAt: '2016-12-12T04:36:39.000Z',
+        firstCommitAt: '2016-12-12T05:10:07.000Z',
+        firstCommitSha: 'first123',
         lastCommitAt: '2026-10-11T11:24:07.000Z',
         lastCommitSha: 'abc123',
         commitStats: { totalCommits: 120, totalCommitters: 8, botCommitters: 2 },
@@ -191,6 +198,8 @@ describe('lib/ecosystems', () => {
         ownerKind: null,
         archived: null,
         createdAt: null,
+        firstCommitAt: null,
+        firstCommitSha: null,
         lastCommitAt: null,
         lastCommitSha: null,
         commitStats: null,
