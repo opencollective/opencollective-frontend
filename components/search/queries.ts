@@ -175,7 +175,6 @@ export const searchHostApplicationFieldsFragment = gql`
 export const searchCommandQuery = gql`
   query SearchCommand(
     $searchTerm: String!
-    $backend: SearchBackend
     $host: AccountReferenceInput
     $account: AccountReferenceInput
     $limit: Int!
@@ -190,14 +189,7 @@ export const searchCommandQuery = gql`
     $includeHostApplications: Boolean!
     $offset: Int
   ) {
-    search(
-      searchTerm: $searchTerm
-      backend: $backend
-      defaultLimit: $limit
-      host: $host
-      account: $account
-      useTopHits: $useTopHits
-    ) {
+    search(searchTerm: $searchTerm, defaultLimit: $limit, host: $host, account: $account, useTopHits: $useTopHits) {
       results {
         accounts(limit: $limit, offset: $offset) @include(if: $includeAccounts) {
           highlights
@@ -327,7 +319,6 @@ export const searchCommandQuery = gql`
 export const searchResultsPageQuery = gql`
   query SearchResultsPage(
     $searchTerm: String!
-    $backend: SearchBackend
     $host: AccountReferenceInput
     $account: AccountReferenceInput
     $defaultLimit: Int!
@@ -351,7 +342,6 @@ export const searchResultsPageQuery = gql`
   ) {
     search(
       searchTerm: $searchTerm
-      backend: $backend
       defaultLimit: $defaultLimit
       host: $host
       account: $account
