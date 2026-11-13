@@ -236,17 +236,17 @@ const HTMLContent = styled(
 
   blockquote {
     font-size: 1em;
-    border-left: 5px solid #e9e9e9;
-    background: white;
-    color: #757677;
+    border-left: 5px solid ${props => props.theme.colors.black[200]};
+    background: ${props => props.theme.colors.white.full};
+    color: ${props => props.theme.colors.black[600]};
     margin: 0;
     padding: 16px;
   }
 
   pre {
     font-size: 0.85em;
-    background: #f6f8fa;
-    color: #333;
+    background: ${props => props.theme.colors.black[50]};
+    color: ${props => props.theme.colors.black[800]};
     border: none;
     padding: 16px;
     font-family: monospace;

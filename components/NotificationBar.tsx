@@ -32,7 +32,7 @@ const CloseIcon = styled(Close)`
   width: 24px;
   height: 24px;
   padding: 4px;
-  background: #fff;
+  background: ${props => props.theme.colors.white.full};
   color: ${props => props.theme.colors.blue[900]};
   border-radius: 99999px;
   cursor: pointer;

@@ -25,7 +25,7 @@ type SecondaryAvatarContainerProps = {
 
 const SecondaryAvatarContainer = styled.div<SecondaryAvatarContainerProps>`
   position: absolute;
-  background: white;
+  background: ${props => props.theme.colors.white.full};
   border-radius: 6px;
   display: flex;
   justify-content: center;

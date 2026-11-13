@@ -19,6 +19,7 @@ export enum PREVIEW_FEATURE_KEYS {
   TABLE_QUICK_ACTIONS = 'TABLE_QUICK_ACTIONS',
   HOSTED_ACCOUNT_OVERVIEW = 'HOSTED_ACCOUNT_OVERVIEW',
   BALANCE_ACCOUNTING_CATEGORIES = 'BALANCE_ACCOUNTING_CATEGORIES',
+  DARK_MODE = 'DARK_MODE',
 }
 
 enum Categories {
@@ -288,5 +289,18 @@ export const previewFeatures: PreviewFeature[] = [
     closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...OFICO_MEMBER_ORGANIZATIONS],
     alwaysEnableInDev: true,
     category: Categories.HOSTING,
+  },
+  {
+    key: PREVIEW_FEATURE_KEYS.DARK_MODE,
+    title: <FormattedMessage defaultMessage="Dark mode" id="PreviewFeatures.darkModeTitle" />,
+    description: (
+      <FormattedMessage
+        defaultMessage="Use the dashboard with a dark theme. Once enabled, pick Auto (follows your system settings), Light or Dark below or from your profile menu."
+        id="PreviewFeatures.darkModeDescription"
+      />
+    ),
+    publicBeta: false,
+    closedBetaAccessFor: [...PLATFORM_ACCOUNTS, ...ENGINEERS],
+    category: Categories.GENERAL,
   },
 ];

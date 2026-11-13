@@ -4,18 +4,18 @@ import { polyfill as PolyfillInterweaveSSR } from 'interweave-ssr';
 import App from 'next/app';
 import Router from 'next/router';
 import NProgress from 'nprogress';
-import { StyleSheetManager, ThemeProvider } from 'styled-components';
+import { StyleSheetManager } from 'styled-components';
 
 import '../lib/dayjs'; // Import first to make sure plugins are initialized
 import '../lib/analytics/plausible';
 import { ApplyDocumentFont, inter } from '../lib/fonts';
 import { API_V1_CONTEXT } from '../lib/graphql/helpers';
 import { getIntlProps } from '../lib/i18n/request';
-import theme from '../lib/theme';
 import defaultColors from '../lib/theme/colors';
 
 import DefaultPaletteStyle from '../components/DefaultPaletteStyle';
 import StripeProviderSSR from '../components/StripeProvider';
+import StyledThemeProvider from '../components/StyledThemeProvider';
 import TwoFactorAuthenticationModal from '../components/two-factor-authentication/TwoFactorAuthenticationModal';
 import { Toaster } from '../components/ui/Toaster';
 import UserProvider from '../components/UserProvider';
@@ -229,7 +229,7 @@ class OpenCollectiveFrontendApp extends App<AppProps> {
               }
             >
               <StyleSheetManager shouldForwardProp={defaultShouldForwardProp}>
-                <ThemeProvider theme={theme}>
+                <StyledThemeProvider>
                   <StripeProviderSSR>
                     <IntlProvider locale={locale}>
                       <TooltipProvider delayDuration={500} skipDelayDuration={100}>
@@ -252,7 +252,7 @@ class OpenCollectiveFrontendApp extends App<AppProps> {
                       </TooltipProvider>
                     </IntlProvider>
                   </StripeProviderSSR>
-                </ThemeProvider>
+                </StyledThemeProvider>
               </StyleSheetManager>
             </ApolloProvider>
           </div>

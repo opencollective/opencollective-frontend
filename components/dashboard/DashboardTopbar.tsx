@@ -39,6 +39,7 @@ export function DashboardTopbar() {
             <ChangelogTrigger />
           </div>
           <ProfileMenu
+            showThemeSwitcher
             logoutParameters={{ skipQueryRefetch: onDashboardRoute, redirect: onDashboardRoute ? '/' : undefined }}
           />
         </div>

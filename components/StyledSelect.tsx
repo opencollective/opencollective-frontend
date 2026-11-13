@@ -11,6 +11,7 @@ import type {
   ValueContainerProps,
 } from 'react-select';
 import Select, { components as ReactSelectComponents } from 'react-select';
+import type { DefaultTheme } from 'styled-components';
 import { styled } from 'styled-components';
 import type { BorderProps, BorderRadiusProps, LayoutProps, SpaceProps, TypographyProps } from 'styled-system';
 import { layout, space, typography } from 'styled-system';
@@ -167,6 +168,37 @@ const getComponents = (components, useSearchIcon) => {
 };
 
 /**
+ * Adapts react-select's colors to the dark theme.
+ */
+const getDarkSelectTheme = (selectTheme, theme: DefaultTheme) => baseTheme => {
+  const base = typeof selectTheme === 'function' ? selectTheme(baseTheme) : { ...baseTheme, ...selectTheme };
+  const { black, white, primary, red } = theme.colors;
+  return {
+    ...base,
+    colors: {
+      ...base.colors,
+      neutral0: white.full,
+      neutral5: black[50],
+      neutral10: black[100],
+      neutral20: black[300],
+      neutral30: black[400],
+      neutral40: black[500],
+      neutral50: black[500],
+      neutral60: black[600],
+      neutral70: black[700],
+      neutral80: black[800],
+      neutral90: black[900],
+      primary: primary[500],
+      primary75: primary[400],
+      primary50: primary[200],
+      primary25: primary[100],
+      danger: red[500],
+      dangerLight: red[100],
+    },
+  };
+};
+
+/**
  * Binds our custom theme and wordings to a regular `react-select`'s `Select`.
  * See https://react-select.com for more documentation.
  */
@@ -204,7 +236,7 @@ export const makeStyledSelect = (SelectComponent, { alwaysSearchable = false } =
       noOptionsMessage,
       components: getComponents(components, useSearchIcon),
       instanceId: instanceId ? instanceId : inputId,
-      theme: selectTheme,
+      theme: theme?.isDark ? getDarkSelectTheme(selectTheme, theme) : selectTheme,
       onBlur: (event: React.FocusEvent<HTMLInputElement>) => {
         // Needed for Reect-select to work with Radix UI dialogs
         // https://github.com/JedWatson/react-select/issues/5732#issuecomment-1742107647
