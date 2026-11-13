@@ -58,7 +58,7 @@ export const DashboardThemeSwitcher = ({
             value={value}
             aria-label={label}
             className={cn(
-              'flex h-7 items-center justify-center gap-1.5 rounded-full text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden data-[state=checked]:bg-background data-[state=checked]:text-foreground data-[state=checked]:shadow-xs data-[state=checked]:ring-1 data-[state=checked]:ring-border',
+              'flex h-7 items-center justify-center gap-1.5 rounded-full text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden data-[state=checked]:bg-background data-[state=checked]:text-foreground data-[state=checked]:shadow-xs data-[state=checked]:ring-1 data-[state=checked]:ring-border dark:data-[state=checked]:bg-slate-300',
               showLabels ? 'px-3 text-sm' : 'w-7',
             )}
           >
