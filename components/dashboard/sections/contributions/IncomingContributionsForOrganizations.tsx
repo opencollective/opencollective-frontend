@@ -96,6 +96,9 @@ const hostFinancialContributionsMetadataQuery = gql`
   }
 `;
 
+/** How many contributions are counted after the current page, to know how many pages to offer */
+const MAX_COUNTED_CONTRIBUTIONS_AHEAD = 10_000;
+
 const schema = baseSchema.extend({
   hostContext: hostContextFilter.schema,
   hostedAccounts: isMulti(z.string()).optional(),
@@ -185,6 +188,8 @@ export default function IncomingContributionsForOrganizations({ accountSlug }: D
       ...(hasIncomingOutgoingReorg && { oppositeAccountScope: OppositeAccountScope.EXTERNAL }),
       includeIncognito: true,
       ...queryFilter.variables,
+      // An exact total takes seconds on hosts with more than a million contributions: only count the pages ahead
+      maxTotalCount: queryFilter.values.offset + MAX_COUNTED_CONTRIBUTIONS_AHEAD,
     },
 
     fetchPolicy: typeof window !== 'undefined' ? 'cache-and-network' : 'cache-first',

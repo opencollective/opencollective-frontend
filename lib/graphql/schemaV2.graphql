@@ -728,6 +728,11 @@ interface Account {
     The term to search
     """
     searchTerm: String
+
+    """
+    If set, `totalCount` stops counting at this number: it is then a lower bound and `totalCountIsCapped` is true. Much faster than an exact total when there are many orders, e.g. to paginate with `offset + <a few pages>`.
+    """
+    maxTotalCount: Int
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
@@ -2220,6 +2225,11 @@ type OrderCollection implements Collection {
   nodes: [Order]
 
   """
+  Whether `totalCount` was capped by the `maxTotalCount` argument: there are more orders than the total, which is a lower bound
+  """
+  totalCountIsCapped: Boolean!
+
+  """
   The accounts that created the orders in this collection (only scoped to the `account`, `hostContext`, `includeChildrenAccounts`, `expectedFundsFilter` and `status` arguments), regardless of pagination. Returns a paginated and searchable collection.
   """
   createdByUsers(
@@ -2273,6 +2283,11 @@ type Order {
   nextChargeDate: DateTime
   lastChargedAt: DateTime
   tier: Tier
+
+  """
+  A tier change waiting for a payment to take effect (e.g. upgrade to a more expensive tier). Only visible to the admins of the contributor, the collective and its host.
+  """
+  pendingTierChange: OrderPendingTierChange
   fromAccount: Account
   toAccount: Account
 
@@ -2395,6 +2410,17 @@ type Order {
   [Host admins only] If the order was associated with a transactions import row, this field will reference it
   """
   transactionImportRow: TransactionsImportRow
+}
+
+"""
+A tier change requested on a recurring contribution. It takes effect once a charge pays for the new tier, typically on the next charge date.
+"""
+type OrderPendingTierChange {
+  """
+  The tier the contribution will move to. Null if the tier was deleted.
+  """
+  tier: Tier
+  requestedAt: DateTime!
 }
 
 """
@@ -3631,6 +3657,11 @@ type Host implements Account & AccountWithContributions & AccountWithPlatformSub
     The term to search
     """
     searchTerm: String
+
+    """
+    If set, `totalCount` stops counting at this number: it is then a lower bound and `totalCountIsCapped` is true. Much faster than an exact total when there are many orders, e.g. to paginate with `offset + <a few pages>`.
+    """
+    maxTotalCount: Int
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
@@ -6759,6 +6790,11 @@ type PaymentMethod {
     The term to search
     """
     searchTerm: String
+
+    """
+    If set, `totalCount` stops counting at this number: it is then a lower bound and `totalCountIsCapped` is true. Much faster than an exact total when there are many orders, e.g. to paginate with `offset + <a few pages>`.
+    """
+    maxTotalCount: Int
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
@@ -11274,6 +11310,11 @@ type Bot implements Account {
     The term to search
     """
     searchTerm: String
+
+    """
+    If set, `totalCount` stops counting at this number: it is then a lower bound and `totalCountIsCapped` is true. Much faster than an exact total when there are many orders, e.g. to paginate with `offset + <a few pages>`.
+    """
+    maxTotalCount: Int
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
@@ -12353,6 +12394,11 @@ type Collective implements Account & AccountWithHost & AccountWithContributions 
     The term to search
     """
     searchTerm: String
+
+    """
+    If set, `totalCount` stops counting at this number: it is then a lower bound and `totalCountIsCapped` is true. Much faster than an exact total when there are many orders, e.g. to paginate with `offset + <a few pages>`.
+    """
+    maxTotalCount: Int
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
@@ -14022,6 +14068,11 @@ type Event implements Account & AccountWithHost & AccountWithContributions & Acc
     The term to search
     """
     searchTerm: String
+
+    """
+    If set, `totalCount` stops counting at this number: it is then a lower bound and `totalCountIsCapped` is true. Much faster than an exact total when there are many orders, e.g. to paginate with `offset + <a few pages>`.
+    """
+    maxTotalCount: Int
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
@@ -15400,6 +15451,11 @@ type Individual implements Account {
     The term to search
     """
     searchTerm: String
+
+    """
+    If set, `totalCount` stops counting at this number: it is then a lower bound and `totalCountIsCapped` is true. Much faster than an exact total when there are many orders, e.g. to paginate with `offset + <a few pages>`.
+    """
+    maxTotalCount: Int
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
@@ -16804,6 +16860,11 @@ type Organization implements Account & AccountWithContributions & AccountWithPla
     The term to search
     """
     searchTerm: String
+
+    """
+    If set, `totalCount` stops counting at this number: it is then a lower bound and `totalCountIsCapped` is true. Much faster than an exact total when there are many orders, e.g. to paginate with `offset + <a few pages>`.
+    """
+    maxTotalCount: Int
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
@@ -18285,6 +18346,11 @@ type Platform implements Account & AccountWithHost & AccountWithParent {
     The term to search
     """
     searchTerm: String
+
+    """
+    If set, `totalCount` stops counting at this number: it is then a lower bound and `totalCountIsCapped` is true. Much faster than an exact total when there are many orders, e.g. to paginate with `offset + <a few pages>`.
+    """
+    maxTotalCount: Int
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
@@ -19473,6 +19539,11 @@ type Vendor implements Account & AccountWithContributions {
     The term to search
     """
     searchTerm: String
+
+    """
+    If set, `totalCount` stops counting at this number: it is then a lower bound and `totalCountIsCapped` is true. Much faster than an exact total when there are many orders, e.g. to paginate with `offset + <a few pages>`.
+    """
+    maxTotalCount: Int
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
@@ -21086,6 +21157,11 @@ type Query {
     The term to search
     """
     searchTerm: String
+
+    """
+    If set, `totalCount` stops counting at this number: it is then a lower bound and `totalCountIsCapped` is true. Much faster than an exact total when there are many orders, e.g. to paginate with `offset + <a few pages>`.
+    """
+    maxTotalCount: Int
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
@@ -23858,6 +23934,11 @@ type Fund implements Account & AccountWithHost & AccountWithContributions {
     The term to search
     """
     searchTerm: String
+
+    """
+    If set, `totalCount` stops counting at this number: it is then a lower bound and `totalCountIsCapped` is true. Much faster than an exact total when there are many orders, e.g. to paginate with `offset + <a few pages>`.
+    """
+    maxTotalCount: Int
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 
@@ -25094,6 +25175,11 @@ type Project implements Account & AccountWithHost & AccountWithContributions & A
     The term to search
     """
     searchTerm: String
+
+    """
+    If set, `totalCount` stops counting at this number: it is then a lower bound and `totalCountIsCapped` is true. Much faster than an exact total when there are many orders, e.g. to paginate with `offset + <a few pages>`.
+    """
+    maxTotalCount: Int
     tierSlug: String @deprecated(reason: "2022-02-25: Should be replaced by a tier reference.")
     tier: [TierReferenceInput]
 

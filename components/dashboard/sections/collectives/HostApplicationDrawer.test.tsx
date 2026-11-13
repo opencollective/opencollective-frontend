@@ -10,8 +10,9 @@ import { HostApplicationStatus } from '../../../../lib/graphql/types/v2/graphql'
 
 import { TooltipProvider } from '../../../ui/Tooltip';
 
-import { EcosystemsRepositoryInfo, HostApplicationCustomData } from './hostApplicationCustomData';
+import { HostApplicationCustomData } from './hostApplicationCustomData';
 import HostApplicationDrawer from './HostApplicationDrawer';
+import RepositoryInformation from './RepositoryInformation';
 
 jest.mock('@apollo/client', () => ({
   ...jest.requireActual('@apollo/client'),
@@ -68,6 +69,8 @@ const ECOSYSTEMS_SNAPSHOT: EcosystemsRepositorySnapshot = {
   ownerKind: 'organization',
   archived: false,
   createdAt: '2020-01-01T00:00:00.000Z',
+  firstCommitAt: '2020-01-02T00:00:00.000Z',
+  firstCommitSha: 'firstcommit',
   lastCommitAt: '2026-01-01T00:00:00.000Z',
   lastCommitSha: 'abcdef0123456789',
   commitStats: { totalCommits: 150, totalCommitters: 7, botCommitters: 2 },
@@ -229,19 +232,26 @@ describe('HostApplicationCustomData', () => {
   });
 });
 
-describe('EcosystemsRepositoryInfo', () => {
-  it('renders the core repository parameters', () => {
-    renderWithIntl(
-      <EcosystemsRepositoryInfo repository={ECOSYSTEMS_SNAPSHOT} repositoryUrl="https://github.com/foo/bar" />,
-    );
+describe('RepositoryInformation', () => {
+  const customData = {
+    repositoryUrl: 'https://github.com/foo/bar',
+    licenseSpdxId: 'MIT',
+    ecosystemsRepositoryInfo: ECOSYSTEMS_SNAPSHOT,
+  };
+
+  it('renders the ecosyste.ms repository parameters', () => {
+    renderWithIntl(<RepositoryInformation customData={customData} />);
 
     expect(screen.getByRole('link', { name: /foo\/bar/ })).toHaveAttribute('href', 'https://github.com/foo/bar');
     expect(screen.getByText('Organization account')).toBeInTheDocument();
     expect(screen.getByText('1,234')).toBeInTheDocument();
     expect(screen.getByText('12')).toBeInTheDocument();
-    expect(screen.getByText('MIT License')).toBeInTheDocument();
+    expect(screen.getByText(/MIT License/)).toBeInTheDocument();
     expect(screen.getByText('150')).toBeInTheDocument();
     expect(screen.getByText('7 human contributors, 2 bot contributors')).toBeInTheDocument();
+    expect(screen.getByText('First commit')).toBeInTheDocument();
+    const firstCommitRow = screen.getByText('First commit').closest('div');
+    expect(within(firstCommitRow).getByText(/2020/)).toBeInTheDocument();
     const lastCommitRow = screen.getByText('Last commit').closest('div');
     expect(within(lastCommitRow).getByText(/\(.+ ago\)/)).toBeInTheDocument();
     expect(screen.getByText('Scanning APK files for URIs, endpoints & secrets.')).toBeInTheDocument();
@@ -249,14 +259,22 @@ describe('EcosystemsRepositoryInfo', () => {
     expect(screen.getByText('Yes')).toBeInTheDocument();
     expect(screen.getByText(/Jane Doe/)).toBeInTheDocument();
     expect(screen.getByText(/12 commits in the past year/)).toBeInTheDocument();
-    expect(screen.getByText('Fork')).toBeInTheDocument();
+    expect(screen.getByText('This is a fork')).toBeInTheDocument();
     expect(screen.getByText('bar')).toBeInTheDocument();
   });
 
-  it('renders nothing when the snapshot has no data', () => {
-    const { container } = renderWithIntl(<EcosystemsRepositoryInfo repository={{} as EcosystemsRepositorySnapshot} />);
+  it('falls back to the validated repository fields', () => {
+    renderWithIntl(
+      <RepositoryInformation
+        customData={{ licenseSpdxId: 'MIT', validatedRepositoryInfo: baseCustomData.validatedRepositoryInfo }}
+      />,
+    );
 
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.getByText('Organization account')).toBeInTheDocument();
+    expect(screen.getByText('MIT (MIT License)')).toBeInTheDocument();
+    expect(screen.getByText('Last commit')).toBeInTheDocument();
+    expect(screen.getByText('7 collaborators')).toBeInTheDocument();
+    expect(screen.getByText('This is a fork')).toBeInTheDocument();
   });
 });
 
@@ -273,7 +291,6 @@ describe('HostApplicationDrawer', () => {
     expect(screen.getByText('Please host us')).toBeInTheDocument();
     expect(screen.getByText('Existing legal entity')).toBeInTheDocument();
     expect(screen.getByText('Repository information')).toBeInTheDocument();
-    expect(screen.getByText('Validated repository information')).toBeInTheDocument();
     expect(screen.getByTestId('accept-reject-buttons')).toBeInTheDocument();
     expect(screen.getByTestId('thread')).toBeInTheDocument();
   });

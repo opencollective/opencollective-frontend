@@ -25,4 +25,19 @@ describe('TimelineItem', () => {
     expect(document.body.textContent).toContain('Alice Admin');
     expect(document.body.textContent).toContain('added a fiscal host note on');
   });
+
+  it('humanizes activity types that have more than one underscore', () => {
+    const activity = {
+      id: 'activity-2',
+      type: 'WEBHOOK_PAYPAL_RECEIVED',
+      createdAt: new Date().toISOString(),
+      data: {},
+      individual: { id: 'individual-1', name: 'Alice Admin', slug: 'alice-admin' },
+      account: { id: 'account-1', name: 'Acme', slug: 'acme' },
+    } as unknown as React.ComponentProps<typeof TimelineItem>['activity'];
+
+    render(withRequiredProviders(<TimelineItem activity={activity} />));
+
+    expect(document.body.textContent).toContain('Webhook paypal received');
+  });
 });

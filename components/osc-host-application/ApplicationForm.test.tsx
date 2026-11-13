@@ -213,6 +213,11 @@ const ECOSYSTEMS_REPO_ENTRY = {
   contributors: { total_committers: 8 },
   issues: { issues_count: 3 },
   owner: { login: 'foo', kind: 'organization' },
+  firstCommit: {
+    sha: 'first123',
+    message: 'first commit',
+    timestamp: '2016-12-12T05:10:07.000Z',
+  },
 };
 
 const REPOSITORY_INFO_DEBOUNCE_MS = 800; // Must match ApplicationForm.js
@@ -309,6 +314,8 @@ describe('ApplicationForm - ecosyste.ms repository info', () => {
       ownerKind: 'organization',
       archived: false,
       createdAt: '2016-12-12T04:36:39.000Z',
+      firstCommitAt: '2016-12-12T05:10:07.000Z',
+      firstCommitSha: 'first123',
       lastCommitAt: RECENT_PUSHED_AT,
       lastCommitSha: 'abc123',
       commitStats: { totalCommits: 120, totalCommitters: 8 },
@@ -1002,6 +1009,10 @@ describe('ApplicationForm - rule notes as the field hint', () => {
       mockFetchEcosystemsRepositoryInfo.mockResolvedValue({
         ...ECOSYSTEMS_REPO_ENTRY,
         packages: [],
+        firstCommit: {
+          ...ECOSYSTEMS_REPO_ENTRY.firstCommit,
+          timestamp: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+        },
         repository: {
           ...ECOSYSTEMS_REPO_ENTRY.repository,
           created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),

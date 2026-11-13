@@ -18,6 +18,7 @@ import {
   type VendorFieldsFragment,
 } from '@/lib/graphql/types/v2/graphql';
 import formatCollectiveType from '@/lib/i18n/collective-type';
+import { getCollectivePageRoute } from '@/lib/url-helpers';
 
 import { ContributionDrawer } from '@/components/contributions/ContributionDrawer';
 import ExpenseDrawer from '@/components/expenses/ExpenseDrawer';
@@ -305,24 +306,12 @@ export function AccountDetails(props: AccountDetailsProps) {
   const rejectedExpensesCount = account?.rejectedExpenses?.totalCount || 0;
   const spamExpensesCount = account?.spamExpenses?.totalCount || 0;
 
-  // Redirecting a child to its parent (hosted account flow)
-  const parentPublicId = account && 'parent' in account && account.parent?.publicId;
-  React.useEffect(() => {
-    if (parentPublicId) {
-      makeReplaceSubpath(router)(`${parentPublicId}/${selectedTab}`);
-    }
-  }, [parentPublicId, selectedTab, router]);
-
   // Canonicalize legacy Money Movements URLs.
   React.useEffect(() => {
     if (rawTab === LEGACY_MONEY_MOVEMENTS_SUBPATH) {
       makeReplaceSubpath(router)(`${props.account.id}/${AccountDetailView.MONEY_MOVEMENTS}`);
     }
   }, [rawTab, props.account.id, router]);
-
-  if (parentPublicId) {
-    return null;
-  }
 
   const moreActions = isHostedAccount ? (
     account &&
@@ -538,9 +527,9 @@ export function AccountDetails(props: AccountDetailsProps) {
                 <FormattedMessage defaultMessage="Flag account" id="FiscalHostNote.FlagAccount" />
               </Button>
             )}
-            {!account?.isPrivate && (
+            {account?.slug && !account.isPrivate && getCollectivePageRoute(account) && (
               <Button variant="outline" size="sm" asChild>
-                <Link href={`/${account?.slug}`}>
+                <Link href={getCollectivePageRoute(account)}>
                   <FormattedMessage defaultMessage="View Profile" id="viewProfile" />
                 </Link>
               </Button>

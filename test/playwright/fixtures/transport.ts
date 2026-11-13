@@ -55,6 +55,12 @@ const graphScenario = z.object({
   urls: z.record(z.string()),
 });
 
+/** `recurring-contribution`: the multi-party shape, plus the Collective's tiers and the contribution. */
+const contributionScenario = graphScenario.extend({
+  tiers: z.record(z.object({ legacyId: z.number(), name: z.string() })),
+  contribution: z.object({ legacyId: z.number(), id: z.string() }),
+});
+
 // Written out rather than inferred: this project compiles without `strict`, where inference makes every field optional.
 type Envelope = {
   recipe: string;
@@ -73,6 +79,11 @@ export type GraphScenario = Envelope & {
   expenses: Record<string, { id: string; legacyId: number; description: string; status: string; url: string }>;
   vendors: Record<string, { id: string; legacyId: number; slug: string; name: string; type: string }>;
   urls: Record<string, string>;
+};
+
+export type ContributionScenario = GraphScenario & {
+  tiers: Record<'gold' | 'silver', { legacyId: number; name: string }>;
+  contribution: { legacyId: number; id: string };
 };
 
 type UseVendorPolicy = 'HOST_ADMINS' | 'HOST_AND_COLLECTIVE_ADMINS' | 'ALL_SUBMITTERS';
@@ -133,6 +144,20 @@ type Contracts = {
    * `hostAdmin` or `otherHostAdmin`), `otherCollective` (on `otherHost`). Vendors by `label`. URLs
    * `hostedCollectives`, `vendors`, `expectedFunds` (host dashboard).
    */
+  /**
+   * Actors `contributor`, `hostAdmin`. Accounts `host`, `collective` (tiers `gold`: fixed $1,000/month,
+   * `silver`: from $100/month). A monthly contribution from `contributor` to `collective`, without tier,
+   * charged once. URLs `outgoingContributions`, `contribution` (its drawer), `collectiveContributors`.
+   */
+  'recurring-contribution': {
+    inputs: {
+      /** Monthly amount in cents, charged once already. $1 unless stated. */
+      amount?: number;
+      /** The contributor already moved to `gold`, waiting for the next payment. */
+      pendingGoldTier?: boolean;
+    };
+    scenario: ContributionScenario;
+  };
   'vendor-host': {
     inputs: {
       /** Who may use the host's vendors; omitted, the host has no policy (product default: host admins only). */
@@ -164,6 +189,7 @@ const schemas: Record<Recipe, z.ZodTypeAny> = {
   'expense-draft-invite': graphScenario,
   'expense-management': graphScenario,
   'vendor-host': graphScenario,
+  'recurring-contribution': contributionScenario,
 };
 
 type Recipe = keyof Contracts;

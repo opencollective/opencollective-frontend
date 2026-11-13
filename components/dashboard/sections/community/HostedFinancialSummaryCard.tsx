@@ -4,19 +4,34 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { z } from 'zod';
 
 import { limit, offset } from '@/lib/filters/schemas';
-import { gql } from '@/lib/graphql/helpers';
 import { TransactionType } from '@/lib/graphql/types/v2/graphql';
 import useQueryFilter from '@/lib/hooks/useQueryFilter';
 import formatCollectiveType from '@/lib/i18n/collective-type';
+import { i18nPeriodFilterType } from '@/lib/i18n/period-compare-filter';
 
+import { formatPeriod } from '../../filters/PeriodCompareFilter';
+import { PeriodFilterType } from '../../filters/PeriodCompareFilter/schema';
+import { periodFilter } from '../../filters/PeriodFilter';
 import { Metric } from '../overview/Metric';
 import { transactionsTableQuery } from '../transactions/queries';
 import type { TransactionsTableProps } from '../transactions/TransactionsTable';
 import TransactionsTable from '../transactions/TransactionsTable';
 
 import { AccountDetailView, type MoneyMovementsView } from './common';
-import { HostedAccountBalanceSummary } from './HostedAccountBalanceSummary';
-import type { HostedAccountDetailData } from './queries';
+import {
+  HostedAccountBalanceSummary,
+  type HostedAccountOverviewFilter,
+  hostedAccountOverviewFilterSchema,
+} from './HostedAccountBalanceSummary';
+import { type HostedAccountDetailData, hostedAccountFinancialOverviewQuery } from './queries';
+
+/** Card title with the period the amount/graph refers to, e.g. "Last 4 weeks". */
+const MetricLabel = ({ children, period }: { children: React.ReactNode; period: string }) => (
+  <span className="block">
+    <span className="block">{children}</span>
+    <span className="block text-xs font-normal text-muted-foreground">{period}</span>
+  </span>
+);
 
 const recentTransactionsSchema = z.object({
   limit: limit.default(5),
@@ -24,45 +39,9 @@ const recentTransactionsSchema = z.object({
   openTransactionId: z.coerce.string().optional(),
 });
 
-const hostedFinancialSummarySeriesQuery = gql`
-  query HostedFinancialSummarySeries($accountId: String!) {
-    account(id: $accountId) {
-      id
-      stats {
-        id
-        totalAmountReceivedTimeSeries(includeChildren: true) {
-          timeUnit
-          dateFrom
-          dateTo
-          nodes {
-            date
-            amount {
-              valueInCents
-              currency
-            }
-          }
-        }
-        totalAmountSpentTimeSeries(includeChildren: true) {
-          timeUnit
-          dateFrom
-          dateTo
-          nodes {
-            date
-            amount {
-              valueInCents
-              currency
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
 type HostedFinancialSummaryCardProps = {
   account?: HostedAccountDetailData;
   hostSlug: string;
-  loading: boolean;
   handleTabChange: (tab: string, view?: MoneyMovementsView) => void;
   handleTransactionTableRowClick: TransactionsTableProps['onClickRow'];
 };
@@ -70,13 +49,39 @@ type HostedFinancialSummaryCardProps = {
 export function HostedFinancialSummaryCard({
   account,
   hostSlug,
-  loading,
   handleTabChange,
   handleTransactionTableRowClick,
 }: HostedFinancialSummaryCardProps) {
   const intl = useIntl();
   const name = account?.name || account?.legalName || account?.slug || formatCollectiveType(intl, account?.type);
-  const stats = account?.stats;
+
+  // The period filter lives here so it can scope the balance card and both charts below.
+  const queryFilter: HostedAccountOverviewFilter = useQueryFilter({
+    schema: hostedAccountOverviewFilterSchema,
+    toVariables: { period: periodFilter.toVariables },
+    defaultFilterValues: {
+      period: { type: PeriodFilterType.ALL_TIME },
+    },
+    filters: { period: periodFilter.filter },
+    skipRouter: true,
+  });
+
+  const overviewQuery = useQuery(hostedAccountFinancialOverviewQuery, {
+    variables: { accountId: account?.id, ...queryFilter.variables },
+    skip: !account?.id,
+    fetchPolicy: 'cache-and-network',
+  });
+
+  const stats = overviewQuery.data?.account?.stats;
+  const loading = overviewQuery.loading && !stats;
+
+  // The received/disbursed cards sit below the balance card that owns the filter,
+  // so they spell out the period they are scoped to.
+  const period = queryFilter.values.period;
+  const periodLabel =
+    period.type === PeriodFilterType.CUSTOM
+      ? formatPeriod({ from: period.gte, to: period.lte }) || intl.formatMessage(i18nPeriodFilterType[period.type])
+      : intl.formatMessage(i18nPeriodFilterType[period.type]);
 
   const recentCreditsQueryFilter = useQueryFilter({
     schema: recentTransactionsSchema,
@@ -121,15 +126,6 @@ export function HostedFinancialSummaryCard({
     notifyOnNetworkStatusChange: true,
   });
 
-  const seriesQuery = useQuery(hostedFinancialSummarySeriesQuery, {
-    variables: { accountId: account?.id },
-    skip: !account?.id,
-    fetchPolicy: 'cache-and-network',
-  });
-
-  const receivedSeries = seriesQuery.data?.account?.stats?.totalAmountReceivedTimeSeries;
-  const spentSeries = seriesQuery.data?.account?.stats?.totalAmountSpentTimeSeries;
-
   const recentCredits = recentCreditsQuery.data?.transactions;
   const recentDebits = recentDebitsQuery.data?.transactions;
 
@@ -137,39 +133,49 @@ export function HostedFinancialSummaryCard({
     <React.Fragment>
       <HostedAccountBalanceSummary
         account={account}
+        stats={stats}
+        queryFilter={queryFilter}
         onOpenMoneyView={view => handleTabChange(AccountDetailView.MONEY_MOVEMENTS, view)}
       />
       <div className="flex flex-col gap-4">
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
           <Metric
             className="order-1 xl:order-1"
-            label={<FormattedMessage defaultMessage="Received by {name}" id="ReceivedBy" values={{ name }} />}
+            label={
+              <MetricLabel period={periodLabel}>
+                <FormattedMessage defaultMessage="Received by {name}" id="ReceivedBy" values={{ name }} />
+              </MetricLabel>
+            }
             loading={loading}
             showTimeSeries
             expanded
             amount={{ current: stats?.consolidatedTotalNetAmountRaised }}
             timeseries={
-              receivedSeries
+              stats?.receivedTimeSeries
                 ? {
-                    current: receivedSeries,
-                    currency: receivedSeries?.nodes[0]?.amount?.currency,
+                    current: stats.receivedTimeSeries,
+                    currency: stats.receivedTimeSeries?.nodes[0]?.amount?.currency,
                   }
                 : undefined
             }
           />
           <Metric
             className="order-3 xl:order-2"
-            label={<FormattedMessage defaultMessage="Disbursed by {name}" id="DisbursedBy" values={{ name }} />}
+            label={
+              <MetricLabel period={periodLabel}>
+                <FormattedMessage defaultMessage="Disbursed by {name}" id="DisbursedBy" values={{ name }} />
+              </MetricLabel>
+            }
             loading={loading}
             showTimeSeries
             expanded
             amount={{ current: stats?.consolidatedTotalAmountSpent }}
             color="#dc2626"
             timeseries={
-              spentSeries
+              stats?.disbursedTimeSeries
                 ? {
-                    current: spentSeries,
-                    currency: spentSeries?.nodes[0]?.amount?.currency,
+                    current: stats.disbursedTimeSeries,
+                    currency: stats.disbursedTimeSeries?.nodes[0]?.amount?.currency,
                   }
                 : undefined
             }
