@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import type { PaymentIntentConfirmParams, PaymentIntentResult, Stripe, StripeElements } from '@stripe/stripe-js';
+import type { PaymentIntentResult, Stripe, StripeElements } from '@stripe/stripe-js';
 
 import { PAYMENT_METHOD_TYPE } from '../constants/payment-methods';
 
@@ -10,7 +10,7 @@ type PaymentData = {
   returnUrl?: string;
 };
 
-type ConfirmParams = PaymentIntentConfirmParams | { payment_method?: string };
+type ConfirmParams = { payment_method?: string; return_url?: string };
 
 export async function confirmPayment(
   stripe: Stripe,
@@ -18,11 +18,12 @@ export async function confirmPayment(
   paymentData: PaymentData,
   { redirect }: { redirect?: 'if_required' } = {},
 ) {
-  const confirmParams: ConfirmParams = paymentData?.paymentMethodId
-    ? {
-        payment_method: paymentData.paymentMethodId,
-      }
-    : undefined;
+  // `return_url` is required at confirmation whenever the PaymentIntent has automatic payment
+  // methods enabled with `allow_redirects: always` (the default), even for non-redirect methods.
+  const confirmParams: ConfirmParams = {
+    ...(paymentData?.paymentMethodId && { payment_method: paymentData.paymentMethodId }),
+    ...(paymentData?.returnUrl && { return_url: paymentData.returnUrl }),
+  };
 
   let paymentIntentResult: PaymentIntentResult;
   switch (paymentData.type) {
