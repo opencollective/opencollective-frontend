@@ -18,6 +18,16 @@ export const THIRD_PARTY_SCRIPT_URL_PATTERNS = [
 ];
 
 /**
+ * Non-Error promise rejections thrown by an injected assistive-writing browser extension
+ * (word prediction, dictation, math OCR...). They are plain strings without a stack trace,
+ * so the frame-based filters cannot catch them. Example values:
+ * - `Request timeout nn-NO_wordsDistributor.getValue`
+ * - `Request timeout isDictateAvailable`
+ */
+export const EXTENSION_REQUEST_TIMEOUT_REJECTION_PATTERN =
+  /^Non-Error promise rejection captured with value: Request timeout [\w-]+(\.getValue|Available)$/;
+
+/**
  * Returns true when a stack frame filename matches a known extension or injected-script URL.
  */
 export function isThirdPartyScriptUrl(url: string | undefined): boolean {
