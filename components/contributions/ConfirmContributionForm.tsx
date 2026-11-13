@@ -8,7 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { getCurrentLocalDateStr } from '../../lib/date-utils';
 import { i18nGraphqlException } from '../../lib/errors';
 import type { ConfirmContributionFieldsFragment, TaxInput } from '../../lib/graphql/types/v2/graphql';
-import { AccountType, OrderEditStrategy } from '../../lib/graphql/types/v2/graphql';
+import { AccountType } from '../../lib/graphql/types/v2/graphql';
 import { i18nTaxType } from '../../lib/i18n/taxes';
 import { FEATURES, isFeatureEnabled } from '@/lib/allowed-features';
 
@@ -22,8 +22,6 @@ import StyledInputPercentage from '../StyledInputPercentage';
 import StyledTooltip from '../StyledTooltip';
 import { Label, P, Span } from '../Text';
 import { useToast } from '../ui/useToast';
-
-import { isOrderEditStrategyConfirmationRequired, OrderEditStrategyPicker } from './OrderEditStrategyPicker';
 
 export const confirmContributionFieldsFragment = gql`
   fragment ConfirmContributionFields on Order {
@@ -105,11 +103,6 @@ export const confirmContributionFieldsFragment = gql`
       valueInCents
     }
     platformTipEligible
-    processedAt
-    paymentProcessorFee {
-      valueInCents
-      currency
-    }
   }
 `;
 
@@ -123,22 +116,6 @@ const confirmContributionMutation = gql`
         id
         canMarkAsPaid
         canMarkAsExpired
-      }
-      ...ConfirmContributionFields
-    }
-  }
-  ${confirmContributionFieldsFragment}
-`;
-
-const editPaidContributionMutation = gql`
-  mutation EditPaidContribution($order: OrderUpdateInput!, $strategy: OrderEditStrategy) {
-    editPaidManualOrder(order: $order, strategy: $strategy) {
-      id
-      legacyId
-      status
-      permissions {
-        id
-        canEditPaidManualOrder
       }
       ...ConfirmContributionFields
     }
@@ -162,7 +139,6 @@ export const ConfirmContributionForm = ({
   footer = null,
   FormBodyContainer = Fragment,
   initialValues = {},
-  isEdit = false,
 }: {
   onSubmit: () => void;
   onSuccess: () => void;
@@ -171,8 +147,6 @@ export const ConfirmContributionForm = ({
   FormBodyContainer?: React.ComponentType<{ children: React.ReactNode }>;
   initialValues?: { amountReceived?: number; processedAt?: string; transactionsImportRow?: { id: string } };
   order: ConfirmContributionFieldsFragment;
-  /** To edit a contribution that was already confirmed, rather than confirming a pending one */
-  isEdit?: boolean;
 }) => {
   const defaultHostFeePercent = order.hostFeePercent ?? order.toAccount['bankTransfersHostFeePercent'] ?? 0;
   const defaultTaxPercent = order.tax?.rate * 100 || 0;
@@ -181,22 +155,13 @@ export const ConfirmContributionForm = ({
   const currency = order.amount.currency;
   const [amountReceived, setAmountReceived] = useState(initialValues['amountReceived'] ?? amountInitiated);
   const [platformTip, setPlatformTip] = useState(defaultPlatformTip);
-  const [paymentProcessorFee, setPaymentProcessorFee] = useState(
-    isEdit ? order.paymentProcessorFee?.valueInCents || 0 : 0,
-  );
+  const [paymentProcessorFee, setPaymentProcessorFee] = useState(0);
   const [hostFeePercent, setHostFeePercent] = useState(defaultHostFeePercent);
   const [taxPercent, setTaxPercent] = useState(defaultTaxPercent);
-  const [processedAt, setProcessedAt] = useState(
-    initialValues['processedAt'] ?? ((isEdit && order.processedAt?.slice(0, 10)) || getCurrentLocalDateStr()),
-  );
-  const [editStrategy, setEditStrategy] = useState(OrderEditStrategy.REVERSE);
-  const [isEditStrategyConfirmed, setEditStrategyConfirmed] = useState(false);
-  const [hasEditStrategyError, setEditStrategyError] = useState(false);
+  const [processedAt, setProcessedAt] = useState(initialValues['processedAt'] ?? getCurrentLocalDateStr());
   const intl = useIntl();
   const { toast } = useToast();
-  const [confirmOrder, { loading: confirming }] = useMutation(confirmContributionMutation);
-  const [editOrder, { loading: editing }] = useMutation(editPaidContributionMutation);
-  const submitting = confirming || editing;
+  const [confirmOrder, { loading: submitting }] = useMutation(confirmContributionMutation);
   const isOriginalAmount = amountReceived === amountInitiated;
 
   // When amount received equals the original initiated amount, force the original platform tip
@@ -228,54 +193,35 @@ export const ConfirmContributionForm = ({
           return;
         }
 
-        // Editing in place requires the admin to acknowledge the consequences
-        if (isEdit && isOrderEditStrategyConfirmationRequired(editStrategy) && !isEditStrategyConfirmed) {
-          setEditStrategyError(true);
-          return;
-        }
-
         onSubmit?.();
-        const orderInput = {
-          id: order.id,
-          amount: { valueInCents: grossContributionAmount, currency },
-          paymentProcessorFee: { valueInCents: paymentProcessorFee || 0, currency },
-          platformTip: { valueInCents: platformTip || 0, currency },
-          hostFeePercent: hostFeePercent || 0,
-          processedAt: processedAt ? new Date(processedAt) : new Date(),
-          tax: !taxPercent
-            ? null
-            : ({
-                type: applicableTax,
-                ...omit(order.tax, ['id', '__typename']),
-                rate: taxPercent / 100,
-                amount: { valueInCents: taxAmount, currency },
-              } as TaxInput),
-        };
-
         try {
-          if (isEdit) {
-            await editOrder({ variables: { order: orderInput, strategy: editStrategy } });
-          } else {
-            await confirmOrder({
-              variables: {
-                action: 'MARK_AS_PAID',
-                order: {
-                  ...orderInput,
-                  transactionsImportRow: initialValues['transactionsImportRow']
-                    ? pick(initialValues['transactionsImportRow'], 'id')
-                    : null,
-                },
+          await confirmOrder({
+            variables: {
+              action: 'MARK_AS_PAID',
+              order: {
+                id: order.id,
+                amount: { valueInCents: grossContributionAmount, currency },
+                paymentProcessorFee: { valueInCents: paymentProcessorFee || 0, currency },
+                platformTip: { valueInCents: platformTip || 0, currency },
+                hostFeePercent: hostFeePercent || 0,
+                processedAt: processedAt ? new Date(processedAt) : new Date(),
+                transactionsImportRow: initialValues['transactionsImportRow']
+                  ? pick(initialValues['transactionsImportRow'], 'id')
+                  : null,
+                tax: !taxPercent
+                  ? null
+                  : ({
+                      type: applicableTax,
+                      ...omit(order.tax, ['id', '__typename']),
+                      rate: taxPercent / 100,
+                      amount: { valueInCents: taxAmount, currency },
+                    } as TaxInput),
               },
-            });
-          }
+            },
+          });
           toast({
             variant: 'success',
-            message: isEdit
-              ? intl.formatMessage({
-                  defaultMessage: 'Contribution edited successfully',
-                  id: 'EditPaidContribution.success',
-                })
-              : intl.formatMessage({ defaultMessage: 'Contribution confirmed successfully', id: 'Khmjkh' }),
+            message: intl.formatMessage({ defaultMessage: 'Contribution confirmed successfully', id: 'Khmjkh' }),
           });
           onSuccess?.();
         } catch (e) {
@@ -286,17 +232,10 @@ export const ConfirmContributionForm = ({
     >
       <FormBodyContainer>
         <P mt={3} fontSize="13px">
-          {isEdit ? (
-            <FormattedMessage
-              defaultMessage="Update the amount of funds you have received in your host account."
-              id="EditPaidContribution.description"
-            />
-          ) : (
-            <FormattedMessage
-              defaultMessage="Confirm the amount of funds you have received in your host account."
-              id="o9RoEi"
-            />
-          )}
+          <FormattedMessage
+            defaultMessage="Confirm the amount of funds you have received in your host account."
+            id="o9RoEi"
+          />
         </P>
         <Container mt={4}>
           <Flex justifyContent="space-between" alignItems={['left', 'center']} flexDirection={['column', 'row']}>
@@ -546,24 +485,6 @@ export const ConfirmContributionForm = ({
             </Box>
           </Flex>
         </Container>
-        {isEdit && (
-          <div className="mt-6 border-t border-slate-100 pt-4">
-            <OrderEditStrategyPicker
-              strategy={editStrategy}
-              onStrategyChange={strategy => {
-                setEditStrategy(strategy);
-                setEditStrategyError(false);
-              }}
-              isConfirmed={isEditStrategyConfirmed}
-              onConfirmedChange={isConfirmed => {
-                setEditStrategyConfirmed(isConfirmed);
-                setEditStrategyError(false);
-              }}
-              hasConfirmationError={hasEditStrategyError}
-              disabled={submitting}
-            />
-          </div>
-        )}
       </FormBodyContainer>
       {footer}
     </form>

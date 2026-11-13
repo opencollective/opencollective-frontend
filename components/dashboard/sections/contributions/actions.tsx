@@ -269,27 +269,6 @@ export function useContributionActions<T extends ManagedOrderFieldsFragment | Co
       });
     }
 
-    if (order.permissions?.['canEditPaidManualOrder']) {
-      actions.primary.push({
-        key: 'edit-paid-contribution',
-        Icon: Pencil,
-        label: intl.formatMessage({ defaultMessage: 'Edit contribution', id: 'EditPaidContribution.submit' }),
-        onClick: () => {
-          showModal(
-            ContributionConfirmationModal,
-            {
-              order: order as React.ComponentProps<typeof ContributionConfirmationModal>['order'],
-              isEdit: true,
-              onSuccess: onMutationSuccess,
-              onCloseFocusRef,
-            },
-            `edit-paid-contribution-${order.id}`,
-          );
-        },
-        'data-cy': 'edit-paid-contribution-button',
-      });
-    }
-
     if (order.paymentMethod?.type === PaymentMethodType.HOST) {
       actions.primary.push({
         key: 'edit-funds',
