@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 
-import type { CommunityAccountDetailQuery } from '@/lib/graphql/types/v2/graphql';
+import type { CommunityAccountDetailQuery, HostedAccountFinancialOverviewQuery } from '@/lib/graphql/types/v2/graphql';
 
 import { accountHoverCardFieldsFragment } from '@/components/AccountHoverCard';
 import { kycStatusFieldsFragment, kycVerificationFieldsFragment } from '@/components/kyc/graphql';
@@ -474,7 +474,88 @@ export const hostedAccountActivitiesQuery = gql`
   ${communityAccountDetailActivityFieldsFragment}
 `;
 
+/**
+ * Balance, totals and time series for the hosted account overview. The period filter
+ * (`dateFrom`/`dateTo`) is shared by the balance card and the received/disbursed charts.
+ */
+export const hostedAccountFinancialOverviewQuery = gql`
+  query HostedAccountFinancialOverview($accountId: String!, $dateFrom: DateTime, $dateTo: DateTime) {
+    account(id: $accountId) {
+      id
+      stats {
+        id
+        balance(dateTo: $dateTo) {
+          valueInCents
+          currency
+        }
+        consolidatedBalance: balance(includeChildren: true, dateTo: $dateTo) {
+          valueInCents
+          currency
+        }
+        consolidatedTotalNetAmountRaised: totalAmountReceived(
+          net: true
+          includeChildren: true
+          dateFrom: $dateFrom
+          dateTo: $dateTo
+        ) {
+          valueInCents
+          currency
+        }
+        consolidatedTotalAmountSpent: totalAmountSpent(includeChildren: true, dateFrom: $dateFrom, dateTo: $dateTo) {
+          valueInCents
+          currency
+        }
+        balanceTimeSeries(dateFrom: $dateFrom, dateTo: $dateTo, includeChildren: true) {
+          timeUnit
+          dateFrom
+          dateTo
+          nodes {
+            date
+            amount {
+              valueInCents
+              currency
+            }
+          }
+        }
+        receivedTimeSeries: totalAmountReceivedTimeSeries(
+          net: true
+          includeChildren: true
+          dateFrom: $dateFrom
+          dateTo: $dateTo
+        ) {
+          timeUnit
+          dateFrom
+          dateTo
+          nodes {
+            date
+            amount {
+              valueInCents
+              currency
+            }
+          }
+        }
+        disbursedTimeSeries: totalAmountSpentTimeSeries(includeChildren: true, dateFrom: $dateFrom, dateTo: $dateTo) {
+          timeUnit
+          dateFrom
+          dateTo
+          nodes {
+            date
+            amount {
+              valueInCents
+              currency
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export type AccountDetailData = NonNullable<CommunityAccountDetailQuery['account']>;
+
+export type HostedAccountFinancialStats = NonNullable<
+  NonNullable<HostedAccountFinancialOverviewQuery['account']>['stats']
+>;
 
 export type AccountDetailHost = NonNullable<CommunityAccountDetailQuery['host']>;
 
