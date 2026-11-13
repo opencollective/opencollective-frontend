@@ -15,6 +15,8 @@ export const LOCAL_STORAGE_KEYS = {
   PLAID_LINK_TOKEN: 'plaidLinkToken',
   GOCARDLESS_DATA: 'gocardlessData',
   NEW_PLATFORM_TIP_FLOW_DRAWS: 'newPlatformTipFlowDraws',
+  DASHBOARD_THEME: 'dashboardTheme',
+  DASHBOARD_DARK_MODE_ENABLED: 'dashboardDarkModeEnabled',
 };
 
 // The below helpers use a try-catch to gracefully fallback in these scenarios:

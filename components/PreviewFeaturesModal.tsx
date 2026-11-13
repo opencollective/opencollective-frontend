@@ -4,12 +4,14 @@ import { FormattedMessage } from 'react-intl';
 
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import type { PreviewFeature } from '../lib/preview-features';
+import { PREVIEW_FEATURE_KEYS } from '../lib/preview-features';
 
 import { editAccountSettingsMutation } from './edit-collective/mutations';
 import CommentIcon from './icons/CommentIcon';
 import { Badge } from './ui/Badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/Dialog';
 import { Switch } from './ui/Switch';
+import { DashboardThemeSwitcher } from './DashboardThemeSwitcher';
 import Link from './Link';
 
 const FeatureListItem = ({
@@ -122,6 +124,14 @@ const FeatureDetailsPanel = ({
       </div>
       <div className="flex flex-col gap-2 px-1">
         {feature.description && <p className="mt-1 text-sm text-muted-foreground">{feature.description}</p>}
+        {feature.key === PREVIEW_FEATURE_KEYS.DARK_MODE && isChecked && (
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-lg border px-3 py-2">
+            <span className="text-sm font-medium text-foreground">
+              <FormattedMessage id="Theme" defaultMessage="Theme" />
+            </span>
+            <DashboardThemeSwitcher showLabels />
+          </div>
+        )}
         {dependentFeatures?.length > 0 && (
           <div className="mt-4">
             <div className="mb-2 text-xs font-semibold text-muted-foreground uppercase">

@@ -82,12 +82,12 @@ const ExpenseContainer = styled.div<{ useDrawer?: boolean; selected?: boolean } 
   display: block;
   width: 100%;
   border: 0;
-  background: white;
+  background: ${props => props.theme.colors.white.full};
   ${space}
 
   transition: background 0.1s;
 
-  ${props => props.useDrawer && props.selected && `background: #E5F3FF;`}
+  ${props => props.useDrawer && props.selected && `background: ${props.theme.colors.primary[100]};`}
 
   ${props =>
     !props.selected &&

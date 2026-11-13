@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 import roles from '../lib/constants/roles';
+import { useApplyDashboardTheme } from '../lib/hooks/useDashboardTheme';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { require2FAForAdmins } from '../lib/policies';
 import type { Context } from '@/lib/apollo-client';
@@ -292,6 +293,7 @@ const DashboardPage = () => {
   const { slug, section, subpath } = parseQuery(router.query);
   const { LoggedInUser, loadingLoggedInUser } = useLoggedInUser();
   const { workspace, setWorkspace } = useWorkspace();
+  useApplyDashboardTheme();
   const isRootUser = LoggedInUser?.isRoot;
   const hasWorkspaceAccess =
     workspace.slug &&

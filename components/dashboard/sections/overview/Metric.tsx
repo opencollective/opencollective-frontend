@@ -245,7 +245,7 @@ export function Metric({
             <div className="flex grow flex-col items-center justify-center">
               <Image
                 alt="No results found illustration with a magnifying glass."
-                className="z-10 sm:h-40 sm:w-40"
+                className="z-10 sm:h-40 sm:w-40 dark:hue-rotate-180 dark:invert"
                 src="/static/images/no-results.png"
                 height={128}
                 width={128}

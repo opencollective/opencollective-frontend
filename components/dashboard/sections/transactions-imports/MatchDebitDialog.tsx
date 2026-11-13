@@ -526,7 +526,13 @@ export const MatchDebitDialog = ({
                 <FormattedMessage defaultMessage="Selected: None" id="rTeNRu" />
               </div>
               <div className="flex grow flex-col items-center justify-center gap-4 rounded bg-slate-50 p-4 text-center">
-                <Image alt="" width={125} height={125} src="/static/images/no-results.png" />
+                <Image
+                  alt=""
+                  width={125}
+                  height={125}
+                  src="/static/images/no-results.png"
+                  className="dark:hue-rotate-180 dark:invert"
+                />
                 <div>
                   <FormattedMessage
                     defaultMessage="Select an item from the table above to match it against the imported transaction or <Link>create a new Expense</Link>."

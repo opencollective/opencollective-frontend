@@ -90,6 +90,17 @@ exports[`HTMLContent cannot inject malicious content 1`] = `
   border-radius: 4px;
 }
 
+:root.dark .c1 blockquote {
+  border-left-color: var(--color-slate-200);
+  background: transparent;
+  color: var(--color-slate-600);
+}
+
+:root.dark .c1 pre {
+  background: var(--color-slate-50);
+  color: var(--color-slate-800);
+}
+
 .c1 ul {
   list-style-type: disc;
 }
@@ -234,6 +245,17 @@ exports[`HTMLContent handles broken HTML 1`] = `
   border-radius: 4px;
 }
 
+:root.dark .c1 blockquote {
+  border-left-color: var(--color-slate-200);
+  background: transparent;
+  color: var(--color-slate-600);
+}
+
+:root.dark .c1 pre {
+  background: var(--color-slate-50);
+  color: var(--color-slate-800);
+}
+
 .c1 ul {
   list-style-type: disc;
 }
@@ -360,6 +382,17 @@ exports[`HTMLContent renders simple HTML string 1`] = `
   max-width: 100%;
   white-space: nowrap;
   border-radius: 4px;
+}
+
+:root.dark .c1 blockquote {
+  border-left-color: var(--color-slate-200);
+  background: transparent;
+  color: var(--color-slate-600);
+}
+
+:root.dark .c1 pre {
+  background: var(--color-slate-50);
+  color: var(--color-slate-800);
 }
 
 .c1 ul {

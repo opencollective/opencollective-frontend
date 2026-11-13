@@ -35,7 +35,7 @@ const CardContainer = styled(Container)<{ size?: number | number[] }>`
   align-items: center;
   font-size: 12px;
   max-width: 100%;
-  background: white;
+  background: ${props => props.theme.colors.white.full};
 
   svg {
     transition: opacity 0.3s;

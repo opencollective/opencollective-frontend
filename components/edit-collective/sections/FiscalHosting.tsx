@@ -332,7 +332,13 @@ const FiscalHosting = ({ collective, account }) => {
           className="flex items-center gap-4 rounded-lg border border-border px-6 py-4"
           data-cy="money-management-section"
         >
-          <Image src="/static/images/welcome/jar.png" alt="Money Management Icon" width={52} height={49} />
+          <Image
+            className="dark:hue-rotate-180 dark:invert"
+            src="/static/images/welcome/jar.png"
+            alt="Money Management Icon"
+            width={52}
+            height={49}
+          />
           <div className="grow">
             <h1 className="mb-2 font-bold">
               <FormattedMessage defaultMessage="Money Management" id="Welcome.Organization.MoneyManagement" />
@@ -351,7 +357,13 @@ const FiscalHosting = ({ collective, account }) => {
           className="flex items-center gap-4 rounded-lg border border-border px-6 py-4"
           data-cy="fiscal-hosting-section"
         >
-          <Image src="/static/images/welcome/place.png" alt="Fiscal Host Icon" width={52} height={49} />
+          <Image
+            className="dark:hue-rotate-180 dark:invert"
+            src="/static/images/welcome/place.png"
+            alt="Fiscal Host Icon"
+            width={52}
+            height={49}
+          />
           <div className="grow">
             <h1 className="mb-2 flex items-center font-bold">
               <FormattedMessage defaultMessage="Fiscal Hosting" id="editCollective.fiscalHosting" />

@@ -256,6 +256,18 @@ const HTMLContent = styled(
     border-radius: 4px;
   }
 
+  /* Dark mode (dashboard only) */
+  :root.dark & blockquote {
+    border-left-color: var(--color-slate-200);
+    background: transparent;
+    color: var(--color-slate-600);
+  }
+
+  :root.dark & pre {
+    background: var(--color-slate-50);
+    color: var(--color-slate-800);
+  }
+
   ul {
     list-style-type: disc;
   }

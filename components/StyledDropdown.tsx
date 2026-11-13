@@ -15,10 +15,10 @@ export const DropdownContent = styled.div`
   font-size: 12px;
   text-transform: initial;
   white-space: normal;
-  color: white;
-  background: white;
+  color: ${props => props.theme.colors.white.full};
+  background: ${props => props.theme.colors.white.full};
   box-shadow: 0px 4px 8px rgba(20, 20, 20, 0.16);
-  border: 1px solid #e2e2e2;
+  border: 1px solid ${props => props.theme.colors.black[200]};
 `;
 
 export const DropdownArrow = styled('div')`
