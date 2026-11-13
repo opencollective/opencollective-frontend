@@ -236,17 +236,17 @@ const HTMLContent = styled(
 
   blockquote {
     font-size: 1em;
-    border-left: 5px solid ${props => props.theme.colors.black[200]};
-    background: ${props => props.theme.colors.white.full};
-    color: ${props => props.theme.colors.black[600]};
+    border-left: 5px solid #e9e9e9;
+    background: white;
+    color: #757677;
     margin: 0;
     padding: 16px;
   }
 
   pre {
     font-size: 0.85em;
-    background: ${props => props.theme.colors.black[50]};
-    color: ${props => props.theme.colors.black[800]};
+    background: #f6f8fa;
+    color: #333;
     border: none;
     padding: 16px;
     font-family: monospace;
@@ -254,6 +254,18 @@ const HTMLContent = styled(
     max-width: 100%;
     white-space: nowrap;
     border-radius: 4px;
+  }
+
+  /* Dark mode (dashboard only) */
+  :root.dark & blockquote {
+    border-left-color: var(--color-slate-200);
+    background: transparent;
+    color: var(--color-slate-600);
+  }
+
+  :root.dark & pre {
+    background: var(--color-slate-50);
+    color: var(--color-slate-800);
   }
 
   ul {
