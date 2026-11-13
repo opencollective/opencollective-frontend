@@ -1,7 +1,7 @@
 import type { BrowserOptions } from '@sentry/browser';
 import * as Sentry from '@sentry/nextjs';
 
-import { THIRD_PARTY_SCRIPT_URL_PATTERNS } from './sentry-filters';
+import { ANDROID_WEBVIEW_JAVA_BRIDGE_ERROR_PATTERN, THIRD_PARTY_SCRIPT_URL_PATTERNS } from './sentry-filters';
 
 // Default scope
 const scope = Sentry.getCurrentScope();
@@ -25,6 +25,7 @@ const defaultConfig: BrowserOptions = {
     'ResizeObserver loop completed with undelivered notifications.',
     'globalThis is not defined', // Happens on old browsers, see https://caniuse.com/?search=globalThis
     "Can't find variable: globalThis", // Happens on old browsers, see https://caniuse.com/?search=globalThis
+    ANDROID_WEBVIEW_JAVA_BRIDGE_ERROR_PATTERN, // Thrown by JS bridges injected by Android in-app browsers (e.g. TikTok)
   ],
   denyUrls: THIRD_PARTY_SCRIPT_URL_PATTERNS,
   tracesSampleRate: process.env.SENTRY_TRACES_SAMPLE_RATE ? parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE) : 0.01,
