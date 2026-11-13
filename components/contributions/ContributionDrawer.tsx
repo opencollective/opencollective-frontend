@@ -123,6 +123,10 @@ const contributionDrawerQuery = gql`
         currency
       }
       hostFeePercent
+      paymentProcessorFee {
+        valueInCents
+        currency
+      }
       tags
       tax {
         type
