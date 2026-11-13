@@ -12268,100 +12268,6 @@ export type ParseUploadedFileResult = {
   success: Scalars['Boolean']['output'];
 };
 
-/** A payment intent representing a charge, transfer, or pending payment */
-export type PaymentIntent = {
-  __typename?: 'PaymentIntent';
-  /** Intended amount from the linked order or expense */
-  amountPledged?: Maybe<Amount>;
-  /** Total amount received by the payee, computed from linked transactions */
-  amountReceived?: Maybe<Amount>;
-  /** Total amount sent by the payer, computed from linked transactions */
-  amountSent?: Maybe<Amount>;
-  createdAt: Scalars['DateTime']['output'];
-  description?: Maybe<Scalars['String']['output']>;
-  expense?: Maybe<Expense>;
-  host?: Maybe<Account>;
-  id: Scalars['String']['output'];
-  /** @deprecated 2026-07-02: use publicId */
-  legacyId: Scalars['Int']['output'];
-  order?: Maybe<Order>;
-  paidAt?: Maybe<Scalars['DateTime']['output']>;
-  payee?: Maybe<Account>;
-  payer?: Maybe<Account>;
-  /** The resource public id (ie: pi_xxxxxxxx) */
-  publicId: Scalars['String']['output'];
-  status: PaymentIntentStatus;
-  /** Transactions linked to this payment intent */
-  transactions?: Maybe<Array<Transaction>>;
-  type: PaymentIntentType;
-};
-
-
-/** A payment intent representing a charge, transfer, or pending payment */
-export type PaymentIntentAmountPledgedArgs = {
-  currencySource?: PaymentIntentAccountRole;
-};
-
-
-/** A payment intent representing a charge, transfer, or pending payment */
-export type PaymentIntentAmountReceivedArgs = {
-  currencySource?: PaymentIntentAccountRole;
-  net?: Scalars['Boolean']['input'];
-};
-
-
-/** A payment intent representing a charge, transfer, or pending payment */
-export type PaymentIntentAmountSentArgs = {
-  currencySource?: PaymentIntentAccountRole;
-  net?: Scalars['Boolean']['input'];
-};
-
-/** Role of the account in the payment intent */
-export enum PaymentIntentAccountRole {
-  /** The host in which ledger entries are recorded */
-  HOST = 'HOST',
-  /** The account that is receiving the money */
-  PAYEE = 'PAYEE',
-  /** The account that is paying */
-  PAYER = 'PAYER'
-}
-
-/** A collection of Payment Intents */
-export type PaymentIntentCollection = Collection & {
-  __typename?: 'PaymentIntentCollection';
-  limit?: Maybe<Scalars['Int']['output']>;
-  nodes: Array<PaymentIntent>;
-  offset?: Maybe<Scalars['Int']['output']>;
-  totalCount?: Maybe<Scalars['Int']['output']>;
-};
-
-/** Payment intent direction relative to the filtered account (INCOMING = payee, OUTGOING = payer) */
-export enum PaymentIntentDirection {
-  INCOMING = 'INCOMING',
-  OUTGOING = 'OUTGOING'
-}
-
-export enum PaymentIntentStatus {
-  CANCELED = 'CANCELED',
-  ERROR = 'ERROR',
-  PAID = 'PAID',
-  PENDING = 'PENDING',
-  REVERSED = 'REVERSED'
-}
-
-export enum PaymentIntentType {
-  AddedMoney = 'AddedMoney',
-  BalanceTransfer = 'BalanceTransfer',
-  CardCharge = 'CardCharge',
-  Contribution = 'Contribution',
-  GrantRequest = 'GrantRequest',
-  InternalTransfer = 'InternalTransfer',
-  Other = 'Other',
-  PaymentRequest = 'PaymentRequest',
-  PlatformBilling = 'PlatformBilling',
-  PlatformBillingTipSettlement = 'PlatformBillingTipSettlement'
-}
-
 /** PaymentMethod model */
 export type PaymentMethod = {
   __typename?: 'PaymentMethod';
@@ -14365,10 +14271,6 @@ export type Query = {
   order?: Maybe<Order>;
   orders: OrderCollection;
   organization?: Maybe<Organization>;
-  /** Returns a single payment intent identified by its public id */
-  paymentIntent?: Maybe<PaymentIntent>;
-  /** Returns a list of payment intents */
-  paymentIntents: PaymentIntentCollection;
   paypalPlan: PaypalPlan;
   /** Get a personal token by reference */
   personalToken?: Maybe<PersonalToken>;
@@ -14698,29 +14600,6 @@ export type QueryOrganizationArgs = {
   id?: InputMaybe<Scalars['String']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
   throwIfMissing?: InputMaybe<Scalars['Boolean']['input']>;
-};
-
-
-/** This is the root query */
-export type QueryPaymentIntentArgs = {
-  publicId: Scalars['String']['input'];
-};
-
-
-/** This is the root query */
-export type QueryPaymentIntentsArgs = {
-  account?: InputMaybe<AccountReferenceInput>;
-  counterparty?: InputMaybe<AccountReferenceInput>;
-  dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
-  dateTo?: InputMaybe<Scalars['DateTime']['input']>;
-  direction?: InputMaybe<PaymentIntentDirection>;
-  host?: InputMaybe<AccountReferenceInput>;
-  hostContext?: InputMaybe<HostContext>;
-  includeChildrenPaymentIntents?: Scalars['Boolean']['input'];
-  limit?: Scalars['Int']['input'];
-  offset?: Scalars['Int']['input'];
-  status?: InputMaybe<Array<PaymentIntentStatus>>;
-  type?: InputMaybe<Array<PaymentIntentType>>;
 };
 
 
