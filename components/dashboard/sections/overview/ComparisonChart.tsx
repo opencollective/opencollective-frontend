@@ -23,7 +23,7 @@ const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expa
     sparkline: {
       enabled: !expanded,
     },
-    foreColor: isDark ? '#899099' : 'hsl(var(--muted-foreground))',
+    foreColor: isDark ? '#8F969F' : 'hsl(var(--muted-foreground))',
     fontFamily: 'Inter, sans-serif',
   },
   legend: {
@@ -58,7 +58,7 @@ const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expa
   },
   markers: {
     size: 0,
-    strokeColors: isDark ? '#101215' : '#fff',
+    strokeColors: isDark ? '#1E1F22' : '#fff',
     strokeWidth: expanded ? 2 : 0,
     strokeOpacity: 0.9,
     strokeDashArray: 0,
