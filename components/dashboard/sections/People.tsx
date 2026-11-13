@@ -28,26 +28,28 @@ import { DashboardContext } from '../DashboardContext';
 import DashboardHeader from '../DashboardHeader';
 import { EmptyResults } from '../EmptyResults';
 import ExportContributorsCSVButton from '../ExportContributorsCSVButton';
-import { makeAmountFilter } from '../filters/AmountFilter';
+import { makeAmountWithYearFilter } from '../filters/AmountFilter/AmountWithYearFilter';
 import ComboSelectFilter from '../filters/ComboSelectFilter';
 import { Filterbar } from '../filters/Filterbar';
 import { hostedAccountFilter } from '../filters/HostedAccountFilter';
 import { Pagination } from '../filters/Pagination';
 import { searchFilter } from '../filters/SearchFilter';
 import { buildSortFilter } from '../filters/SortFilter';
+import { isTaxFormsFeatureEnabled } from '../menu-items';
 import type { DashboardSectionProps } from '../types';
 import { makePushSubpath, makeReplaceSubpath } from '../utils';
 
 import { AccountDetails } from './community/AccountDetail';
 import { usePersonActions } from './community/common';
+import { missingInformationFilter } from './community/filters';
 import { peopleHostDashboardQuery } from './community/queries';
 
-const totalContributedFilter = makeAmountFilter(
+const totalContributedFilter = makeAmountWithYearFilter(
   'totalContributed',
   defineMessage({ defaultMessage: 'Total Contributed', id: 'TotalContributed' }),
 );
 
-const totalExpendedFilter = makeAmountFilter(
+const totalExpendedFilter = makeAmountWithYearFilter(
   'totalExpended',
   defineMessage({ defaultMessage: 'Total Expended', id: 'TotalExpended' }),
 );
@@ -263,6 +265,7 @@ const schema = z.object({
   offset: integer.default(0),
   orderBy: sortFilter.schema,
   relation: relationTypeFilter.schema,
+  missingInformation: missingInformationFilter.schema,
   searchTerm: searchFilter.schema,
   account: z.string().optional(),
   totalContributed: totalContributedFilter.schema,
@@ -276,11 +279,13 @@ const toVariables = {
 };
 const filters = {
   orderBy: sortFilter.filter,
-  relation: relationTypeFilter.filter,
+  // Keep the (static) search first: the filterbar order follows the keys of this object when the page is re-mounted
   searchTerm: searchFilter.filter,
+  relation: relationTypeFilter.filter,
   account: hostedAccountFilter.filter,
   totalContributed: totalContributedFilter.filter,
   totalExpended: totalExpendedFilter.filter,
+  missingInformation: missingInformationFilter.filter,
 };
 
 type ContributorsProps = DashboardSectionProps;
@@ -324,7 +329,7 @@ const PeopleDashboard = ({ accountSlug }: ContributorsProps) => {
     schema,
     toVariables,
     filters,
-    meta: { hostSlug: accountSlug, currency: account?.currency },
+    meta: { hostSlug: accountSlug, currency: account?.currency, supportsTaxForm: isTaxFormsFeatureEnabled(account) },
   });
 
   const {
