@@ -6033,6 +6033,7 @@ enum ActivityType {
   ORDER_DISPUTE_CLOSED
   ORDER_UPDATED
   ADDED_FUNDS_EDITED
+  ORDER_PAID_MANUALLY_EDITED
   VENDOR_CREATED
   VENDOR_EDITED
   VENDOR_DELETED
@@ -10628,6 +10629,11 @@ type OrderPermissions {
   Whether the current user can edit this pending order
   """
   canEdit: Boolean!
+
+  """
+  Whether the current user can edit this contribution after it was manually marked as paid (see `editPaidManualOrder`)
+  """
+  canEditPaidManualOrder: Boolean!
 
   """
   Whether the current user can comment on this order
@@ -23122,6 +23128,7 @@ enum ActivityAndClassesType {
   ORDER_DISPUTE_CLOSED
   ORDER_UPDATED
   ADDED_FUNDS_EDITED
+  ORDER_PAID_MANUALLY_EDITED
   VENDOR_CREATED
   VENDOR_EDITED
   VENDOR_DELETED
@@ -27889,6 +27896,21 @@ type Mutation {
   ): Order!
 
   """
+  Edit the amounts or the date of a contribution that was manually marked as paid by a host admin (bank transfer, expected funds...). Scope: "orders".
+  """
+  editPaidManualOrder(
+    """
+    The order to edit, with its new values. `transactionsImportRow` is not supported.
+    """
+    order: OrderUpdateInput!
+
+    """
+    How the ledger should be updated to reflect the changes
+    """
+    strategy: OrderEditStrategy! = REVERSE
+  ): Order!
+
+  """
   [Root only] A mutation to move orders from one account to another
   """
   moveOrders(
@@ -29634,7 +29656,7 @@ input TransactionsImportRowReferenceInput {
 }
 
 """
-How the ledger is updated when editing added funds
+How the ledger is updated when editing funds that were recorded manually by a host admin
 """
 enum OrderEditStrategy {
   """

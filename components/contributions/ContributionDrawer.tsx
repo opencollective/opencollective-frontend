@@ -191,6 +191,7 @@ const contributionDrawerQuery = gql`
         canMarkAsPaid
         canCancel
         canEdit
+        canEditPaidManualOrder
         canComment
         canSeePrivateActivities
         canSetTags
