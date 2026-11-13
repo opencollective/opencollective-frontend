@@ -179,6 +179,11 @@ const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
       &.trix-active::before {
         margin: 4px; // Use this to reduce the icons size
       }
+
+      /* Toolbar icons are black SVG images: make them light on the dark theme */
+      :root.dark &::before {
+        filter: invert(1);
+      }
     }
 
     /** Hide some buttons on the simplified version */

@@ -93,7 +93,7 @@ const StyledTagBase = styled.div.withConfig({
     variants: {
       squared: {
         color: 'black.700',
-        background: 'black.100',
+        backgroundColor: 'black.100',
         borderRadius: '4px',
         padding: '6px 8px',
         fontSize: '9px',

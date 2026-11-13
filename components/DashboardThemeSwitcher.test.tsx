@@ -65,6 +65,20 @@ describe('Dashboard theme', () => {
       expect(screen.getByRole('radio', { name: 'Dark' })).toBeChecked();
       expect(window.localStorage.getItem(LOCAL_STORAGE_KEYS.DASHBOARD_THEME)).toBe('dark');
     });
+
+    it('keeps the selection when localStorage is unavailable', async () => {
+      mockLoggedInUser({ darkModeEnabled: true });
+      const setItem = jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+        throw new Error('QuotaExceededError');
+      });
+      try {
+        renderSwitcher({ showLabels: true });
+        await userEvent.click(screen.getByRole('radio', { name: 'Light' }));
+        expect(screen.getByRole('radio', { name: 'Light' })).toBeChecked();
+      } finally {
+        setItem.mockRestore();
+      }
+    });
   });
 
   describe('useApplyDashboardTheme', () => {

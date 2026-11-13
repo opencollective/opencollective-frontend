@@ -36,7 +36,7 @@ export const getExpenseStatusMsgType = status => {
 const ExtendedTag = ({ children, ...props }) => (
   <StyledTag
     {...props}
-    background="white.full"
+    backgroundColor="white.full"
     border="1px solid"
     borderColor="yellow.400"
     color="black.700"

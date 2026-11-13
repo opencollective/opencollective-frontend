@@ -18,6 +18,7 @@ const subscribeToPreference = (callback: () => void) => {
   listeners.add(callback);
   const onStorage = (event: StorageEvent) => {
     if (event.key === LOCAL_STORAGE_KEYS.DASHBOARD_THEME) {
+      currentPreference = readStoredPreference();
       callback();
     }
   };
@@ -25,15 +26,29 @@ const subscribeToPreference = (callback: () => void) => {
   return () => {
     listeners.delete(callback);
     window.removeEventListener('storage', onStorage);
+    if (listeners.size === 0) {
+      currentPreference = null; // Re-read from storage on next use
+    }
   };
 };
 
-const getPreference = (): ThemePreference => {
+const readStoredPreference = (): ThemePreference => {
   const value = getFromLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_THEME) as ThemePreference;
   return THEME_PREFERENCES.includes(value) ? value : 'system';
 };
 
+// In-memory snapshot, so that the selection still applies when localStorage is unavailable (persistence is best effort)
+let currentPreference: ThemePreference | null = null;
+
+const getPreference = (): ThemePreference => {
+  if (currentPreference === null) {
+    currentPreference = readStoredPreference();
+  }
+  return currentPreference;
+};
+
 const setPreference = (preference: ThemePreference) => {
+  currentPreference = preference;
   setLocalStorage(LOCAL_STORAGE_KEYS.DASHBOARD_THEME, preference);
   listeners.forEach(listener => listener());
 };
