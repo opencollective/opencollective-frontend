@@ -7,7 +7,7 @@
   },
   "private": true,
   "engines": {
-    "node": "24.x",
+    "node": "26.x",
     "npm": "11.x"
   },
   "files": [],
@@ -226,7 +226,7 @@
     "@types/jest": "^30.0.0",
     "@types/jscodeshift": "^17.3.0",
     "@types/lodash-es": "^4.17.12",
-    "@types/node": "^24.0.0",
+    "@types/node": "^26.0.0",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@types/styled-system": "^5.1.22",
