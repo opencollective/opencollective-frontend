@@ -84,7 +84,7 @@
     "express-winston": "4.2.0",
     "file-saver": "2.0.5",
     "formik": "2.4.9",
-    "graphql": "16.14.2",
+    "graphql": "16.15.0",
     "helmet": "8.3.0",
     "input-otp": "1.5.0",
     "interweave": "13.1.1",
