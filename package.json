@@ -123,7 +123,7 @@
     "react-text-mask": "5.5.0",
     "react-turnstile": "1.1.5",
     "react-verification-input": "4.2.2",
-    "react-window": "2.3.4",
+    "react-window": "2.5.3",
     "redis": "6.3.1",
     "sanitize-html": "2.18.1",
     "slugify": "1.6.9",
