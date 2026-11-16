@@ -5,7 +5,7 @@ describe('Recurring contributions', () => {
   let collectiveSlug;
 
   before(() => {
-    cy.createHostedCollective({ type: 'COLLECTIVE' })
+    cy.createHostedCollective()
       .then(collective => {
         collectiveSlug = collective.slug;
         cy.login({ redirect: `/dashboard/${collectiveSlug}/tiers` });
