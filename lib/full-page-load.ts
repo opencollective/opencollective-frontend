@@ -1,3 +1,5 @@
+import Router from 'next/router';
+
 import { IgnorableError } from './errors';
 
 /**
@@ -16,6 +18,7 @@ export const requiresFullPageLoad = (url: string): boolean => {
 export const forceFullPageLoad = (url: string) => {
   if (requiresFullPageLoad(url)) {
     window.location.assign(url);
+    Router.events.emit('routeChangeError'); // Stops the NProgress indicator if the user cancels the page unload
     throw new IgnorableError(`Full page load for ${url}`);
   }
 };
