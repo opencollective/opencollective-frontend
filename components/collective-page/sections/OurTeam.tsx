@@ -34,6 +34,7 @@ const SectionOurTeam = ({ collective, coreContributors, LoggedInUser }) => {
               contributor={contributor}
               currency={collective.currency}
               collectiveId={collective.id}
+              collectiveSlug={collective.slug}
               isLoggedUser={loggedUserCollectiveId === contributor.collectiveId}
               hideTotalAmountDonated
             />

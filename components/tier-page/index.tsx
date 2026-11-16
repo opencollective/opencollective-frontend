@@ -445,6 +445,7 @@ class TierPage extends Component<TierPageProps> {
             contributorsStats={contributorsStats}
             currency={tier.currency || collective.currency}
             collectiveId={collective.id}
+            collectiveSlug={collective.slug}
           />
         )}
         <Container

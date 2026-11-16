@@ -98,6 +98,7 @@ type ContributorCellProps = {
   paddingLeft?: number;
   currency?: string;
   collectiveId?: number | string;
+  collectiveSlug?: string;
   loggedUserCollectiveId?: number | string;
 };
 
@@ -112,6 +113,7 @@ const ContributorCell = ({
   paddingLeft,
   currency,
   collectiveId,
+  collectiveSlug,
   loggedUserCollectiveId,
 }: ContributorCellProps) => {
   const idx = getContributorIdx(columnIndex, rowIndex, nbRows, nbCols, hasScroll);
@@ -133,6 +135,7 @@ const ContributorCell = ({
         contributor={contributor}
         currency={currency}
         collectiveId={collectiveId}
+        collectiveSlug={collectiveSlug}
         isLoggedUser={contributor.collectiveId && loggedUserCollectiveId === contributor.collectiveId}
       />
     </ContributorCardContainer>
@@ -159,6 +162,7 @@ const ContributorsGrid = ({
   currency,
   LoggedInUser,
   collectiveId,
+  collectiveSlug = undefined,
   gridRef,
 }) => {
   const maxNbRows = maxNbRowsForViewports[viewport];
@@ -191,6 +195,7 @@ const ContributorsGrid = ({
         paddingLeft,
         currency,
         collectiveId,
+        collectiveSlug,
         loggedUserCollectiveId,
       }}
       columnCount={nbCols}
