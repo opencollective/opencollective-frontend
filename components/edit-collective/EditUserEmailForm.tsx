@@ -4,7 +4,7 @@ import { isNil } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 import { isEmail } from 'validator';
 
-import { API_V1_CONTEXT, gqlV1 } from '../../lib/graphql/helpers';
+import { gql } from '../../lib/graphql/helpers';
 
 import { Box } from '../Grid';
 import LoadingPlaceholder from '../LoadingPlaceholder';
@@ -16,13 +16,12 @@ import { Button } from '../ui/Button';
 import SettingsSectionTitle from './sections/SettingsSectionTitle';
 
 type EditUserEmailFormProps = {
-  updateUserEmail?: (options: { variables: { email: string } }) => Promise<{
-    data?: { updateUserEmail: { emailWaitingForValidation?: string } };
+  requestEmailChange?: (options: { variables: { email: string } }) => Promise<{
+    data?: { requestEmailChange: { emailWaitingForValidation?: string } };
   }>;
   data?: {
     loading?: boolean;
-    LoggedInUser?: { email?: string; emailWaitingForValidation?: string };
-    updateUserEmail?: { emailWaitingForValidation?: string };
+    me?: { email?: string; emailWaitingForValidation?: string };
   };
 };
 
@@ -50,13 +49,13 @@ class EditUserEmailForm extends React.Component<EditUserEmailFormProps, EditUser
   }
 
   componentDidUpdate(oldProps: EditUserEmailFormProps) {
-    if (oldProps.data.LoggedInUser !== this.props.data.LoggedInUser) {
+    if (oldProps.data.me !== this.props.data.me) {
       this.loadInitialState();
     }
   }
 
   loadInitialState() {
-    const { LoggedInUser } = this.props.data;
+    const { me: LoggedInUser } = this.props.data;
     if (!LoggedInUser) {
       return;
     }
@@ -68,8 +67,8 @@ class EditUserEmailForm extends React.Component<EditUserEmailFormProps, EditUser
   }
 
   render() {
-    const { data, updateUserEmail } = this.props;
-    const { loading, LoggedInUser = { email: '' } } = data;
+    const { data, requestEmailChange } = this.props;
+    const { loading, me: LoggedInUser = { email: '' } } = data;
     const { step, newEmail, error, isTouched, isSubmitting, isResendingConfirmation } = this.state;
     const isValid = newEmail && isEmail(newEmail);
     const isDone = step === 'already-sent' || step === 'success';
@@ -86,7 +85,7 @@ class EditUserEmailForm extends React.Component<EditUserEmailFormProps, EditUser
               type="email"
               className="w-full md:w-1/2"
               value={isNil(newEmail) ? LoggedInUser.email : newEmail}
-              disabled={!data.LoggedInUser || loading}
+              disabled={!data.me || loading}
               onChange={e => {
                 this.setState({ step: 'form', error: null, newEmail: e.target.value, isTouched: true });
               }}
@@ -105,11 +104,11 @@ class EditUserEmailForm extends React.Component<EditUserEmailFormProps, EditUser
               onClick={async () => {
                 this.setState({ isSubmitting: true });
                 try {
-                  const { data } = await updateUserEmail({ variables: { email: newEmail } });
+                  const { data } = await requestEmailChange({ variables: { email: newEmail } });
                   this.setState({
                     step: LoggedInUser.email === newEmail ? 'initial' : 'success',
                     error: null,
-                    newEmail: data.updateUserEmail.emailWaitingForValidation || LoggedInUser.email,
+                    newEmail: data.requestEmailChange.emailWaitingForValidation || LoggedInUser.email,
                     isSubmitting: false,
                     isTouched: false,
                   });
@@ -127,7 +126,7 @@ class EditUserEmailForm extends React.Component<EditUserEmailFormProps, EditUser
                 onClick={async () => {
                   this.setState({ isResendingConfirmation: true });
                   try {
-                    await updateUserEmail({ variables: { email: newEmail } });
+                    await requestEmailChange({ variables: { email: newEmail } });
                     this.setState({ isResendingConfirmation: false, step: 'already-sent', error: null });
                   } catch (e) {
                     this.setState({ error: e.message, isResendingConfirmation: false });
@@ -162,9 +161,9 @@ class EditUserEmailForm extends React.Component<EditUserEmailFormProps, EditUser
   }
 }
 
-const loggedInUserEmailQuery = gqlV1 /* GraphQL */ `
+const loggedInUserEmailQuery = gql`
   query LoggedInUserEmail {
-    LoggedInUser {
+    me {
       id
       email
       emailWaitingForValidation
@@ -174,19 +173,18 @@ const loggedInUserEmailQuery = gqlV1 /* GraphQL */ `
 
 const addLoggedInUserEmailData = graphql<
   EditUserEmailFormProps,
-  { LoggedInUser?: { id?: string; email?: string; emailWaitingForValidation?: string } },
+  { me?: { id?: string; email?: string; emailWaitingForValidation?: string } },
   Record<string, unknown>,
   { data?: EditUserEmailFormProps['data'] }
 >(loggedInUserEmailQuery, {
   options: {
     fetchPolicy: 'network-only',
-    context: API_V1_CONTEXT,
   },
 });
 
-const updateUserEmailMutation = gqlV1 /* GraphQL */ `
-  mutation UpdateUserEmail($email: String!) {
-    updateUserEmail(email: $email) {
+const requestEmailChangeMutation = gql`
+  mutation RequestEmailChange($email: EmailAddress!) {
+    requestEmailChange(email: $email) {
       id
       email
       emailWaitingForValidation
@@ -194,16 +192,13 @@ const updateUserEmailMutation = gqlV1 /* GraphQL */ `
   }
 `;
 
-const addUpdateUserEmailMutation = graphql<
+const addRequestEmailChangeMutation = graphql<
   EditUserEmailFormProps,
-  { updateUserEmail?: { id?: string; email?: string; emailWaitingForValidation?: string } },
+  { requestEmailChange?: { id?: string; email?: string; emailWaitingForValidation?: string } },
   { email: string },
-  { updateUserEmail?: EditUserEmailFormProps['updateUserEmail'] }
->(updateUserEmailMutation, {
-  name: 'updateUserEmail',
-  options: {
-    context: API_V1_CONTEXT,
-  },
+  { requestEmailChange?: EditUserEmailFormProps['requestEmailChange'] }
+>(requestEmailChangeMutation, {
+  name: 'requestEmailChange',
 });
 
-export default addUpdateUserEmailMutation(addLoggedInUserEmailData(EditUserEmailForm));
+export default addRequestEmailChangeMutation(addLoggedInUserEmailData(EditUserEmailForm));

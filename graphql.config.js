@@ -12,7 +12,6 @@ module.exports = {
         'components/collective-page/hero/HeroTotalCollectiveContributionsWithData.tsx',
         'components/CollectivePickerAsync.tsx',
         'components/CreateCollectiveMiniForm.tsx',
-        'components/edit-collective/EditUserEmailForm.js',
         'components/edit-collective/sections/PaymentReceipts.tsx',
         'components/MembershipsWithData.tsx',
         'components/MembersWithData.tsx',
