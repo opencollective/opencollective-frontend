@@ -1790,6 +1790,8 @@
   "ExpenseForm.ReceiptLabel": "Reimbursement",
   "ExpenseForm.SavePayout": "Save this info for future payouts",
   "ExpenseForm.SignUp.SignIn": "We will use this email to create your account. If you already have an account, {loginLink}.",
+  "ExpenseForm.SubmissionExpenseDetailsNotice": "The administrators of {hostName} can access the recipient's legal name and the address submitted with this expense to process it. The submitted address may remain part of the expense record.",
+  "ExpenseForm.SubmissionPrivacyNotice": "After payment, the administrators of {hostName} retain access to the recipient's current email and private address, including future updates, even if the Collective leaves or changes fiscal host.",
   "ExpenseForm.Submit": "Odeslat výdaj",
   "ExpenseForm.Type.Request": "Request Grant",
   "ExpenseInvoice.count": "{count, plural, one {# invoice} other {# invoices}}",

@@ -14,6 +14,7 @@ import type { ExpenseForm } from '../useExpenseForm';
 import { AdditionalDetailsSection } from './AdditionalDetailsSection';
 import { ExpenseCategorySection } from './ExpenseCategorySection';
 import { ExpenseItemsSection } from './ExpenseItemsSection';
+import { ExpenseSubmissionNotices } from './ExpenseSubmissionNotices';
 import { FormSectionContainer } from './FormSectionContainer';
 import { PayoutMethodSection } from './PayoutMethodSection';
 import { SummarySection } from './SummarySection';
@@ -78,6 +79,7 @@ export function SubmitExpenseFlowForm(props: SubmitExpenseFlowFormProps) {
           <SummarySection inViewChange={onInViewChange} form={form} />
         </React.Fragment>
       )}
+      <ExpenseSubmissionNotices form={form} />
       <div className="flex justify-center sm:justify-end">
         <Button
           disabled={form.initialLoading || form.isLoadingOptions || form.isSubmitting || form.isValidating}
