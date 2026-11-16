@@ -239,6 +239,7 @@ export const expenseFormSchemaQuery = gql`
     publicId
     name
     legalName
+    termsUrl
     slug
     type
     currency
