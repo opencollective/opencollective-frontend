@@ -45,7 +45,7 @@ describe('Expense flow', () => {
       cy.createExpense({
         type: 'INVOICE',
         userEmail: user.email,
-        account: { legacyId: collective.id },
+        account: { slug: collective.slug },
         payee: { legacyId: user.CollectiveId },
         description: 'Expense for E2E tests',
       }).then(createdExpense => {
@@ -73,7 +73,7 @@ describe('Expense flow', () => {
         cy.createExpense({
           type: 'INVOICE',
           userEmail: user.email,
-          account: { legacyId: collective.id },
+          account: { slug: collective.slug },
           payee: { legacyId: user.CollectiveId },
           description: 'Expense with a PDF attachment',
           attachedFiles: [{ url: fileUrl }],

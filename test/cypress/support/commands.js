@@ -283,40 +283,14 @@ Cypress.Commands.add('draftExpenseAndInviteUser', ({ userEmail = defaultTestUser
 });
 
 /**
- * Create a collective hosted by the open source collective.
- * TODO: Migrate this to GQLV2 -> `createCollective` with `__skipApprovalTestOnly` set to true
+ * Create a collective hosted by the open source collective, approved right away.
  */
-Cypress.Commands.add('createHostedCollective', ({ userEmail = defaultTestUserEmail, ...collectiveParams } = {}) => {
-  const collective = {
-    slug: randomSlug(),
-    name: 'Test Collective',
-    type: 'COLLECTIVE',
-    ...collectiveParams,
-  };
-
-  return signinRequest({ email: userEmail }, null).then(response => {
-    const token = getTokenFromRedirectUrl(response.body.redirect);
-    return graphqlQuery(token, {
-      operationName: 'CreateCollectiveWithHost',
-      query: gqlV1 /* GraphQL */ `
-        mutation CreateCollectiveWithHost($collective: CollectiveInputType!) {
-          createCollectiveFromGithub(collective: $collective) {
-            id
-            slug
-            isActive
-            host {
-              id
-            }
-          }
-        }
-      `,
-      context: API_V1_CONTEXT,
-      variables: { collective },
-    }).then(({ body }) => {
-      return body.data.createCollectiveFromGithub;
-    });
-  });
-});
+Cypress.Commands.add(
+  'createHostedCollective',
+  ({ userEmail = defaultTestUserEmail, name = 'Test Collective' } = {}) => {
+    return cy.createHostedCollectiveV2({ email: userEmail, collective: { name }, skipApproval: true });
+  },
+);
 
 Cypress.Commands.add('createProject', ({ userEmail = defaultTestUserEmail, collective } = {}) => {
   const project = {
