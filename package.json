@@ -186,6 +186,7 @@
     "prettier": "prettier --cache --cache-location .prettiercache \"*.@(js|ts|tsx|json|md)\" \"@(components|lib|pages|scripts|server|test)/**/*.@(js|ts|tsx|json|md|mdx)\"",
     "prettier:check": "npm run prettier -- --check",
     "prettier:write": "npm run prettier -- --write",
+    "prepare": "husky",
     "script": "tsx $@",
     "start": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON dist/server/index.ts",
     "start:ci": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON server/index.ts",
@@ -290,11 +291,6 @@
     "url-loader": "^4.1.1",
     "webpack": "^5.91.0"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "lint-staged": {
     "*.{js,json,md,graphql}": [
       "prettier --write"
@@ -336,7 +332,6 @@
     "sharp@0.35.5": true,
     "@sentry/cli@2.58.6": true,
     "canvas@3.2.3": true,
-    "husky@4.3.8": true,
     "unrs-resolver@1.13.0": true
   }
 }
