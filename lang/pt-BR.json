@@ -1790,7 +1790,6 @@
   "ExpenseForm.SavePayout": "Salvar estas informações para pagamentos futuros",
   "ExpenseForm.SignUp.SignIn": "Usaremos este e-mail para criar sua conta. Se você já tem uma conta, {loginLink}.",
   "ExpenseForm.SubmissionExpenseDetailsNotice": "The administrators of {hostName} can access the recipient's legal name and the address submitted with this expense to process it. The submitted address may remain part of the expense record.",
-  "ExpenseForm.SubmissionHostTermsNotice": "By submitting this expense, you agree to the <termsLink>terms of service</termsLink> of {hostName}.",
   "ExpenseForm.SubmissionPrivacyNotice": "After payment, the administrators of {hostName} retain access to the recipient's current email and private address, including future updates, even if the Collective leaves or changes fiscal host.",
   "ExpenseForm.Submit": "Enviar despesa",
   "ExpenseForm.Type.Request": "Solicitação de concessão",

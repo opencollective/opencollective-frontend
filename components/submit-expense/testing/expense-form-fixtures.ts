@@ -49,7 +49,6 @@ export const host = (overrides: Fixture = {}) => ({
   publicId: 'host-1-public',
   name: 'Host One',
   legalName: 'Host One Inc',
-  termsUrl: null,
   slug: 'host-one',
   type: 'ORGANIZATION',
   currency: 'USD',
