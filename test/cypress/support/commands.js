@@ -62,7 +62,8 @@ Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams, comple
     const token = getTokenFromRedirectUrl(redirect);
     if (token) {
       return getMeFromToken(token).then(loggedInUser => {
-        return completeProfileIfRequired({ token, loggedInUser, completeProfile, name: user.name }).then(() => {
+        const slug = slugFromName(user.name);
+        return completeProfileIfRequired({ token, loggedInUser, completeProfile, name: user.name, slug }).then(() => {
           return cy.visit(redirect, visitParams).then(() => loggedInUser);
         });
       });
@@ -72,7 +73,12 @@ Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams, comple
   });
 });
 
-function completeProfileIfRequired({ token, loggedInUser, completeProfile, name }) {
+// v1 `createUser` derived the account's slug from its name, and specs that sign up with a slug-shaped
+// name (`randomSlug()`) then open `/dashboard/<name>`. The REST sign-up gives a random slug instead,
+// so set it when completing the profile. Other names keep the API's slug (no collision on "John Doe").
+const slugFromName = name => (typeof name === 'string' && /^[a-z0-9-]+$/.test(name) ? name : undefined);
+
+function completeProfileIfRequired({ token, loggedInUser, completeProfile, name, slug }) {
   if (!completeProfile || !loggedInUser.requiresProfileCompletion) {
     return cy.wrap(loggedInUser);
   }
@@ -94,14 +100,14 @@ function completeProfileIfRequired({ token, loggedInUser, completeProfile, name 
           account: {
             id: accountId,
             name: name ?? loggedInUser.collective.name ?? 'Test User',
+            ...(slug && { slug }),
           },
         },
       });
     })
     .then(({ body }) => {
-      // `editAccount` regenerates the collective slug for profile-completion
-      // users, so reflect the fresh slug on the returned user (several specs
-      // read `user.collective.slug`).
+      // `editAccount` may change the slug when completing the profile (or set the one asked
+      // for), so reflect it on the returned user (several specs read `user.collective.slug`).
       const { slug } = body.data.editAccount;
       if (loggedInUser.collective && slug) {
         loggedInUser.collective.slug = slug;
