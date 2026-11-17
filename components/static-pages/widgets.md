@@ -52,16 +52,6 @@ You can target them with CSS to customize them:
       color: black;
     }
 
-## For backers, sponsors and core contributors
-
-To show the list of collectives that you are backing or managing on your website, just add this script:
-
-    <script src="https://opencollective.com/:username/collectives.js"></script>
-
-E.g. https://opencollective.com/opencollective/collectives.js
-
-<script src="https://opencollective.com/opencollective/collectives.js"></script>
-
 ## Feedback
 
 If you would like a different or custom widget, let us know. Send us your feedback to info@opencollective.com or join us on Discord: https://discord.opencollective.com
