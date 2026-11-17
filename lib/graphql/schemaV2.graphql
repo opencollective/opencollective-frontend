@@ -5818,6 +5818,11 @@ input PaymentMethodReferenceInput {
   The id assigned to the payment method (ie: pm_xxxxxxxx)
   """
   id: String
+
+  """
+  The internal id of the payment method (ie: 4242)
+  """
+  legacyId: Int
 }
 
 input PayoutMethodReferenceInput {
@@ -21757,6 +21762,16 @@ type Query {
     """
     counterparty: AccountReferenceInput
   ): PaymentIntentCollection!
+
+  """
+  Get a payment method by reference. Returns null if it does not exist or if the logged in user is not an admin of the account that owns it. Scope: "orders".
+  """
+  paymentMethod(
+    """
+    Identifiers to retrieve the payment method
+    """
+    paymentMethod: PaymentMethodReferenceInput!
+  ): PaymentMethod
   platformSubscriptionTiers: [PlatformSubscriptionTier]
 }
 
