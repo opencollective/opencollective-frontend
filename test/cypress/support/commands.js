@@ -1,6 +1,7 @@
 import 'cypress-mailpit';
 
 import * as cheerio from 'cheerio';
+import { pick } from 'lodash-es';
 
 import { fakeTag as gql } from '../../../lib/graphql/helpers';
 
@@ -832,24 +833,43 @@ function postSignin(user, redirect, sendLink) {
  *
  * The e2e API must run without rate limiting (`DISABLE_RATE_LIMITING`): sign-up allows 5 calls per IP
  * per 15 minutes, and a test run creates many users.
+ *
+ * `/users/verify-email` signs the new user in (auth cookies): the browser's cookies are restored
+ * afterwards, so creating a user doesn't change who the test is signed in as.
  */
 function signupAndVerifyEmail(email) {
   const headers = { Accept: 'application/json', 'Content-Type': 'application/json' };
-  return cy
-    .request({ url: '/api/users/signup', method: 'POST', headers, body: { email }, failOnStatusCode: false })
-    .then(({ status, body }) => {
-      if (status !== 200 || !body?.sessionId) {
-        throw new Error(`Sign-up for ${email} failed (${status}): ${JSON.stringify(body)}`);
-      }
-      return getSignupCode(email).then(otp =>
-        cy.request({
-          url: '/api/users/verify-email',
-          method: 'POST',
-          headers,
-          body: { email, otp, sessionId: body.sessionId },
-        }),
-      );
-    });
+  return saveAuthCookies().then(savedCookies =>
+    cy
+      .request({ url: '/api/users/signup', method: 'POST', headers, body: { email }, failOnStatusCode: false })
+      .then(({ status, body }) => {
+        if (status !== 200 || !body?.sessionId) {
+          throw new Error(`Sign-up for ${email} failed (${status}): ${JSON.stringify(body)}`);
+        }
+        return getSignupCode(email).then(otp =>
+          cy.request({
+            url: '/api/users/verify-email',
+            method: 'POST',
+            headers,
+            body: { email, otp, sessionId: body.sessionId },
+          }),
+        );
+      })
+      .then(() => restoreAuthCookies(savedCookies)),
+  );
+}
+
+const AUTH_COOKIES = ['accessTokenPayload', 'accessTokenSignature'];
+
+function saveAuthCookies() {
+  return cy.getCookies().then(cookies => cookies.filter(cookie => AUTH_COOKIES.includes(cookie.name)));
+}
+
+function restoreAuthCookies(savedCookies) {
+  AUTH_COOKIES.forEach(name => cy.clearCookie(name));
+  savedCookies.forEach(({ name, value, ...options }) =>
+    cy.setCookie(name, value, pick(options, ['path', 'domain', 'secure', 'httpOnly', 'sameSite', 'expiry'])),
+  );
 }
 
 // Outside production, the API may rewrite recipients (`@` → `-at-`), as in 01-signup.test.ts
