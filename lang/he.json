@@ -4591,7 +4591,6 @@
   "UpdateAudienceBreakdown.Total": "העדכון שלך יישלח ל{count} מיילים",
   "updatePaymentMethod.allUpdated": "All your recurring contributions now use a new payment method.",
   "updatePaymentMethod.form.updatePaymentMethodSuccess.btn": "מעבר לעמוד Collective",
-  "updatePaymentMethod.paymentFailed": "Payment failed",
   "updatePaymentMethod.subtitle.line": "Please add a new payment method for the following subscriptions before your current one expires.",
   "updatePaymentMethod.title": "עדכון אמצעי תשלום",
   "updatePaymentMethod.viewContributions": "View your contributions",

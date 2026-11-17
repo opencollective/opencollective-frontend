@@ -4591,7 +4591,6 @@
   "UpdateAudienceBreakdown.Total": "Your Update will be sent to a total of {count} emails",
   "updatePaymentMethod.allUpdated": "All your recurring contributions now use a new payment method.",
   "updatePaymentMethod.form.updatePaymentMethodSuccess.btn": "Go to profile page",
-  "updatePaymentMethod.paymentFailed": "Payment failed",
   "updatePaymentMethod.subtitle.line": "Пожалуйста, добавьте новый способ оплаты для следующих подписок до истечения вашего текущего срока оплаты.",
   "updatePaymentMethod.title": "Обновить способ оплаты",
   "updatePaymentMethod.viewContributions": "View your contributions",

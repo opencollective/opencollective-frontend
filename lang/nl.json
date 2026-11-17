@@ -4591,7 +4591,6 @@
   "UpdateAudienceBreakdown.Total": "Your Update will be sent to a total of {count} emails",
   "updatePaymentMethod.allUpdated": "All your recurring contributions now use a new payment method.",
   "updatePaymentMethod.form.updatePaymentMethodSuccess.btn": "Ga naar de profielpagina",
-  "updatePaymentMethod.paymentFailed": "Payment failed",
   "updatePaymentMethod.subtitle.line": "Please add a new payment method for the following subscriptions before your current one expires.",
   "updatePaymentMethod.title": "Betaalwijze updaten",
   "updatePaymentMethod.viewContributions": "View your contributions",

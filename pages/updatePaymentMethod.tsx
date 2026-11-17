@@ -118,7 +118,7 @@ const UpdatePaymentMethodContent = ({ paymentMethodId }: { paymentMethodId: numb
                 />
                 {order.status === 'ERROR' && (
                   <Badge type="error" size="sm">
-                    <FormattedMessage defaultMessage="Payment failed" id="updatePaymentMethod.paymentFailed" />
+                    <FormattedMessage defaultMessage="Payment failed" id="qV+TFm" />
                   </Badge>
                 )}
               </div>
@@ -134,7 +134,8 @@ const UpdatePaymentMethodContent = ({ paymentMethodId }: { paymentMethodId: numb
           open
           setOpen={open => !open && setEditedOrder(null)}
           order={editedOrder}
-          accountSlug={editedOrder.fromAccount.slug}
+          // The dashboard of the payment method owner, also for contributions made from its incognito profile
+          accountSlug={paymentMethod.account?.slug || editedOrder.fromAccount.slug}
           action="editPaymentMethod"
           onSuccess={() => {
             setHasUpdatedOrders(true);

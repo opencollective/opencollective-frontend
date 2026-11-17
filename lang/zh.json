@@ -4591,7 +4591,6 @@
   "UpdateAudienceBreakdown.Total": "Your Update will be sent to a total of {count} emails",
   "updatePaymentMethod.allUpdated": "All your recurring contributions now use a new payment method.",
   "updatePaymentMethod.form.updatePaymentMethodSuccess.btn": "访问资料页",
-  "updatePaymentMethod.paymentFailed": "Payment failed",
   "updatePaymentMethod.subtitle.line": "请在你当前的订阅到期之前为以下订阅添加一个新的支付方法。",
   "updatePaymentMethod.title": "更新付款方式",
   "updatePaymentMethod.viewContributions": "View your contributions",
