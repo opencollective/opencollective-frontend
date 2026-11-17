@@ -1,71 +1,31 @@
 import React from 'react';
-import { useQuery } from '@apollo/client';
 import { ArrowRight } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
-import { gql } from '@/lib/graphql/helpers';
-import useQueryFilter from '@/lib/hooks/useQueryFilter';
+import type { useQueryFilterReturnType } from '@/lib/hooks/useQueryFilter';
 
 import { DashboardContentCard } from '@/components/dashboard/DashboardContentCard';
 import { Filterbar } from '@/components/dashboard/filters/Filterbar';
 import { periodFilter } from '@/components/dashboard/filters/PeriodFilter';
 import FormattedMoneyAmount from '@/components/FormattedMoneyAmount';
 
-import { PeriodFilterType } from '../../filters/PeriodCompareFilter/schema';
 import ComparisonChart from '../overview/ComparisonChart';
 
-import type { HostedAccountDetailData } from './queries';
+import type { HostedAccountDetailData, HostedAccountFinancialStats } from './queries';
 
 const BALANCE_COLOR = '#16a34a';
 
-// Balance summary stats for the picked date range: the range from the filter is
-// injected into this query, which feeds the metrics and the chart.
-const accountDetailBalanceSummaryQuery = gql`
-  query AccountDetailBalanceSummary($accountId: String!, $dateFrom: DateTime, $dateTo: DateTime) {
-    account(id: $accountId) {
-      id
-      stats {
-        id
-        balance(dateTo: $dateTo) {
-          valueInCents
-          currency
-        }
-        consolidatedBalance: balance(includeChildren: true, dateTo: $dateTo) {
-          valueInCents
-          currency
-        }
-        consolidatedTotalNetAmountRaised: totalAmountReceived(
-          net: true
-          includeChildren: true
-          dateFrom: $dateFrom
-          dateTo: $dateTo
-        ) {
-          valueInCents
-          currency
-        }
-        consolidatedTotalAmountSpent: totalAmountSpent(includeChildren: true, dateFrom: $dateFrom, dateTo: $dateTo) {
-          valueInCents
-          currency
-        }
-        balanceTimeSeries(dateFrom: $dateFrom, dateTo: $dateTo, includeChildren: true) {
-          timeUnit
-          dateFrom
-          dateTo
-          nodes {
-            date
-            amount {
-              valueInCents
-              currency
-            }
-          }
-        }
-      }
-    }
-  }
-`;
+/**
+ * The period filter is owned by `HostedFinancialSummaryCard` so that it can scope the
+ * received/disbursed charts as well; this card only renders it.
+ */
+export const hostedAccountOverviewFilterSchema = z.object({ period: periodFilter.schema });
 
-const balanceFilterSchema = z.object({ period: periodFilter.schema });
+export type HostedAccountOverviewFilter = useQueryFilterReturnType<
+  typeof hostedAccountOverviewFilterSchema,
+  { dateFrom?: string; dateTo?: string }
+>;
 
 type AmountLike = { valueInCents?: number | null; currency?: string | null } | null | undefined;
 
@@ -110,31 +70,20 @@ const Metric = ({
 
 type HostedAccountBalanceSummaryProps = {
   account?: HostedAccountDetailData;
+  stats?: HostedAccountFinancialStats;
+  queryFilter: HostedAccountOverviewFilter;
   onOpenMoneyView?: (view: 'CONTRIBUTIONS' | 'PAYOUTS') => void;
 };
 
-export function HostedAccountBalanceSummary({ account, onOpenMoneyView }: HostedAccountBalanceSummaryProps) {
+export function HostedAccountBalanceSummary({
+  account,
+  stats,
+  queryFilter,
+  onOpenMoneyView,
+}: HostedAccountBalanceSummaryProps) {
   const currency = account?.currency;
   // `parent` only exists on projects and events (the `AccountWithParent` facet).
   const isChild = Boolean(account && 'parent' in account && account.parent?.id);
-
-  const queryFilter = useQueryFilter({
-    schema: balanceFilterSchema,
-    toVariables: { period: periodFilter.toVariables },
-    defaultFilterValues: {
-      period: { type: PeriodFilterType.ALL_TIME },
-    },
-    filters: { period: periodFilter.filter },
-    skipRouter: true,
-  });
-
-  const balanceSeriesQuery = useQuery(accountDetailBalanceSummaryQuery, {
-    variables: { accountId: account?.id, ...queryFilter.variables },
-    skip: !account?.id,
-    fetchPolicy: 'cache-and-network',
-  });
-
-  const stats = balanceSeriesQuery.data?.account?.stats;
   const balanceSeries = stats?.balanceTimeSeries;
   const isAllTime = queryFilter.variables?.['dateTo'] === undefined;
 

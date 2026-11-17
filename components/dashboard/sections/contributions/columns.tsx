@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
+import { Clock } from 'lucide-react';
 import { defineMessage, FormattedMessage } from 'react-intl';
 
 import dayjs from '@/lib/dayjs';
@@ -170,6 +171,19 @@ export const columns: ColumnDef<ManagedOrderFieldsFragment>[] = [
           {['MONTHLY', 'YEARLY'].includes(frequency) && (
             <div className="overflow-hidden text-xs leading-4 font-normal text-ellipsis whitespace-nowrap text-slate-700">
               {i18nFrequency(intl, frequency)}
+            </div>
+          )}
+          {row.original.pendingTierChange?.tier && row.original.status !== 'CANCELLED' && (
+            <div
+              className="flex items-center gap-1 overflow-hidden text-xs leading-4 font-normal text-ellipsis whitespace-nowrap text-slate-700"
+              data-cy="pending-tier-change-cell"
+            >
+              <Clock size={12} className="shrink-0" />
+              <FormattedMessage
+                defaultMessage="{tierName} after next payment"
+                id="PendingTierChange.Short"
+                values={{ tierName: row.original.pendingTierChange.tier.name }}
+              />
             </div>
           )}
         </div>

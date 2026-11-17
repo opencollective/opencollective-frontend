@@ -60,6 +60,13 @@ export const managedOrderFieldsFragment = gql`
       id
       name
     }
+    pendingTierChange {
+      requestedAt
+      tier {
+        id
+        name
+      }
+    }
     tax {
       id
       type

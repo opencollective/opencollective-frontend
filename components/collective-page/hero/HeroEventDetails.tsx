@@ -43,8 +43,8 @@ type TimerangeProps = {
 const Timerange = ({ startsAt, endsAt, timezone, isSameDay }: TimerangeProps) => {
   return (
     <Fragment>
-      <FormattedDate {...FormattedDateProps(startsAt, timezone)} />
-      , <FormattedTime {...FormattedTimeProps(startsAt, timezone)} />{' '}
+      <FormattedDate {...FormattedDateProps(startsAt, timezone)} />,{' '}
+      <FormattedTime {...FormattedTimeProps(startsAt, timezone)} />{' '}
       {endsAt && (
         <Fragment>
           -{' '}

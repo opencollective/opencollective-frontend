@@ -4,7 +4,7 @@ describe('Accept financial contributions flow', () => {
 
     beforeEach(() => {
       cy.login();
-      return cy.createHostedCollective({ type: 'COLLECTIVE' }).then(collective => {
+      return cy.createHostedCollective().then(collective => {
         collectiveSlug = collective.slug;
       });
     });
@@ -38,7 +38,7 @@ describe('Accept financial contributions flow', () => {
 
     beforeEach(() => {
       cy.login();
-      return cy.createHostedCollective({ type: 'COLLECTIVE' }).then(collective => {
+      return cy.createHostedCollective().then(collective => {
         collectiveSlug = collective.slug;
       });
     });
@@ -73,7 +73,7 @@ describe('Accept financial contributions flow', () => {
     let collectiveSlug;
 
     beforeEach(() => {
-      cy.createHostedCollective({ type: 'COLLECTIVE' }).then(collective => {
+      cy.createHostedCollective().then(collective => {
         collectiveSlug = collective.slug;
       });
     });

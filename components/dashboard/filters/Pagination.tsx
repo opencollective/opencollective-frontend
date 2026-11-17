@@ -2,11 +2,12 @@ import React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { isNil, uniq } from 'lodash-es';
 import { ChevronDown } from 'lucide-react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import useKeyboardKey, { PAGE_DOWN_KEY, PAGE_UP_KEY } from '../../../lib/hooks/useKeyboardKey';
 import useLoggedInUser from '../../../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../../../lib/hooks/usePrevious';
+import { i18nSearchCount } from '../../../lib/i18n/search';
 import { PREVIEW_FEATURE_KEYS } from '../../../lib/preview-features';
 import { cn } from '@/lib/utils';
 
@@ -28,6 +29,8 @@ type PaginationProps = (
 ) & {
   /** Maximum number of items per page that can be selected */
   maxLimit?: number;
+  /** `total` is a lower bound (the API stopped counting): the last page is not known, so it is not offered */
+  isTotalCapped?: boolean;
 };
 
 function SelectLimit({ limit, setLimit, defaultLimit, maxLimit }) {
@@ -57,7 +60,15 @@ function SelectLimit({ limit, setLimit, defaultLimit, maxLimit }) {
   );
 }
 
-export function Pagination({ total, hasMore, queryFilter, className = '', maxLimit }: PaginationProps) {
+export function Pagination({
+  total,
+  hasMore,
+  queryFilter,
+  className = '',
+  maxLimit,
+  isTotalCapped = false,
+}: PaginationProps) {
+  const intl = useIntl();
   const { LoggedInUser } = useLoggedInUser();
   const { offset, limit } = queryFilter.values;
   const defaultLimit = queryFilter.defaultSchemaValues.limit;
@@ -156,7 +167,7 @@ export function Pagination({ total, hasMore, queryFilter, className = '', maxLim
       );
     }
 
-    if (endPage < totalPages - 1) {
+    if (endPage < totalPages - 1 || isTotalCapped) {
       pages.push(
         <PaginationItem key="end-ellipsis">
           <PaginationEllipsis />
@@ -164,8 +175,8 @@ export function Pagination({ total, hasMore, queryFilter, className = '', maxLim
       );
     }
 
-    // Always show the last page
-    if (totalPages > 1) {
+    // Always show the last page, when it is known
+    if (totalPages > 1 && !isTotalCapped) {
       pages.push(
         <PaginationItem key={totalPages}>
           <PaginationButton size="icon-sm" onClick={() => goToPage(totalPages)} isActive={currentPage === totalPages}>
@@ -196,7 +207,7 @@ export function Pagination({ total, hasMore, queryFilter, className = '', maxLim
               defaultMessage="Page {current} of {total}"
               values={{
                 current: currentPage,
-                total: totalPages,
+                total: i18nSearchCount(intl, totalPages, isTotalCapped),
               }}
             />
           </div>

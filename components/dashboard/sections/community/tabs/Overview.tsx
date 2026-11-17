@@ -917,7 +917,6 @@ export const Overview = ({
         <HostedFinancialSummaryCard
           account={account}
           hostSlug={query.variables.hostSlug}
-          loading={query.loading}
           handleTabChange={handleTabChange}
           handleTransactionTableRowClick={handleTransactionTableRowClick}
         />

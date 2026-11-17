@@ -40,7 +40,7 @@ type Contributor = {
 };
 
 type SectionContributorsProps = {
-  collective?: { id: number; name: string; type: string; currency?: string };
+  collective?: { id: number; slug?: string; name: string; type: string; currency?: string };
   stats: { backers?: { all?: number } };
   coreContributors?: Contributor[];
   financialContributors?: Contributor[];
@@ -158,6 +158,7 @@ export default class SectionContributors extends React.PureComponent<
         <ContributorsGrid
           contributors={contributors}
           collectiveId={collective.id}
+          collectiveSlug={collective.slug}
           currency={collective.currency}
           maxWidthWhenNotFull={Dimensions.MAX_SECTION_WIDTH}
           gridRef={this.contributorsGridRef}

@@ -19,6 +19,7 @@ import type {
 import { DEFAULT_MINIMUM_AMOUNT } from '../lib/tier-utils';
 
 import { NewPlatformTipSelector } from './contribution-flow/NewPlatformTipContainer';
+import { PendingTierChangeNotice } from './contributions/PendingTierChangeNotice';
 import AddFundsModal from './dashboard/sections/collectives/AddFundsModal';
 import type { PaymentMethodOption } from './orders/PaymentMethodPicker';
 import PaymentMethodPicker from './orders/PaymentMethodPicker';
@@ -36,6 +37,7 @@ import { useUpdatePaymentMethod } from './recurring-contributions/UpdatePaymentM
 import { Button } from './ui/Button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/Dialog';
 import { toast, useToast } from './ui/useToast';
+import DateTime from './DateTime';
 import FormattedMoneyAmount from './FormattedMoneyAmount';
 import { Box, Flex } from './Grid';
 import I18nFormatters from './I18nFormatters';
@@ -233,6 +235,10 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
             )}
           </DialogDescription>
         </DialogHeader>
+        <PendingTierChangeNotice
+          pendingTierChange={props.order.pendingTierChange}
+          nextChargeDate={props.order.nextChargeDate}
+        />
         {tiersLoading || contributeOptionsState.loading ? (
           <LoadingPlaceholder height={100} />
         ) : (
@@ -317,6 +323,24 @@ const EditAmountModal = (props: Omit<EditOrderModalProps, 'action'>) => {
             )}
           </StyledRadioList>
         )}
+        {selectedTier &&
+          selectedTier.id !== props.order.tier?.id &&
+          selectedTier.id !== props.order.pendingTierChange?.tier?.id && (
+            <p className="mt-2 text-xs text-muted-foreground" data-cy="tier-change-timing">
+              {props.order.nextChargeDate ? (
+                <FormattedMessage
+                  defaultMessage="Moving to a tier that costs more than your last payment? It applies after your next payment at the new amount, on {date}. Until then, you keep your current tier."
+                  id="EditOrder.TierUpgradeTiming"
+                  values={{ date: <DateTime value={props.order.nextChargeDate} dateStyle="long" /> }}
+                />
+              ) : (
+                <FormattedMessage
+                  defaultMessage="Moving to a tier that costs more than your last payment? It applies after your next payment at the new amount. Until then, you keep your current tier."
+                  id="EditOrder.TierUpgradeTimingNoDate"
+                />
+              )}
+            </p>
+          )}
         <div className="mt-4 flex flex-wrap justify-between">
           {isPaypal && selectedAmountOption ? (
             <PayWithPaypalButton

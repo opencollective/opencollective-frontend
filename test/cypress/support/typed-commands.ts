@@ -37,10 +37,12 @@ declare global {
         email?: string;
         slug?: string;
         name?: string;
-        type?: string;
-      }): Chainable<{ id: number; slug: string }>;
+        description?: string;
+        settings?: Record<string, unknown>;
+        type?: 'ORGANIZATION' | 'COLLECTIVE';
+      }): Chainable<{ id: string; slug: string; name: string }>;
 
-      createHostedCollective(params?: { userEmail?: string }): Chainable<{ slug: string }>;
+      createHostedCollective(params?: { userEmail?: string; name?: string }): Chainable<{ id: string; slug: string }>;
 
       createProject(params: {
         userEmail?: string;

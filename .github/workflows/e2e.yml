@@ -63,7 +63,7 @@ env:
 jobs:
   e2e:
     name: e2e (${{ matrix.files }})
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     timeout-minutes: 30
 
@@ -78,7 +78,7 @@ jobs:
         ports:
           - 6379:6379
       postgres:
-        image: postgres:16.15
+        image: postgres:16.16
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres

@@ -102,6 +102,7 @@ export const dashboardOrdersQuery = gql`
     $hostedAccounts: [AccountReferenceInput!]
     $createdBy: [AccountReferenceInput]
     $oppositeAccountScope: OppositeAccountScope
+    $maxTotalCount: Int
   ) {
     account(slug: $slug) {
       id
@@ -133,8 +134,10 @@ export const dashboardOrdersQuery = gql`
         hostedAccounts: $hostedAccounts
         createdBy: $createdBy
         oppositeAccountScope: $oppositeAccountScope
+        maxTotalCount: $maxTotalCount
       ) {
         totalCount
+        totalCountIsCapped
         nodes {
           id
           ...ManagedOrderFields

@@ -110,8 +110,9 @@ const REWRITES: Rewrite[] = [
     destination: '/banner-iframe',
   },
   {
+    // Removed widget, still embedded on some pages: an empty page (pages/api/legacy/removed-widget.ts)
     source: '/:collectiveSlug/(collectives|widget).html',
-    destination: '/collectives-iframe',
+    destination: '/api/legacy/removed-widget',
   },
   {
     source: '/redirect',

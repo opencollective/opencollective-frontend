@@ -26,7 +26,7 @@ type ContributionsTableProps<FilterValues extends Record<string, unknown>> = {
   accountSlug: string;
   queryFilter: useQueryFilterReturnType<typeof schema, DashboardOrdersQueryVariables, FilterMeta>;
   views?: readonly { id: string; label: string; filter: Partial<FilterValues>; count?: number }[];
-  orders: { nodes: ManagedOrderFieldsFragment[]; totalCount: number };
+  orders: { nodes: ManagedOrderFieldsFragment[]; totalCount: number; totalCountIsCapped?: boolean };
   loading?: boolean;
   nbPlaceholders?: number;
   error?: ApolloError;
@@ -141,7 +141,7 @@ export default function ContributionsTable<FilterValues extends Record<string, u
         onSuccess={refetch}
       />
 
-      <Pagination queryFilter={queryFilter} total={orders.totalCount} />
+      <Pagination queryFilter={queryFilter} total={orders.totalCount} isTotalCapped={orders.totalCountIsCapped} />
 
       <ContributionDrawer
         open={!!selectedContributionId}

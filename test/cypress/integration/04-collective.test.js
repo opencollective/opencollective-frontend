@@ -28,12 +28,18 @@ const uploadImage = ({ dropzone, fileName }) => {
 describe('Collective page', () => {
   let collectiveSlug = null;
   before(() => {
-    cy.createHostedCollective({
-      twitterHandle: 'testCollective',
-      githubHandle: 'testCollective',
-      website: 'opencollective.com/testCollective',
-    })
+    cy.createHostedCollective()
       .then(({ slug }) => (collectiveSlug = slug))
+      .then(() =>
+        cy.editAccount({
+          slug: collectiveSlug,
+          socialLinks: [
+            { type: 'TWITTER', url: 'https://x.com/testCollective' },
+            { type: 'GITHUB', url: 'https://github.com/testCollective' },
+            { type: 'WEBSITE', url: 'https://opencollective.com/testCollective' },
+          ],
+        }),
+      )
       .then(() => cy.visit(`/${collectiveSlug}`));
   });
 
@@ -50,9 +56,9 @@ describe('Collective page', () => {
 
   describe('Hero', () => {
     it('Must have links to twitter, github and website', () => {
-      cy.get('[data-cy=twitterProfileUrl]').should('have.attr', 'href', 'https://x.com/testCollective');
-      cy.get('[data-cy=repositoryUrl]').should('have.attr', 'href', 'https://github.com/testCollective');
-      cy.get('[data-cy=collectiveWebsite]').should('have.attr', 'href', 'https://opencollective.com/testCollective');
+      cy.get('[data-cy=social-link-0]').should('have.attr', 'href', 'https://x.com/testCollective');
+      cy.get('[data-cy=social-link-1]').should('have.attr', 'href', 'https://github.com/testCollective');
+      cy.get('[data-cy=social-link-2]').should('have.attr', 'href', 'https://opencollective.com/testCollective');
     });
 
     it('Must have the fiscal host displayed', () => {

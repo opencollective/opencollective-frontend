@@ -8,7 +8,16 @@ import { z } from 'zod';
 // `res` is the Express response object provided by the custom server (`server/index.ts`); express has
 // no types in this project, so it stays untyped until the server layer is migrated.
 
-const WIDGET_ALLOWLIST = /^(widget|events|collectives|banner)$/;
+const WIDGET_ALLOWLIST = /^(events|banner)$/;
+// The "collectives" widget, also served as `widget`, has been removed
+// (https://github.com/opencollective/opencollective/issues/9122). Pages that still include its script get one
+// that does nothing, instead of the banner's (the fallback below) or an error.
+const REMOVED_WIDGETS = /^(widget|collectives)$/;
+const REMOVED_WIDGET_SCRIPT = `/* This Open Collective widget has been removed. */
+if (typeof console !== 'undefined' && console.info) {
+  console.info('The Open Collective "collectives" widget has been removed: https://github.com/opencollective/opencollective/issues/9122');
+}
+`;
 const SAFE_SELECTOR_REGEX = /^[a-zA-Z0-9#_.-]{1,50}$/;
 const SAFE_PROPERTY_REGEX = /^[a-zA-Z-]{1,50}$/;
 const DANGEROUS_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
@@ -53,6 +62,13 @@ function sanitizeStyle(raw: unknown): string {
 // next.js export
 // ts-unused-exports:disable-next-line
 export default function handler(req: NextApiRequest, res) {
+  if (typeof req.query?.widget === 'string' && REMOVED_WIDGETS.test(req.query.widget)) {
+    res.set('Cache-Control', `public, max-age=86400`);
+    res.setHeader('content-type', 'application/javascript');
+    res.send(REMOVED_WIDGET_SCRIPT);
+    return;
+  }
+
   const content = fs.readFileSync(path.join(process.cwd(), 'server/templates/widget.js'), 'utf8');
   const compiled = template(content, { interpolate: /{{([\s\S]+?)}}/g });
 

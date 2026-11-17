@@ -9,7 +9,7 @@ const redisProvider = async () => {
 
   return {
     clear: async () => redisClient?.flushAll(),
-    delete: async key => redisClient?.del(key),
+    del: async key => redisClient?.del(key),
     get: async (key, { unserialize = JSON.parse }: { unserialize?: (value: string | Buffer) => unknown } = {}) => {
       const value = await redisClient?.get(key);
       if (value) {

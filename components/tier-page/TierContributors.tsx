@@ -37,6 +37,8 @@ type TierContributorsProps = {
   currency: string;
   // Collective id
   collectiveId?: number;
+  // Collective slug, used to refresh its page after a public message is edited
+  collectiveSlug?: string;
 };
 
 type TierContributorsState = {
@@ -60,7 +62,7 @@ export default class TierContributors extends React.Component<TierContributorsPr
   filterContributors = memoizeOne(filterContributors);
 
   render() {
-    const { contributors, contributorsStats, currency, collectiveId } = this.props;
+    const { contributors, contributorsStats, currency, collectiveId, collectiveSlug } = this.props;
     const { filter } = this.state;
     const hasFilters = contributors.length >= TierContributors.MIN_CONTRIBUTORS_TO_SHOW_FILTERS;
     const filters = hasFilters && this.getContributorsFilters(contributors);
@@ -97,6 +99,7 @@ export default class TierContributors extends React.Component<TierContributorsPr
             contributors={filteredContributors}
             currency={currency}
             collectiveId={collectiveId}
+            collectiveSlug={collectiveSlug}
             maxWidthWhenNotFull={CONTENT_WIDTH + 16} // Add 16 to compensate for the margin of the card
           />
         </Box>
