@@ -4,7 +4,7 @@ describe('Contribution Flow: Sign In', () => {
   const validUserEmail = randomEmail();
 
   before(() => {
-    cy.createCollective({ type: 'USER', email: validUserEmail });
+    cy.createCollective({ type: 'ORGANIZATION', email: validUserEmail }); // The user administers "TestOrg"
   });
 
   it("Doesn't allow to submit if email is invalid", () => {

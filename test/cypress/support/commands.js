@@ -1,9 +1,8 @@
 import 'cypress-mailpit';
 
-import { pick } from 'lodash-es';
+import * as cheerio from 'cheerio';
 
-import { API_V1_CONTEXT, fakeTag as gql, fakeTag as gqlV1 } from '../../../lib/graphql/helpers';
-import { loggedInUserQuery } from '../../../lib/graphql/v1/queries';
+import { fakeTag as gql } from '../../../lib/graphql/helpers';
 
 import { CreditCards } from '../../stripe-helpers';
 
@@ -33,7 +32,7 @@ Cypress.Commands.add('login', (params = {}) => {
       return cy.visit(redirect, visitParams).then(() => user);
     }
 
-    return getLoggedInUserFromToken(token).then(loggedInUser => {
+    return getMeFromToken(token).then(loggedInUser => {
       return completeProfileIfRequired({ token, loggedInUser, completeProfile }).then(() => {
         return cy.visit(redirect, visitParams).then(() => user);
       });
@@ -61,7 +60,7 @@ Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams, comple
     // opencollective-api/server/controllers/users.js for more info
     const token = getTokenFromRedirectUrl(redirect);
     if (token) {
-      return getLoggedInUserFromToken(token).then(loggedInUser => {
+      return getMeFromToken(token).then(loggedInUser => {
         return completeProfileIfRequired({ token, loggedInUser, completeProfile, name: user.name }).then(() => {
           return cy.visit(redirect, visitParams).then(() => loggedInUser);
         });
@@ -130,7 +129,6 @@ Cypress.Commands.add('openEmail', (emailMatcher, timeout = 8000) => {
  *
  * - `type: 'ORGANIZATION'` (default): an organization (`createOrganization`)
  * - `type: 'COLLECTIVE'`: a collective without host (`createCollective`)
- * - `type: 'USER'`: only makes sure the user exists, and returns its account
  *
  * Other params (`name`, `slug`, `description`, `settings`…) go to the created account. Resolves
  * `{ id, slug, name, … }`, where `id` is the GraphQL v2 id.
@@ -141,11 +139,7 @@ Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defau
     const token = getTokenFromRedirectUrl(response.body.redirect);
     return getMeFromToken(token)
       .then(me => completeProfileIfRequired({ token, loggedInUser: me, completeProfile: true }))
-      .then(me => {
-        if (type === 'USER') {
-          return { id: me.id, slug: me.collective.slug, name: me.collective.name };
-        }
-
+      .then(() => {
         const account = {
           name: type === 'COLLECTIVE' ? 'TestCollective' : 'TestOrg',
           description: type === 'COLLECTIVE' ? 'A test collective' : 'A test organization',
@@ -794,49 +788,81 @@ function getIdV2FromReferenceInput(account, token) {
   });
 }
 
+// Sign-in answers for an email without a verified account: create it, then sign in again
+const SIGNIN_UNKNOWN_USER_ERRORS = ['EMAIL_DOES_NOT_EXIST', 'EMAIL_AWAITING_VERIFICATION'];
+
 /**
- * @param {object} user - should have `email` and `id` set
+ * Request a sign-in for `user.email`. Setup commands also pass fresh test emails here: an unknown
+ * (or never verified) email is first created through the real sign-up, as a visitor would.
+ *
+ * @param {object} user - should have `email` set
  */
 function signinRequest(user, redirect, sendLink) {
-  // Setup commands also pass fresh test emails here. Ensure the user exists
-  // without changing existing users or sending an extra login email.
-  return graphqlQuery(null, {
-    operationName: 'CreateUser',
-    query: gqlV1`
-      mutation CreateUser($user: UserInputType!) {
-        createUser(user: $user, sendSignInLink: false, throwIfExists: false) {
-          user {
-            id
-          }
-        }
-      }
-    `,
-    variables: {
-      user: pick(user, [
-        'email',
-        'name',
-        'legalName',
-        'company',
-        'image',
-        'description',
-        'website',
-        'newsletterOptIn',
-        'location',
-      ]),
-    },
-  }).then(({ body }) => {
-    if (body.errors?.length) {
-      throw new Error(body.errors.map(error => error.message).join('\n'));
+  return postSignin(user, redirect, sendLink).then(response => {
+    if (SIGNIN_UNKNOWN_USER_ERRORS.includes(response.body?.errorCode)) {
+      return signupAndVerifyEmail(user.email).then(() => postSignin(user, redirect, sendLink));
     }
-    return cy.request({
+    return response;
+  });
+}
+
+function postSignin(user, redirect, sendLink) {
+  return cy
+    .request({
       url: '/api/users/signin',
       method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
       body: JSON.stringify({ user, redirect, sendLink }),
+      failOnStatusCode: false,
+    })
+    .then(response => {
+      if (response.status >= 400 && !SIGNIN_UNKNOWN_USER_ERRORS.includes(response.body?.errorCode)) {
+        throw new Error(
+          `Sign-in request for ${user.email} failed (${response.status}): ${JSON.stringify(response.body)}`,
+        );
+      }
+      return response;
     });
+}
+
+/**
+ * Create a user with the sign-up the website uses (`/users/signup`, then the one-time code sent by
+ * email, read from Mailpit, to `/users/verify-email`). The new account still requires profile
+ * completion, which `cy.login` and `cy.signup` handle (`completeProfile`).
+ *
+ * The e2e API must run without rate limiting (`DISABLE_RATE_LIMITING`): sign-up allows 5 calls per IP
+ * per 15 minutes, and a test run creates many users.
+ */
+function signupAndVerifyEmail(email) {
+  const headers = { Accept: 'application/json', 'Content-Type': 'application/json' };
+  return cy
+    .request({ url: '/api/users/signup', method: 'POST', headers, body: { email }, failOnStatusCode: false })
+    .then(({ status, body }) => {
+      if (status !== 200 || !body?.sessionId) {
+        throw new Error(`Sign-up for ${email} failed (${status}): ${JSON.stringify(body)}`);
+      }
+      return getSignupCode(email).then(otp =>
+        cy.request({
+          url: '/api/users/verify-email',
+          method: 'POST',
+          headers,
+          body: { email, otp, sessionId: body.sessionId },
+        }),
+      );
+    });
+}
+
+// Outside production, the API may rewrite recipients (`@` → `-at-`), as in 01-signup.test.ts
+const isSentTo = (To, email) =>
+  To?.some(({ Address }) => Address.includes(email) || Address.includes(email.replace(/@/g, '-at-')));
+
+function getSignupCode(email) {
+  return getEmail(({ Subject, To }) => isSentTo(To, email) && Subject.includes('Email Confirmation')).then(message => {
+    const otp = cheerio.load(message.HTML)('h3 > span').text().trim();
+    if (!otp) {
+      throw new Error(`No sign-up code found in the confirmation email sent to ${email}`);
+    }
+    return otp;
   });
 }
 
@@ -867,20 +893,6 @@ export function signinRequestAndReturnToken(user, redirect) {
     .then(({ body }) => body.token);
 }
 
-function graphqlQuery(token, body) {
-  body.operationName && cy.log(`GraphQL: ${body.operationName}`);
-  return cy.request({
-    url: '/api/graphql/v1',
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  });
-}
-
 export function graphqlQueryV2(token, body) {
   body.operationName && cy.log(`GraphQL: ${body.operationName}`);
   return cy.request({
@@ -896,8 +908,8 @@ export function graphqlQueryV2(token, body) {
 }
 
 /**
- * The signed-in user with GraphQL v2, shaped like the v1 LoggedInUser fields that
- * `completeProfileIfRequired` reads (`requiresProfileCompletion`, `collective.slug`, `collective.name`).
+ * The signed-in user with GraphQL v2, shaped like the v1 LoggedInUser fields that `completeProfileIfRequired`
+ * and the specs read (`email`, `requiresProfileCompletion`, `collective.slug`, `collective.name`).
  */
 function getMeFromToken(token) {
   return graphqlQueryV2(token, {
@@ -906,6 +918,7 @@ function getMeFromToken(token) {
       query CypressMeForTest {
         me {
           id
+          email
           slug
           name
           requiresProfileCompletion
@@ -916,6 +929,7 @@ function getMeFromToken(token) {
     const me = getGraphqlResult(body, 'me');
     return {
       id: me.id,
+      email: me.email,
       requiresProfileCompletion: me.requiresProfileCompletion,
       collective: { slug: me.slug, name: me.name },
     };
@@ -927,16 +941,6 @@ function getGraphqlResult(body, field) {
     throw new Error(body.errors.map(error => error.message).join('\n'));
   }
   return body.data[field];
-}
-
-function getLoggedInUserFromToken(token) {
-  return graphqlQuery(token, {
-    operationName: 'LoggedInUser',
-    query: loggedInUserQuery.loc.source.body,
-    context: API_V1_CONTEXT,
-  }).then(({ body }) => {
-    return body.data.LoggedInUser;
-  });
 }
 
 /**

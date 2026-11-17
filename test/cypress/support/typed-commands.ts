@@ -39,7 +39,7 @@ declare global {
         name?: string;
         description?: string;
         settings?: Record<string, unknown>;
-        type?: 'ORGANIZATION' | 'COLLECTIVE' | 'USER';
+        type?: 'ORGANIZATION' | 'COLLECTIVE';
       }): Chainable<{ id: string; slug: string; name: string }>;
 
       createHostedCollective(params?: { userEmail?: string; name?: string }): Chainable<{ id: string; slug: string }>;
