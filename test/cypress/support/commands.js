@@ -62,8 +62,7 @@ Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams, comple
     const token = getTokenFromRedirectUrl(redirect);
     if (token) {
       return getMeFromToken(token).then(loggedInUser => {
-        const slug = slugFromName(user.name);
-        return completeProfileIfRequired({ token, loggedInUser, completeProfile, name: user.name, slug }).then(() => {
+        return completeProfileIfRequired({ token, loggedInUser, completeProfile, name: user.name }).then(() => {
           return cy.visit(redirect, visitParams).then(() => loggedInUser);
         });
       });
@@ -73,47 +72,41 @@ Cypress.Commands.add('signup', ({ user = {}, redirect = '/', visitParams, comple
   });
 });
 
-// v1 `createUser` derived the account's slug from its name, and specs that sign up with a slug-shaped
-// name (`randomSlug()`) then open `/dashboard/<name>`. The REST sign-up gives a random slug instead,
-// so set it when completing the profile. Other names keep the API's slug (no collision on "John Doe").
-const slugFromName = name => (typeof name === 'string' && /^[a-z0-9-]+$/.test(name) ? name : undefined);
-
-function completeProfileIfRequired({ token, loggedInUser, completeProfile, name, slug }) {
+function completeProfileIfRequired({ token, loggedInUser, completeProfile, name }) {
   if (!completeProfile || !loggedInUser.requiresProfileCompletion) {
     return cy.wrap(loggedInUser);
   }
 
-  return getIdV2FromReferenceInput({ slug: loggedInUser.collective.slug }, token)
-    .then(accountId => {
-      return graphqlQueryV2(token, {
-        operationName: 'CompleteProfileForTest',
-        query: gql`
-          mutation CompleteProfileForTest($account: AccountUpdateInput!) {
-            editAccount(account: $account) {
-              id
-              slug
-              name
-            }
-          }
-        `,
-        variables: {
-          account: {
-            id: accountId,
-            name: name ?? loggedInUser.collective.name ?? 'Test User',
-            ...(slug && { slug }),
-          },
-        },
-      });
-    })
-    .then(({ body }) => {
-      // `editAccount` may change the slug when completing the profile (or set the one asked
-      // for), so reflect it on the returned user (several specs read `user.collective.slug`).
-      const { slug } = body.data.editAccount;
-      if (loggedInUser.collective && slug) {
-        loggedInUser.collective.slug = slug;
+  return graphqlQueryV2(token, {
+    operationName: 'CompleteProfileForTest',
+    query: gql`
+      mutation CompleteProfileForTest($account: AccountUpdateInput!) {
+        editAccount(account: $account) {
+          id
+          slug
+          name
+        }
       }
-      return loggedInUser;
-    });
+    `,
+    variables: {
+      account: {
+        id: loggedInUser.id, // v2 id, from `me`
+        name: name ?? loggedInUser.collective.name ?? 'Test User',
+        // v1 `createUser` derived the slug from the name, and specs that sign up with a slug-shaped name
+        // (`randomSlug()`) open `/dashboard/<name>`: the REST sign-up gives a random slug, so set it.
+        // Other names keep the API's slug (no collision on "John Doe").
+        ...(typeof name === 'string' && /^[a-z0-9-]+$/.test(name) && { slug: name }),
+      },
+    },
+  }).then(({ body }) => {
+    // `editAccount` may change the slug when completing the profile (or set the one asked
+    // for), so reflect it on the returned user (several specs read `user.collective.slug`).
+    const { slug } = body.data.editAccount;
+    if (loggedInUser.collective && slug) {
+      loggedInUser.collective.slug = slug;
+    }
+    return loggedInUser;
+  });
 }
 
 /**
@@ -845,8 +838,9 @@ function postSignin(user, redirect, sendLink) {
  */
 function signupAndVerifyEmail(email) {
   const headers = { Accept: 'application/json', 'Content-Type': 'application/json' };
-  return saveAuthCookies().then(savedCookies =>
-    cy
+  return cy.getCookies().then(cookies => {
+    const savedCookies = cookies.filter(cookie => AUTH_COOKIES.includes(cookie.name));
+    return cy
       .request({ url: '/api/users/signup', method: 'POST', headers, body: { email }, failOnStatusCode: false })
       .then(({ status, body }) => {
         if (status !== 200 || !body?.sessionId) {
@@ -861,15 +855,11 @@ function signupAndVerifyEmail(email) {
           }),
         );
       })
-      .then(() => restoreAuthCookies(savedCookies)),
-  );
+      .then(() => restoreAuthCookies(savedCookies));
+  });
 }
 
 const AUTH_COOKIES = ['accessTokenPayload', 'accessTokenSignature'];
-
-function saveAuthCookies() {
-  return cy.getCookies().then(cookies => cookies.filter(cookie => AUTH_COOKIES.includes(cookie.name)));
-}
 
 function restoreAuthCookies(savedCookies) {
   AUTH_COOKIES.forEach(name => cy.clearCookie(name));
