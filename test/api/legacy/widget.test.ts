@@ -104,7 +104,7 @@ describe('GET /api/legacy/widget.js', () => {
     expect(dom.alertCalls).toHaveLength(0);
   });
 
-  it.each(['widget', 'events', 'collectives', 'banner'])('accepts allowlisted widget parameter: %s', widgetName => {
+  it.each(['events', 'banner'])('accepts allowlisted widget parameter: %s', widgetName => {
     const req = { query: { widget: widgetName } } as unknown as NextApiRequest;
     const res = createMockRes();
 
@@ -113,6 +113,28 @@ describe('GET /api/legacy/widget.js', () => {
     expect(res.body).toContain(`window.OC.widgets['${widgetName}']`);
     const dom = makeStubDom({ readyState: 'loading' });
     expect(() => evaluateScript(res.body!, dom)).not.toThrow();
+  });
+
+  it.each(['widget', 'collectives'])('serves a script that does nothing for the removed widget: %s', widgetName => {
+    const req = { query: { widget: widgetName } } as unknown as NextApiRequest;
+    const res = createMockRes();
+
+    widgetHandler(req, res as unknown as NextApiResponse);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.headers['content-type']).toBe('application/javascript');
+    expect(res.body).not.toContain('window.OC');
+    expect(res.body).not.toContain('iframe');
+
+    const dom = makeStubDom({ readyState: 'complete', scriptSrc: `https://opencollective.com/x/${widgetName}.js` });
+    const info = jest.spyOn(console, 'info').mockImplementation(() => {});
+    try {
+      expect(() => evaluateScript(res.body!, dom)).not.toThrow();
+      expect(info).toHaveBeenCalledTimes(1);
+    } finally {
+      info.mockRestore();
+    }
+    expect(dom.alertCalls).toHaveLength(0);
   });
 
   it('falls back to "banner" on invalid or breakout widget parameter', () => {
