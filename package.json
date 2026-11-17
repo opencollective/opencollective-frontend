@@ -274,7 +274,7 @@
     "mocha-junit-reporter": "^2.2.1",
     "npm-run-all2": "^9.0.0",
     "pdf-parse": "^2.4.5",
-    "postcss": "8.5.32",
+    "postcss": "8.5.33",
     "prettier": "3.10.1",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "raf": "^3.4.1",
