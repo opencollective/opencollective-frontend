@@ -28,6 +28,8 @@ const EMPTY_PAGE = `<!DOCTYPE html>
 // next.js export
 // ts-unused-exports:disable-next-line
 export default function handler(req: NextApiRequest, res) {
+  // Embedded on other sites: without this, browsers block the frame (Helmet's SAMEORIGIN) and show an error
+  res.removeHeader('X-Frame-Options');
   res.status(410);
   res.set('Cache-Control', `public, max-age=86400`);
   res.setHeader('content-type', 'text/html; charset=utf-8');
