@@ -7,15 +7,19 @@ jest.mock('next/router', () => ({ __esModule: true, default: { events: { emit: j
 
 describe('requiresFullPageLoad', () => {
   it('matches listed paths, ignoring query, hash, trailing slash and case', () => {
-    expect(requiresFullPageLoad('/phpfoundation/hybrid')).toBe(true);
-    expect(requiresFullPageLoad('/phpfoundation/hybrid/')).toBe(true);
-    expect(requiresFullPageLoad('/phpfoundation/hybrid?currency=EUR#finances')).toBe(true);
-    expect(requiresFullPageLoad('/PHPFoundation/Hybrid')).toBe(true);
+    expect(requiresFullPageLoad('/phpfoundation')).toBe(true);
+    expect(requiresFullPageLoad('/phpfoundation/')).toBe(true);
+    expect(requiresFullPageLoad('/phpfoundation?currency=EUR#finances')).toBe(true);
+    expect(requiresFullPageLoad('/PHPFoundation')).toBe(true);
+    expect(requiresFullPageLoad('/phpfoundation/contributors')).toBe(true);
+    expect(requiresFullPageLoad('/phpfoundation/contributors/?tier=sponsors')).toBe(true);
+    expect(requiresFullPageLoad('/PHPFoundation/Contributors')).toBe(true);
   });
 
   it('does not match other paths', () => {
-    expect(requiresFullPageLoad('/phpfoundation')).toBe(false);
-    expect(requiresFullPageLoad('/phpfoundation/hybrid/transactions')).toBe(false);
+    expect(requiresFullPageLoad('/phpfoundation/transactions')).toBe(false);
+    expect(requiresFullPageLoad('/phpfoundation/contributors/sponsors')).toBe(false);
+    expect(requiresFullPageLoad('/phpfoundationx')).toBe(false);
     expect(requiresFullPageLoad('/dashboard')).toBe(false);
   });
 });
@@ -26,7 +30,7 @@ describe('forceFullPageLoad', () => {
   });
 
   it('stops the loading indicator and aborts the client-side navigation for listed paths', () => {
-    expect(() => forceFullPageLoad('/phpfoundation/hybrid')).toThrow(IgnorableError);
+    expect(() => forceFullPageLoad('/phpfoundation/contributors')).toThrow(IgnorableError);
     expect(Router.events.emit).toHaveBeenCalledWith('routeChangeError');
   });
 

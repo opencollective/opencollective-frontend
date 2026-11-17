@@ -7,7 +7,7 @@ import { IgnorableError } from './errors';
  * Cloudflare worker). Client-side navigation would render this app's own page
  * for them, so they always get a full page load.
  */
-const FULL_PAGE_LOAD_PATHS = new Set<string>(['/phpfoundation/hybrid']);
+const FULL_PAGE_LOAD_PATHS = new Set<string>(['/phpfoundation', '/phpfoundation/contributors']);
 
 export const requiresFullPageLoad = (url: string): boolean => {
   const { pathname } = new URL(url, 'https://opencollective.com');
