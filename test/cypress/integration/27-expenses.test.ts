@@ -46,7 +46,7 @@ describe('Expense flow', () => {
         type: 'INVOICE',
         userEmail: user.email,
         account: { slug: collective.slug },
-        payee: { legacyId: user.CollectiveId },
+        payee: { slug: user.collective.slug },
         description: 'Expense for E2E tests',
       }).then(createdExpense => {
         expense = createdExpense;
@@ -74,7 +74,7 @@ describe('Expense flow', () => {
           type: 'INVOICE',
           userEmail: user.email,
           account: { slug: collective.slug },
-          payee: { legacyId: user.CollectiveId },
+          payee: { slug: user.collective.slug },
           description: 'Expense with a PDF attachment',
           attachedFiles: [{ url: fileUrl }],
         }).then(expenseWithPdf => {
@@ -261,7 +261,7 @@ describe('Expense flow', () => {
             description: 'Recurring-like USD draft',
             currency: 'USD',
             items: [{ description: 'Consulting', amount: 12500 }],
-            payee: { legacyId: org.id },
+            payee: { slug: org.slug },
           },
         }).then(draft => {
           cy.wrap(draft.status).should('equal', 'DRAFT');
