@@ -125,38 +125,69 @@ Cypress.Commands.add('openEmail', (emailMatcher, timeout = 8000) => {
 });
 
 /**
- * Create a collective. Admin will be the user designated by `email`. If not
+ * Create an account with GraphQL v2. Admin will be the user designated by `email`. If not
  * provided, the email used will default to `defaultTestUserEmail`.
+ *
+ * - `type: 'ORGANIZATION'` (default): an organization (`createOrganization`)
+ * - `type: 'COLLECTIVE'`: a collective without host (`createCollective`)
+ * - `type: 'USER'`: only makes sure the user exists, and returns its account
+ *
+ * Other params (`name`, `slug`, `description`, `settings`…) go to the created account. Resolves
+ * `{ id, slug, name, … }`, where `id` is the GraphQL v2 id.
  */
 Cypress.Commands.add('createCollective', ({ type = 'ORGANIZATION', email = defaultTestUserEmail, ...params }) => {
   const user = { email, newsletterOptIn: false };
   return signinRequest(user, null).then(response => {
     const token = getTokenFromRedirectUrl(response.body.redirect);
-    return getLoggedInUserFromToken(token)
-      .then(loggedInUser => completeProfileIfRequired({ token, loggedInUser, completeProfile: true }))
-      .then(() =>
-        graphqlQuery(token, {
-          operationName: 'CreateCollective',
-          query: gqlV1 /* GraphQL */ `
-            mutation CreateCollective($collective: CollectiveInputType!) {
-              createCollective(collective: $collective) {
-                id
-                slug
-                name
-                description
-                longDescription
-                website
-                imageUrl
-                settings
+    return getMeFromToken(token)
+      .then(me => completeProfileIfRequired({ token, loggedInUser: me, completeProfile: true }))
+      .then(me => {
+        if (type === 'USER') {
+          return { id: me.id, slug: me.collective.slug, name: me.collective.name };
+        }
+
+        const account = {
+          name: type === 'COLLECTIVE' ? 'TestCollective' : 'TestOrg',
+          description: type === 'COLLECTIVE' ? 'A test collective' : 'A test organization',
+          ...params,
+          slug: params.slug || randomSlug(),
+        };
+
+        if (type === 'COLLECTIVE') {
+          return graphqlQueryV2(token, {
+            operationName: 'CreateUnhostedCollectiveForTest',
+            query: gql`
+              mutation CreateUnhostedCollectiveForTest($collective: CollectiveCreateInput!) {
+                createCollective(collective: $collective) {
+                  id
+                  slug
+                  name
+                  description
+                  settings
+                }
               }
-            }
-          `,
-          context: API_V1_CONTEXT,
-          variables: { collective: { location: {}, name: 'TestOrg', slug: '', type, ...params } },
-        }),
-      )
-      .then(({ body }) => {
-        return body.data.createCollective;
+            `,
+            variables: { collective: account },
+          }).then(({ body }) => getGraphqlResult(body, 'createCollective'));
+        } else if (type === 'ORGANIZATION') {
+          return graphqlQueryV2(token, {
+            operationName: 'CreateOrganizationForTest',
+            query: gql`
+              mutation CreateOrganizationForTest($organization: OrganizationCreateInput!) {
+                createOrganization(organization: $organization) {
+                  id
+                  slug
+                  name
+                  description
+                  settings
+                }
+              }
+            `,
+            variables: { organization: account },
+          }).then(({ body }) => getGraphqlResult(body, 'createOrganization'));
+        } else {
+          throw new Error(`cy.createCollective: unsupported type ${type}`);
+        }
       });
   });
 });
@@ -862,6 +893,40 @@ export function graphqlQueryV2(token, body) {
     },
     body: JSON.stringify(body),
   });
+}
+
+/**
+ * The signed-in user with GraphQL v2, shaped like the v1 LoggedInUser fields that
+ * `completeProfileIfRequired` reads (`requiresProfileCompletion`, `collective.slug`, `collective.name`).
+ */
+function getMeFromToken(token) {
+  return graphqlQueryV2(token, {
+    operationName: 'CypressMeForTest',
+    query: gql`
+      query CypressMeForTest {
+        me {
+          id
+          slug
+          name
+          requiresProfileCompletion
+        }
+      }
+    `,
+  }).then(({ body }) => {
+    const me = getGraphqlResult(body, 'me');
+    return {
+      id: me.id,
+      requiresProfileCompletion: me.requiresProfileCompletion,
+      collective: { slug: me.slug, name: me.name },
+    };
+  });
+}
+
+function getGraphqlResult(body, field) {
+  if (body.errors?.length) {
+    throw new Error(body.errors.map(error => error.message).join('\n'));
+  }
+  return body.data[field];
 }
 
 function getLoggedInUserFromToken(token) {

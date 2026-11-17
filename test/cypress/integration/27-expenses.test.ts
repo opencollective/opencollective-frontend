@@ -261,7 +261,7 @@ describe('Expense flow', () => {
             description: 'Recurring-like USD draft',
             currency: 'USD',
             items: [{ description: 'Consulting', amount: 12500 }],
-            payee: { legacyId: org.id },
+            payee: { slug: org.slug },
           },
         }).then(draft => {
           cy.wrap(draft.status).should('equal', 'DRAFT');
