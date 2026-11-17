@@ -4595,7 +4595,6 @@
   "UpdateAudienceBreakdown.Total": "Din uppdatering kommer att skickas till totalt {count} e-postadresser",
   "updatePaymentMethod.allUpdated": "All your recurring contributions now use a new payment method.",
   "updatePaymentMethod.form.updatePaymentMethodSuccess.btn": "Gå till profilsidan",
-  "updatePaymentMethod.paymentFailed": "Payment failed",
   "updatePaymentMethod.subtitle.line": "Lägg till en ny betalningsmetod för följande prenumerationer innan din nuvarande metod går ut.",
   "updatePaymentMethod.title": "Uppdatera betalningsmetod",
   "updatePaymentMethod.viewContributions": "View your contributions",

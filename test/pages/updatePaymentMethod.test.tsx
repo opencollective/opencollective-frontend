@@ -77,7 +77,7 @@ describe('pages/updatePaymentMethod', () => {
   it('lists each contribution, flags failed payments, and edits one contribution at a time', () => {
     mockQueryResult({
       id: 'pm',
-      account: { id: 'from', slug: 'contributor-org' },
+      account: { id: 'owner', slug: 'pm-owner' },
       orders: {
         totalCount: 2,
         nodes: [makeOrder('o1', 'ACTIVE', 'Collective A'), makeOrder('o2', 'ERROR', 'Collective B')],
@@ -94,7 +94,7 @@ describe('pages/updatePaymentMethod', () => {
     expect(mockEditOrderModal).toHaveBeenLastCalledWith(
       expect.objectContaining({
         action: 'editPaymentMethod',
-        accountSlug: 'contributor-org',
+        accountSlug: 'pm-owner',
         order: expect.objectContaining({ id: 'o2' }),
       }),
     );

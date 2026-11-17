@@ -4595,7 +4595,6 @@
   "UpdateAudienceBreakdown.Total": "Vaša aktualizácia bude odoslaná na {count} e-mailov",
   "updatePaymentMethod.allUpdated": "All your recurring contributions now use a new payment method.",
   "updatePaymentMethod.form.updatePaymentMethodSuccess.btn": "Prejsť na stránku profilu",
-  "updatePaymentMethod.paymentFailed": "Payment failed",
   "updatePaymentMethod.subtitle.line": "Pred skončením platnosti predplatného pridajte nový spôsob platby pre nasledujúce predplatné.",
   "updatePaymentMethod.title": "Aktualizovať spôsob platby",
   "updatePaymentMethod.viewContributions": "View your contributions",
