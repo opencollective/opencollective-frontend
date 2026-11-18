@@ -64,7 +64,7 @@ PLAYWRIGHT_WORKERS=2 PLAYWRIGHT_RETRIES=1 ./test/playwright/run-local.sh
 ```
 
 What the launcher does: preflights tools/checkouts/builds/infrastructure before
-changing state, restores the API development dump + migrations into the same
+changing state, restores the API blank dump (`npm run db:restore:blank`) + migrations into the same
 explicitly owned disposable database (refusing protected names), starts
 API/frontend/images/PDF with the CI runtime contract (`TZ=UTC OC_ENV=ci
 NODE_ENV=test E2E_TEST=1`), verifies semantic readiness (API status, GraphQL
@@ -102,6 +102,26 @@ report full live coverage unavailable. Failure/recovery evidence is kept
 
 Focused non-Stripe runs require no Stripe credentials. Existing Cypress
 coverage and live-integration boundaries are unchanged.
+
+## Signup journeys
+
+`specs/signup/signup.spec.ts` holds the signup pilot: a new individual, a new
+user with an Organization or a Collective (inviting an admin), a signed-in
+user creating an active Organization, a fiscal host or a Collective, and the
+OTP failure paths (wrong codes, expired sessions, existing accounts, rate
+limits) against the real API.
+
+```bash
+./test/playwright/run-local.sh --spec test/playwright/specs/signup
+npm run e2e -- test/playwright/specs/signup/signup.spec.ts --grep "Organization"
+```
+
+They use `visitorTest` (logged out, no recipe) with the `mail` fixture for the
+emailed code and invitation, and its `redis` fixture (`helpers/redis.ts`) to
+reset the API's per-IP OTP rate limits before each signup (so re-runs against
+a running environment are not refused) and to expire or exhaust them on
+purpose. Keep every signup journey in this one file. Coverage mapping and
+differences are in the canonical [guide](../../docs/e2e.md#signup-journeys-playwright-pilot).
 
 ## Building for upload journeys
 

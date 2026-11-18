@@ -65,6 +65,8 @@ HEADED=false
 HEADED_SET=false
 KEEP_ON_FAILURE=false
 MODE="fresh"
+# The API's blank dump (schema with every migration up to its creation), restored by `npm run db:restore:blank`.
+SEED_FILE="test/dbdumps/schema-with-migrations.pgsql"
 REPLAY_MANIFEST=""
 REPLAY_REQUESTED=false
 REUSE_REQUESTED=false
@@ -627,7 +629,7 @@ apply_replay_manifest() {
   check_field "pdfRev" "$(jq -r '.pdfRev // empty' "$manifest")" "$(git_rev "$PDF_DIR")"
   check_field "frontendLock" "$(jq -r '.frontendLock // empty' "$manifest")" "$(file_sha "$FRONTEND_DIR/package-lock.json")"
   check_field "apiLock" "$(jq -r '.apiLock // empty' "$manifest")" "$(file_sha "$API_DIR/package-lock.json")"
-  check_field "seedSha256" "$(jq -r '.seedSha256 // empty' "$manifest")" "$(file_sha "$API_DIR/test/dbdumps/opencollective_dvl.pgsql")"
+  check_field "seedSha256" "$(jq -r '.seedSha256 // empty' "$manifest")" "$(file_sha "$API_DIR/$SEED_FILE")"
   check_field "migrationHead" "$(jq -r '.migrationHead // empty' "$manifest")" "$(migration_head "$API_DIR")"
   check_field "npm" "$(jq -r '.npm // empty' "$manifest")" "$(npm --version)"
   check_field "postgres" "$(jq -r '.postgres // empty' "$manifest")" "$(psql --version 2>/dev/null || echo unknown)"
@@ -716,6 +718,19 @@ EOF
 }
 
 # --- Preflight (before changing any state) ---
+use_recorded_redis() {
+  # Joining runs and restarted services use the Redis the environment's API was started with: journeys reset
+  # its rate-limit counters, so another Redis would leave the API's untouched. URLs are not printed (credentials).
+  local recorded
+  recorded="$(jq -r '.redisUrl // empty' "$RECORD_FILE")"
+  if [[ -n "${REDIS_URL:-}" && -n "$recorded" && "$REDIS_URL" != "$recorded" ]]; then
+    fail "REDIS_URL differs from the Redis the E2E environment '$PG_DATABASE' was started with. Unset it to join, or start a fresh environment."
+    exit 2
+  fi
+  REDIS_URL="${recorded:-${REDIS_URL:-}}"
+  [[ -z "$REDIS_URL" ]] || export REDIS_URL
+}
+
 redis_ping() {
   # redis-cli when installed, otherwise a raw RESP PING (only the client is optional).
   local url="$1" hostport host port
@@ -983,13 +998,15 @@ cleanup_owned() {
 
 # --- Fresh DB restore + migrations (same disposable target) ---
 setup_db() {
-  echo "> Restoring disposable database ($PG_DATABASE) from API dump"
+  echo "> Restoring disposable database ($PG_DATABASE) from the API blank dump"
   # Stop conflicting owned clients is handled by terminating backends below;
   # attached/shared infrastructure is never reset.
   PGPASSWORD="${PGPASSWORD:-postgres}" psql -h "$PG_HOST" -U postgres -d postgres -c \
     "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '$PG_DATABASE';" \
     >>"$ARTIFACTS_DIR/db-restore.log" 2>&1 || true
-  (cd "$API_DIR" && npm run db:restore -- -d "$PG_DATABASE" -h "$PG_HOST" -f test/dbdumps/opencollective_dvl.pgsql) \
+  # Passed explicitly: the script falls back to the API checkout's .env, which names a developer database.
+  # --yes: the API refuses to replace an existing database without it, and this one is disposable.
+  (cd "$API_DIR" && PG_HOST="$PG_HOST" PG_DATABASE="$PG_DATABASE" npm run db:restore:blank -- --yes) \
     >>"$ARTIFACTS_DIR/db-restore.log" 2>&1
   echo "> Running API migrations on $PG_DATABASE"
   (cd "$API_DIR" && PG_HOST="$PG_HOST" PG_DATABASE="$PG_DATABASE" npm run db:migrate) \
@@ -1372,7 +1389,7 @@ MANIFEST_WRITTEN=false
 write_manifest() {
   local playwright_exit="$1"
   local status="$2"
-  local dump_file="$API_DIR/test/dbdumps/opencollective_dvl.pgsql"
+  local dump_file="$API_DIR/$SEED_FILE"
   local spec_esc="${SPEC//\\/\\\\}"
   spec_esc="${spec_esc//\"/\\\"}"
   local grep_esc="${GREP//\\/\\\\}"
@@ -1406,7 +1423,7 @@ write_manifest() {
   "pdfRev": "$(git_rev "$PDF_DIR")",
   "frontendLock": "$(file_sha "$FRONTEND_DIR/package-lock.json")",
   "apiLock": "$(file_sha "$API_DIR/package-lock.json")",
-  "seedFile": "test/dbdumps/opencollective_dvl.pgsql",
+  "seedFile": "$SEED_FILE",
   "seedSha256": "$(file_sha "$dump_file")",
   "migrations": "api HEAD migrations applied to PG_DATABASE (see db-restore.log)",
   "migrationHead": "$(migration_head "$API_DIR")",
@@ -1645,6 +1662,8 @@ reuse_main() {
   fi
   # The owner's inbox: journeys read their own mail from it and never clear it.
   MAILPIT_URL="$(jq -r '.mailpitUrl // empty' "$RECORD_FILE")"
+  # The owner's Redis: journeys reset the rate-limit keys they name (helpers/redis.ts).
+  use_recorded_redis
   export WEBSITE_URL API_URL MAILPIT_URL
   export PLAYWRIGHT_FIXTURE_OWNER_FILE="$FIXTURE_OWNER_FILE"
   export PLAYWRIGHT_RUN_ID="$RUN_ID"
@@ -1783,6 +1802,8 @@ join_environment() {
   WEBSITE_URL="$(jq -r '.websiteUrl // empty' "$RECORD_FILE")"
   API_URL="$api"
   MAILPIT_URL="$(jq -r '.mailpitUrl // empty' "$RECORD_FILE")"
+  # Restarted services and journeys (helpers/redis.ts) need the Redis the E2E environment started with.
+  use_recorded_redis
   if [[ ! -r "$FIXTURE_OWNER_FILE" ]]; then
     fail "fixture ownership proof missing for the running E2E environment. Restart it with: npm run e2e -- --fresh$(db_flag) <spec>"
     exit 2
@@ -1797,9 +1818,6 @@ join_environment() {
       exit 2
     fi
     export_runtime_env
-    # Restarted services need the Redis the E2E environment started with.
-    REDIS_URL="${REDIS_URL:-$(jq -r '.redisUrl // empty' "$RECORD_FILE")}"
-    [[ -z "$REDIS_URL" ]] || export REDIS_URL
     build_services "${REBUILD_SERVICES[@]}"
     for svc in "${REBUILD_SERVICES[@]}"; do
       restart_service "$svc"
