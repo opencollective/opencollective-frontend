@@ -1132,8 +1132,6 @@
   "contribution.paymentFee": "Comisión del procesador de pagos",
   "contribution.quantity": "Cantidad",
   "ContributionFlow.backToCollectivePage": "Volver a la página de {accountName}",
-  "ContributionFlow.CreateOrganizationLabel": "Contribuir como organización",
-  "ContributionFlow.CreateUserLabel": "Contribuir como individuo",
   "ContributionFlow.goBackToGuest": "Volver para contribuir como invitado",
   "ContributionFlow.noSupportedPaymentMethods": "No hay ningún proveedor de pago disponible",
   "ContributionFlow.Payment": "Pago",

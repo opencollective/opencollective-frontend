@@ -1132,8 +1132,6 @@
   "contribution.paymentFee": "Opłata za przetwarzanie płatności",
   "contribution.quantity": "Ilość",
   "ContributionFlow.backToCollectivePage": "Wróć do strony {accountName}",
-  "ContributionFlow.CreateOrganizationLabel": "Przyczyń się jako organizacja",
-  "ContributionFlow.CreateUserLabel": "Wesprzyj jako osoba fizyczna",
   "ContributionFlow.goBackToGuest": "Wróć do wsparcia jako gość",
   "ContributionFlow.noSupportedPaymentMethods": "Nie ma dostępnego dostawcy płatności",
   "ContributionFlow.Payment": "Płatność",

@@ -1132,8 +1132,6 @@
   "contribution.paymentFee": "支付手续费",
   "contribution.quantity": "数量",
   "ContributionFlow.backToCollectivePage": "返回 {accountName} 页",
-  "ContributionFlow.CreateOrganizationLabel": "作为一个组织进行捐款",
-  "ContributionFlow.CreateUserLabel": "作为个人贡献",
   "ContributionFlow.goBackToGuest": "返回作为访客进行贡献",
   "ContributionFlow.noSupportedPaymentMethods": "没有可用的付款提供商",
   "ContributionFlow.Payment": "付款",
