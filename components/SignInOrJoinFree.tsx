@@ -491,6 +491,7 @@ const completeSignupProfileMutation = gql`
     editAccount(account: $account) {
       id
       name
+      slug
     }
   }
 `;
