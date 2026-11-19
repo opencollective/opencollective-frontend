@@ -345,22 +345,23 @@ class SignInOrJoinFree extends React.Component<SignInOrJoinFreeProps, SignInOrJo
   };
 
   /**
-   * Saves what the form asked for besides the email. Runs before `login`, with the new token, so the
-   * page only sees the user once the profile is complete.
+   * Saves what the form asked for besides the email. Runs before `login`, with the new token and without
+   * touching the Apollo cache: the page only learns about the user at `login`, and loads a complete profile.
+   * (Writing `me` to the cache here makes pages that watch it refetch before the name is saved.)
    */
   async saveNewProfile(token: string) {
     const { client } = this.props;
     const { name, newsletterOptIn } = this.state;
-    const context = { headers: { authorization: `Bearer ${token}` } };
+    const options = { context: { headers: { authorization: `Bearer ${token}` } }, fetchPolicy: 'no-cache' as const };
     try {
-      const { data } = await client.query({ query: signupProfileQuery, context, fetchPolicy: 'network-only' });
+      const { data } = await client.query({ query: signupProfileQuery, ...options });
       await client.mutate({
         mutation: completeSignupProfileMutation,
         variables: { account: { id: data.me.id, name } },
-        context,
+        ...options,
       });
       if (newsletterOptIn) {
-        await client.mutate({ mutation: signupNewsletterOptInMutation, variables: { newsletterOptIn }, context });
+        await client.mutate({ mutation: signupNewsletterOptInMutation, variables: { newsletterOptIn }, ...options });
       }
     } catch (error) {
       // The account exists and is verified: sign in anyway, the profile can be completed later
@@ -490,8 +491,6 @@ const completeSignupProfileMutation = gql`
   mutation SignInOrJoinFreeCompleteProfile($account: AccountUpdateInput!) {
     editAccount(account: $account) {
       id
-      name
-      slug
     }
   }
 `;
@@ -500,7 +499,6 @@ const signupNewsletterOptInMutation = gql`
   mutation SignInOrJoinFreeNewsletterOptIn($newsletterOptIn: Boolean!) {
     setNewsletterOptIn(newsletterOptIn: $newsletterOptIn) {
       id
-      newsletterOptIn
     }
   }
 `;
