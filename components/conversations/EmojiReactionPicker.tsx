@@ -55,7 +55,7 @@ const ReactionButton = styled(StyledRoundButton).attrs<{ isSelected?: boolean }>
   buttonSize: 'small',
 })<{ isSelected?: boolean }>`
   margin: 4px;
-  background: white !important;
+  background: ${props => props.theme.colors.white.full} !important;
 
   ${Emoji} {
     transition: transform 0.15s cubic-bezier(0.2, 0, 0.13, 2);

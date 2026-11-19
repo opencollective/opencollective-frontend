@@ -620,7 +620,15 @@ const ALL_STEPS = {
 
 export const ORGANIZATION_CATEGORIES: Record<string, Category> = {
   platformBasics: {
-    image: <Image src="/static/images/welcome/planets.png" alt="PlatformBasics" width={40} height={40} />,
+    image: (
+      <Image
+        className="dark:hue-rotate-180 dark:invert"
+        src="/static/images/welcome/planets.png"
+        alt="PlatformBasics"
+        width={40}
+        height={40}
+      />
+    ),
     title: <FormattedMessage defaultMessage="Platform Basics" id="Welcome.Organization.PlatformBasics" />,
     description: (
       <FormattedMessage
@@ -639,7 +647,15 @@ export const ORGANIZATION_CATEGORIES: Record<string, Category> = {
   },
   moneyManagement: {
     className: 'bg-green-50',
-    image: <Image src="/static/images/welcome/tickets.png" alt="PlatformBasics" width={42} height={40} />,
+    image: (
+      <Image
+        className="dark:hue-rotate-180 dark:invert"
+        src="/static/images/welcome/tickets.png"
+        alt="PlatformBasics"
+        width={42}
+        height={40}
+      />
+    ),
     title: <FormattedMessage defaultMessage="Money Management" id="Welcome.Organization.MoneyManagement" />,
     description: (
       <FormattedMessage
@@ -650,7 +666,15 @@ export const ORGANIZATION_CATEGORIES: Record<string, Category> = {
     steps: [ALL_STEPS.moneyManagement, ALL_STEPS.inviteAdmins, ALL_STEPS.twofaPolicy],
   },
   crowdfunding: {
-    image: <Image src="/static/images/welcome/jar.png" alt="Crowdfunding" width={42} height={40} />,
+    image: (
+      <Image
+        className="dark:hue-rotate-180 dark:invert"
+        src="/static/images/welcome/jar.png"
+        alt="Crowdfunding"
+        width={42}
+        height={40}
+      />
+    ),
     className: 'bg-red-50',
     title: <FormattedMessage defaultMessage="Crowdfunding" id="solutions.features.crowdfunding" />,
     description: (
@@ -664,7 +688,15 @@ export const ORGANIZATION_CATEGORIES: Record<string, Category> = {
   },
   expenseAutomations: {
     className: 'bg-yellow-50',
-    image: <Image src="/static/images/welcome/stars.png" alt="PlatformBasics" width={42} height={40} />,
+    image: (
+      <Image
+        className="dark:hue-rotate-180 dark:invert"
+        src="/static/images/welcome/stars.png"
+        alt="PlatformBasics"
+        width={42}
+        height={40}
+      />
+    ),
     title: <FormattedMessage defaultMessage="Automate Payments" id="Welcome.Organization.ExpenseAutomations" />,
     description: (
       <FormattedMessage
@@ -682,7 +714,15 @@ export const ORGANIZATION_CATEGORIES: Record<string, Category> = {
   },
   fundGrants: {
     className: 'bg-purple-50',
-    image: <Image src="/static/images/welcome/badge.png" alt="PlatformBasics" width={41} height={40} />,
+    image: (
+      <Image
+        className="dark:hue-rotate-180 dark:invert"
+        src="/static/images/welcome/badge.png"
+        alt="PlatformBasics"
+        width={41}
+        height={40}
+      />
+    ),
     title: <FormattedMessage defaultMessage="Fund & Grants" id="Welcome.Organization.FundGrants" />,
     description: (
       <FormattedMessage
@@ -700,7 +740,15 @@ export const ORGANIZATION_CATEGORIES: Record<string, Category> = {
   },
   fiscalHosting: {
     className: 'bg-orange-50',
-    image: <Image src="/static/images/welcome/place.png" alt="PlatformBasics" width={42} height={40} />,
+    image: (
+      <Image
+        className="dark:hue-rotate-180 dark:invert"
+        src="/static/images/welcome/place.png"
+        alt="PlatformBasics"
+        width={42}
+        height={40}
+      />
+    ),
     title: <FormattedMessage defaultMessage="Fiscal Hosting" id="editCollective.fiscalHosting" />,
     description: (
       <FormattedMessage
@@ -720,7 +768,15 @@ export const ORGANIZATION_CATEGORIES: Record<string, Category> = {
 
 export const COLLECTIVE_CATEGORIES: Record<string, Category> = {
   setupProfile: {
-    image: <Image src="/static/images/welcome/eye.png" alt="SetupProfile" width={40} height={40} />,
+    image: (
+      <Image
+        className="dark:hue-rotate-180 dark:invert"
+        src="/static/images/welcome/eye.png"
+        alt="SetupProfile"
+        width={40}
+        height={40}
+      />
+    ),
     title: <FormattedMessage defaultMessage="Setup Public Profile" id="Welcome.Collective.SetupProfile" />,
     if: (account: WelcomeOrganizationQuery['account']) => account.features[FEATURES.PUBLIC_PROFILE] === 'ACTIVE',
     description: (
@@ -742,7 +798,15 @@ export const COLLECTIVE_CATEGORIES: Record<string, Category> = {
     className: 'bg-yellow-50',
     if: (account: WelcomeOrganizationQuery['account']) =>
       account.features[FEATURES.RECEIVE_FINANCIAL_CONTRIBUTIONS] !== 'UNSUPPORTED',
-    image: <Image src="/static/images/welcome/jar.png" alt="FundRaise" width={42} height={40} />,
+    image: (
+      <Image
+        className="dark:hue-rotate-180 dark:invert"
+        src="/static/images/welcome/jar.png"
+        alt="FundRaise"
+        width={42}
+        height={40}
+      />
+    ),
     title: <FormattedMessage defaultMessage="Fundraise" id="Welcome.Collective.Fundraise" />,
     description: (
       <FormattedMessage
@@ -760,7 +824,15 @@ export const COLLECTIVE_CATEGORIES: Record<string, Category> = {
   },
   spendMoney: {
     className: 'bg-green-50',
-    image: <Image src="/static/images/welcome/stars.png" alt="SpendMoney" width={42} height={40} />,
+    image: (
+      <Image
+        className="dark:hue-rotate-180 dark:invert"
+        src="/static/images/welcome/stars.png"
+        alt="SpendMoney"
+        width={42}
+        height={40}
+      />
+    ),
     title: <FormattedMessage defaultMessage="Spend Your Money" id="Welcome.Collective.SpendMoney" />,
     description: (
       <FormattedMessage
@@ -780,7 +852,15 @@ export const COLLECTIVE_CATEGORIES: Record<string, Category> = {
 
 export const INDIVIDUAL_CATEGORIES: Record<string, Category> = {
   submitExpense: {
-    image: <Image src="/static/images/welcome/planets.png" alt="PlatformBasics" width={40} height={40} />,
+    image: (
+      <Image
+        className="dark:hue-rotate-180 dark:invert"
+        src="/static/images/welcome/planets.png"
+        alt="PlatformBasics"
+        width={40}
+        height={40}
+      />
+    ),
     title: <FormattedMessage defaultMessage="Submit expenses" id="Welcome.Individual.SubmitExpenses" />,
     description: (
       <FormattedMessage
@@ -792,7 +872,15 @@ export const INDIVIDUAL_CATEGORIES: Record<string, Category> = {
   },
   contribute: {
     className: 'bg-yellow-50',
-    image: <Image src="/static/images/welcome/stars.png" alt="PlatformBasics" width={42} height={40} />,
+    image: (
+      <Image
+        className="dark:hue-rotate-180 dark:invert"
+        src="/static/images/welcome/stars.png"
+        alt="PlatformBasics"
+        width={42}
+        height={40}
+      />
+    ),
     title: <FormattedMessage defaultMessage="Contribute to projects" id="Welcome.Individual.Contribute" />,
     description: (
       <FormattedMessage
@@ -803,7 +891,15 @@ export const INDIVIDUAL_CATEGORIES: Record<string, Category> = {
   },
   createOrg: {
     className: 'bg-green-50',
-    image: <Image src="/static/images/welcome/stars.png" alt="PlatformBasics" width={42} height={40} />,
+    image: (
+      <Image
+        className="dark:hue-rotate-180 dark:invert"
+        src="/static/images/welcome/stars.png"
+        alt="PlatformBasics"
+        width={42}
+        height={40}
+      />
+    ),
     title: <FormattedMessage defaultMessage="Create an organization" id="signup.createOrganization.title" />,
     description: (
       <FormattedMessage
@@ -814,7 +910,15 @@ export const INDIVIDUAL_CATEGORIES: Record<string, Category> = {
   },
   createCollective: {
     className: 'bg-red-50',
-    image: <Image src="/static/images/welcome/jar.png" alt="Crowdfunding" width={42} height={40} />,
+    image: (
+      <Image
+        className="dark:hue-rotate-180 dark:invert"
+        src="/static/images/welcome/jar.png"
+        alt="Crowdfunding"
+        width={42}
+        height={40}
+      />
+    ),
     title: <FormattedMessage defaultMessage="Create a collective" id="Welcome.Individual.CreateCollective" />,
     description: (
       <FormattedMessage

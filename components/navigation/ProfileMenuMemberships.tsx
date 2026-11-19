@@ -27,7 +27,7 @@ const AccountList = styled.div`
   h3 {
     font-size: 12px;
     font-weight: 600;
-    color: #656d76;
+    color: var(--color-gray-500);
     letter-spacing: 0;
     line-height: 20px;
     margin: 0;
@@ -41,17 +41,17 @@ const MenuLink = styled(Link)`
   grid-gap: 8px;
   cursor: pointer;
   &:hover {
-    background: #f8fafc;
+    background: var(--color-slate-50);
   }
   positon: relative;
   padding: 8px;
   border-radius: 8px;
-  color: #0f172a;
+  color: var(--color-slate-900);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   svg {
-    color: #4b5563;
+    color: var(--color-gray-600);
   }
 `;
 

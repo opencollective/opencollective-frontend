@@ -188,7 +188,7 @@ export const getButtonStyles = ({ colors }): Record<ButtonStyle, Record<string, 
   return {
     // Base
     standard: {
-      backgroundColor: 'white',
+      backgroundColor: colors.white.full,
       borderColor: colors.black[300],
       color: colors.black[800],
 
@@ -201,11 +201,11 @@ export const getButtonStyles = ({ colors }): Record<ButtonStyle, Record<string, 
         background: colors.black[900],
         backgroundColor: colors.black[900],
         borderColor: colors.black[900],
-        color: 'white',
+        color: colors.white.full,
       },
 
       '&:disabled': {
-        backgroundColor: 'white',
+        backgroundColor: colors.white.full,
         borderColor: colors.black[200],
         color: colors.black[300],
       },

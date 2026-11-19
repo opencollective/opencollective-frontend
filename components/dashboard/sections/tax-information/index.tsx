@@ -153,7 +153,13 @@ export const TaxInformationSettingsSection = ({ account }) => {
         />
       ) : (
         <div className="flex items-center justify-between gap-5 text-xl">
-          <Image src="/static/images/illustrations/plant.png" alt="" width={164} height={164} />
+          <Image
+            src="/static/images/illustrations/plant.png"
+            alt=""
+            width={164}
+            height={164}
+            className="dark:hue-rotate-180 dark:invert"
+          />
           <FormattedMessage
             defaultMessage="You currently do not need to fill out any tax related information. Should this become necessary, you will be alerted and guided through the process."
             id="Mdn+cL"
