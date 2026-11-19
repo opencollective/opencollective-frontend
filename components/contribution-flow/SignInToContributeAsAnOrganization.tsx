@@ -11,21 +11,7 @@ const SignInToContributeAsAnOrganization = ({ onCancel, ...props }) => {
         &larr;{' '}
         <FormattedMessage id="ContributionFlow.goBackToGuest" defaultMessage="Go back to contribute as a guest" />
       </StyledButton>
-      <SignInOrJoinFree
-        {...props}
-        defaultForm="signin"
-        createProfileLabels={{
-          personal: (
-            <FormattedMessage id="ContributionFlow.CreateUserLabel" defaultMessage="Contribute as an individual" />
-          ),
-          organization: (
-            <FormattedMessage
-              id="ContributionFlow.CreateOrganizationLabel"
-              defaultMessage="Contribute as an organization"
-            />
-          ),
-        }}
-      />
+      <SignInOrJoinFree {...props} defaultForm="signin" />
     </React.Fragment>
   );
 };

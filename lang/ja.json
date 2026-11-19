@@ -1132,8 +1132,6 @@
   "contribution.paymentFee": "決済代行手数料",
   "contribution.quantity": "数量",
   "ContributionFlow.backToCollectivePage": "{accountName} のメインページへ移動",
-  "ContributionFlow.CreateOrganizationLabel": "組織として貢献する",
-  "ContributionFlow.CreateUserLabel": "Contribute as an individual",
   "ContributionFlow.goBackToGuest": "Go back to contribute as a guest",
   "ContributionFlow.noSupportedPaymentMethods": "利用可能な支払いプロバイダがありません",
   "ContributionFlow.Payment": "支払い",

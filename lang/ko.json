@@ -1132,8 +1132,6 @@
   "contribution.paymentFee": "결제 처리 수수료",
   "contribution.quantity": "수량",
   "ContributionFlow.backToCollectivePage": "Back to {accountName}'s Page",
-  "ContributionFlow.CreateOrganizationLabel": "단체로 기부",
-  "ContributionFlow.CreateUserLabel": "Contribute as an individual",
   "ContributionFlow.goBackToGuest": "Go back to contribute as a guest",
   "ContributionFlow.noSupportedPaymentMethods": "There is no payment provider available",
   "ContributionFlow.Payment": "결제",
