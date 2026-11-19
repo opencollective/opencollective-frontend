@@ -1,4 +1,8 @@
-import { isExtensionOrInjectedScriptError, isThirdPartyScriptUrl } from '../../sentry-filters';
+import {
+  EXTENSION_REQUEST_TIMEOUT_REJECTION_PATTERN,
+  isExtensionOrInjectedScriptError,
+  isThirdPartyScriptUrl,
+} from '../../sentry-filters';
 
 describe('sentry-filters', () => {
   describe('isThirdPartyScriptUrl', () => {
@@ -55,6 +59,29 @@ describe('sentry-filters', () => {
 
     it('returns false when there is no stack trace', () => {
       expect(isExtensionOrInjectedScriptError({ exception: { values: [{}] } })).toBe(false);
+    });
+  });
+
+  describe('EXTENSION_REQUEST_TIMEOUT_REJECTION_PATTERN', () => {
+    const prefix = 'Non-Error promise rejection captured with value: ';
+
+    it('matches request timeouts from the injected extension', () => {
+      expect(
+        EXTENSION_REQUEST_TIMEOUT_REJECTION_PATTERN.test(`${prefix}Request timeout nn-NO_wordsDistributor.getValue`),
+      ).toBe(true);
+      expect(
+        EXTENSION_REQUEST_TIMEOUT_REJECTION_PATTERN.test(`${prefix}Request timeout predictionDistributor.getValue`),
+      ).toBe(true);
+      expect(EXTENSION_REQUEST_TIMEOUT_REJECTION_PATTERN.test(`${prefix}Request timeout isDictateAvailable`)).toBe(
+        true,
+      );
+    });
+
+    it('does not match other timeouts or rejections', () => {
+      expect(EXTENSION_REQUEST_TIMEOUT_REJECTION_PATTERN.test(`${prefix}Request timeout`)).toBe(false);
+      expect(EXTENSION_REQUEST_TIMEOUT_REJECTION_PATTERN.test(`${prefix}Request timeout on /api/graphql`)).toBe(false);
+      expect(EXTENSION_REQUEST_TIMEOUT_REJECTION_PATTERN.test('Request timeout isDictateAvailable')).toBe(false);
+      expect(EXTENSION_REQUEST_TIMEOUT_REJECTION_PATTERN.test(`${prefix}null`)).toBe(false);
     });
   });
 });
