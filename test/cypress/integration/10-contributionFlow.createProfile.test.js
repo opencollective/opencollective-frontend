@@ -54,6 +54,8 @@ describe('Contribution Flow: Create profile', () => {
     // Signed in without leaving the flow, with the name from the form
     cy.contains('Contribute as');
     cy.contains('[data-cy="contribute-profile-picker"]', 'Dummy NameTest User');
+    // The profile slug comes from the name, as it did with v1 `createUser`
+    cy.contains('[data-cy="contribute-profile-picker"]', '@dummy-nametest-user');
     cy.url().should('include', '/apex/donate/profile');
   });
 });
