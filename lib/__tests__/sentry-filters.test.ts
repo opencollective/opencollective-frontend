@@ -1,6 +1,26 @@
-import { isExtensionOrInjectedScriptError, isThirdPartyScriptUrl } from '../../sentry-filters';
+import {
+  ANDROID_WEBVIEW_JAVA_BRIDGE_ERROR_PATTERN,
+  isExtensionOrInjectedScriptError,
+  isThirdPartyScriptUrl,
+} from '../../sentry-filters';
 
 describe('sentry-filters', () => {
+  describe('ANDROID_WEBVIEW_JAVA_BRIDGE_ERROR_PATTERN', () => {
+    it('matches Java bridge errors from injected Android WebView scripts', () => {
+      expect(
+        ANDROID_WEBVIEW_JAVA_BRIDGE_ERROR_PATTERN.test('Error invoking log: Java bridge method invocation error'),
+      ).toBe(true);
+      expect(
+        ANDROID_WEBVIEW_JAVA_BRIDGE_ERROR_PATTERN.test('Error invoking batch: Java bridge method invocation error'),
+      ).toBe(true);
+    });
+
+    it('does not match unrelated errors', () => {
+      expect(ANDROID_WEBVIEW_JAVA_BRIDGE_ERROR_PATTERN.test('Error invoking log: something else')).toBe(false);
+      expect(ANDROID_WEBVIEW_JAVA_BRIDGE_ERROR_PATTERN.test('Cannot read properties of undefined')).toBe(false);
+    });
+  });
+
   describe('isThirdPartyScriptUrl', () => {
     it('matches browser extension URLs', () => {
       expect(isThirdPartyScriptUrl('chrome-extension://abc123/content.js')).toBe(true);

@@ -18,6 +18,13 @@ export const THIRD_PARTY_SCRIPT_URL_PATTERNS = [
 ];
 
 /**
+ * Error thrown by Android WebView when a host app (e.g. TikTok's in-app browser) injects a JS bridge
+ * script that calls a native Java interface (`addJavascriptInterface`) and the Java method fails.
+ * We never use a Java bridge ourselves, so these errors are not actionable.
+ */
+export const ANDROID_WEBVIEW_JAVA_BRIDGE_ERROR_PATTERN = /^Error invoking \w+: Java bridge method invocation error/;
+
+/**
  * Returns true when a stack frame filename matches a known extension or injected-script URL.
  */
 export function isThirdPartyScriptUrl(url: string | undefined): boolean {
