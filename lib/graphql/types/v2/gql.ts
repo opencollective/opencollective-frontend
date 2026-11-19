@@ -42,6 +42,9 @@ type Documents = {
     "\n  mutation ReplyToMemberInvitation($invitation: MemberInvitationReferenceInput!, $accept: Boolean!) {\n    replyToMemberInvitation(invitation: $invitation, accept: $accept)\n  }\n": typeof types.ReplyToMemberInvitationDocument,
     "\n  query SendMoneyToCollectivePaymentMethods($slug: String) {\n    account(slug: $slug) {\n      id\n      paymentMethods(service: OPENCOLLECTIVE, type: COLLECTIVE) {\n        id\n        service\n        name\n      }\n    }\n  }\n": typeof types.SendMoneyToCollectivePaymentMethodsDocument,
     "\n  mutation SendMoneyToCollective($order: OrderCreateInput!) {\n    createOrder(order: $order) {\n      order {\n        id\n        fromAccount {\n          id\n          stats {\n            id\n            balance {\n              valueInCents\n            }\n          }\n        }\n      }\n    }\n  }\n": typeof types.SendMoneyToCollectiveDocument,
+    "\n  query SignInOrJoinFreeSignupProfile {\n    me {\n      id\n    }\n  }\n": typeof types.SignInOrJoinFreeSignupProfileDocument,
+    "\n  mutation SignInOrJoinFreeCompleteProfile($account: AccountUpdateInput!) {\n    editAccount(account: $account) {\n      id\n      name\n    }\n  }\n": typeof types.SignInOrJoinFreeCompleteProfileDocument,
+    "\n  mutation SignInOrJoinFreeNewsletterOptIn($newsletterOptIn: Boolean!) {\n    setNewsletterOptIn(newsletterOptIn: $newsletterOptIn) {\n      id\n      newsletterOptIn\n    }\n  }\n": typeof types.SignInOrJoinFreeNewsletterOptInDocument,
     "\n  mutation DeleteUpdate($id: String!) {\n    deleteUpdate(id: $id) {\n      id\n    }\n  }\n": typeof types.DeleteUpdateDocument,
     "\n  mutation SetTags($order: OrderReferenceInput, $expense: ExpenseReferenceInput, $tags: [String!]!) {\n    setTags(expense: $expense, order: $order, tags: $tags) {\n      order {\n        id\n        tags\n      }\n      expense {\n        id\n        tags\n      }\n    }\n  }\n": typeof types.SetTagsDocument,
     "\n  query UserPickerSearch($searchTerm: String, $limit: Int) {\n    accounts(searchTerm: $searchTerm, type: [INDIVIDUAL], limit: $limit) {\n      nodes {\n        id\n        name\n        slug\n        type\n        imageUrl\n      }\n    }\n  }\n": typeof types.UserPickerSearchDocument,
@@ -606,6 +609,9 @@ const documents: Documents = {
     "\n  mutation ReplyToMemberInvitation($invitation: MemberInvitationReferenceInput!, $accept: Boolean!) {\n    replyToMemberInvitation(invitation: $invitation, accept: $accept)\n  }\n": types.ReplyToMemberInvitationDocument,
     "\n  query SendMoneyToCollectivePaymentMethods($slug: String) {\n    account(slug: $slug) {\n      id\n      paymentMethods(service: OPENCOLLECTIVE, type: COLLECTIVE) {\n        id\n        service\n        name\n      }\n    }\n  }\n": types.SendMoneyToCollectivePaymentMethodsDocument,
     "\n  mutation SendMoneyToCollective($order: OrderCreateInput!) {\n    createOrder(order: $order) {\n      order {\n        id\n        fromAccount {\n          id\n          stats {\n            id\n            balance {\n              valueInCents\n            }\n          }\n        }\n      }\n    }\n  }\n": types.SendMoneyToCollectiveDocument,
+    "\n  query SignInOrJoinFreeSignupProfile {\n    me {\n      id\n    }\n  }\n": types.SignInOrJoinFreeSignupProfileDocument,
+    "\n  mutation SignInOrJoinFreeCompleteProfile($account: AccountUpdateInput!) {\n    editAccount(account: $account) {\n      id\n      name\n    }\n  }\n": types.SignInOrJoinFreeCompleteProfileDocument,
+    "\n  mutation SignInOrJoinFreeNewsletterOptIn($newsletterOptIn: Boolean!) {\n    setNewsletterOptIn(newsletterOptIn: $newsletterOptIn) {\n      id\n      newsletterOptIn\n    }\n  }\n": types.SignInOrJoinFreeNewsletterOptInDocument,
     "\n  mutation DeleteUpdate($id: String!) {\n    deleteUpdate(id: $id) {\n      id\n    }\n  }\n": types.DeleteUpdateDocument,
     "\n  mutation SetTags($order: OrderReferenceInput, $expense: ExpenseReferenceInput, $tags: [String!]!) {\n    setTags(expense: $expense, order: $order, tags: $tags) {\n      order {\n        id\n        tags\n      }\n      expense {\n        id\n        tags\n      }\n    }\n  }\n": types.SetTagsDocument,
     "\n  query UserPickerSearch($searchTerm: String, $limit: Int) {\n    accounts(searchTerm: $searchTerm, type: [INDIVIDUAL], limit: $limit) {\n      nodes {\n        id\n        name\n        slug\n        type\n        imageUrl\n      }\n    }\n  }\n": types.UserPickerSearchDocument,
@@ -1268,6 +1274,18 @@ export function graphql(source: "\n  query SendMoneyToCollectivePaymentMethods($
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation SendMoneyToCollective($order: OrderCreateInput!) {\n    createOrder(order: $order) {\n      order {\n        id\n        fromAccount {\n          id\n          stats {\n            id\n            balance {\n              valueInCents\n            }\n          }\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation SendMoneyToCollective($order: OrderCreateInput!) {\n    createOrder(order: $order) {\n      order {\n        id\n        fromAccount {\n          id\n          stats {\n            id\n            balance {\n              valueInCents\n            }\n          }\n        }\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query SignInOrJoinFreeSignupProfile {\n    me {\n      id\n    }\n  }\n"): (typeof documents)["\n  query SignInOrJoinFreeSignupProfile {\n    me {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SignInOrJoinFreeCompleteProfile($account: AccountUpdateInput!) {\n    editAccount(account: $account) {\n      id\n      name\n    }\n  }\n"): (typeof documents)["\n  mutation SignInOrJoinFreeCompleteProfile($account: AccountUpdateInput!) {\n    editAccount(account: $account) {\n      id\n      name\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SignInOrJoinFreeNewsletterOptIn($newsletterOptIn: Boolean!) {\n    setNewsletterOptIn(newsletterOptIn: $newsletterOptIn) {\n      id\n      newsletterOptIn\n    }\n  }\n"): (typeof documents)["\n  mutation SignInOrJoinFreeNewsletterOptIn($newsletterOptIn: Boolean!) {\n    setNewsletterOptIn(newsletterOptIn: $newsletterOptIn) {\n      id\n      newsletterOptIn\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
