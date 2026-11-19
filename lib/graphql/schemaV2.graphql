@@ -21252,7 +21252,8 @@ type Query {
     """
     The backend to use for this search
     """
-    backend: SearchBackend! = OPENSEARCH
+    backend: SearchBackend! = POSTGRES
+      @deprecated(reason: "2026-11-13: Searches always run on PostgreSQL, this argument is ignored.")
 
     """
     Limit the scope of the search to this account and its children. When used with `host`, results must match both.
@@ -26195,12 +26196,12 @@ The backend used to run a search
 """
 enum SearchBackend {
   """
-  OpenSearch cluster (default)
+  OpenSearch cluster. Searches now run on PostgreSQL.
   """
-  OPENSEARCH
+  OPENSEARCH @deprecated(reason: "2026-11-13: OpenSearch has been removed, searches run on PostgreSQL.")
 
   """
-  [Preview] PostgreSQL: exact totals and numbered pages (up to 50 results per page and offset 5000), search terms up to 200 characters and 12 words.
+  PostgreSQL (default): exact totals and numbered pages (up to 50 results per page and offset 5000), search terms up to 200 characters and 12 words.
   """
   POSTGRES
 }

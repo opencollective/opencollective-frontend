@@ -30,19 +30,12 @@ import { OrderResult } from './result/OrderResult';
 import { PageResult } from './result/PageResult';
 import { TransactionResult } from './result/TransactionResult';
 import { UpdateResult } from './result/UpdateResult';
-import {
-  getBackendLimits,
-  getSearchBackendVariables,
-  isEntitySupportedByBackend,
-  NarrowSearchMessage,
-  SearchBackendSelector,
-  useSearchBackend,
-} from './backend';
 import { ContextPill } from './ContextPill';
 import { EntityFilterItem } from './EntityFilterItem';
 import type { SearchResultEntity } from './filters';
 import { entityFilterOptions, schema, SEARCH_ENTITY_RESULT_FIELDS, SearchEntity } from './filters';
 import { getVisibleErrors, sortNodesByScore } from './lib';
+import { getSearchVariables, NarrowSearchMessage, SEARCH_LIMITS } from './limits';
 import { searchCommandQuery } from './queries';
 import { RecentVisits } from './RecentVisits';
 import { SearchCommandGroup } from './SearchCommandGroup';
@@ -148,9 +141,6 @@ export const SearchCommand = ({ open, setOpen }) => {
     defaultFilterValues: { workspace: account?.slug, entity: SearchEntity.ALL },
     skipRouter: true,
   });
-  const searchBackend = useSearchBackend(queryFilter);
-  const { backend } = searchBackend;
-
   useEffect(() => {
     if (open) {
       queryFilter.setFilters({ workspace: account?.slug, entity: SearchEntity.ALL });
@@ -165,7 +155,7 @@ export const SearchCommand = ({ open, setOpen }) => {
     variables: usedVariables,
   } = useQuery(searchCommandQuery, {
     variables: {
-      ...getSearchBackendVariables(queryFilter.variables, backend),
+      ...getSearchVariables(queryFilter.variables),
       imageHeight: 72,
       __infiniteScroll: true,
     },
@@ -173,7 +163,7 @@ export const SearchCommand = ({ open, setOpen }) => {
     // Each entity can fail on its own (e.g. a search too broad for PostgreSQL): keep the results of the others
     errorPolicy: 'all',
     fetchPolicy: 'cache-and-network',
-    skip: !queryFilter.values.searchTerm || !searchBackend.isBackendReady,
+    skip: !queryFilter.values.searchTerm,
   });
 
   // Track if we're loading more results
@@ -263,14 +253,10 @@ export const SearchCommand = ({ open, setOpen }) => {
         entities.push(SearchEntity.HOST_APPLICATIONS);
       }
 
-      return Object.values(pick(entityFilterOptions, entities)).filter(opt =>
-        isEntitySupportedByBackend(opt.value, backend),
-      );
+      return Object.values(pick(entityFilterOptions, entities));
     }
-    return Object.values(pick(entityFilterOptions, [SearchEntity.ACCOUNTS, SearchEntity.UPDATES])).filter(opt =>
-      isEntitySupportedByBackend(opt.value, backend),
-    );
-  }, [queryFilter.values.workspace, defaultContext?.type, backend]);
+    return Object.values(pick(entityFilterOptions, [SearchEntity.ACCOUNTS, SearchEntity.UPDATES]));
+  }, [queryFilter.values.workspace, defaultContext?.type]);
 
   const filteredGoToPages = React.useMemo(() => {
     if (!queryFilter.values.workspace || !input || queryFilter.values.entity !== SearchEntity.ALL) {
@@ -358,13 +344,12 @@ export const SearchCommand = ({ open, setOpen }) => {
   const showNoResults =
     debouncedInput !== '' && !isLoading && !visibleErrors.length && filteredGoToPages.length === 0 && !hasSearchResults;
 
-  // The PostgreSQL backend doesn't serve results beyond a maximum offset
-  const { maxOffset } = getBackendLimits(backend);
+  // The search doesn't serve results beyond a maximum offset
+  const { maxOffset } = SEARCH_LIMITS;
   const infiniteScrollCollection = isInfiniteScrollEnabled
     ? data?.search?.results?.[SEARCH_ENTITY_RESULT_FIELDS[queryFilter.values.entity]]?.collection
     : null;
   const hasReachedMaxOffset =
-    maxOffset !== undefined &&
     (infiniteScrollCollection?.nodes?.length || 0) > maxOffset &&
     infiniteScrollCollection.totalCount > infiniteScrollCollection.nodes.length;
 
@@ -440,17 +425,7 @@ export const SearchCommand = ({ open, setOpen }) => {
           placeholder={intl.formatMessage({ defaultMessage: 'Search...', id: 'search.placeholder' })}
           className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
         />
-        {isLoading && (
-          <Spinner
-            size={16}
-            className={
-              searchBackend.canSelectBackend
-                ? 'shrink-0 text-muted-foreground'
-                : 'absolute right-4 text-muted-foreground'
-            }
-          />
-        )}
-        <SearchBackendSelector {...searchBackend} />
+        {isLoading && <Spinner size={16} className="absolute right-4 text-muted-foreground" />}
       </div>
 
       <CommandList ref={listRef} onScroll={handleScroll} className="max-h-[600px] border-t-0 border-b">
