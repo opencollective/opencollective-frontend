@@ -34,7 +34,7 @@ import { hasAccountMoneyManagement, isIndividualAccount, isOrganizationAccount }
 import { isOneOfTypes, isType } from '../../lib/collective-sections';
 import { CollectiveType } from '../../lib/constants/collectives';
 import { canUseAsyncExports } from '../../lib/export-requests';
-import { ExpenseType } from '../../lib/graphql/types/v2/graphql';
+import { ExpenseType, LegalDocumentType } from '../../lib/graphql/types/v2/graphql';
 import { PREVIEW_FEATURE_KEYS } from '../../lib/preview-features';
 import type { DashboardQuery } from '@/lib/graphql/types/v2/graphql';
 
@@ -117,6 +117,20 @@ function shouldIncludeMenuItemWithLegacyFallback(
     ? isFeatureSupported(account, featureKey)
     : fallback;
 }
+
+const hasUsTaxFormRequirement = (account: DashboardQuery['account']): boolean =>
+  hasAccountMoneyManagement(account) &&
+  Boolean('host' in account && account.host?.requiredLegalDocuments?.includes(LegalDocumentType.US_TAX_FORM));
+
+/** Whether the Tax Forms menu item is shown for the (host) account of the dashboard (feature supported, even if disabled) */
+const isTaxFormsFeatureSupported = (account: DashboardQuery['account']): boolean =>
+  shouldIncludeMenuItemWithLegacyFallback(account, FEATURES.TAX_FORMS, hasUsTaxFormRequirement(account));
+
+/** Whether the Tax Forms feature is actually enabled (active or available) for the (host) account of the dashboard */
+export const isTaxFormsFeatureEnabled = (account: DashboardQuery['account']): boolean =>
+  'platformSubscription' in account && account.platformSubscription
+    ? isFeatureEnabled(account, FEATURES.TAX_FORMS)
+    : hasUsTaxFormRequirement(account);
 
 export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
   if (!account) {
@@ -411,11 +425,7 @@ export const getMenuItems = ({ intl, account, LoggedInUser }): MenuItem[] => {
       section: ALL_SECTIONS.HOST_TAX_FORMS,
       Icon: FileText,
       label: intl.formatMessage({ defaultMessage: 'Tax Forms', id: 'skSw4d' }),
-      if: shouldIncludeMenuItemWithLegacyFallback(
-        account,
-        FEATURES.TAX_FORMS,
-        hasMoneyManagement && Boolean(account.host?.requiredLegalDocuments?.includes('US_TAX_FORM')),
-      ),
+      if: isTaxFormsFeatureSupported(account),
     },
     {
       if:

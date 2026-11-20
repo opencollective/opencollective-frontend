@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
-import { compact, isEmpty, pick } from 'lodash-es';
+import { compact, isEmpty, omit, pick } from 'lodash-es';
 import { AlertTriangle, PlusIcon, User } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -32,15 +32,18 @@ import VendorForm from '../../vendors/VendorForm';
 import { DashboardContext } from '../DashboardContext';
 import DashboardHeader from '../DashboardHeader';
 import { makeAmountFilter } from '../filters/AmountFilter';
+import { makeAmountWithYearFilter } from '../filters/AmountFilter/AmountWithYearFilter';
 import { Filterbar } from '../filters/Filterbar';
 import { Pagination } from '../filters/Pagination';
 import { searchFilter } from '../filters/SearchFilter';
 import { buildSortFilter } from '../filters/SortFilter';
+import { isTaxFormsFeatureEnabled } from '../menu-items';
 import type { DashboardSectionProps } from '../types';
 import { makePushSubpath } from '../utils';
 
 import { AccountDetails } from './community/AccountDetail';
 import { usePersonActions } from './community/common';
+import { missingInformationFilter } from './community/filters';
 
 enum VendorsTab {
   ALL = 'ALL',
@@ -133,7 +136,10 @@ const dashboardVendorsQuery = gql`
     $offset: Int = 0
     $totalContributed: AmountRangeInput
     $totalExpended: AmountRangeInput
+    $communityTotalContributed: AmountRangeWithYearInput
+    $communityTotalExpended: AmountRangeWithYearInput
     $onlyVendors: Boolean!
+    $missingInformation: [MissingInformationField!]
     $orderBy: OrderByInput
   ) {
     account(slug: $slug) {
@@ -157,8 +163,9 @@ const dashboardVendorsQuery = gql`
       host: { slug: $slug }
       type: [ORGANIZATION]
       searchTerm: $searchTerm
-      totalContributed: $totalContributed
-      totalExpended: $totalExpended
+      missingInformation: $missingInformation
+      totalContributed: $communityTotalContributed
+      totalExpended: $communityTotalExpended
       limit: $limit
       offset: $offset
       orderBy: $orderBy
@@ -233,7 +240,7 @@ const getColumns = ({ isVendor, host }) => {
         return (
           <div className="flex items-center gap-1">
             <Avatar collective={vendor} size={24} className="mr-1" />
-            {vendor.name}
+            {vendor.name || vendor.legalName || vendor.slug}
             {contact && (
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -388,15 +395,15 @@ const getColumns = ({ isVendor, host }) => {
 
 const PAGE_SIZE = 20;
 
-const totalContributed = makeAmountFilter(
-  'totalContributed',
-  defineMessage({ defaultMessage: 'Total Contributed', id: 'TotalContributed' }),
-);
+const totalContributedMessage = defineMessage({ defaultMessage: 'Total Contributed', id: 'TotalContributed' });
+const totalExpendedMessage = defineMessage({ defaultMessage: 'Total Expended', id: 'TotalExpended' });
 
-const totalExpended = makeAmountFilter(
-  'totalExpended',
-  defineMessage({ defaultMessage: 'Total Expended', id: 'TotalExpended' }),
-);
+// Managed vendors (`vendors` field): plain amount range
+const vendorsTotalContributed = makeAmountFilter('totalContributed', totalContributedMessage);
+const vendorsTotalExpended = makeAmountFilter('totalExpended', totalExpendedMessage);
+// Platform organizations (`community` query): amount range with an optional year
+const communityTotalContributed = makeAmountWithYearFilter('communityTotalContributed', totalContributedMessage);
+const communityTotalExpended = makeAmountWithYearFilter('communityTotalExpended', totalExpendedMessage);
 
 const schema = z.object({
   limit: limit.default(PAGE_SIZE),
@@ -405,8 +412,9 @@ const schema = z.object({
   orderBy: sortFilter.schema,
   isArchived: boolean.optional().default(false),
   onlyVendors: boolean.optional().default(false),
-  totalContributed: totalContributed.schema,
-  totalExpended: totalExpended.schema,
+  missingInformation: missingInformationFilter.schema,
+  totalContributed: communityTotalContributed.schema,
+  totalExpended: communityTotalExpended.schema,
 });
 
 type FilterValues = z.infer<typeof schema>;
@@ -414,8 +422,9 @@ type FilterValues = z.infer<typeof schema>;
 const filters: FilterComponentConfigs<FilterValues> = {
   orderBy: sortFilter.filter,
   searchTerm: searchFilter.filter,
-  totalContributed: totalContributed.filter,
-  totalExpended: totalExpended.filter,
+  totalContributed: communityTotalContributed.filter,
+  totalExpended: communityTotalExpended.filter,
+  missingInformation: missingInformationFilter.filter,
   isArchived: {
     labelMsg: defineMessage({ defaultMessage: 'Archived', id: '0HT+Ib' }),
     hide: () => true,
@@ -426,9 +435,16 @@ const filters: FilterComponentConfigs<FilterValues> = {
   },
 };
 
+// Both variable sets are provided: the active tab only uses one of them (`vendors` or `community`)
 const toVariables = {
-  totalContributed: totalContributed.toVariables,
-  totalExpended: totalExpended.toVariables,
+  totalContributed: (value, key, meta) => ({
+    ...vendorsTotalContributed.toVariables(value, key, meta),
+    ...communityTotalContributed.toVariables(value, key, meta),
+  }),
+  totalExpended: (value, key, meta) => ({
+    ...vendorsTotalExpended.toVariables(value, key, meta),
+    ...communityTotalExpended.toVariables(value, key, meta),
+  }),
   orderBy: sortFilter.toVariables,
 };
 
@@ -470,8 +486,22 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
     meta: {
       intl,
       currency: account?.currency,
+      supportsTaxForm: isTaxFormsFeatureEnabled(account),
     },
   });
+  // The missing information filter and the year of the amount filters only apply to the community query
+  // (Platform Organizations tab)
+  const filterBarFilters: FilterComponentConfigs<FilterValues> = React.useMemo(
+    () =>
+      queryFilter.variables?.onlyVendors
+        ? {
+            ...omit(filters, 'missingInformation'),
+            totalContributed: vendorsTotalContributed.filter,
+            totalExpended: vendorsTotalExpended.filter,
+          }
+        : filters,
+    [queryFilter.variables?.onlyVendors],
+  );
   const {
     data,
     previousData,
@@ -568,7 +598,7 @@ const Vendors = ({ accountSlug, subpath }: DashboardSectionProps) => {
           )
         }
       />
-      <Filterbar {...queryFilter} hideCounts />
+      <Filterbar {...queryFilter} filters={filterBarFilters} hideCounts />
       {error ? (
         <MessageBoxGraphqlError error={error} />
       ) : (

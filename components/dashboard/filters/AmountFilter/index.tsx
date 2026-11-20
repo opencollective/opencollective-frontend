@@ -13,7 +13,11 @@ import { AmountFilterValue } from './AmountFilterValue';
 import type { AmountFilterValueType } from './schema';
 import { amountFilterSchema, AmountFilterType } from './schema';
 
-function amountToVariables(value: z.infer<typeof amountFilterSchema>, _key?: string, meta?: { currency?: string }) {
+export function amountToVariables(
+  value: z.infer<typeof amountFilterSchema>,
+  _key?: string,
+  meta?: { currency?: string },
+) {
   const currency = value.currency || meta?.currency || undefined;
   return {
     amount: {
