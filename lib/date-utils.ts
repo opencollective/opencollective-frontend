@@ -36,7 +36,7 @@ export const getNextChargeDate = (firstChargeDate, interval, paymentMethodServic
 export const toIsoDateStr = date => {
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
-  const day = date.getUTCDate();
+  const day = date.getDate();
   return `${year}-${padStart(month.toString(), 2, '0')}-${padStart(day.toString(), 2, '0')}`;
 };
 
