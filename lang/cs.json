@@ -1132,8 +1132,6 @@
   "contribution.paymentFee": "Poplatek zpracovatele platby",
   "contribution.quantity": "Množství",
   "ContributionFlow.backToCollectivePage": "Back to {accountName}'s Page",
-  "ContributionFlow.CreateOrganizationLabel": "Přispět jako organizace",
-  "ContributionFlow.CreateUserLabel": "Přispět jako jednotlivec",
   "ContributionFlow.goBackToGuest": "Vrať se a přispívej jako host",
   "ContributionFlow.noSupportedPaymentMethods": "Není k dispozici žádný poskytovatel platby",
   "ContributionFlow.Payment": "Payment",

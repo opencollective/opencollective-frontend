@@ -1132,8 +1132,6 @@
   "contribution.paymentFee": "Payment processor fee",
   "contribution.quantity": "Aantal",
   "ContributionFlow.backToCollectivePage": "Terug naar {accountName} pagina",
-  "ContributionFlow.CreateOrganizationLabel": "Bijdragen als een organisatie",
-  "ContributionFlow.CreateUserLabel": "Bijdragen als individu",
   "ContributionFlow.goBackToGuest": "Ga terug om bij te dragen als gast",
   "ContributionFlow.noSupportedPaymentMethods": "There is no payment provider available",
   "ContributionFlow.Payment": "Betaling",

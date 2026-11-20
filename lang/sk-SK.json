@@ -1132,8 +1132,6 @@
   "contribution.paymentFee": "Poplatok za spracovanie platby",
   "contribution.quantity": "Množstvo",
   "ContributionFlow.backToCollectivePage": "Späť na stránku používateľa {accountName}",
-  "ContributionFlow.CreateOrganizationLabel": "Prispieť ako organizácia",
-  "ContributionFlow.CreateUserLabel": "Prispieť ako jednotlivec",
   "ContributionFlow.goBackToGuest": "Vrátiť sa späť a prispieť ako hosť",
   "ContributionFlow.noSupportedPaymentMethods": "Nie je k dispozícii žiadny poskytovateľ platieb",
   "ContributionFlow.Payment": "Platba",
