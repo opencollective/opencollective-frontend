@@ -1,5 +1,7 @@
 import * as cheerio from 'cheerio';
 
+import { graphqlQueryV2, signinRequestAndReturnToken } from '../support/commands';
+
 describe('Recurring contributions', () => {
   let user;
   let collectiveSlug;
@@ -29,6 +31,52 @@ describe('Recurring contributions', () => {
           cy.contains('button', 'Contribute').click();
           cy.getByDataCy('order-success');
         });
+      });
+  });
+
+  it('Can replace the payment method of its contributions from the update payment method page', () => {
+    // The "credit card expiring" email links to /paymentmethod/:legacyId/update
+    signinRequestAndReturnToken({ email: user.email }, null)
+      .then(token =>
+        graphqlQueryV2(token, {
+          operationName: 'RecurringContributionPaymentMethod',
+          query: `
+            query RecurringContributionPaymentMethod($slug: String!) {
+              account(slug: $slug) {
+                id
+                orders(filter: OUTGOING, onlyActiveSubscriptions: true) {
+                  nodes {
+                    id
+                    paymentMethod {
+                      id
+                      legacyId
+                    }
+                  }
+                }
+              }
+            }
+          `,
+          variables: { slug: user.collective.slug },
+        }),
+      )
+      .then(({ body }) => {
+        const paymentMethodId = body.data.account.orders.nodes[0].paymentMethod.legacyId;
+        cy.login({ email: user.email, redirect: `/paymentmethod/${paymentMethodId}/update` });
+        cy.getByDataCy('update-payment-method-order')
+          .should('have.length', 1)
+          .find(`a[href*="${collectiveSlug}"]`)
+          .should('exist');
+        cy.getByDataCy('update-payment-method-order-button').click();
+        cy.get('input[type=radio][value="stripe-payment-element"]').check();
+        cy.wait(500);
+        cy.fillStripePaymentElementInput();
+        cy.getByDataCy('recurring-contribution-submit-pm-button').click();
+        cy.getByDataCy('toast-notification').contains('Your recurring contribution has been updated.');
+        cy.contains('All your recurring contributions now use a new payment method.');
+
+        // The old payment method no longer backs any contribution
+        cy.reload();
+        cy.contains('There are no active subscriptions linked to this payment method');
       });
   });
 
