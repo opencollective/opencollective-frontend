@@ -20,6 +20,27 @@ describe('extractCypressTests', () => {
     expect(tests[1].matches('User can submit expense invite to new user')).toBe(false);
     expect(tests[0].matches('shows the login screen and more')).toBe(false);
   });
+
+  it('records the describe blocks around each test, skipping an options object and braces in strings', () => {
+    const source = `
+describe('/signup', () => {
+  (describe as unknown as Mocha.SuiteFunction)('Individual', { testIsolation: false }, () => {
+    it('sends the code', () => { cy.type('{selectall}'); });
+  });
+  describe('Organization', function () {
+    it('sends the code', () => {});
+  });
+  it('outside the nested blocks', () => {});
+});
+it('outside every block', () => {});
+`;
+    expect(extractCypressTests('01-signup.test.ts', source).map(t => t.suites)).toEqual([
+      ['/signup', 'Individual'],
+      ['/signup', 'Organization'],
+      ['/signup'],
+      [],
+    ]);
+  });
 });
 
 describe('listPlaywrightTests', () => {
@@ -104,6 +125,30 @@ describe('checkInventory', () => {
     expect(result.staleCypress.map(e => e.cypress.title)).toEqual(['a removed test']);
     expect(result.missingJourneys).toEqual([{ file: 'expenses/logged-out.spec.ts', title: 'renamed journey' }]);
     expect(result.complete).toBe(false);
+  });
+
+  it('requires a suite when a title matches several tests, so removing one of them cannot go unnoticed', () => {
+    const shared = extractCypressTests(
+      '01-signup.test.ts',
+      `describe('Individual', () => { it('sends the code', () => {}); });
+describe('Organization', () => { it('sends the code', () => {}); });`,
+    );
+    const journeys = [{ file: 'signup/signup.spec.ts', title: 'signs up' }];
+    const byTitle = [{ group: 'Signup', cypress: { file: '01-signup.test.ts', title: 'sends the code' }, journeys }];
+    const bySuite = ['Individual', 'Organization'].map(suite => ({
+      group: 'Signup',
+      cypress: { file: '01-signup.test.ts', title: 'sends the code', suite },
+      journeys,
+    }));
+    const check = entries =>
+      checkInventory({ cypress: shared, playwright: journeys, entries, isPilotJourney: () => true });
+
+    expect(check(byTitle).ambiguousCypress.map(e => e.cypress.title)).toEqual(['sends the code']);
+    expect(check(byTitle).complete).toBe(false);
+    expect(check(bySuite).ambiguousCypress).toEqual([]);
+    expect(check(bySuite).complete).toBe(true);
+    // Dropping the Organization entry leaves that test unmapped instead of silently covered by the Individual one.
+    expect(check(bySuite.slice(0, 1)).unmappedCypress.map(t => t.suites)).toEqual([['Organization']]);
   });
 
   it('reports pilot journeys that no entry claims, ignoring non-pilot specs', () => {

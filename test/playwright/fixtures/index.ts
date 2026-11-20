@@ -4,6 +4,7 @@ import { LOCAL_STORAGE_KEYS } from '../../../lib/local-storage';
 
 import { attemptTag } from '../helpers/attempt';
 import { Mailbox } from '../helpers/mail';
+import { RedisStore } from '../helpers/redis';
 
 import {
   FixtureRecipes,
@@ -64,6 +65,19 @@ const authored = base.extend<{ recipes: FixtureRecipes; session: string | null; 
       // Delivery waits, so reports can tell waiting for mail from driving the browser.
       await testInfo.attach('mail-timings', { body: JSON.stringify(mail.timings), contentType: 'application/json' });
     }
+  },
+});
+
+/**
+ * Journeys of a logged-out visitor that need no arranged data, such as signing up: the attempt's `mail`
+ * mints the addresses the journey owns, and `redis` reaches the API's rate-limit counters (`helpers/redis.ts`).
+ */
+export const visitorTest = authored.extend<{ redis: RedisStore }>({
+  // eslint-disable-next-line no-empty-pattern -- Playwright declares fixture dependencies through destructuring.
+  redis: async ({}, provide) => {
+    const redis = await RedisStore.connect();
+    await provide(redis);
+    await redis.disconnect();
   },
 });
 
