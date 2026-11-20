@@ -20,6 +20,8 @@ const parseAmount = (
 
   if (format === '1.000,00') {
     amountInput = amountInput.replace(/\./g, '').replace(',', '.');
+  } else {
+    amountInput = amountInput.replace(/,/g, '');
   }
 
   const currencyRegex = /[A-Z]{3}/;
