@@ -16,6 +16,7 @@ const amountFilter = z.union([
       gte: z.coerce.number().int(),
       lte: z.coerce.number().int(),
       currency: z.string().optional(),
+      year: z.coerce.number().int().optional(),
     })
     .refine(({ gte, lte }) => gte === lte),
   z.object({
@@ -23,16 +24,19 @@ const amountFilter = z.union([
     gte: z.coerce.number().int(),
     lte: z.coerce.number().int(),
     currency: z.string().optional(),
+    year: z.coerce.number().int().optional(),
   }),
   z.object({
     type: z.literal(IS_GREATER_THAN).default(IS_GREATER_THAN),
     gte: z.coerce.number().int(),
     currency: z.string().optional(),
+    year: z.coerce.number().int().optional(),
   }),
   z.object({
     type: z.literal(IS_LESS_THAN).default(IS_LESS_THAN),
     lte: z.coerce.number().int(),
     currency: z.string().optional(),
+    year: z.coerce.number().int().optional(),
   }),
 ]);
 

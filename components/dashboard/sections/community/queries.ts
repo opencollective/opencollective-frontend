@@ -15,15 +15,17 @@ export const peopleHostDashboardQuery = gql`
     $offset: Int
     $limit: Int
     $relation: [CommunityRelationType!]
+    $missingInformation: [MissingInformationField!]
     $searchTerm: String
     $account: AccountReferenceInput
-    $totalContributed: AmountRangeInput
-    $totalExpended: AmountRangeInput
+    $totalContributed: AmountRangeWithYearInput
+    $totalExpended: AmountRangeWithYearInput
     $orderBy: OrderByInput
   ) {
     community(
       host: { slug: $slug }
       relation: $relation
+      missingInformation: $missingInformation
       account: $account
       type: [INDIVIDUAL]
       searchTerm: $searchTerm

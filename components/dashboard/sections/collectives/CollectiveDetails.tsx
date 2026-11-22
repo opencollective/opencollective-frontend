@@ -52,6 +52,7 @@ import { useToast } from '../../../ui/useToast';
 import { DashboardContext } from '../../DashboardContext';
 import ActivityDescription from '../ActivityLog/ActivityDescription';
 import { ActivityUser } from '../ActivityLog/ActivityUser';
+import HeroSocialLinks from '../community/SocialLinks';
 
 import type { HostedCollectivesDataTableMeta } from './common';
 import { cols, MoreActionsMenu } from './common';
@@ -633,6 +634,12 @@ const CollectiveDetails = ({
               }
             />
             <InfoListItem title={<FormattedMessage id="Balance" defaultMessage="Balance" />} value={displayBalance} />
+            {collective.socialLinks?.length > 0 && (
+              <InfoListItem
+                title={<FormattedMessage defaultMessage="Social Links" id="3bLmoU" />}
+                value={<HeroSocialLinks className="size-6" socialLinks={collective.socialLinks} />}
+              />
+            )}
             {collective?.type === CollectiveType.EVENT && (
               <InfoListItem
                 className="col-span-2"
