@@ -9,7 +9,7 @@ import { styled } from 'styled-components';
 import { isEmail } from 'validator';
 
 import { resendOTP, signin, signup, verifyEmail } from '../lib/api';
-import { ERROR, formatErrorMessage, i18nGraphqlException } from '../lib/errors';
+import { createError, ERROR, formatErrorMessage, i18nGraphqlException } from '../lib/errors';
 import { gql } from '../lib/graphql/helpers';
 import { getWebsiteUrl, isTrustedSigninRedirectionUrl } from '../lib/utils';
 import injectIntl from '@/lib/injectIntl';
@@ -278,7 +278,7 @@ class SignInOrJoinFree extends React.Component<SignInOrJoinFreeProps, SignInOrJo
   showSignupError(error: { type?: string; message?: string } | string) {
     const message =
       (typeof error === 'string' ? error : formatErrorMessage(this.props.intl, error, null) || error?.message) ||
-      formatErrorMessage(this.props.intl);
+      formatErrorMessage(this.props.intl, createError(ERROR.UNKNOWN));
     toast({ variant: 'error', message });
   }
 
