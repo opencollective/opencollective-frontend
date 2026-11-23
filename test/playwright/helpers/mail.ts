@@ -113,7 +113,9 @@ export async function expenseInvitationLink(
   mail: Mailbox,
   { to, account }: { to: string; account: { name: string; slug: string } },
 ): Promise<string> {
-  const message = await mail.waitForMessage({ to, subject: `wants to send funds to ${account.name}` });
+  // The subject starts with the paying Account: "<account> wants to pay you" to a person,
+  // "<account> wants to send funds to <payee>" to an Organization.
+  const message = await mail.waitForMessage({ to, subject: `${account.name} wants to ` });
   const link = linkIn(message, "OK, let's go!");
   expect(link, 'The invitation must lead to an expense of the inviting Account').toMatch(
     new RegExp(`^/${account.slug}/expenses/\\d+\\?key=`),
