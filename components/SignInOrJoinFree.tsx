@@ -169,6 +169,17 @@ class SignInOrJoinFree extends React.Component<SignInOrJoinFreeProps, SignInOrJo
     return encodeURIComponent(redirectUrl || currentPath || '/');
   }
 
+  /** A trusted whitelabel destination signs in with the token on its own domain, through its `/signin` page */
+  redirectToTrustedWhitelabel(redirect: string, token: string) {
+    if (isTrustedSigninRedirectionUrl(decodeURIComponent(redirect))) {
+      const parsedUrl = new URL(decodeURIComponent(redirect));
+      parsedUrl.searchParams.set('token', token);
+      parsedUrl.searchParams.set('next', parsedUrl.pathname);
+      parsedUrl.pathname = '/signin';
+      window.location.href = parsedUrl.toString();
+    }
+  }
+
   signIn = async (
     email: string,
     password: string = null,
@@ -199,14 +210,7 @@ class SignInOrJoinFree extends React.Component<SignInOrJoinFreeProps, SignInOrJo
         if (!user) {
           this.setState({ error: 'Token rejected' });
         }
-        const isTrustedWhitelabel = isTrustedSigninRedirectionUrl(decodeURIComponent(redirect));
-        if (isTrustedWhitelabel) {
-          const parsedUrl = new URL(decodeURIComponent(redirect));
-          parsedUrl.searchParams.set('token', response.token);
-          parsedUrl.searchParams.set('next', parsedUrl.pathname);
-          parsedUrl.pathname = '/signin';
-          window.location.href = parsedUrl.toString();
-        }
+        this.redirectToTrustedWhitelabel(redirect, response.token);
       } else if (resetPassword) {
         await this.props.router.push({ pathname: '/reset-password/sent', query: { email } });
       } else {
@@ -277,9 +281,8 @@ class SignInOrJoinFree extends React.Component<SignInOrJoinFreeProps, SignInOrJo
 
   showSignupError(error: { type?: string; message?: string } | string) {
     const message =
-      typeof error === 'string'
-        ? error
-        : formatErrorMessage(this.props.intl, error, null) || error?.message || formatErrorMessage(this.props.intl);
+      (typeof error === 'string' ? error : formatErrorMessage(this.props.intl, error, null) || error?.message) ||
+      formatErrorMessage(this.props.intl);
     toast({ variant: 'error', message });
   }
 
@@ -298,8 +301,11 @@ class SignInOrJoinFree extends React.Component<SignInOrJoinFreeProps, SignInOrJo
   }
 
   resendSignupCode = async () => {
-    const response = await resendOTP({ email: this.state.email, sessionId: this.state.signupSessionId });
-    if (response.success) {
+    const { email, signupSessionId } = this.state;
+    const response = await resendOTP({ email, sessionId: signupSessionId });
+    if (this.state.signupSessionId !== signupSessionId) {
+      return; // The visitor went back and started another sign-up meanwhile
+    } else if (response.success) {
       toast({
         variant: 'success',
         message: (
@@ -340,7 +346,11 @@ class SignInOrJoinFree extends React.Component<SignInOrJoinFreeProps, SignInOrJo
     this.props.onSignup?.();
     const user = await this.props.login(token);
     if (!user) {
-      this.setState({ error: 'Token rejected', submitting: false });
+      // The account is created and verified: the visitor can sign in with their email
+      this.showSignupError(null);
+      this.setState({ submitting: false, signupSessionId: null });
+    } else {
+      this.redirectToTrustedWhitelabel(this.getRedirectURL(), token);
     }
   };
 
