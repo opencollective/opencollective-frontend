@@ -25,6 +25,7 @@ import { cn } from '../../lib/utils';
 import useWhitelabelProvider from '@/lib/hooks/useWhitelabel';
 
 import Avatar from '../Avatar';
+import { DashboardThemeMenuRow } from '../DashboardThemeSwitcher';
 import Link from '../Link';
 import PreviewFeaturesModal from '../PreviewFeaturesModal';
 import SignupLogin from '../SignupLogin';
@@ -101,7 +102,14 @@ const MenuItem = ({
   );
 };
 
-const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserContextProps['logout']>[0] }) => {
+const ProfileMenu = ({
+  logoutParameters,
+  showThemeSwitcher = false,
+}: {
+  logoutParameters?: Parameters<UserContextProps['logout']>[0];
+  /** Show the dashboard theme switcher (only rendered if the dark mode preview feature is enabled) */
+  showThemeSwitcher?: boolean;
+}) => {
   const whitelabel = useWhitelabelProvider();
   const router = useRouter();
   const intl = useIntl();
@@ -192,6 +200,7 @@ const ProfileMenu = ({ logoutParameters }: { logoutParameters?: Parameters<UserC
               href={`/dashboard/${LoggedInUser.collective.slug}/info`}
               label={intl.formatMessage({ id: 'Settings', defaultMessage: 'Settings' })}
             />
+            {showThemeSwitcher && <DashboardThemeMenuRow />}
             <Separator className="my-1" />
             {!whitelabel ? ( // <div className="min-h-10" />
               <React.Fragment>

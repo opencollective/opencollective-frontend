@@ -16,7 +16,9 @@ if [ -z "$API_FOLDER" ]; then
 else
   cd $API_FOLDER
 fi
-PG_DATABASE=opencollective_dvl MAILPIT_CLIENT=true npm run start:e2e:server &
+# The Cypress helpers create their test users through the real sign-up (`/users/signup` + OTP),
+# which the API limits to 5 per IP per 15 minutes: a run creates many more.
+PG_DATABASE=opencollective_dvl MAILPIT_CLIENT=true DISABLE_RATE_LIMITING=1 npm run start:e2e:server &
 API_PID=$!
 echo "> Starting mailpit server"
 npm run mailpit &

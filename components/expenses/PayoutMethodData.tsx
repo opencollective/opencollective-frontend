@@ -4,7 +4,7 @@ import { BadgeCheck, ShieldAlert } from 'lucide-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 
 import { PayoutMethodType } from '../../lib/constants/payout-method';
-import { getCountryDisplayName, getFlagEmoji } from '@/lib/i18n/countries';
+import { getCountryDisplayName, getFlagEmoji, normalizePayPalCountryCode } from '@/lib/i18n/countries';
 
 import Container from '../Container';
 import PrivateInfoIcon from '../icons/PrivateInfoIcon';
@@ -51,6 +51,7 @@ const PayoutMethodData = ({ payoutMethod, showLabel = true, isLoading = false })
     case PayoutMethodType.PAYPAL: {
       const isVerified = payoutMethod.isVerified;
       const verifiedAt = payoutMethod.data?.verifiedAt;
+      const paypalCountry = normalizePayPalCountryCode(intl, payoutMethod.data?.paypalUserInfo?.address?.country);
       return (
         <div>
           {/* Verification status — shown when paypalInfo is available (host admins / permission holders) */}
@@ -149,15 +150,15 @@ const PayoutMethodData = ({ payoutMethod, showLabel = true, isLoading = false })
                     />
                   </div>
                   <div className="text-xs text-slate-700">
-                    {!payoutMethod.data.paypalUserInfo.address?.country ? (
+                    {!paypalCountry ? (
                       <i>
                         <FormattedMessage defaultMessage="Unknown" id="Unknown" />
                       </i>
                     ) : (
                       <Badge size="xs">
-                        {getFlagEmoji(payoutMethod.data.paypalUserInfo.address.country)}
+                        {getFlagEmoji(paypalCountry)}
                         &nbsp;
-                        {getCountryDisplayName(intl, payoutMethod.data.paypalUserInfo.address.country)}
+                        {getCountryDisplayName(intl, paypalCountry)}
                       </Badge>
                     )}
                   </div>

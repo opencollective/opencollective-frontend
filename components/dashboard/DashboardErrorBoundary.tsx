@@ -27,7 +27,13 @@ function DashboardErrorFallback({ error }: { error: unknown }) {
   return (
     <div className="flex w-full flex-col items-center justify-center px-4 py-8">
       <div className="flex w-full max-w-md flex-col items-center gap-6">
-        <Image src="/static/images/unexpected-error.png" alt="" width={312} height={202} className="h-auto w-auto" />
+        <Image
+          src="/static/images/unexpected-error.png"
+          alt=""
+          width={312}
+          height={202}
+          className="h-auto w-auto dark:hue-rotate-180 dark:invert"
+        />
         <div className="space-y-2 text-center">
           <h2 className="text-xl font-semibold">
             <FormattedMessage defaultMessage="Something went wrong" id="SectionError.Title" />

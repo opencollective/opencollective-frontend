@@ -1335,6 +1335,11 @@ enum Currency {
   MOP
 
   """
+  Ouguiya
+  """
+  MRU
+
+  """
   Mauritius Rupee
   """
   MUR
@@ -4131,7 +4136,6 @@ type Query {
     includeExpenseTransactions: Boolean = true
     includeHostedCollectivesTransactions: Boolean
   ): [Transaction] @deprecated(reason: "2025-07-10: Please use GraphQL V2")
-  Transaction(id: Int, uuid: String): Transaction @deprecated(reason: "2025-07-10: Please use GraphQL V2")
   allMembers(
     CollectiveId: Int
     collectiveSlug: String
@@ -4258,13 +4262,7 @@ This is the root mutation
 """
 type Mutation {
   createCollective(collective: CollectiveInputType!): CollectiveInterface
-  createCollectiveFromGithub(collective: CollectiveInputType!): CollectiveInterface
-    @deprecated(reason: "2022-05-03: This mutation is deprecated and can only be used in test environments.")
   editCollective(collective: CollectiveInputType!): CollectiveInterface
-  deleteCollective(id: Int!): CollectiveInterface
-  deleteUserCollective(id: Int!): CollectiveInterface
-  archiveCollective(id: Int!): CollectiveInterface
-  unarchiveCollective(id: Int!): CollectiveInterface
 
   """
   Create a user with an optional organization.
@@ -4307,26 +4305,10 @@ type Mutation {
   ): CreateUserResult
 
   """
-  Update the email address for logged in user
-  """
-  updateUserEmail(
-    """
-    The new email address for user
-    """
-    email: String!
-  ): UserDetails
-
-  """
   Updates all the core contributors (role = ADMIN or MEMBER) for this collective.
   """
   editCoreContributors(collectiveId: Int!, members: [MemberInputType!]!): CollectiveInterface
     @deprecated(reason: "2021-07-02: Please use inviteMember, editMember or removeMember mutations from GraphQLV2")
-
-  """
-  A mutation to edit the public message of all matching members.
-  """
-  editPublicMessage(FromCollectiveId: Int!, CollectiveId: Int!, message: String): [Member]
-    @deprecated(reason: "2021-01-27: Please use editPublicMessage from GraphQLV2")
 
   """
   Replace a payment method
@@ -4338,21 +4320,6 @@ type Mutation {
     token: String!
     data: StripeCreditCardDataInputType!
   ): PaymentMethodType
-
-  """
-  Edits (by replacing) the admin-level webhooks for a collective.
-  """
-  editWebhooks(
-    """
-    ID of the collective whose webhooks are edited.
-    """
-    collectiveId: Int!
-
-    """
-    New notifications for the collective.
-    """
-    notifications: [NotificationInputType]
-  ): [NotificationType]
 }
 
 """

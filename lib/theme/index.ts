@@ -7,9 +7,11 @@ import { getButtonSizes, getButtonStyles } from './variants/button';
 // Import defaults
 import defaultBreakpoints from './breakpoints';
 import defaultColors from './colors';
+import darkColors from './colors-dark';
 import defaultSpaces from './spaces';
 
-export const generateTheme = ({ colors = defaultColors, space = defaultSpaces } = {}) => ({
+export const generateTheme = ({ colors = defaultColors, space = defaultSpaces, isDark = false } = {}) => ({
+  isDark,
   colors,
   space,
   breakpoints: defaultBreakpoints,
@@ -55,8 +57,12 @@ export const generateTheme = ({ colors = defaultColors, space = defaultSpaces } 
 const theme = generateTheme();
 export default theme;
 
+/** Dark variant of the theme, used by the dashboard when dark mode is enabled */
+export const darkTheme = generateTheme({ colors: darkColors, isDark: true });
+
 declare module 'styled-components' {
   export interface DefaultTheme {
+    isDark: boolean;
     colors: typeof theme.colors;
     space: typeof theme.space;
     breakpoints: typeof theme.breakpoints;

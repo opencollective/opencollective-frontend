@@ -101,6 +101,7 @@ const ContributorCard = ({
   currency = 'USD',
   isLoggedUser,
   collectiveId,
+  collectiveSlug = undefined,
   hideTotalAmountDonated = false,
   ...props
 }) => {
@@ -170,6 +171,7 @@ const ContributorCard = ({
           intl={intl}
           fromCollectiveId={fromCollectiveId}
           collectiveId={collectiveId}
+          collectiveSlug={collectiveSlug}
         />
       )}
     </MainContainer>

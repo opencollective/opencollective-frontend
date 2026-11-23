@@ -14,8 +14,8 @@ describe('New Expense Flow comments', () => {
   beforeEach(() => {
     cy.createExpense({
       userEmail: user.email,
-      payee: { legacyId: user.CollectiveId },
-      account: { legacyId: collective.id },
+      payee: { slug: user.collective.slug },
+      account: { slug: collective.slug },
     }).then(expense => (expenseUrl = `/${collective.slug}/expenses/${expense.legacyId}`));
   });
 
