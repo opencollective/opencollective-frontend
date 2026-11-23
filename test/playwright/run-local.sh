@@ -46,6 +46,32 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FRONTEND_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
+# --- Portability: Linux (CI, devcontainer) and macOS (bash 3.2, BSD tools, no setsid/timeout) ---
+# Runs a command with a time limit; macOS has no `timeout`, perl's alarm does the same.
+run_with_timeout() {
+  local seconds="$1"
+  shift
+  if command -v timeout >/dev/null 2>&1; then
+    timeout "$seconds" "$@"
+  else
+    perl -e 'alarm shift; exec @ARGV or exit 127' "$seconds" "$@"
+  fi
+}
+# Both replace the calling (sub)shell, so `$!` stays the service's PID.
+exec_service() { exec "$@"; }
+# Runs a command in a new session, detached from the terminal; macOS has no `setsid`.
+run_in_new_session() {
+  if command -v setsid >/dev/null 2>&1; then
+    exec setsid "$@"
+  else
+    exec perl -MPOSIX=setsid -e 'setsid(); exec @ARGV or exit 127' "$@"
+  fi
+}
+child_pids() { pgrep -P "$1" 2>/dev/null || true; }
+# Command line of a live process (macOS has no /proc); empty when it is gone.
+pid_command() { ps -o args= -p "$1" 2>/dev/null || true; }
+file_mtime() { stat -c %Y "$1" 2>/dev/null || stat -f %m "$1" 2>/dev/null; }
+
 # --- Defaults (CI contract) ---
 SPEC="${PLAYWRIGHT_SPEC:-test/playwright/specs/smoke.spec.ts}"
 SPEC_SET=false
@@ -454,7 +480,7 @@ record_owner_pid() {
 
 record_age_seconds() {
   local mtime
-  mtime="$(stat -c %Y "$RECORD_FILE" 2>/dev/null || echo 0)"
+  mtime="$(file_mtime "$RECORD_FILE" || echo 0)"
   echo $(( $(date +%s) - mtime ))
 }
 
@@ -577,16 +603,13 @@ run_cleanup() {
   # PIDs are recycled by the kernel, so a stale record could point at an
   # unrelated live process. Only signal PIDs whose command line still looks
   # like one of our service trees (node/npm); anything else is left alone.
-  pid_cmdline() {
-    tr '\0' ' ' <"/proc/$1/cmdline" 2>/dev/null
-  }
   local pid child cmd rc=0
   for pid in $(jq -r '.servicePids[] // empty' "$RECORD_FILE" 2>/dev/null); do
     [[ "$pid" == "0" ]] && continue
     if ! kill -0 "$pid" 2>/dev/null; then
       continue
     fi
-    cmd="$(pid_cmdline "$pid")"
+    cmd="$(pid_command "$pid")"
     if [[ "$cmd" != *node* && "$cmd" != *npm* && "$cmd" != *stripe* ]]; then
       echo "WARNING: skipping pid $pid (no longer looks like a service: ${cmd:-<unreadable>})." | sanitize
       continue
@@ -597,12 +620,12 @@ run_cleanup() {
   for pid in $(jq -r '.servicePids[] // empty' "$RECORD_FILE" 2>/dev/null); do
     [[ "$pid" == "0" ]] && continue
     if kill -0 "$pid" 2>/dev/null; then
-      cmd="$(pid_cmdline "$pid")"
+      cmd="$(pid_command "$pid")"
       if [[ "$cmd" == *node* || "$cmd" == *npm* || "$cmd" == *stripe* ]]; then
         kill -9 "$pid" 2>/dev/null || rc=1
       fi
     fi
-    for child in $(ps -o pid= --ppid "$pid" 2>/dev/null); do
+    for child in $(child_pids "$pid"); do
       kill -9 "$child" 2>/dev/null || rc=1
     done
   done
@@ -742,7 +765,7 @@ redis_ping() {
   host="${hostport%%:*}"
   port="${hostport##*:}"
   [[ "$host" != "$port" ]] || port=6379
-  timeout 3 bash -c 'exec 3<>"/dev/tcp/$0/$1" && printf "PING\r\n" >&3 && read -r line <&3 && [[ "$line" == +PONG* ]]' "$host" "$port" 2>/dev/null
+  run_with_timeout 3 bash -c 'exec 3<>"/dev/tcp/$0/$1" && printf "PING\r\n" >&3 && read -r line <&3 && [[ "$line" == +PONG* ]]' "$host" "$port" 2>/dev/null
 }
 
 preflight_tools() {
@@ -840,7 +863,7 @@ compose_command() {
 host_resolves() {
   # Compose service names only resolve inside the devcontainer network; a slow
   # resolver outside it must not cost seconds on every run.
-  timeout 2 getent hosts "$1" >/dev/null 2>&1
+  run_with_timeout 2 getent hosts "$1" >/dev/null 2>&1
 }
 
 preflight_infra() {
@@ -955,7 +978,7 @@ PIDS=()
 kill_tree() {
   local pid="$1"
   local child
-  for child in $(ps -o pid= --ppid "$pid" 2>/dev/null); do
+  for child in $(child_pids "$pid"); do
     kill_tree "$child"
   done
   kill "$pid" 2>/dev/null || true
@@ -965,17 +988,17 @@ cleanup_owned() {
     return 0
   fi
   local issues=0
-  for pid in "${PIDS[@]}"; do
+  for pid in ${PIDS[@]+"${PIDS[@]}"}; do
     kill_tree "$pid"
   done
   sleep 2
-  for pid in "${PIDS[@]}"; do
+  for pid in ${PIDS[@]+"${PIDS[@]}"}; do
     if kill -0 "$pid" 2>/dev/null; then
       kill -9 "$pid" 2>/dev/null || true
       issues=$((issues + 1))
     fi
     # Reap any remaining descendants of the original tree (routine; uncounted).
-    for child in $(ps -o pid= --ppid "$pid" 2>/dev/null); do
+    for child in $(child_pids "$pid"); do
       kill -9 "$child" 2>/dev/null || true
     done
   done
@@ -1057,26 +1080,26 @@ service_index() {
 start_service() {
   # Iteration starts services in their own session so Ctrl-C on a Playwright
   # run (or closing the terminal) leaves the E2E environment running.
-  local name="$1" log="$2" detach=()
+  local name="$1" log="$2" launch=exec_service
   if [[ "$MODE" == "iterate" ]]; then
-    detach=(setsid)
+    launch=run_in_new_session
   fi
   case "$name" in
     api)
       echo "> Starting API ($API_DIR)"
-      (cd "$API_DIR" && exec ${detach[@]+"${detach[@]}"} npm run start:e2e:server) >"$log" 2>&1 &
+      (cd "$API_DIR" && "$launch" npm run start:e2e:server) >"$log" 2>&1 &
       ;;
     frontend)
       echo "> Starting frontend ($FRONTEND_DIR)"
-      (cd "$FRONTEND_DIR" && exec ${detach[@]+"${detach[@]}"} node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON server/index.ts) >"$log" 2>&1 &
+      (cd "$FRONTEND_DIR" && "$launch" node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON server/index.ts) >"$log" 2>&1 &
       ;;
     images)
       echo "> Starting images ($IMAGES_DIR)"
-      (cd "$IMAGES_DIR" && exec ${detach[@]+"${detach[@]}"} npm start) >"$log" 2>&1 &
+      (cd "$IMAGES_DIR" && "$launch" npm start) >"$log" 2>&1 &
       ;;
     pdf)
       echo "> Starting PDF ($PDF_DIR)"
-      (cd "$PDF_DIR" && PORT=3002 API_URL="$API_URL" exec ${detach[@]+"${detach[@]}"} npm start) >"$log" 2>&1 &
+      (cd "$PDF_DIR" && export PORT=3002 API_URL="$API_URL" && "$launch" npm start) >"$log" 2>&1 &
       ;;
   esac
   PIDS[$(service_index "$name")]=$!
@@ -1263,20 +1286,31 @@ build_script() {
   fi
 }
 
-declare -A STAMP_JSON=()
-declare -A STALE_REASON=()
+# Per-service values, one variable per service (`STAMP_JSON_api`...): macOS ships bash 3.2, which has no
+# associative arrays (`declare -A`) and no `mapfile`. Service names are valid variable name suffixes.
+svc_get() { local var="${1}_${2}"; printf '%s' "${!var-}"; }
+svc_set() { printf -v "${1}_${2}" '%s' "$3"; }
+
+# Reads the `KEY=value` lines of `build_env` into the `env_pairs` array of the caller.
+read_build_env() {
+  local line
+  env_pairs=()
+  while IFS= read -r line; do
+    env_pairs+=("$line")
+  done < <(build_env "$1")
+}
 
 compute_stamps() {
   local svc dir env_pairs reason
   for svc in "${SERVICES[@]}"; do
     dir="$(service_dir "$svc")"
-    mapfile -t env_pairs < <(build_env "$svc")
-    STAMP_JSON[$svc]="$(launcher_cli stamp-compute "$dir" "${env_pairs[@]}")"
-    reason="$(launcher_cli stamp-check "$dir" "$(stamp_file "$svc")" "${STAMP_JSON[$svc]}")"
+    read_build_env "$svc"
+    svc_set STAMP_JSON "$svc" "$(launcher_cli stamp-compute "$dir" ${env_pairs[@]+"${env_pairs[@]}"})"
+    reason="$(launcher_cli stamp-check "$dir" "$(stamp_file "$svc")" "$(svc_get STAMP_JSON "$svc")")"
     if ! build_output_present "$svc"; then
       reason="build output missing"
     fi
-    STALE_REASON[$svc]="$reason"
+    svc_set STALE_REASON "$svc" "$reason"
   done
 }
 
@@ -1284,20 +1318,20 @@ build_service() {
   # Runs in the background next to other builds; output goes to a log.
   local svc="$1" dir env_pairs script log
   dir="$(service_dir "$svc")"
-  mapfile -t env_pairs < <(build_env "$svc")
+  read_build_env "$svc"
   script="$(build_script "$svc")"
   log="$ARTIFACTS_DIR/build-$svc.log"
-  (cd "$dir" && env "${env_pairs[@]}" npm run "$script") >"$log" 2>&1 || return 1
+  (cd "$dir" && env ${env_pairs[@]+"${env_pairs[@]}"} npm run "$script") >"$log" 2>&1 || return 1
   if [[ "$svc" == "frontend" ]]; then
-    launcher_cli stamp-save "$(stamp_file "$svc")" "${STAMP_JSON[$svc]}" "$FRONTEND_DIR/.next/BUILD_ID"
+    launcher_cli stamp-save "$(stamp_file "$svc")" "$(svc_get STAMP_JSON "$svc")" "$FRONTEND_DIR/.next/BUILD_ID"
   else
-    launcher_cli stamp-save "$(stamp_file "$svc")" "${STAMP_JSON[$svc]}"
+    launcher_cli stamp-save "$(stamp_file "$svc")" "$(svc_get STAMP_JSON "$svc")"
   fi
 }
 
 build_services() {
   # Production builds through each service's normal build script, in parallel.
-  local svc owner start pids=() names=() failed=() i
+  local svc owner reason start pids=() names=() failed=() i
   for svc in "$@"; do
     if [[ "$svc" == "frontend" ]]; then
       owner="$(launcher_cli frontend-owner "$FRONTEND_DIR/.next/BUILD_ID" "$(stamp_file frontend)")"
@@ -1307,7 +1341,8 @@ build_services() {
         echo "  (.next/dev) is unaffected."
       fi
     fi
-    echo "> Building $svc with npm run $(build_script "$svc") (${STALE_REASON[$svc]:-requested}); log: $ARTIFACTS_DIR/build-$svc.log"
+    reason="$(svc_get STALE_REASON "$svc")"
+    echo "> Building $svc with npm run $(build_script "$svc") (${reason:-requested}); log: $ARTIFACTS_DIR/build-$svc.log"
     build_service "$svc" &
     pids+=($!)
     names+=("$svc")
@@ -1326,7 +1361,7 @@ build_services() {
   fi
   echo "> Built ${names[*]} in $(( $(date +%s) - start ))s"
   for svc in "${names[@]}"; do
-    STALE_REASON[$svc]=""
+    svc_set STALE_REASON "$svc" ""
     if [[ "$svc" == "frontend" ]]; then
       echo "> NOTE: .next now holds the E2E build. A later npm run build replaces it with a"
       echo "  production build, and the next npm run e2e rebuilds the E2E one."
@@ -1724,7 +1759,7 @@ restart_service() {
   local svc="$1" pid cmd waited=0 port
   pid="$(jq -r --arg s "$svc" '.servicePids[$s] // 0' "$RECORD_FILE")"
   if [[ "$pid" != "0" ]] && kill -0 "$pid" 2>/dev/null; then
-    cmd="$(tr '\0' ' ' <"/proc/$pid/cmdline" 2>/dev/null || true)"
+    cmd="$(pid_command "$pid")"
     if [[ "$cmd" == *node* || "$cmd" == *npm* ]]; then
       echo "> Stopping $svc (pid $pid)"
       kill_tree "$pid"
@@ -1781,9 +1816,9 @@ init_s3_bucket() {
 print_stale_services() {
   local svc stale=()
   for svc in "${SERVICES[@]}"; do
-    if [[ -n "${STALE_REASON[$svc]}" ]]; then
+    if [[ -n "$(svc_get STALE_REASON "$svc")" ]]; then
       stale+=("$svc")
-      echo "> WARNING: the running $svc is stale (${STALE_REASON[$svc]})."
+      echo "> WARNING: the running $svc is stale ($(svc_get STALE_REASON "$svc"))."
     fi
   done
   if [[ ${#stale[@]} -gt 0 ]]; then
@@ -1850,7 +1885,7 @@ start_environment() {
   preflight_ports
   stripe_require_credentials
   for svc in "${SERVICES[@]}"; do
-    if [[ -n "${STALE_REASON[$svc]}" ]]; then
+    if [[ -n "$(svc_get STALE_REASON "$svc")" ]]; then
       stale+=("$svc")
     fi
   done
