@@ -43,7 +43,8 @@ describe('Contribution Flow: Sign In', () => {
 
     // Test user gets logged in directly
     cy.contains('Contribute as');
-    cy.contains('[data-cy="contribute-profile-picker"]', 'Personal profile - @incognito');
+    // A profile without a name has a placeholder slug: `incognito-…`, or `user-…` with newer versions of the API
+    cy.contains('[data-cy="contribute-profile-picker"]', /Personal profile - @(incognito|user)-/);
     cy.getByDataCy('contribute-profile-picker').click();
     cy.contains('[data-cy="select-option"]', 'TestOrg');
   });
