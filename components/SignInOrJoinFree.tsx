@@ -419,7 +419,7 @@ class SignInOrJoinFree extends React.Component<SignInOrJoinFreeProps, SignInOrJo
               whitelabelProvider={whitelabelProvider}
             />
           ) : this.state.signupSessionId ? (
-            <Box maxWidth={535} mx={[2, 4]} width="100%">
+            <div className="mx-2 w-full max-w-[535px] sm:mx-4">
               <SignupCodeVerification
                 email={email}
                 loading={submitting}
@@ -427,7 +427,7 @@ class SignInOrJoinFree extends React.Component<SignInOrJoinFreeProps, SignInOrJo
                 onResend={this.resendSignupCode}
                 onBack={() => this.setState({ signupSessionId: null })}
               />
-            </Box>
+            </div>
           ) : (
             <Flex flexDirection="column" width={1} alignItems="center">
               <Flex justifyContent="center" width={1}>
