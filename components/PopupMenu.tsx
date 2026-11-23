@@ -10,9 +10,9 @@ import { Box } from './Grid';
 const Popup = styled(Box)<{ zIndex?: number }>`
   position: absolute;
   padding: 8px;
-  border: 1px solid #f3f3f3;
+  border: 1px solid ${props => props.theme.colors.black[100]};
   border-radius: 8px;
-  background: white;
+  background: ${props => props.theme.colors.white.full};
   box-shadow: 0px 4px 8px rgba(20, 20, 20, 0.16);
   z-index: ${props => props.zIndex ?? 1000};
 `;

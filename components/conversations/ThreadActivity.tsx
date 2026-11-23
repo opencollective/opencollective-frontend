@@ -20,7 +20,7 @@ const ActivityParagraph = styled(Container)<{ activityColor?: string }>`
 const ActivityMessage = styled.span`
   font-size: 10px;
   font-weight: 600;
-  background: white;
+  background: ${props => props.theme.colors.white.full};
   color: ${props => props.color};
 `;
 
