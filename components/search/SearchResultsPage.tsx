@@ -137,6 +137,14 @@ export const SearchResults = () => {
   });
   const [input, setInput] = React.useState(queryFilter.values.searchTerm);
 
+  // Offsets are computed from the page size: keep it within the maximum supported by the search
+  const { limit } = queryFilter.values;
+  useEffect(() => {
+    if (limit > SEARCH_LIMITS.maxLimit) {
+      queryFilter.setFilter('limit', SEARCH_LIMITS.maxLimit);
+    }
+  }, [limit]);
+
   // Sync input state with URL changes (e.g., from SearchCommand navigation)
   useEffect(() => {
     setInput(queryFilter.values.searchTerm || '');
@@ -446,7 +454,9 @@ function SearchResultsPagination({
   queryFilter: useQueryFilterReturnType<any, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
 }) {
   const { maxLimit, maxOffset } = SEARCH_LIMITS;
-  const browsableCount = maxOffset + queryFilter.values.limit;
+  const { limit } = queryFilter.values;
+  // The offset of the last page must not exceed `maxOffset`: only count whole pages
+  const browsableCount = Math.floor(maxOffset / limit) * limit + limit;
   return (
     <React.Fragment>
       <Pagination
