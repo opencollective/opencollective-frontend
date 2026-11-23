@@ -13,6 +13,7 @@ import { v4 as uuid } from 'uuid';
 
 import { APOLLO_STATE_PROP_NAME } from '../lib/apollo-client';
 import { getTokenFromCookie } from '../lib/auth';
+import { DASHBOARD_THEME_INIT_SCRIPT } from '../lib/hooks/useDashboardTheme';
 import { getIntlProps, getLocaleMessages } from '../lib/i18n/request';
 import { parseToBoolean } from '../lib/utils';
 import { getCSPHeader } from '../server/content-security-policy';
@@ -183,6 +184,7 @@ export default class IntlDocument extends Document<IntlDocumentProps> {
           ))}
           <script nonce={this.props.cspNonce} defer src={languageManifest[this.props.locale]} />
           <link rel="icon" href="/static/images/favicon.ico.png" />
+          <script nonce={this.props.cspNonce} dangerouslySetInnerHTML={{ __html: DASHBOARD_THEME_INIT_SCRIPT }} />
         </Head>
         <body>
           <Main {...({ nonce: this.props.cspNonce } as Record<string, unknown>)} />

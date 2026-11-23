@@ -29,7 +29,7 @@ import { CommentMetadata } from './CommentMetadata';
 
 const AdminActionsPopupContainer = styled(Flex)`
   flex-direction: column;
-  background: #ffffff;
+  background: ${props => props.theme.colors.white.full};
   border: 1px solid rgba(49, 50, 51, 0.1);
   border-radius: 8px;
   box-shadow: 0px 4px 8px rgba(20, 20, 20, 0.16);

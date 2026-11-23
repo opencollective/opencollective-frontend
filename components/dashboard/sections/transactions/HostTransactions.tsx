@@ -193,7 +193,13 @@ const HostTransactions = props => {
       <div className="flex justify-center py-12">
         <Card>
           <CardContent className="flex max-w-xl flex-col items-center justify-center gap-6 pt-4 text-center">
-            <Image src="/static/images/not-found-illustration.png" alt="" width={200} height={200} />
+            <Image
+              src="/static/images/not-found-illustration.png"
+              alt=""
+              width={200}
+              height={200}
+              className="dark:hue-rotate-180 dark:invert"
+            />
             <div>
               This page has moved, please go to the new{' '}
               <Link className="text-blue-600 underline" href={getOffPlatformTransactionsRoute(props.accountSlug)}>

@@ -2,7 +2,7 @@ describe('Contact collective', () => {
   let collectiveSlug;
 
   before(() => {
-    return cy.createHostedCollective({ type: 'COLLECTIVE' }).then(collective => {
+    return cy.createHostedCollective().then(collective => {
       collectiveSlug = collective.slug;
     });
   });

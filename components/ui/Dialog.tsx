@@ -14,7 +14,7 @@ const DialogTrigger = DialogPrimitive.Trigger;
 const DialogPortal = DialogPrimitive.Portal;
 
 const dialogOverlayVariants = cva(
-  'fixed inset-0 z-3000 flex max-h-screen flex-col items-center overflow-y-auto bg-foreground/25 px-0 py-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0',
+  'fixed inset-0 z-3000 flex max-h-screen flex-col items-center overflow-y-auto bg-foreground/25 px-0 py-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 dark:bg-black/60',
   {
     variants: {
       size: {

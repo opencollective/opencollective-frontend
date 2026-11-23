@@ -154,9 +154,9 @@ const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
 
     .trix-button-group {
       border-radius: 6px;
-      border-color: #c4c7cc;
+      border-color: ${props => props.theme.colors.black[400]};
       margin-bottom: 0;
-      background: white;
+      background: ${props => props.theme.colors.white.full};
       &:not(:first-child) {
         margin-left: min(1.5vw, 10px);
       }
@@ -178,6 +178,11 @@ const TrixEditorContainer = styled.div<RichTextEditorContainerProps>`
       &::before,
       &.trix-active::before {
         margin: 4px; // Use this to reduce the icons size
+      }
+
+      /* Toolbar icons are black SVG images: make them light on the dark theme */
+      :root.dark &::before {
+        filter: invert(1);
       }
     }
 

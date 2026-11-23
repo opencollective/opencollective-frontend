@@ -215,6 +215,10 @@ export const hostedCollectiveFieldsFragment = gql`
     name
     slug
     website
+    socialLinks {
+      type
+      url
+    }
     type
     currency
     imageUrl(height: 96)

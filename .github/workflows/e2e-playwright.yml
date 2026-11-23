@@ -87,7 +87,7 @@ env:
 jobs:
   playwright:
     name: playwright smoke
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     timeout-minutes: 30
 
@@ -111,7 +111,7 @@ jobs:
         ports:
           - 6379:6379
       postgres:
-        image: postgres:16.15
+        image: postgres:16.16
         env:
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
@@ -133,7 +133,7 @@ jobs:
         # (localhost:1025). The scratch-built mailpit image has no
         # curl/wget, so no container healthcheck: the launcher verifies
         # Mailpit/API readiness with its own five-minute deadlines.
-        image: axllent/mailpit:v1.33.1@sha256:aef2aacc11f075ec0fb6874275ee4a421e688e11a96ebb296134d1735c7761ce
+        image: axllent/mailpit:v1.34.0@sha256:23a2ef85bc50853ab3093645d1d64679afd8887e89da5e48a88940c172591a4e
         ports:
           - 8025:8025
           - 1025:1025
@@ -148,8 +148,8 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get install \
-          `# Postgres client (psql/pg_restore for the launcher DB lifecycle)` \
-          postgresql-client-16 \
+          `# Postgres client (psql/pg_isready for the launcher; the restore runs from the postgres:16 image, see USE_DOCKER)` \
+          postgresql-client \
           `# Redis client: the launcher validates the supplied Redis service` \
           redis-tools
 
@@ -311,6 +311,9 @@ jobs:
 
       - name: Run Playwright smoke via shared launcher
         run: ./test/playwright/run-local.sh
+        env:
+          # Run pg_restore & co from the postgres:16 image, matching the PostgreSQL 16 service whatever client the runner ships
+          USE_DOCKER: true
 
       # Report first-attempt failures, recovered attempts, final failures,
       # and setup/interruption separately from the manifest and the

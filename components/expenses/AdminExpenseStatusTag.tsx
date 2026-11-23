@@ -34,7 +34,7 @@ const PopupContainer = styled(`div`)`
   text-transform: initial;
   white-space: normal;
   min-width: 200px;
-  background: #ffffff;
+  background: ${props => props.theme.colors.white.full};
   box-shadow: 0px 4px 8px rgba(20, 20, 20, 0.16);
 
   svg {
@@ -61,7 +61,7 @@ const Arrow = styled('div')`
     display: block;
     border-style: solid;
     border-width: 0 1.5em 1em 1.5em;
-    border-color: transparent transparent #ffffff transparent;
+    border-color: transparent transparent ${props => props.theme.colors.white.full} transparent;
     filter: drop-shadow(0px -3px 3px rgba(20, 20, 20, 0.1));
   }
 `;

@@ -7,12 +7,13 @@ import { useIntl } from 'react-intl';
 
 import { formatAmountForLegend, formatDateLabel, formatSeriesData, setDatesIfMissing } from '../../../../lib/charts';
 import type { Currency, TimeSeriesAmount } from '../../../../lib/graphql/types/v2/graphql';
+import { useIsDarkModeActive } from '../../../../lib/hooks/useDashboardTheme';
 
 import MessageBox from '../../../MessageBox';
 
 const ApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expanded }): ApexOptions => ({
+const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expanded, isDark }): ApexOptions => ({
   chart: {
     toolbar: { show: false },
     zoom: { enabled: false },
@@ -22,7 +23,7 @@ const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expa
     sparkline: {
       enabled: !expanded,
     },
-    foreColor: 'hsl(var(--muted-foreground))',
+    foreColor: isDark ? '#8F969F' : 'hsl(var(--muted-foreground))',
     fontFamily: 'Inter, sans-serif',
   },
   legend: {
@@ -57,7 +58,7 @@ const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expa
   },
   markers: {
     size: 0,
-    strokeColors: '#fff',
+    strokeColors: isDark ? '#1E1F22' : '#fff',
     strokeWidth: expanded ? 2 : 0,
     strokeOpacity: 0.9,
     strokeDashArray: 0,
@@ -102,6 +103,7 @@ const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expa
     },
   },
   tooltip: {
+    theme: isDark ? 'dark' : 'light',
     x: {
       show: false,
     },
@@ -124,10 +126,12 @@ const makeApexOptions = ({ currency, timeUnit, dateFrom, intl, compareFrom, expa
   },
 });
 
-const getSeries = ({ current, comparison, color = '#1d4ed8' }): ApexOptions['series'] => {
+const getSeries = ({ current, comparison, color, isDark }): ApexOptions['series'] => {
+  color = color || (isDark ? '#3b82f6' : '#1d4ed8');
   const series = [{ name: 'current', data: formatSeriesData(current), color, zIndex: 2 }];
   if (comparison) {
-    series.push({ name: 'comparison', data: formatSeriesData(comparison), color: '#cbd5e1', zIndex: 1 });
+    const comparisonColor = isDark ? '#475569' : '#cbd5e1';
+    series.push({ name: 'comparison', data: formatSeriesData(comparison), color: comparisonColor, zIndex: 1 });
   }
   return series;
 };
@@ -143,14 +147,15 @@ interface ComparisonChartProps {
 
 function Chart({ current, comparison, expanded, currency, color }: ComparisonChartProps) {
   const intl = useIntl();
+  const isDark = useIsDarkModeActive();
 
   // When using the "All time" option, the API does not return a dateFrom value, instead we pick the lowest returned date to start the time series.
   // This is a temporary solution until the API returns the dateFrom value.
   const currentWithDates = React.useMemo(() => setDatesIfMissing(current), [current]);
 
   const series = React.useMemo(
-    () => getSeries({ current: currentWithDates, comparison, color }),
-    [currentWithDates, comparison, color],
+    () => getSeries({ current: currentWithDates, comparison, color, isDark }),
+    [currentWithDates, comparison, color, isDark],
   );
 
   const options = makeApexOptions({
@@ -160,6 +165,7 @@ function Chart({ current, comparison, expanded, currency, color }: ComparisonCha
     compareFrom: comparison?.dateFrom,
     intl,
     expanded,
+    isDark,
   });
 
   return <ApexChart type="area" width="100%" height="100%" options={options} series={series} />;

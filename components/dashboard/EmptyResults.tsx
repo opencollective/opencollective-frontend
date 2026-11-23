@@ -40,7 +40,7 @@ export function EmptyResults({
         <div className={'absolute inset-0 m-2 rounded-full bg-slate-50'} />
         <Image
           alt="No results found illustration with a magnifying glass."
-          className="z-10 sm:h-40 sm:w-40"
+          className="z-10 sm:h-40 sm:w-40 dark:hue-rotate-180 dark:invert"
           src="/static/images/no-results.png"
           height={imageSize}
           width={imageSize}

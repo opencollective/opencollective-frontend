@@ -9,7 +9,7 @@ import { Popper } from 'react-popper';
 import { styled } from 'styled-components';
 
 import { formatErrorMessage, getErrorFromGraphqlException } from '../lib/errors';
-import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
+import { API_V1_CONTEXT, gql } from '../lib/graphql/helpers';
 import withViewport from '../lib/withViewport';
 
 import { collectivePageQuery } from '../components/collective-page/graphql/queries';
@@ -95,17 +95,18 @@ const Arrow = styled('div')`
   }
 `;
 
-const editPublicMessageMutation = gqlV1 /* GraphQL */ `
-  mutation EditPublicMessage($fromCollectiveId: Int!, $collectiveId: Int!, $message: String) {
-    editPublicMessage(FromCollectiveId: $fromCollectiveId, CollectiveId: $collectiveId, message: $message) {
+const editPublicMessageMutation = gql`
+  mutation EditPublicMessage(
+    $fromAccount: AccountReferenceInput!
+    $toAccount: AccountReferenceInput!
+    $message: String
+  ) {
+    editPublicMessage(fromAccount: $fromAccount, toAccount: $toAccount, message: $message) {
       id
       publicMessage
       tier {
         id
-      }
-      collective {
-        id
-        slug
+        legacyId
       }
     }
   }
@@ -134,6 +135,8 @@ type EditPublicMessagePopupProps = {
   width?: number;
   fromCollectiveId: number;
   collectiveId: number;
+  /** Slug of the collective, used to refresh its page after saving */
+  collectiveSlug?: string;
   cardRef: React.RefObject<HTMLElement>;
   onClose: () => void;
   message?: string;
@@ -144,6 +147,7 @@ function EditPublicMessagePopup({
   width,
   fromCollectiveId,
   collectiveId,
+  collectiveSlug,
   cardRef,
   onClose,
   message = '',
@@ -157,7 +161,7 @@ function EditPublicMessagePopup({
   }
 
   return createPortal(
-    <Mutation mutation={editPublicMessageMutation} context={API_V1_CONTEXT}>
+    <Mutation mutation={editPublicMessageMutation}>
       {(submitMessage, { loading, error }) => (
         <Popper
           referenceElement={cardRef.current}
@@ -210,34 +214,35 @@ function EditPublicMessagePopup({
                     onClick={async () => {
                       await submitMessage({
                         variables: {
-                          fromCollectiveId,
-                          collectiveId,
+                          // The contributor cards only have the legacy ids of both accounts
+                          fromAccount: { legacyId: fromCollectiveId },
+                          toAccount: { legacyId: collectiveId },
                           message: messageDraft ? messageDraft.trim() : null,
                         },
-                        // Update cache after mutation
+                        // Refresh the collective and tier pages, which show the contributors with their message.
+                        // These page queries are still on v1.
                         refetchQueries({ data: { editPublicMessage } }) {
-                          const [member] = editPublicMessage;
-                          const collectiveSlug = member.collective.slug;
-                          const tier = member.tier;
                           const queries: Array<{
                             query: DocumentNode;
                             context: typeof API_V1_CONTEXT;
                             variables: Record<string, unknown>;
-                          }> = [
-                            {
+                          }> = [];
+                          if (collectiveSlug) {
+                            queries.push({
                               query: collectivePageQuery,
                               context: API_V1_CONTEXT,
                               variables: {
                                 slug: collectiveSlug,
                                 nbContributorsPerContributeCard: MAX_CONTRIBUTORS_PER_CONTRIBUTE_CARD,
                               },
-                            },
-                          ];
-                          if (tier) {
+                            });
+                          }
+                          const tierLegacyId = editPublicMessage?.tier?.legacyId;
+                          if (tierLegacyId) {
                             queries.push({
                               query: tierPageQuery,
                               context: API_V1_CONTEXT,
-                              variables: { tierId: tier.id },
+                              variables: { tierId: tierLegacyId },
                             });
                           }
                           return queries;

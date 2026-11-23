@@ -90,6 +90,14 @@ const Footer = ({ className, isDashboard }: { className?: string; isDashboard?: 
                       alt="Open Collective"
                       height={28}
                       width={167}
+                      className="dark:hidden"
+                    />
+                    <Image
+                      src="/static/images/opencollectivelogo-footer-n-dark.svg"
+                      alt="Open Collective"
+                      height={28}
+                      width={167}
+                      className="hidden dark:block"
                     />
                   </Link>
                   <p className="text-sm text-muted-foreground">

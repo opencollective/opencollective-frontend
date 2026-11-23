@@ -119,6 +119,7 @@ export const PausedIncomingContributionsMessage = ({ accountSlug }: PausedIncomi
           alt=""
           width={32}
           height={32}
+          className="dark:hue-rotate-180 dark:invert"
           src={
             msgType === 'warning'
               ? '/static/images/illustrations/eye-warning.png'
