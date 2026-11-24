@@ -177,7 +177,9 @@ class MembersWithData extends React.Component<Props, State> {
       return <div />;
     }
     let members = data.account.members.nodes.filter(node => node?.account).map(toMemberNode);
-    if (members.length === 0) {
+    // Count on the raw nodes: v2 returns one node per membership, de-duplicated below
+    const hasMore = data.account.members.nodes.length < (data.account.members.totalCount ?? 0);
+    if (members.length === 0 && !hasMore) {
       return <div />;
     }
 
@@ -202,8 +204,6 @@ class MembersWithData extends React.Component<Props, State> {
     if (tier && tier.name.match(/sponsor/i)) {
       viewMode = 'ORGANIZATION';
     }
-    // Count on the raw nodes: v2 returns one node per membership, de-duplicated above
-    const hasMore = data.account.members.nodes.length < (data.account.members.totalCount ?? 0);
     return (
       <MembersContainer
         ref={node => {
@@ -321,6 +321,7 @@ const addMembersData = graphql<OwnProps, MembersQueryData, MembersQueryVariables
               ...previousResult.account,
               members: {
                 ...previousResult.account.members,
+                totalCount: fetchMoreResult.account.members.totalCount,
                 nodes: [...previousResult.account.members.nodes, ...fetchMoreResult.account.members.nodes],
               },
             },
