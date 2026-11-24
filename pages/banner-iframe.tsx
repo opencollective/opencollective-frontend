@@ -1,4 +1,5 @@
 import React from 'react';
+import type { ApolloError } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
 import { graphql } from '@apollo/client/react/hoc';
 import { partition } from 'lodash-es';
@@ -239,7 +240,7 @@ type BannerIframeProps = {
   collectiveSlug?: string;
   id?: string;
   style?: string;
-  data?: { loading?: boolean; account?: BannerAccount };
+  data?: { loading?: boolean; error?: ApolloError; account?: BannerAccount };
   useNewFormat?: boolean;
 };
 
@@ -374,6 +375,18 @@ class BannerIframe extends React.Component<BannerIframeProps> {
           }}
         >
           <FormattedMessage id="loading" defaultMessage="loading" />
+        </div>
+      );
+    }
+
+    if (data.error) {
+      return (
+        <div
+          ref={node => {
+            this.node = node;
+          }}
+        >
+          <MessageBoxGraphqlError error={data.error} />
         </div>
       );
     }

@@ -37,12 +37,17 @@ const makeNode = (i: number) => ({
   },
 });
 
-const renderWithLink = (props: Partial<React.ComponentProps<typeof MembersWithData>>) => {
+const renderWithLink = (
+  props: Partial<React.ComponentProps<typeof MembersWithData>>,
+  mapNode: (node: ReturnType<typeof makeNode>) => ReturnType<typeof makeNode> = node => node,
+) => {
   const calls = [];
   const link = new ApolloLink(operation => {
     const { offset, limit } = operation.variables;
     calls.push(operation.variables);
-    const nodes = Array.from({ length: Math.max(0, Math.min(limit, 15 - offset)) }, (_, i) => makeNode(offset + i));
+    const nodes = Array.from({ length: Math.max(0, Math.min(limit, 15 - offset)) }, (_, i) =>
+      mapNode(makeNode(offset + i)),
+    );
     const data = {
       account: {
         __typename: 'Collective',
@@ -97,5 +102,16 @@ describe('MembersWithData', () => {
     expect(screen.getAllByTestId('member').map(el => el.textContent.split(':')[0])).toEqual(
       Array.from({ length: 15 }, (_, i) => `member-${i}`),
     );
+  });
+
+  it('keeps "load more" when a backer has several memberships, and hides it once all are loaded', async () => {
+    // Members m0 and m1 are two memberships of the same account
+    renderWithLink({ type: 'USER', memberRole: 'BACKER', orderBy: 'totalDonations', limit: 10 }, node =>
+      node.id === 'm1' ? { ...node, account: { ...node.account, id: 'a0' } } : node,
+    );
+    await waitFor(() => expect(screen.getAllByTestId('member')).toHaveLength(9));
+    fireEvent.click(screen.getByText('load more'));
+    await waitFor(() => expect(screen.getAllByTestId('member')).toHaveLength(14));
+    expect(screen.queryByText('load more')).not.toBeInTheDocument();
   });
 });

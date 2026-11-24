@@ -202,7 +202,8 @@ class MembersWithData extends React.Component<Props, State> {
     if (tier && tier.name.match(/sponsor/i)) {
       viewMode = 'ORGANIZATION';
     }
-    const limit = this.props.limit || MEMBERS_PER_PAGE * 2;
+    // Count on the raw nodes: v2 returns one node per membership, de-duplicated above
+    const hasMore = data.account.members.nodes.length < (data.account.members.totalCount ?? 0);
     return (
       <MembersContainer
         ref={node => {
@@ -229,7 +230,7 @@ class MembersWithData extends React.Component<Props, State> {
             />
           ))}
         </Container>
-        {members.length % 10 === 0 && members.length >= limit && (
+        {hasMore && (
           <Container margin="0.65rem" textAlign="center">
             <StyledButton onClick={this.fetchMore}>
               {this.state.loading && <FormattedMessage id="loading" defaultMessage="loading" />}
