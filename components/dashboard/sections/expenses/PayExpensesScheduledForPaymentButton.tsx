@@ -4,8 +4,11 @@ import { create, Mode } from '@transferwise/approve-api-action-helpers';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { addAuthTokenToHeader } from '../../../../lib/api';
+import { ERROR } from '../../../../lib/errors';
 import { gql } from '../../../../lib/graphql/helpers';
 import type { Host } from '../../../../lib/graphql/types/v2/graphql';
+import { TwoFactorAuthenticationHeader } from '../../../../lib/two-factor-authentication';
+import { useTwoFactorAuthenticationPrompt } from '../../../../lib/two-factor-authentication/TwoFactorAuthenticationContext';
 import { getWebsiteUrl } from '../../../../lib/utils';
 
 import ConfirmationModal from '../../../ConfirmationModal';
@@ -25,6 +28,31 @@ const scheduledExpensesQuery = gql`
   }
 `;
 
+/**
+ * Reads the body of a failed `pay-batch` request once: the API answers with JSON for 2FA errors and plain text
+ * otherwise.
+ */
+const getErrorResponseBody = async (
+  error,
+): Promise<{
+  message?: string;
+  supportedMethods?: string[];
+  authenticationOptions?: Record<string, unknown>;
+} | null> => {
+  if (!error?.response) {
+    return null;
+  } else if (!error.responseBody) {
+    const text = await error.response.text();
+    try {
+      error.responseBody = JSON.parse(text);
+    } catch {
+      error.responseBody = { message: text };
+    }
+  }
+
+  return error.responseBody;
+};
+
 type PayExpensesScheduledForPaymentButtonProps = {
   className?: string;
   host: Pick<Host, 'id' | 'slug'>;
@@ -34,6 +62,7 @@ type PayExpensesScheduledForPaymentButtonProps = {
 export default function PayExpensesScheduledForPaymentButton(props: PayExpensesScheduledForPaymentButtonProps) {
   const { toast } = useToast();
   const intl = useIntl();
+  const prompt2fa = useTwoFactorAuthenticationPrompt();
   const [showConfirmationModal, setConfirmationModalDisplay] = React.useState(false);
 
   const scheduledExpenses = useQuery(scheduledExpensesQuery, {
@@ -46,12 +75,35 @@ export default function PayExpensesScheduledForPaymentButton(props: PayExpensesS
   const request = create({ mode: process.env.WISE_ENVIRONMENT === 'production' ? Mode.PRODUCTION : Mode.SANDBOX });
   const handlePayBatch = async () => {
     const expenseIds = scheduledExpenses.data.expenses.nodes.map(e => e.id);
-    try {
-      await request(`${getWebsiteUrl()}/api/services/transferwise/pay-batch`, {
+    // The Wise helper sends the same headers again when the Wise approval is done, 2FA code included
+    const payBatch = (headers = {}) =>
+      request(`${getWebsiteUrl()}/api/services/transferwise/pay-batch`, {
         method: 'POST',
         body: JSON.stringify({ expenseIds, hostId: props.host.id }),
-        headers: addAuthTokenToHeader(),
+        headers: { ...addAuthTokenToHeader(), ...headers },
       });
+
+    try {
+      try {
+        await payBatch();
+      } catch (e) {
+        // Paying a batch goes through the host's payout 2FA: prompt for a code and retry
+        const responseBody = await getErrorResponseBody(e);
+        if (e?.response?.status !== 401 || responseBody?.message !== 'Two-factor authentication required') {
+          throw e;
+        }
+
+        const result = await prompt2fa.open({
+          supportedMethods: responseBody.supportedMethods,
+          authenticationOptions: responseBody.authenticationOptions,
+        });
+        if (!result) {
+          return; // The prompt is already open
+        }
+
+        await payBatch({ [TwoFactorAuthenticationHeader]: `${result.type} ${result.code}` });
+      }
+
       setConfirmationModalDisplay(false);
       toast({
         variant: 'success',
@@ -64,8 +116,13 @@ export default function PayExpensesScheduledForPaymentButton(props: PayExpensesS
       });
       props.onSubmit?.();
     } catch (e) {
-      const message = e?.response
-        ? await e.response.text()
+      if (e?.type === ERROR.TWO_FACTOR_AUTH_CANCELED) {
+        return;
+      }
+
+      const responseBody = await getErrorResponseBody(e);
+      const message = responseBody?.message
+        ? responseBody.message
         : intl.formatMessage(
             {
               defaultMessage:
