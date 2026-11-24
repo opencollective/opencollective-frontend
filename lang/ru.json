@@ -1132,8 +1132,6 @@
   "contribution.paymentFee": "Комиссия обработки платежа",
   "contribution.quantity": "Количество",
   "ContributionFlow.backToCollectivePage": "Back to {accountName}'s Page",
-  "ContributionFlow.CreateOrganizationLabel": "Внести вклад как организация",
-  "ContributionFlow.CreateUserLabel": "Внести вклад как физическое лицо",
   "ContributionFlow.goBackToGuest": "Вернуться, чтобы внести свой вклад в качестве гостя",
   "ContributionFlow.noSupportedPaymentMethods": "Нет доступных платежных провайдеров",
   "ContributionFlow.Payment": "Оплата",

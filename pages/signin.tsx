@@ -43,6 +43,8 @@ type SigninPageState = {
   success: boolean | null;
   isRobot: boolean;
   redirecting: boolean;
+  /** The visitor just created their account on this page (`/create-account`) */
+  signedUp?: boolean;
 };
 
 class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
@@ -104,7 +106,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
       !this.state.redirecting &&
       this.props.LoggedInUser &&
       !this.props.errorLoggedInUser &&
-      this.props.form !== 'create-account'
+      (this.props.form !== 'create-account' || this.state.signedUp)
     ) {
       // --- User logged in ---
       this.setState({ success: true, redirecting: true });
@@ -209,7 +211,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
       );
     } else if ((loadingLoggedInUser || this.state.success) && token) {
       return <Loading />;
-    } else if (!loadingLoggedInUser && LoggedInUser && form === 'create-account') {
+    } else if (!loadingLoggedInUser && LoggedInUser && form === 'create-account' && !this.state.signedUp) {
       return (
         <MessageBox type="warning" withIcon>
           <FormattedMessage
@@ -252,6 +254,7 @@ class SigninPage extends React.Component<SigninPageProps, SigninPageState> {
           redirect={next || '/'}
           form={form}
           routes={this.getRoutes()}
+          onSignup={() => this.setState({ signedUp: true })}
           whitelabelProvider={this.props.requestedByWhitelabelProvider}
         />
       </React.Fragment>

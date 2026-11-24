@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
-import { graphql } from '@apollo/client/react/hoc';
-import { get, pick } from 'lodash-es';
+import type { ApolloClient } from '@apollo/client';
+import { withApollo } from '@apollo/client/react/hoc';
 import type { Router } from 'next/router';
 import { withRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
@@ -8,9 +8,9 @@ import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 import { isEmail } from 'validator';
 
-import { signin } from '../lib/api';
-import { i18nGraphqlException } from '../lib/errors';
-import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
+import { resendOTP, signin, signup, verifyEmail } from '../lib/api';
+import { createError, ERROR, formatErrorMessage, i18nGraphqlException } from '../lib/errors';
+import { gql } from '../lib/graphql/helpers';
 import { getWebsiteUrl, isTrustedSigninRedirectionUrl } from '../lib/utils';
 import injectIntl from '@/lib/injectIntl';
 
@@ -21,6 +21,7 @@ import { Box, Flex } from './Grid';
 import Link from './Link';
 import Loading from './Loading';
 import SignIn from './SignIn';
+import SignupCodeVerification from './SignupCodeVerification';
 import StyledHr from './StyledHr';
 import { Span } from './Text';
 import { withUser } from './UserProvider';
@@ -56,8 +57,10 @@ type SignInOrJoinFreeProps = {
   defaultEmail?: string;
   /** Provide this to automatically sign in the given email */
   email?: string;
-  /** createUserQuery binding */
-  createUser?: (options: { variables: Record<string, unknown> }) => Promise<unknown>;
+  /** @ignore from withApollo */
+  client?: ApolloClient<unknown>;
+  /** Called when a visitor has signed up through the form, right before they are signed in */
+  onSignup?: () => void;
   /** Whether user can signup from there */
   disableSignup?: boolean;
   /** Use this prop to use this as a controlled component */
@@ -113,6 +116,8 @@ type SignInOrJoinFreeState = {
   name?: string;
   newsletterOptIn?: boolean;
   tosOptIn?: boolean;
+  /** Set once `/users/signup` has sent a code: the form is replaced by the code step */
+  signupSessionId?: string;
 };
 
 /**
@@ -241,53 +246,132 @@ class SignInOrJoinFree extends React.Component<SignInOrJoinFreeProps, SignInOrJo
   createProfile = async (data: {
     email?: string;
     name?: string;
-    legalName?: string;
     newsletterOptIn?: boolean;
     captcha?: { token?: string; provider?: string };
-    orgName?: string;
-    orgLegalName?: string;
-    githubHandle?: string;
-    twitterHandle?: string;
-    website?: string;
   }) => {
     if (this.state.submitting) {
       return false;
     }
-    const user = pick(data, ['email', 'name', 'legalName', 'newsletterOptIn']);
-    const organizationData = pick(data, ['orgName', 'orgLegalName', 'githubHandle', 'twitterHandle', 'website']);
-    const organization: Record<string, unknown> = Object.keys(organizationData).length > 0 ? organizationData : null;
-    if (organization) {
-      organization.name = organization.orgName;
-      organization.legalName = organization.orgLegalName;
-      delete organization.orgName;
-      delete organization.orgLegalName;
-    }
 
     this.setState({ submitting: true, error: null });
 
-    try {
-      await this.props.createUser({
-        variables: {
-          user,
-          organization,
-          redirect: this.getRedirectURL(),
-          websiteUrl: getWebsiteUrl(),
-          captcha: data.captcha,
-        },
+    // The name and newsletter choice are saved once the email is verified (see `verifySignupCode`)
+    const response = await signup({ email: data.email, captcha: data.captcha });
+    if (response.success) {
+      this.setState({
+        submitting: false,
+        signupSessionId: response.sessionId,
+        email: data.email,
+        name: data.name,
+        newsletterOptIn: data.newsletterOptIn,
       });
-      await this.props.router.push({ pathname: '/signin/sent', query: { email: user.email } });
       window.scrollTo(0, 0);
-    } catch (error) {
-      const emailAlreadyExists = get(error, 'graphQLErrors.0.extensions.code') === 'EMAIL_ALREADY_EXISTS';
+    } else {
+      const emailAlreadyExists = response.error?.type === ERROR.USER_ALREADY_EXISTS;
       if (!emailAlreadyExists) {
-        toast({
-          variant: 'error',
-          message: i18nGraphqlException(this.props.intl, error),
-        });
+        this.showSignupError(response.error);
       }
       this.setState({ submitting: false, emailAlreadyExists });
     }
   };
+
+  showSignupError(error: { type?: string; message?: string } | string) {
+    const message =
+      (typeof error === 'string' ? error : formatErrorMessage(this.props.intl, error, null) || error?.message) ||
+      formatErrorMessage(this.props.intl, createError(ERROR.UNKNOWN));
+    toast({ variant: 'error', message });
+  }
+
+  /** The challenge is over (expired, too many wrong codes): back to the form to request a new code */
+  restartSignup() {
+    toast({
+      variant: 'error',
+      message: (
+        <FormattedMessage
+          defaultMessage="This verification link is no longer valid. Please start again."
+          id="signup.otp.sessionExpired"
+        />
+      ),
+    });
+    this.setState({ submitting: false, signupSessionId: null });
+  }
+
+  resendSignupCode = async () => {
+    const { email, signupSessionId } = this.state;
+    const response = await resendOTP({ email, sessionId: signupSessionId });
+    if (this.state.signupSessionId !== signupSessionId) {
+      return; // The visitor went back and started another sign-up meanwhile
+    } else if (response.success) {
+      toast({
+        variant: 'success',
+        message: (
+          <FormattedMessage
+            defaultMessage="A new OTP code has been sent to your email."
+            id="signup.otp.resendSuccess"
+          />
+        ),
+      });
+    } else if (response.error?.type === 'NOT_FOUND') {
+      this.restartSignup();
+    } else {
+      this.showSignupError(response.error);
+    }
+  };
+
+  verifySignupCode = async (otp: string) => {
+    if (this.state.submitting) {
+      return false;
+    }
+
+    this.setState({ submitting: true });
+    const { email, signupSessionId } = this.state;
+    const response = await verifyEmail({ email, otp, sessionId: signupSessionId });
+    if (!response.success) {
+      if (response.error?.type === 'NOT_FOUND') {
+        this.restartSignup();
+      } else {
+        this.showSignupError(response.error);
+        this.setState({ submitting: false });
+      }
+      return;
+    }
+
+    // Signed in on the spot: the page showing this form carries on (or redirects, see `onSignup`)
+    const { token } = response;
+    await this.saveNewProfile(token);
+    this.props.onSignup?.();
+    const user = await this.props.login(token);
+    if (!user) {
+      // The account is created and verified: the visitor can sign in with their email
+      this.showSignupError(null);
+      this.setState({ submitting: false, signupSessionId: null });
+    }
+  };
+
+  /**
+   * Saves what the form asked for besides the email. Runs before `login`, with the new token and without
+   * touching the Apollo cache: the page only learns about the user at `login`, and loads a complete profile.
+   * (Writing `me` to the cache here makes pages that watch it refetch before the name is saved.)
+   */
+  async saveNewProfile(token: string) {
+    const { client } = this.props;
+    const { name, newsletterOptIn } = this.state;
+    const options = { context: { headers: { authorization: `Bearer ${token}` } }, fetchPolicy: 'no-cache' as const };
+    try {
+      const { data } = await client.query({ query: signupProfileQuery, ...options });
+      await client.mutate({
+        mutation: completeSignupProfileMutation,
+        variables: { account: { id: data.me.id, name } },
+        ...options,
+      });
+      if (newsletterOptIn) {
+        await client.mutate({ mutation: signupNewsletterOptInMutation, variables: { newsletterOptIn }, ...options });
+      }
+    } catch (error) {
+      // The account exists and is verified: sign in anyway, the profile can be completed later
+      toast({ variant: 'error', message: i18nGraphqlException(this.props.intl, error) });
+    }
+  }
 
   render() {
     const { submitting, error, unknownEmailError, passwordRequired, email, password } = this.state;
@@ -334,6 +418,16 @@ class SignInOrJoinFree extends React.Component<SignInOrJoinFreeProps, SignInOrJo
               noSignInTitle={this.props.noSignInTitle}
               whitelabelProvider={whitelabelProvider}
             />
+          ) : this.state.signupSessionId ? (
+            <div className="mx-2 w-full max-w-[535px] sm:mx-4">
+              <SignupCodeVerification
+                email={email}
+                loading={submitting}
+                onSubmit={this.verifySignupCode}
+                onResend={this.resendSignupCode}
+                onBack={() => this.setState({ signupSessionId: null })}
+              />
+            </div>
           ) : (
             <Flex flexDirection="column" width={1} alignItems="center">
               <Flex justifyContent="center" width={1}>
@@ -389,37 +483,28 @@ class SignInOrJoinFree extends React.Component<SignInOrJoinFreeProps, SignInOrJo
   }
 }
 
-const signupMutation = gqlV1 /* GraphQL */ `
-  mutation Signup(
-    $user: UserInputType!
-    $organization: CollectiveInputType
-    $redirect: String
-    $websiteUrl: String
-    $captcha: CaptchaInputType
-  ) {
-    createUser(
-      user: $user
-      organization: $organization
-      redirect: $redirect
-      websiteUrl: $websiteUrl
-      captcha: $captcha
-    ) {
-      user {
-        id
-      }
-      organization {
-        id
-        slug
-      }
+const signupProfileQuery = gql`
+  query SignInOrJoinFreeSignupProfile {
+    me {
+      id
     }
   }
 `;
 
-const addSignupMutation = graphql<
-  Omit<SignInOrJoinFreeProps, 'router'>,
-  Record<string, unknown>,
-  Record<string, unknown>,
-  { createUser?: (options: { variables: Record<string, unknown> }) => Promise<unknown> }
->(signupMutation, { name: 'createUser', options: { context: API_V1_CONTEXT } });
+const completeSignupProfileMutation = gql`
+  mutation SignInOrJoinFreeCompleteProfile($account: AccountUpdateInput!) {
+    editAccount(account: $account) {
+      id
+    }
+  }
+`;
 
-export default withUser(injectIntl(addSignupMutation(withRouter(SignInOrJoinFree))));
+const signupNewsletterOptInMutation = gql`
+  mutation SignInOrJoinFreeNewsletterOptIn($newsletterOptIn: Boolean!) {
+    setNewsletterOptIn(newsletterOptIn: $newsletterOptIn) {
+      id
+    }
+  }
+`;
+
+export default withUser(injectIntl(withApollo<Omit<SignInOrJoinFreeProps, 'router'>>(withRouter(SignInOrJoinFree))));

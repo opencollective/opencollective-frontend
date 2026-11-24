@@ -1132,8 +1132,6 @@
   "contribution.paymentFee": "Gebühr für Zahlungsabwicklung",
   "contribution.quantity": "Menge",
   "ContributionFlow.backToCollectivePage": "Zurück zur Seite von {accountName}",
-  "ContributionFlow.CreateOrganizationLabel": "Als Organisation beitragen",
-  "ContributionFlow.CreateUserLabel": "Als Einzelperson spenden",
   "ContributionFlow.goBackToGuest": "Gehe zurück, um als Gast zu spenden",
   "ContributionFlow.noSupportedPaymentMethods": "Es ist kein Zahlungsanbieter verfügbar",
   "ContributionFlow.Payment": "Zahlung",

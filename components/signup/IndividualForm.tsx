@@ -82,7 +82,7 @@ const showSessionExpiredAndRestart = (
   nextStep(SignupSteps.EMAIL_INPUT);
 };
 
-const ResendOTPCodeButton = (props: React.ComponentProps<typeof Button>) => {
+export const ResendOTPCodeButton = (props: React.ComponentProps<typeof Button>) => {
   const [start, setStart] = React.useState<number>(new Date().getTime());
   const [secondsLeft, setSecondsLeft] = React.useState(OTP_RESEND_INTERVAL);
 

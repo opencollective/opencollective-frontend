@@ -1132,8 +1132,6 @@
   "contribution.paymentFee": "Frais du prestataire de paiement",
   "contribution.quantity": "Quantité",
   "ContributionFlow.backToCollectivePage": "Revenir à la page de {accountName}",
-  "ContributionFlow.CreateOrganizationLabel": "Contribuer en tant qu'organisation",
-  "ContributionFlow.CreateUserLabel": "Contribuer en tant que personne",
   "ContributionFlow.goBackToGuest": "Revenir en arrière pour contribuer en tant qu'invité",
   "ContributionFlow.noSupportedPaymentMethods": "Aucun moyen de paiement disponible",
   "ContributionFlow.Payment": "Paiement",

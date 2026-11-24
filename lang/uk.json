@@ -1132,8 +1132,6 @@
   "contribution.paymentFee": "Комісія обробника платежу",
   "contribution.quantity": "Кількість",
   "ContributionFlow.backToCollectivePage": "Повернутися на сторінку {accountName}",
-  "ContributionFlow.CreateOrganizationLabel": "Зробити внесок як організація",
-  "ContributionFlow.CreateUserLabel": "Зробити внесок як окрема особа",
   "ContributionFlow.goBackToGuest": "Повернутися до здійснення внеску в ролі гостя",
   "ContributionFlow.noSupportedPaymentMethods": "Немає доступного постачальника платежу",
   "ContributionFlow.Payment": "Платіж",

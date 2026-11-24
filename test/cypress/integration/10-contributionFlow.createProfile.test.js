@@ -1,4 +1,10 @@
+import * as cheerio from 'cheerio';
+
 import { randomEmail } from '../support/faker';
+
+// Outside production, the API may rewrite recipients (`@` → `-at-`)
+const isSentTo = (To, email) =>
+  To?.some(({ Address }) => Address.includes(email) || Address.includes(email.replace(/@/g, '-at-')));
 
 describe('Contribution Flow: Create profile', () => {
   it('Personal profile', () => {
@@ -29,13 +35,27 @@ describe('Contribution Flow: Create profile', () => {
     // Test backend validations
     cy.get('[data-cy="cf-content"] input[name=email]').type('{selectall}Incorrect@value');
     cy.get('[data-cy="cf-content"] button[type=submit]').click();
-    cy.contains('Validation error: Email must be valid');
+    cy.contains('Invalid email address.');
 
     // Submit the form with correct values
     const email = randomEmail();
     cy.get('[data-cy="cf-content"] input[name=email]').type(`{selectall}${email}`);
     cy.get('[data-cy="cf-content"] button[type=submit]').click();
-    cy.contains('Your magic link is on its way!');
-    cy.contains(`We've sent it to ${email}`);
+
+    // The code step replaces the form, still inside the contribution flow
+    cy.getByDataCy('signup-code-form').as('code-form');
+    cy.get('@code-form').contains(`Enter the code sent to ${email}.`);
+    cy.contains('[data-cy="cf-content"] button', 'Go back to contribute as a guest');
+    cy.openEmail(({ Subject, To }) => isSentTo(To, email) && Subject.includes('Email Confirmation')).then(message => {
+      const otp = cheerio.load(message.HTML)('h3 > span').text().trim();
+      cy.get('@code-form').find('input[data-slot="input-otp"]').type(otp);
+    });
+
+    // Signed in without leaving the flow, with the name from the form
+    cy.contains('Contribute as');
+    cy.contains('[data-cy="contribute-profile-picker"]', 'Dummy NameTest User');
+    // The profile slug comes from the name, as it did with v1 `createUser`
+    cy.contains('[data-cy="contribute-profile-picker"]', '@dummy-nametest-user');
+    cy.url().should('include', '/apex/donate/profile');
   });
 });

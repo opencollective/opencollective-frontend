@@ -156,7 +156,7 @@ class CreateCollective extends Component<CreateCollectiveProps, CreateCollective
           <MessageBox m={4} type="warning" withIcon>
             <FormattedMessage id="mustBeLoggedIn" defaultMessage="You must be logged in to see this page" />
           </MessageBox>
-          <SignInOrJoinFree createProfileTabs={['personal']} />
+          <SignInOrJoinFree />
         </Flex>
       );
     }
