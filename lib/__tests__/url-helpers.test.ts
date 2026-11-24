@@ -21,7 +21,7 @@ describe('isTrustedRedirectHost', () => {
     expect(isTrustedRedirectURL(new URL('https://opencollective.com'))).toBe(true);
     expect(isTrustedRedirectURL(new URL('https://docs.opencollective.com'))).toBe(true);
     expect(isTrustedRedirectURL(new URL('https://documentation.opencollective.com'))).toBe(true);
-    expect(isTrustedRedirectURL(new URL('https://app.papertree.earth'))).toBe(true);
+    expect(isTrustedRedirectURL(new URL('https://www.oscollective.org'))).toBe(true);
     expect(isTrustedRedirectURL(new URL('https://gatherfor.org'))).toBe(true);
   });
 
@@ -29,6 +29,8 @@ describe('isTrustedRedirectHost', () => {
     expect(isTrustedRedirectURL(new URL('https://wowoctobox.io'))).toBe(false);
     expect(isTrustedRedirectURL(new URL('https://opencollectivez.com'))).toBe(false);
     expect(isTrustedRedirectURL(new URL('https://malicious-opencollective.com'))).toBe(false);
+    // Removed after the domain changed hands
+    expect(isTrustedRedirectURL(new URL('https://compassionate-revolution.net'))).toBe(false);
   });
 });
 
