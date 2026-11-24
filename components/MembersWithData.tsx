@@ -6,7 +6,7 @@ import { uniqBy } from 'lodash-es';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
-import { API_V1_CONTEXT, gqlV1 } from '../lib/graphql/helpers';
+import { gql } from '../lib/graphql/helpers';
 import type { Currency } from '../lib/graphql/types/v2/graphql';
 import type LoggedInUser from '../lib/LoggedInUser';
 
@@ -27,7 +27,7 @@ const MembersContainer = styled.div`
   }
 `;
 
-/** Hand-written shape for the V1 members query (V1 is not covered by codegen, see #4054) */
+/** Shape consumed by `Member` and `CollectiveCard`, built from the v2 members nodes */
 type MemberNode = {
   id?: string;
   role?: string;
@@ -42,24 +42,42 @@ type MemberNode = {
     company?: string;
     description?: string;
     slug?: string;
-    website?: string;
     imageUrl?: string;
     backgroundImage?: string;
     isIncognito?: boolean;
   };
 };
 
+type V2MemberNode = {
+  id: string;
+  role: string;
+  createdAt: string;
+  tier?: { id: string; name?: string } | null;
+  totalDonations: { valueInCents: number };
+  account?: {
+    id: string;
+    type: string;
+    name?: string;
+    description?: string;
+    slug?: string;
+    imageUrl?: string;
+    backgroundImageUrl?: string;
+    isIncognito?: boolean;
+    company?: string;
+  } | null;
+};
+
 type MembersQueryVariables = {
   collectiveSlug: string;
-  role?: string;
-  type?: string;
+  role?: string[];
+  accountType?: string[];
   limit?: number;
   offset?: number;
-  orderBy?: string;
+  orderByTotalContributed?: 'DESC' | 'ASC';
 };
 
 type MembersQueryData = {
-  allMembers?: MemberNode[];
+  account?: { id: string; name?: string; members: { totalCount?: number; nodes: V2MemberNode[] } } | null;
   error?: { message?: string };
   fetchMore: (options: {
     variables: { offset: number; limit: number };
@@ -98,6 +116,26 @@ type State = {
   loading: boolean;
 };
 
+// Map the v2 member to the shape the cards expect (v2 INDIVIDUAL is USER for them)
+const toMemberNode = (node: V2MemberNode): MemberNode => ({
+  id: node.id,
+  role: node.role,
+  createdAt: node.createdAt,
+  tier: node.tier,
+  stats: { totalDonations: node.totalDonations.valueInCents },
+  member: {
+    id: node.account.id,
+    type: node.account.type === 'INDIVIDUAL' ? 'USER' : node.account.type,
+    name: node.account.name,
+    company: node.account.company,
+    description: node.account.description,
+    slug: node.account.slug,
+    imageUrl: node.account.imageUrl,
+    backgroundImage: node.account.backgroundImageUrl,
+    isIncognito: node.account.isIncognito,
+  },
+});
+
 class MembersWithData extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -135,10 +173,10 @@ class MembersWithData extends React.Component<Props, State> {
     if (data.error) {
       return <Error message={data.error.message} />;
     }
-    if (!data.allMembers) {
+    if (!data.account?.members?.nodes) {
       return <div />;
     }
-    let members = [...data.allMembers];
+    let members = data.account.members.nodes.filter(node => node?.account).map(toMemberNode);
     if (members.length === 0) {
       return <div />;
     }
@@ -151,7 +189,7 @@ class MembersWithData extends React.Component<Props, State> {
       } else if (a.createdAt !== b.createdAt) {
         return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       } else {
-        return a.collective.name.localeCompare(b.collective.name);
+        return (a.member.name || '').localeCompare(b.member.name || '');
       }
     });
 
@@ -204,42 +242,50 @@ class MembersWithData extends React.Component<Props, State> {
   }
 }
 
-const membersQuery = gqlV1 /* GraphQL */ `
-  query Members($collectiveSlug: String!, $role: String, $type: String, $limit: Int, $offset: Int, $orderBy: String) {
-    allMembers(
-      collectiveSlug: $collectiveSlug
-      role: $role
-      type: $type
-      limit: $limit
-      offset: $offset
-      orderBy: $orderBy
-    ) {
+const membersQuery = gql`
+  query BannerMembers(
+    $collectiveSlug: String!
+    $role: [MemberRole]
+    $accountType: [AccountType]
+    $limit: Int!
+    $offset: Int!
+    $orderByTotalContributed: OrderDirection
+  ) {
+    account(slug: $collectiveSlug, throwIfMissing: false) {
       id
-      role
-      createdAt
-      collective {
-        id
-        name
-      }
-      stats {
-        id
-        totalDonations
-      }
-      tier {
-        id
-        name
-      }
-      member {
-        id
-        type
-        name
-        company
-        description
-        slug
-        website
-        imageUrl
-        backgroundImage
-        isIncognito
+      members(
+        role: $role
+        accountType: $accountType
+        limit: $limit
+        offset: $offset
+        orderByTotalContributed: $orderByTotalContributed
+      ) {
+        totalCount
+        nodes {
+          id
+          role
+          createdAt
+          tier {
+            id
+            name
+          }
+          totalDonations {
+            valueInCents
+          }
+          account {
+            id
+            type
+            name
+            slug
+            description
+            imageUrl
+            backgroundImageUrl
+            isIncognito
+            ... on Individual {
+              company
+            }
+          }
+        }
       }
     }
   }
@@ -247,13 +293,12 @@ const membersQuery = gqlV1 /* GraphQL */ `
 
 const addMembersData = graphql<OwnProps, MembersQueryData, MembersQueryVariables>(membersQuery, {
   options: props => ({
-    context: API_V1_CONTEXT,
     variables: {
       collectiveSlug: props.collective.slug,
       offset: 0,
-      type: props.type,
-      role: props.memberRole,
-      orderBy: props.orderBy,
+      accountType: props.type ? props.type.split(',').map(type => (type === 'USER' ? 'INDIVIDUAL' : type)) : undefined,
+      role: props.memberRole ? [props.memberRole] : undefined,
+      orderByTotalContributed: props.orderBy === 'totalDonations' ? 'DESC' : undefined,
       limit: props.limit || MEMBERS_PER_PAGE * 2,
     },
   }),
@@ -262,17 +307,23 @@ const addMembersData = graphql<OwnProps, MembersQueryData, MembersQueryVariables
     fetchMore: () => {
       return data.fetchMore({
         variables: {
-          offset: data.allMembers.length,
+          offset: data.account.members.nodes.length,
           limit: MEMBERS_PER_PAGE,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) {
+          if (!fetchMoreResult?.account) {
             return previousResult;
           }
-          return Object.assign({}, previousResult, {
-            // Append the new posts results to the old one
-            allMembers: [...previousResult.allMembers, ...fetchMoreResult.allMembers],
-          });
+          return {
+            ...previousResult,
+            account: {
+              ...previousResult.account,
+              members: {
+                ...previousResult.account.members,
+                nodes: [...previousResult.account.members.nodes, ...fetchMoreResult.account.members.nodes],
+              },
+            },
+          };
         },
       });
     },
