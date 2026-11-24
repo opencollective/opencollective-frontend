@@ -130,7 +130,7 @@
     "spdx-license-list": "6.12.0",
     "styled-components": "6.6.0",
     "styled-system": "5.1.5",
-    "tailwind-merge": "3.7.0",
+    "tailwind-merge": "3.7.1",
     "throng": "5.0.0",
     "trix": "2.1.19",
     "uuid": "14.0.3",
