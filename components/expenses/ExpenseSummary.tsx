@@ -649,7 +649,7 @@ const ExpenseSummary = ({
           p={3}
           {...({
             borderRadius: '8px',
-            backgroundColor: '#f9fafb',
+            backgroundColor: 'var(--color-gray-50)',
             border: '1px solid',
             borderColor: 'black.200',
           } as Record<string, unknown>)}

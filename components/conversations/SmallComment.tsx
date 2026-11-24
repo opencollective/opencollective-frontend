@@ -86,7 +86,7 @@ export default function SmallComment(props: CommentProps) {
                       fontSize="14px"
                       autoFocus
                       setUploading={setUploading}
-                      toolbarBackgroundColor={isPrivateNote ? '#fffbeb' : '#ffffff'}
+                      toolbarBackgroundColor={isPrivateNote ? 'var(--color-amber-50)' : 'var(--color-white)'}
                     />
                   )
                 }

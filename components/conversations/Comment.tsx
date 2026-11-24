@@ -86,7 +86,7 @@ const Comment = ({
                 fontSize="13px"
                 autoFocus
                 setUploading={setUploading}
-                toolbarBackgroundColor={isPrivateNote ? '#fffbeb' : '#ffffff'}
+                toolbarBackgroundColor={isPrivateNote ? 'var(--color-amber-50)' : 'var(--color-white)'}
               />
             )
           }

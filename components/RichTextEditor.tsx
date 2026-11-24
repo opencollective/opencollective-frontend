@@ -269,7 +269,7 @@ export default class RichTextEditor extends React.Component<RichTextEditorProps,
     toolbarTop: 0,
     toolbarOffsetY: -62, // Default Trix toolbar height
     inputName: 'content',
-    toolbarBackgroundColor: 'white',
+    toolbarBackgroundColor: 'var(--color-white)',
     version: 'default',
     'data-cy': 'RichTextEditor',
     videoEmbedEnabled: false,
