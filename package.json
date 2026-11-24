@@ -326,8 +326,8 @@
     "@types/react-dom": "19.3.0"
   },
   "allowScripts": {
-    "@tailwindcss/oxide@4.3.3": true,
-    "cypress@16.2.1": true,
+    "@tailwindcss/oxide@4.3.5": true,
+    "cypress@16.3.0": true,
     "esbuild@0.28.2": true,
     "sharp@0.35.5": true,
     "@sentry/cli@2.58.6": true,
