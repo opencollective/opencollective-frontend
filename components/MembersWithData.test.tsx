@@ -114,4 +114,13 @@ describe('MembersWithData', () => {
     await waitFor(() => expect(screen.getAllByTestId('member')).toHaveLength(14));
     expect(screen.queryByText('load more')).not.toBeInTheDocument();
   });
+
+  it('shows backers whose account is hidden as incognito', async () => {
+    renderWithLink({ type: 'USER', memberRole: 'BACKER', limit: 10 }, node =>
+      node.id === 'm0' ? { ...node, account: null } : node,
+    );
+    await waitFor(() => expect(screen.getAllByTestId('member')).toHaveLength(10));
+    const incognito = screen.getAllByTestId('member').find(el => el.textContent.startsWith(':'));
+    expect(incognito).toHaveAttribute('data-type', 'USER');
+  });
 });

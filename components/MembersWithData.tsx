@@ -116,24 +116,28 @@ type State = {
   loading: boolean;
 };
 
-// Map the v2 member to the shape the cards expect (v2 INDIVIDUAL is USER for them)
+// Map the v2 member to the shape the cards expect (v2 INDIVIDUAL is USER for them).
+// v2 hides incognito (and private) backers' accounts from the public: show them as an
+// anonymous "Incognito" card, like the v1 incognito profile was.
 const toMemberNode = (node: V2MemberNode): MemberNode => ({
   id: node.id,
   role: node.role,
   createdAt: node.createdAt,
   tier: node.tier,
   stats: { totalDonations: node.totalDonations.valueInCents },
-  member: {
-    id: node.account.id,
-    type: node.account.type === 'INDIVIDUAL' ? 'USER' : node.account.type,
-    name: node.account.name,
-    company: node.account.company,
-    description: node.account.description,
-    slug: node.account.slug,
-    imageUrl: node.account.imageUrl,
-    backgroundImage: node.account.backgroundImageUrl,
-    isIncognito: node.account.isIncognito,
-  },
+  member: node.account
+    ? {
+        id: node.account.id,
+        type: node.account.type === 'INDIVIDUAL' ? 'USER' : node.account.type,
+        name: node.account.name,
+        company: node.account.company,
+        description: node.account.description,
+        slug: node.account.slug,
+        imageUrl: node.account.imageUrl,
+        backgroundImage: node.account.backgroundImageUrl,
+        isIncognito: node.account.isIncognito,
+      }
+    : { id: `incognito-${node.id}`, type: 'USER', name: 'Incognito', isIncognito: true },
 });
 
 class MembersWithData extends React.Component<Props, State> {
@@ -176,7 +180,7 @@ class MembersWithData extends React.Component<Props, State> {
     if (!data.account?.members?.nodes) {
       return <div />;
     }
-    let members = data.account.members.nodes.filter(node => node?.account).map(toMemberNode);
+    let members = data.account.members.nodes.filter(Boolean).map(toMemberNode);
     // Count on the raw nodes: v2 returns one node per membership, de-duplicated below
     const hasMore = data.account.members.nodes.length < (data.account.members.totalCount ?? 0);
     if (members.length === 0 && !hasMore) {
