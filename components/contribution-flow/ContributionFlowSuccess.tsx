@@ -19,6 +19,10 @@ import { SocialLinkType } from '../../lib/graphql/types/v2/graphql';
 import { iconForSocialLinkType } from '../../lib/social-links';
 import { getStripe } from '../../lib/stripe';
 import {
+  getMicrodepositVerificationUrl,
+  isPaymentIntentAwaitingMicrodepositVerification,
+} from '../../lib/stripe/microdeposits';
+import {
   blueskyShareURL,
   followOrderRedirectUrl,
   getCollectivePageRoute,
@@ -225,7 +229,12 @@ class ContributionFlowSuccess extends React.Component<
     this.trackSuccess();
 
     const paymentIntentResult = this.state?.paymentIntentResult;
-    if (order && paymentIntentResult) {
+    // A bank account waiting for microdeposit verification is pending, not failed: stay on this page
+    // so the contributor sees the instructions instead of being sent back to the payment step.
+    const isAwaitingMicrodepositVerification = isPaymentIntentAwaitingMicrodepositVerification(
+      paymentIntentResult?.paymentIntent,
+    );
+    if (order && paymentIntentResult && !isAwaitingMicrodepositVerification) {
       const stripeErrorMessage = paymentIntentResult.error
         ? paymentIntentResult.error.message
         : !['succeeded', 'processing'].includes(paymentIntentResult.paymentIntent.status)
@@ -426,6 +435,11 @@ class ContributionFlowSuccess extends React.Component<
     const shareURL = `${getWebsiteUrl()}/${collective.slug}`;
     const isProcessing = order?.status === ORDER_STATUS.PROCESSING;
     const isPendingManualContribution = order?.status === ORDER_STATUS.PENDING && !order.paymentMethod;
+    const paymentIntentResult = this.state?.paymentIntentResult;
+    const isAwaitingMicrodepositVerification = isPaymentIntentAwaitingMicrodepositVerification(
+      paymentIntentResult?.paymentIntent,
+    );
+    const microdepositVerificationUrl = getMicrodepositVerificationUrl(paymentIntentResult);
 
     const loading = data.loading || !this.state?.loaded;
 
@@ -457,7 +471,40 @@ class ContributionFlowSuccess extends React.Component<
 
     return (
       <React.Fragment>
-        {!isEmbed && isProcessing && (
+        {!loading && isAwaitingMicrodepositVerification && (
+          <div
+            className="flex flex-col items-center justify-center bg-[#FFFFC2] px-4 py-6 text-[#0C2D66]"
+            data-cy="order-success-verify-microdeposits"
+          >
+            <p className="text-center text-sm leading-5 font-bold">
+              <FormattedMessage
+                defaultMessage="Check your email to verify your bank account"
+                id="ContributionFlow.Success.VerifyMicrodeposits.Title"
+              />
+            </p>
+            <div className="mt-1 max-w-[672px]">
+              <p className="text-center text-sm leading-5 font-normal">
+                <FormattedMessage
+                  defaultMessage="Your bank account could not be verified instantly. Stripe will send two small deposits to your account, which should arrive in 1-2 business days, and email you a link to confirm them. Your contribution will be processed once your bank account is verified. If it is not verified within 10 days, the payment will be canceled."
+                  id="ContributionFlow.Success.VerifyMicrodeposits.Description"
+                />
+              </p>
+            </div>
+            {microdepositVerificationUrl && (
+              <StyledLink
+                href={microdepositVerificationUrl}
+                openInNewTab
+                className="mt-1 text-sm leading-5 font-bold text-[#0C2D66] underline"
+              >
+                <FormattedMessage
+                  defaultMessage="Verify bank account"
+                  id="ContributionFlow.Success.VerifyMicrodeposits.Link"
+                />
+              </StyledLink>
+            )}
+          </div>
+        )}
+        {!isEmbed && isProcessing && !isAwaitingMicrodepositVerification && (
           <div className="flex h-[120px] flex-col items-center justify-center bg-[#FFFFC2] text-[#0C2D66]">
             <p className="text-sm leading-5 font-bold">
               <FormattedMessage defaultMessage="Your Contribution is processing!" id="RTyy4V" />
