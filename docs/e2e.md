@@ -170,6 +170,26 @@ the database, starts the services, runs the spec and stops everything it
 started. Replay (`--replay <manifest>`) always runs fresh. Both are described
 below.
 
+### On macOS
+
+The launcher runs natively on macOS with the system `/bin/bash` (3.2) and BSD
+tools: where `setsid` and `timeout` are missing it falls back to `perl`, which
+macOS ships. Checked on macOS 26 (Apple silicon): first run, iteration,
+`--rebuild` and `npm run e2e:stop`. Postgres, Mailpit and the object store run
+in Docker as on Linux.
+
+Limits:
+
+- Services need different Node majors (images: 26, the others: 24) with
+  `engine-strict`, and the launcher runs them all with the `node` on the PATH.
+  Use Node 24 and `npm_config_engine_strict=false npm run e2e -- <spec>`, as
+  CI does for images.
+- `--replay` refuses a manifest recorded on another OS (CI runs on Linux).
+  Replay those on Linux.
+- Full native macOS support (declared versions, replay of Linux runs) is
+  tracked in
+  [opencollective#8959](https://github.com/opencollective/opencollective/issues/8959).
+
 ## Playwright fresh reproduction (Linux pilot)
 
 One shared launcher provisions a fresh disposable Linux environment and runs a

@@ -685,11 +685,16 @@ apply_replay_manifest() {
   fi
   check_field "playwright" "$(jq -r '.playwright // empty' "$manifest")" \
     "$("$FRONTEND_DIR/node_modules/.bin/playwright" --version 2>/dev/null || echo unknown)"
-  check_field "platform OS" "$(jq -r '.platform // empty' "$manifest" | cut -d/ -f1)" "$(uname -s)"
+  local rec_os
+  rec_os="$(jq -r '.platform // empty' "$manifest" | cut -d/ -f1)"
+  check_field "platform OS" "$rec_os" "$(uname -s)"
 
   if [[ ${#mismatches[@]} -gt 0 ]]; then
     echo "ERROR: replay inputs do not match; checkouts were not modified." >&2
     printf '  - %s\n' "${mismatches[@]}" >&2
+    if [[ -n "$rec_os" && "$rec_os" != "$(uname -s)" ]]; then
+      echo "This run was recorded on $rec_os: replay it on $rec_os (see \"On macOS\" in docs/e2e.md)." >&2
+    fi
     echo "Check out the recorded service revisions (without overwriting unrelated" >&2
     echo "local changes), rebuild, reinstall the recorded Playwright, and retry." >&2
     exit 2
