@@ -21,8 +21,15 @@ test('Collective admin drafts, publishes and edits a restricted update that outs
   await page.getByTestId('update-title').fill(title);
   const editor = page.getByTestId('update-content-editor').locator('trix-editor');
   await editor.fill('This is some bold HTML');
-  await editor.press('ControlOrMeta+a');
-  await page.getByTestId('update-content-editor').locator('trix-toolbar .trix-button--icon-bold').click();
+  // Selecting everything right after filling can select nothing yet; select and embolden again until it holds.
+  const bold = page.getByTestId('update-content-editor').locator('trix-toolbar .trix-button--icon-bold');
+  await expect(async () => {
+    if ((await editor.locator('strong').count()) === 0) {
+      await editor.press('ControlOrMeta+a');
+      await bold.click();
+    }
+    await expect(editor.locator('strong')).toHaveText('This is some bold HTML', { timeout: 2_000 });
+  }).toPass();
   await page.getByTestId('update-save-draft-btn').click();
   await expect(header.locator('h1')).toHaveText(title);
   await expect(header).toContainText('Draft');

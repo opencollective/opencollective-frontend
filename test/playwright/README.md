@@ -223,3 +223,24 @@ admin's own picker. Coverage mapping, differences from Cypress, timings, and
 the reconciliation of both pilot Cypress files with all Playwright journeys are
 in the canonical
 [guide](../../docs/e2e.md#vendor-creation-and-settings-journeys-playwright-pilot).
+
+## Public pages and content journeys
+
+`specs/pages/` holds the public pages: the docs search of the help page (the
+`/api/docs/search` route stays stubbed in the browser, as in Cypress), the
+not-found page, the search page, a Collective's transactions (indexing and the
+receipt PDF) and expenses list, and the contact form (its message is read from
+Mailpit). `specs/content/` holds what Collective admins and members write:
+updates, conversations, expense comments and reactions, and a new Collective
+completed through the onboarding modal. Language switching is covered by
+`smoke.spec.ts`; publishing a conversation and its reply by
+`account-conversation.spec.ts`.
+
+```bash
+npm run e2e -- test/playwright/specs/pages test/playwright/specs/content --workers 4
+```
+
+They reuse the existing recipes (`account-profile`, `account-conversation`,
+`expense-submission`, `expense-management` with `listedExpenses` for a list
+that spans pages, `recurring-contribution` for a Collective with a charged
+contribution) and arrange no seeded Account.
