@@ -26,8 +26,9 @@ test.describe('Contribute with a card (Stripe Payment Element)', { tag: STRIPE_T
 
     await page.goto(scenario.urls.transactions);
     const transaction = page.getByTestId('transaction-item').first();
-    await expect(transaction).toContainText(`Financial contribution to ${scenario.accounts.collective.name}`);
-    await expect(transaction).toContainText('Guest');
+    // The title is cut short: the credit line names both parties in full
+    await expect(transaction).toContainText('Financial contribution to');
+    await expect(transaction).toContainText(`Credit from Guest to ${scenario.accounts.collective.name}`);
     await expect(transaction).toContainText('Completed');
   });
 

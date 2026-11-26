@@ -17,6 +17,8 @@ test.describe('Pay a settlement expense with Stripe', { tag: STRIPE_TAG }, () =>
     await expect(modal).toContainText('Pay expense');
     await fillTestCard(stripeElement(modal));
     await modal.getByRole('button', { name: 'Pay', exact: true }).click();
+    // The modal closes once Stripe confirmed the payment and the expense was marked as paid with Stripe
+    await expect(modal).toBeHidden({ timeout: 60_000 });
 
     // Paid once Stripe reports the payment succeeded (a webhook)
     await expect(async () => {
