@@ -61,6 +61,11 @@ const contributionScenario = graphScenario.extend({
   contribution: z.object({ legacyId: z.number(), id: z.string() }),
 });
 
+/** `contribution-flow`: the multi-party shape, plus the tiers it arranged (possibly none). */
+const contributionFlowScenario = graphScenario.extend({
+  tiers: z.record(z.object({ legacyId: z.number(), name: z.string() })),
+});
+
 // Written out rather than inferred: this project compiles without `strict`, where inference makes every field optional.
 type Envelope = {
   recipe: string;
@@ -84,6 +89,10 @@ export type GraphScenario = Envelope & {
 export type ContributionScenario = GraphScenario & {
   tiers: Record<'gold' | 'silver', { legacyId: number; name: string }>;
   contribution: { legacyId: number; id: string };
+};
+
+export type ContributionFlowScenario = GraphScenario & {
+  tiers: Partial<Record<'open' | 'ticket', { legacyId: number; name: string }>>;
 };
 
 type UseVendorPolicy = 'HOST_ADMINS' | 'HOST_AND_COLLECTIVE_ADMINS' | 'ALL_SUBMITTERS';
@@ -158,6 +167,23 @@ type Contracts = {
     };
     scenario: ContributionScenario;
   };
+  /**
+   * Actors `hostAdmin`, `admin` (Collective admin), optional `contributor` (administers `organization` only).
+   * Accounts `host` (accepts bank transfers, no Stripe), `collective`, optional `organization`, `event`.
+   * Tiers: optional `open`, `ticket`. URLs `donate`, `contribute`, optional `event`, `eventTickets` (dashboard).
+   */
+  'contribution-flow': {
+    inputs: {
+      /** The Collective asks for a platform tip. */
+      platformTips?: boolean;
+      /** A one-time `Backer` tier, $5 by default, from $0. */
+      openTier?: boolean;
+      contributorOrganization?: boolean;
+      /** `upcoming`: in a week, without tickets. `past`: ended nine days ago, with a $10 ticket. */
+      event?: 'upcoming' | 'past';
+    };
+    scenario: ContributionFlowScenario;
+  };
   'vendor-host': {
     inputs: {
       /** Who may use the host's vendors; omitted, the host has no policy (product default: host admins only). */
@@ -190,6 +216,7 @@ const schemas: Record<Recipe, z.ZodTypeAny> = {
   'expense-management': graphScenario,
   'vendor-host': graphScenario,
   'recurring-contribution': contributionScenario,
+  'contribution-flow': contributionFlowScenario,
 };
 
 type Recipe = keyof Contracts;

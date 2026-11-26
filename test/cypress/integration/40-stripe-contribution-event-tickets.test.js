@@ -22,32 +22,6 @@ describe('event.createOrder page', () => {
     cy.createHostedCollective().then(c => (collective = c));
   });
 
-  it('makes an order for a free ticket', () => {
-    createEvent('Free Ticket Event');
-
-    // Create Ticket
-    cy.getByDataCy('menu-item-tickets').click();
-    cy.get('[data-cy="admin-panel-container"] [data-cy="create-ticket"]').click();
-    cy.get('[data-cy=name]').type('Free ticket');
-    cy.get('input[data-cy=amount]').type('0');
-    cy.getByDataCy('confirm-btn').click();
-    cy.checkToast({ variant: 'success', message: 'Ticket created.' });
-    cy.getByDataCy('public-profile-link').click();
-
-    // Go to the contribution flow
-    cy.contains('button', 'RSVP').click();
-
-    cy.get('[data-cy="amount-picker"]').should('not.exist');
-    cy.get('[data-cy="contribution-quantity"]').should('exist');
-
-    cy.getByDataCy('cf-next-step').click();
-    cy.getByDataCy('input-legalName').type('John Doe');
-    cy.getByDataCy('cf-next-step').contains('Get ticket').click();
-
-    cy.wait(500);
-    cy.getByDataCy('order-success', { timeout: 20000 });
-  });
-
   it('makes an order for a paying ticket with fixed amount', () => {
     createEvent('Paying Ticket Event');
 
@@ -227,14 +201,5 @@ describe('event.createOrder page', () => {
     cy.contains('button', 'Get tickets').click();
     cy.wait(500);
     cy.getByDataCy('order-success', { timeout: 20000 });
-  });
-
-  describe('Outdated Event', () => {
-    it("can't contribute if the event is over", () => {
-      cy.visit('/opensource/events/webpack-webinar');
-      cy.contains('Webinar: How Webpack Reached $400K+/year in Sponsorship & Crowdfunding');
-      cy.get('[data-cy="financial-contributions"]').should('not.exist');
-      cy.get('[data-cy="Tickets"]').should('not.exist');
-    });
   });
 });

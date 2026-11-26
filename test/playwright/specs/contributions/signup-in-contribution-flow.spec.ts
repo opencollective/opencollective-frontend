@@ -2,10 +2,13 @@ import { randomUUID } from 'crypto';
 import path from 'path';
 
 import type { Locator, Page, TestInfo } from '@playwright/test';
-import { expect, test } from '@playwright/test';
 import * as cheerio from 'cheerio';
 
-import { Mailbox } from '../../helpers/mail';
+import { expect, scenarioTest } from '../../fixtures';
+import { resetSignupRateLimit } from '../../helpers/rate-limits';
+
+// A Collective of its own to contribute to, for a visitor who is not signed in
+const test = scenarioTest('contribution-flow', { inputs: {}, actor: null });
 
 /** Attached to the report; also written to `PW_SCREENSHOTS_DIR` when set (e.g. to illustrate a pull request). */
 const capture = async (page: Page, testInfo: TestInfo, name: string, target?: Locator) => {
@@ -26,8 +29,9 @@ const capture = async (page: Page, testInfo: TestInfo, name: string, target?: Lo
  */
 test('visitor creates an account with an emailed code without leaving the contribution flow', async ({
   page,
+  scenario,
+  mail,
 }, testInfo) => {
-  const mail = new Mailbox(randomUUID());
   const email = mail.address('contributor');
   const suffix = randomUUID().slice(0, 8);
   const name = `Playwright Contributor ${suffix}`;
@@ -35,7 +39,7 @@ test('visitor creates an account with an emailed code without leaving the contri
   await page.setViewportSize({ width: 1280, height: 900 });
 
   // 1. Contribution details, then the profile step
-  await page.goto('/apex/donate');
+  await page.goto(scenario.urls.donate);
   await expect(page.getByTestId('cf-next-step')).toBeVisible();
   await capture(page, testInfo, '1-contribution-details');
   await page.getByTestId('cf-next-step').click();
@@ -60,6 +64,7 @@ test('visitor creates an account with an emailed code without leaving the contri
   await page.unroute('**/api/users/signup');
 
   // 4. The retry goes through: the code step replaces the form, still in the flow
+  await resetSignupRateLimit();
   await content.locator('button[type=submit]').click();
   const codeForm = page.getByTestId('signup-code-form');
   await expect(codeForm).toContainText(`Enter the code sent to ${email}.`);
@@ -76,6 +81,6 @@ test('visitor creates an account with an emailed code without leaving the contri
   await expect(page.getByText('Contribute as')).toBeVisible();
   await expect(picker).toContainText(name);
   await expect(picker).toContainText(`@playwright-contributor-${suffix}`);
-  await expect(page).toHaveURL(/\/apex\/donate\/profile/);
+  await expect(page).toHaveURL(new RegExp(`${scenario.urls.donate}/profile`));
   await capture(page, testInfo, '5-contribute-as-new-profile');
 });
