@@ -265,8 +265,8 @@ jobs:
       api-ref: ${{ needs.e2e-prepare.outputs.api-ref }}
       images-ref: ${{ needs.e2e-prepare.outputs.images-ref }}
       pdf-ref: ${{ needs.e2e-prepare.outputs.pdf-ref }}
-      # TEMPORARY (evidence runs, reverted before review): Stripe journeys only, 4 workers, isolation probe + 1 retry
+      # TEMPORARY (evidence runs, reverted before review): Stripe journeys only, 4 workers, no retries
       spec: test/playwright/specs/stripe
       workers: '4'
-      retries: '1'
+      retries: '0'
     secrets: inherit
