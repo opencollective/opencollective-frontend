@@ -16,6 +16,8 @@ jwt = re.compile(rb"eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+")
 # which together are the token: traces record them in request headers and as name/value pairs.
 signature_cookie = re.compile(rb"(accessTokenSignature=)[a-zA-Z0-9_-]+")
 signature_pair = re.compile(rb'("name":\s*"accessTokenSignature",\s*"value":\s*")[^"]+')
+# Stripe keys and the listener's webhook signing secret (the listener log prints it).
+stripe_secret = re.compile(rb"\b(?:whsec|sk_test|sk_live|rk_test|rk_live)_[A-Za-z0-9]+")
 failures = []
 
 
@@ -24,6 +26,7 @@ def redact(data):
         data = data.replace(token, b"[redacted-fixture-token]")
     data = signature_cookie.sub(rb"\1[redacted-auth-signature]", data)
     data = signature_pair.sub(rb"\1[redacted-auth-signature]", data)
+    data = stripe_secret.sub(b"[redacted-stripe-secret]", data)
     return jwt.sub(b"[redacted-auth-token]", data)
 
 

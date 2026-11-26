@@ -186,6 +186,23 @@ type Contracts = {
     scenario: ContributionScenario;
   };
   /**
+   * Actors `contributor` (no payment method yet), `collectiveAdmin`. Accounts `host` (a seeded host whose
+   * Stripe test connection journeys share: `e2e-host`, USD, unless stated, or `e2e-eur-host`, EUR) and
+   * `collective`, hosted by it. URLs `donate`, `transactions`, `orders`. For `@stripe` journeys.
+   */
+  'stripe-contribution': {
+    inputs: { host?: 'e2e-host' | 'e2e-eur-host' };
+    scenario: GraphScenario;
+  };
+  /**
+   * Actor `hostAdmin`. Accounts `host` and `payee` (the seeded `ofitech`, paid through its shared Stripe
+   * connection). Expenses: `settlement` ($10, pending, owed by `host` to `payee`). URLs `expense`. For `@stripe` journeys.
+   */
+  'stripe-settlement-expense': {
+    inputs: Record<string, never>;
+    scenario: GraphScenario;
+  };
+  /**
    * Actors `hostAdmin`, `collectiveAdmin`, optional `contributor`, `applicant` (no role anywhere). Accounts `host`,
    * `collective` (admin: `collectiveAdmin`), optional `collective2` (admin: `hostAdmin`), `applicantCollective`
    * (no host, admin: `applicant`). Expenses: optional `pending` ($10 invoice by `collectiveAdmin` on `collective`).
@@ -283,6 +300,8 @@ const schemas: Record<Recipe, z.ZodTypeAny> = {
   'vendor-host': graphScenario,
   'fiscal-host': graphScenario,
   'recurring-contribution': contributionScenario,
+  'stripe-contribution': graphScenario,
+  'stripe-settlement-expense': graphScenario,
   'collective-admin': collectiveScenario,
   individual: individualScenario,
   'user-profile': graphScenario,
@@ -354,6 +373,31 @@ export class FixtureRecipes {
       workerIndex: testInfo.workerIndex,
       nonce: randomUUID(),
     };
+  }
+
+  /**
+   * Value of the `oc_e2e_attempt` cookie a `@stripe` journey's browser carries: it names this attempt to the
+   * API, which records every Stripe object it creates for it and only lets webhooks about them through.
+   */
+  get stripeAttemptCookie(): string {
+    return Buffer.from(JSON.stringify(this.attempt)).toString('base64url');
+  }
+
+  /**
+   * Ends this attempt's ownership: later Stripe events about its objects are dropped. Returns what it owned
+   * and what became of its events (`server/e2e/stripe-ownership.ts` in the API), for the report.
+   */
+  async retireStripeAttempt(): Promise<unknown> {
+    const response = await fetch(`${process.env.API_URL}/e2e/stripe/attempts/retire`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${this.token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ attempt: this.attempt }),
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (!response.ok) {
+      throw new Error(`Retiring the Stripe attempt failed (${response.status}). Rebuild the companion API.`);
+    }
+    return response.json();
   }
 
   async request<R extends Recipe>(recipe: R, inputs: Inputs<R>, requestId: string = recipe) {
