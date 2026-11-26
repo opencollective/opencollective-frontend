@@ -20,7 +20,7 @@ import Link from '../Link';
 import LinkCollective from '../LinkCollective';
 import Loading from '../Loading';
 import MessageBox from '../MessageBox';
-import StyledButton from '../StyledButton';
+import { Button } from '../ui/Button';
 import { InfoList, InfoListItem } from '../ui/InfoList';
 import { useToast } from '../ui/useToast';
 
@@ -77,6 +77,14 @@ const virtualCardQuery = gql`
   }
   ${accountHoverCardFieldsFragment}
 `;
+
+const MoreActionsButton = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof Button>>((props, ref) => (
+  <Button variant="outline" {...props} ref={ref}>
+    <FormattedMessage defaultMessage="More actions" id="S8/4ZI" />
+  </Button>
+));
+
+MoreActionsButton.displayName = 'MoreActionsButton';
 
 export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
   const intl = useIntl();
@@ -202,7 +210,7 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
 
       {virtualCard && props.open && (
         <DrawerActions>
-          <Flex justifyContent="space-between" width="100%">
+          <div className="flex w-full justify-between gap-2">
             <ActionsButton
               virtualCard={virtualCard}
               host={virtualCard.host}
@@ -210,28 +218,20 @@ export default function VirtualCardDrawer(props: VirtualCardDrawerProps) {
               canDeleteVirtualCard={props.canDeleteVirtualCard}
               onDeleteRefetchQuery={props.onDeleteRefetchQuery}
               hideViewTransactions
-              as={React.forwardRef((props, ref: React.ForwardedRef<HTMLButtonElement>) => {
-                return (
-                  <StyledButton {...props} ref={ref}>
-                    <FormattedMessage defaultMessage="More actions" id="S8/4ZI" />
-                  </StyledButton>
-                );
-              })}
+              as={MoreActionsButton}
             />
 
-            <Flex gap="8px">
-              <StyledButton
-                as={Link}
-                href={`/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard?.id}`}
-                buttonStyle="secondary"
-              >
-                <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
-              </StyledButton>
-              <StyledButton buttonStyle="primary" onClick={() => setIsEditingVirtualCard(true)}>
+            <div className="flex gap-2">
+              <Button asChild variant="outline">
+                <Link href={`/${virtualCard.account.slug}/transactions?virtualCard=${virtualCard?.id}`}>
+                  <FormattedMessage defaultMessage="View transactions" id="DfQJQ6" />
+                </Link>
+              </Button>
+              <Button onClick={() => setIsEditingVirtualCard(true)}>
                 <FormattedMessage defaultMessage="Edit Card Details" id="ILnhs8" />
-              </StyledButton>
-            </Flex>
-          </Flex>
+              </Button>
+            </div>
+          </div>
           {isEditingVirtualCard && (
             <EditVirtualCardModal
               host={virtualCard.host}

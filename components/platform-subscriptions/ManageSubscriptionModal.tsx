@@ -400,7 +400,14 @@ export function PlatformSubscriptionTierCard(props: PlatformSubscriptionTierCard
   return (
     <div className="pt-0 pb-5">
       <div className={cn('relative mx-auto flex justify-center')}>
-        <Image src={imgSrc} height={512} width={512} className="!size-40" alt="" aria-hidden />
+        <Image
+          src={imgSrc}
+          height={512}
+          width={512}
+          className="!size-40 dark:mb-3 dark:rounded-2xl dark:bg-slate-900 dark:p-3"
+          alt=""
+          aria-hidden
+        />
       </div>
       <div className="flex justify-center text-2xl font-bold">
         <FormattedMessage {...titleMessage} />
