@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto';
 
 import { expect, scenarioTest, STRIPE_TAG } from '../../fixtures';
+import { isolationProbe } from '../../helpers/attempt';
 import {
   chooseNewPaymentMethod,
   contributionOnSuccessPage,
@@ -36,11 +37,15 @@ test.describe('Contribute with a card (Stripe Payment Element)', { tag: STRIPE_T
     test('user pays with a new card, then again with the card saved by the first payment', async ({
       page,
       scenario,
-    }) => {
+    }, testInfo) => {
       await goToPaymentStep(page, scenario.urls.donate);
       await fillTestCard(await chooseNewPaymentMethod(page));
       await page.getByTestId('cf-next-step').click();
       await expectContributionStatus(scenario.actors.collectiveAdmin, await contributionOnSuccessPage(page), /^PAID$/);
+      isolationProbe(
+        testInfo,
+        'leave a paid contribution, a Stripe customer and a saved card behind; the retry pays from a new contributor',
+      );
 
       const saved = page.getByTestId('PaymentMethodList').getByText('VISA **** 4242');
       await goToPaymentStep(page, scenario.urls.donate);
