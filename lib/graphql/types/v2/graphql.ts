@@ -2868,7 +2868,6 @@ export type CollectiveFeatures = {
   ACCOUNTING_CATEGORIZATION_RULES?: Maybe<CollectiveFeatureStatus>;
   ACCOUNT_MANAGEMENT?: Maybe<CollectiveFeatureStatus>;
   AGREEMENTS?: Maybe<CollectiveFeatureStatus>;
-  ALIPAY?: Maybe<CollectiveFeatureStatus>;
   ALL?: Maybe<CollectiveFeatureStatus>;
   CHARGE_HOSTING_FEES?: Maybe<CollectiveFeatureStatus>;
   CHART_OF_ACCOUNTS?: Maybe<CollectiveFeatureStatus>;
@@ -12429,7 +12428,6 @@ export type PaymentMethodInput = {
 export enum PaymentMethodLegacyType {
   ACCOUNT_BALANCE = 'ACCOUNT_BALANCE',
   ADDED_FUNDS = 'ADDED_FUNDS',
-  ALIPAY = 'ALIPAY',
   BACS_DEBIT = 'BACS_DEBIT',
   BANCONTACT = 'BANCONTACT',
   BANK_TRANSFER = 'BANK_TRANSFER',
@@ -12458,7 +12456,6 @@ export enum PaymentMethodService {
 
 export enum PaymentMethodType {
   ADAPTIVE = 'ADAPTIVE',
-  ALIPAY = 'ALIPAY',
   BACS_DEBIT = 'BACS_DEBIT',
   BANCONTACT = 'BANCONTACT',
   BANK_TRANSFER = 'BANK_TRANSFER',
@@ -12481,8 +12478,6 @@ export enum PaymentMethodType {
   VIRTUAL_CARD = 'VIRTUAL_CARD',
   /** @deprecated Please use uppercase values */
   adaptive = 'adaptive',
-  /** @deprecated Please use uppercase values */
-  alipay = 'alipay',
   /** @deprecated Please use uppercase values */
   bacs_debit = 'bacs_debit',
   /** @deprecated Please use uppercase values */

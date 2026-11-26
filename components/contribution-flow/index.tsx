@@ -554,14 +554,8 @@ class ContributionFlow extends React.Component<ContributionFlowProps, Contributi
     if (!response) {
       this.handleError(message);
     } else if (response.paymentIntent) {
-      const isAlipay = response.paymentIntent.allowed_source_types[0] === 'alipay';
       const stripe = await getStripe(null, account);
-      const result = isAlipay
-        ? await stripe.confirmAlipayPayment(response.paymentIntent.client_secret, {
-            // eslint-disable-next-line camelcase
-            return_url: `${window.location.origin}/api/services/stripe/alipay/callback?OrderId=${order.id}`,
-          })
-        : await stripe.handleCardAction(response.paymentIntent.client_secret);
+      const result = await stripe.handleCardAction(response.paymentIntent.client_secret);
       if (result.error) {
         this.handleError(result.error.message);
       } else if (result.paymentIntent && result.paymentIntent.status === 'requires_confirmation') {

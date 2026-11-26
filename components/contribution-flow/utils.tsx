@@ -60,7 +60,6 @@ export const generatePaymentMethodOptions = (
       manualPaymentProviders?: unknown[];
     };
   },
-  isEmbed: boolean,
   disabledPaymentMethodTypes: string[],
   paymentIntent?: {
     payment_method_types?: string[];
@@ -72,7 +71,6 @@ export const generatePaymentMethodOptions = (
   const hostHasPaypal = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.PAYPAL);
   const hostHasStripe = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.CREDIT_CARD);
   const totalAmount = getTotalAmount(stepDetails, stepSummary);
-  const interval = get(stepDetails, 'interval', null);
 
   type PaymentMethodOption = {
     id?: string;
@@ -238,23 +236,6 @@ export const generatePaymentMethodOptions = (
           type: PAYMENT_METHOD_TYPE.PAYMENT,
         },
         icon: getPaymentMethodIcon({ service: PAYMENT_METHOD_SERVICE.PAYPAL, type: PAYMENT_METHOD_TYPE.PAYMENT }),
-      });
-    }
-
-    if (
-      interval === INTERVALS.oneTime &&
-      !isEmbed &&
-      supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.ALIPAY) &&
-      !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.ALIPAY)
-    ) {
-      uniquePMs.push({
-        key: 'alipay',
-        paymentMethod: {
-          service: PAYMENT_METHOD_SERVICE.STRIPE,
-          type: PAYMENT_METHOD_TYPE.ALIPAY,
-        },
-        title: 'Alipay',
-        icon: getPaymentMethodIcon({ service: PAYMENT_METHOD_SERVICE.STRIPE, type: PAYMENT_METHOD_TYPE.ALIPAY }),
       });
     }
 
