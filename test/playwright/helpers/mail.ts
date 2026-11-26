@@ -146,6 +146,27 @@ export async function emailedSignInLink(mail: Mailbox, { to }: { to: string }): 
   return linkIn(message, 'One-click Sign In');
 }
 
+/**
+ * The invitation to join `account`'s team the product emails to `to`: its text, and the link to the invitation
+ * (through sign-up for someone without an account) as a path relative to the site.
+ */
+export async function memberInvitation(
+  mail: Mailbox,
+  { to, account }: { to: string; account: { name: string } },
+): Promise<{ text: string; link: string }> {
+  const message = await mail.waitForMessage({ to, subject: `Invitation to join ${account.name} on Open Collective` });
+  const $ = cheerio.load(message.html);
+  const label = $('a').filter((_, link) =>
+    ['Sign up and view invitation', 'View invitation'].includes($(link).text().trim()),
+  );
+  const href = label.first().attr('href');
+  if (!href) {
+    throw new Error(`The message "${message.subject}" has no invitation link`);
+  }
+  const url = new URL(href);
+  return { text: $('body').text(), link: `${url.pathname}${url.search}${url.hash}` };
+}
+
 /** The link the product emails to `to` after they asked to reset their password, as a path relative to the site. */
 export async function emailedResetPasswordLink(mail: Mailbox, { to }: { to: string }): Promise<string> {
   const message = await mail.waitForMessage({ to, subject: 'Reset Password' });

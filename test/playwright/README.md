@@ -224,6 +224,30 @@ the reconciliation of both pilot Cypress files with all Playwright journeys are
 in the canonical
 [guide](../../docs/e2e.md#vendor-creation-and-settings-journeys-playwright-pilot).
 
+## Collectives, organizations, events and tiers
+
+`specs/collectives/` holds the journeys of the admin of a Collective: its
+public page (hero images and color, updates, rich description, contributors
+and budget), its tiers (from the tier page and the dashboard), team
+invitations (the invitee signs up from the emailed link), info, VAT,
+events and tickets, archiving and unarchiving, creating a Collective (from
+the form, or from a GitHub repository with the GitHub routes stubbed as in
+Cypress), an Organization's public page, and adding an authenticator app.
+
+```bash
+npm run e2e -- test/playwright/specs/collectives --workers 4
+```
+
+They use the `collective-admin` recipe: a Collective hosted by a host of its
+own, with the default tiers, optional social links, an optional Organization
+run by the same admin, and optional money moved between the two. Two
+boundaries stay live, as in Cypress: Google's address autocomplete (event
+location, Collective country) and the `opensource` host of the dev database,
+which the GitHub application flow is built for. Contributing with a card
+before editing one's public message stays in Cypress
+(`test/cypress/integration/40-stripe-collective-contribution.test.js`) until
+the live Stripe journeys migrate.
+
 ## Public pages and content journeys
 
 `specs/public/` holds the public pages: the docs search of the help page (the

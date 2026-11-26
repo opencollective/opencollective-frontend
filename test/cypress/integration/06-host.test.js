@@ -1,7 +1,9 @@
 describe('New host page', () => {
-  /**
-   * About section is already tested in `04-collective.test.js`
-   */
+  before(() => {
+    // The "Test Collective" listed below used to be left behind by `04-collective.test.js`, now in Playwright.
+    cy.createHostedCollective();
+  });
+
   beforeEach(() => {
     cy.visit('/opensource');
   });
