@@ -1,5 +1,20 @@
 #!/bin/bash
 
+# Specs migrate to Playwright shard by shard (docs/e2e.md). A shard whose specs are all gone stays a required
+# check until a maintainer retires it, so it passes, saying so, instead of failing on "no spec files".
+if [ -n "$CYPRESS_TEST_FILES" ]; then
+  shopt -s extglob nullglob
+  # Cypress reads `0*.(js|ts)` as a glob group; bash's extglob spells it `0*.@(js|ts)`.
+  SHARD_GLOB="${CYPRESS_TEST_FILES//\(/@(}"
+  SHARD_SPECS=(test/cypress/integration/$SHARD_GLOB)
+  shopt -u extglob nullglob
+  if [ ${#SHARD_SPECS[@]} -eq 0 ]; then
+    echo "> No Cypress spec matches '${CYPRESS_TEST_FILES}': every spec of this shard moved to Playwright. Nothing to run."
+    exit 0
+  fi
+  echo "> Cypress specs in this shard: ${SHARD_SPECS[*]}"
+fi
+
 echo "> Setting locale to en_US"
 export LANGUAGE=en-US
 export LANG=en-US
