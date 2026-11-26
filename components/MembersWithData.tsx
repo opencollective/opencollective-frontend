@@ -3,11 +3,13 @@ import type { DataValue } from '@apollo/client/react/hoc';
 import { graphql } from '@apollo/client/react/hoc';
 import { clsx } from 'clsx';
 import { uniqBy } from 'lodash-es';
+import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { gql } from '../lib/graphql/helpers';
 import type { Currency } from '../lib/graphql/types/v2/graphql';
+import injectIntl from '../lib/injectIntl';
 import type LoggedInUser from '../lib/LoggedInUser';
 
 import Container from './Container';
@@ -109,6 +111,7 @@ type OwnProps = {
 type Props = OwnProps & {
   data?: DataValue<MembersQueryData, MembersQueryVariables>;
   fetchMore?: () => Promise<unknown>;
+  intl: IntlShape;
 };
 
 type State = {
@@ -119,7 +122,7 @@ type State = {
 // Map the v2 member to the shape the cards expect (v2 INDIVIDUAL is USER for them).
 // v2 hides incognito (and private) backers' accounts from the public: show them as an
 // anonymous "Incognito" card, like the v1 incognito profile was.
-const toMemberNode = (node: V2MemberNode): MemberNode => ({
+const toMemberNode = (node: V2MemberNode, intl: IntlShape): MemberNode => ({
   id: node.id,
   role: node.role,
   createdAt: node.createdAt,
@@ -137,7 +140,12 @@ const toMemberNode = (node: V2MemberNode): MemberNode => ({
         backgroundImage: node.account.backgroundImageUrl,
         isIncognito: node.account.isIncognito,
       }
-    : { id: `incognito-${node.id}`, type: 'USER', name: 'Incognito', isIncognito: true },
+    : {
+        id: `incognito-${node.id}`,
+        type: 'USER',
+        name: intl.formatMessage({ id: 'profile.incognito', defaultMessage: 'Incognito' }),
+        isIncognito: true,
+      },
 });
 
 class MembersWithData extends React.Component<Props, State> {
@@ -180,7 +188,7 @@ class MembersWithData extends React.Component<Props, State> {
     if (!data.account?.members?.nodes) {
       return <div />;
     }
-    let members = data.account.members.nodes.filter(Boolean).map(toMemberNode);
+    let members = data.account.members.nodes.filter(Boolean).map(node => toMemberNode(node, this.props.intl));
     // Count on the raw nodes: v2 returns one node per membership, de-duplicated below
     const hasMore = data.account.members.nodes.length < (data.account.members.totalCount ?? 0);
     if (members.length === 0 && !hasMore) {
@@ -336,4 +344,4 @@ const addMembersData = graphql<OwnProps, MembersQueryData, MembersQueryVariables
   }),
 });
 
-export default addMembersData(MembersWithData);
+export default addMembersData(injectIntl(MembersWithData));

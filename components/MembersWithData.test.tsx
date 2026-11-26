@@ -10,7 +10,7 @@ import MembersWithData from './MembersWithData';
 jest.mock('./Member', () => ({
   __esModule: true,
   default: ({ member, viewMode }) => (
-    <div data-testid="member" data-type={member.member.type} data-view={viewMode}>
+    <div data-testid="member" data-type={member.member.type} data-name={member.member.name} data-view={viewMode}>
       {member.member.slug}:{member.stats.totalDonations}
     </div>
   ),
@@ -59,7 +59,7 @@ const renderWithLink = (
   });
   const client = new ApolloClient({ link, cache: new InMemoryCache() });
   render(
-    <IntlProvider locale="en">
+    <IntlProvider locale="en" messages={{ 'profile.incognito': 'Incognito (translated)' }}>
       <ApolloProvider client={client}>
         <MembersWithData collective={{ slug: 'my-collective' }} {...props} />
       </ApolloProvider>
@@ -122,5 +122,6 @@ describe('MembersWithData', () => {
     await waitFor(() => expect(screen.getAllByTestId('member')).toHaveLength(10));
     const incognito = screen.getAllByTestId('member').find(el => el.textContent.startsWith(':'));
     expect(incognito).toHaveAttribute('data-type', 'USER');
+    expect(incognito).toHaveAttribute('data-name', 'Incognito (translated)');
   });
 });
