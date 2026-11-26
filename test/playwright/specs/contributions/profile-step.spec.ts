@@ -1,6 +1,7 @@
 import type { Page } from '@playwright/test';
 
 import { expect, scenarioTest } from '../../fixtures';
+import { toast } from '../../helpers/notifications';
 import { resetSignupRateLimit } from '../../helpers/rate-limits';
 
 /**
@@ -50,7 +51,7 @@ test('visitor goes back to the guest form, then the sign-up form checks the emai
   await resetSignupRateLimit();
   await email.fill('Incorrect@value');
   await content.locator('button[type=submit]').click();
-  await expect(page.getByText('Invalid email address.')).toBeVisible();
+  await expect(toast(page, 'Invalid email address.')).toBeVisible();
 
   // A valid address moves on to the code step, still inside the flow
   const address = mail.address('signup');
