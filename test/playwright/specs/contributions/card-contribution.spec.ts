@@ -170,12 +170,15 @@ test.describe('Contribute with a card (Stripe card element)', { tag: STRIPE_TAG 
       await page.getByTestId('cf-next-step').click();
 
       await expect(page.getByTestId('progress-step-profile')).toContainText(scenario.actors.contributor.name);
-      await page.getByTestId('input-legalName').fill('Very Legal Name');
+      // The address section shows once the contributor's yearly total is known, and the form renders again then
       await page.getByTestId('country-select').click();
       await page.getByTestId('select-option').filter({ hasText: 'Algeria' }).click();
       await page.locator('input[data-cy="address-address1"]').fill('Street Name, 123');
       await page.locator('input[data-cy="address-postalCode"]').fill('123');
       await page.locator('input[data-cy="address-city"]').fill('Citycitycity');
+      const legalName = page.getByTestId('input-legalName');
+      await legalName.fill('Very Legal Name');
+      await expect(legalName).toHaveValue('Very Legal Name');
       await page.getByTestId('cf-next-step').click();
 
       await expect(page.locator('input[type=checkbox][name=save]')).toBeChecked();
