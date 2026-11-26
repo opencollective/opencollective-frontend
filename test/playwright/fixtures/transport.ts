@@ -130,7 +130,7 @@ type Contracts = {
   /**
    * Actors `hostAdmin`, `admin` (Collective admin; submitter and payee of the expense). Accounts `host`,
    * `collective` (no expense policy), optional `project` under it. Expenses: optional `pending` (invoice,
-   * optionally with a stored PDF attached file).
+   * optionally with a stored PDF attached file), plus optional unreturned `listedExpenses`.
    * URLs `expenses`, `policies`, optional `projectNewExpense`.
    */
   'expense-management': {
@@ -142,6 +142,8 @@ type Contracts = {
         attachedPdf?: { name: string; text: string };
       };
       project?: boolean;
+      /** This many more pending invoices by `admin` on `collective`, described `Listed expense <n> <tag>`. */
+      listedExpenses?: number;
     };
     scenario: GraphScenario;
   };

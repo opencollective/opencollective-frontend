@@ -4,13 +4,7 @@
 import type { Message, MessageSummary } from 'cypress-mailpit/dist/src/types';
 
 import { fakeTag as gql } from '../../../lib/graphql/helpers';
-import type {
-  AccountReferenceInput,
-  AmountInput,
-  ExpenseType,
-  UploadedFileKind,
-  UseVendorPolicy,
-} from '@/lib/graphql/types/v2/graphql';
+import type { AccountReferenceInput, AmountInput, ExpenseType, UseVendorPolicy } from '@/lib/graphql/types/v2/graphql';
 
 import { graphqlQueryV2, signinRequestAndReturnToken } from './commands';
 
@@ -43,14 +37,6 @@ declare global {
       }): Chainable<{ id: string; slug: string; name: string }>;
 
       createHostedCollective(params?: { userEmail?: string; name?: string }): Chainable<{ id: string; slug: string }>;
-
-      createProject(params: {
-        userEmail?: string;
-        collective?: { slug: string };
-        name?: string;
-        description?: string;
-        type?: string;
-      }): Chainable<{ slug: string }>;
 
       createCollectiveV2(params: {
         email?: string;
@@ -89,19 +75,6 @@ declare global {
         attachedFiles?: { url: string }[];
       }): Chainable<{ legacyId: number }>;
 
-      draftExpenseAndInviteUser(params: {
-        userEmail?: string;
-        account: { slug?: string; legacyId?: number };
-        expense: {
-          type: ExpenseType | `${ExpenseType}`;
-          description?: string;
-          currency?: string;
-          items?: Record<string, unknown>[];
-          payee: { slug?: string; legacyId?: number; name?: string; email?: string };
-          [key: string]: unknown;
-        };
-      }): Chainable<{ id: string; legacyId: number; status: string; currency: string }>;
-
       openEmail(matcher: (summary: MessageSummary) => boolean): Chainable<Message>;
 
       logout();
@@ -112,8 +85,6 @@ declare global {
       ): Chainable<{ id: string; legacyId: number; slug: string }>;
 
       createVendor: typeof createVendor;
-
-      uploadFile: typeof uploadFile;
 
       graphqlQueryV2(
         query: string,
@@ -186,51 +157,6 @@ function createVendor(
       variables: { hostSlug, vendor },
     }).then(({ body }) => {
       return body.data.createVendor;
-    });
-  });
-}
-
-Cypress.Commands.add('uploadFile', uploadFile);
-/**
- * Uploads a fixture through the API (like the file dropzones do) and returns the uploaded file URL.
- * The fixture is sent in a text body, so it must be ASCII (like `pdf/preview.pdf`).
- */
-function uploadFile(
-  file: { fixture: string; kind: UploadedFileKind | `${UploadedFileKind}`; mimeType: string },
-  userEmail: string,
-): Cypress.Chainable<string> {
-  const fileName = file.fixture.split('/').pop();
-  const boundary = 'cypress-upload-boundary';
-  return cy.fixture(file.fixture, 'utf8').then(content => {
-    return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
-      return cy
-        .request({
-          url: '/api/images',
-          method: 'POST',
-          headers: {
-            authorization: `Bearer ${token}`,
-            'Content-Type': `multipart/form-data; boundary=${boundary}`,
-          },
-          body: [
-            `--${boundary}`,
-            'Content-Disposition: form-data; name="kind"',
-            '',
-            file.kind,
-            `--${boundary}`,
-            `Content-Disposition: form-data; name="file"; filename="${fileName}"`,
-            `Content-Type: ${file.mimeType}`,
-            '',
-            content,
-            `--${boundary}--`,
-            '',
-          ].join('\r\n'),
-        })
-        .then(({ body }) => {
-          if (typeof body.url !== 'string') {
-            throw new Error(`Upload of ${fileName} returned no file URL: ${JSON.stringify(body)}`);
-          }
-          return body.url;
-        });
     });
   });
 }
