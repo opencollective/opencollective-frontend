@@ -25,7 +25,9 @@ exists only in an E2E environment it owns.
 Python 3 must be available for credential redaction. Infrastructure (Postgres,
 Mailpit, S3-compatible store) must already be running; the launcher prints the
 `docker compose` command for whatever is missing. Non-Stripe runs need no
-Stripe credentials.
+Stripe credentials; tests tagged `@stripe` need `STRIPE_WEBHOOK_KEY` and the
+Stripe CLI, or `--without-stripe` to exclude them (see
+[Live Stripe journeys](../../docs/e2e.md#live-stripe-journeys)).
 
 ## Fresh runs (CI contract)
 
