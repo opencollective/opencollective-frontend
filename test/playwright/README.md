@@ -224,6 +224,29 @@ the reconciliation of both pilot Cypress files with all Playwright journeys are
 in the canonical
 [guide](../../docs/e2e.md#vendor-creation-and-settings-journeys-playwright-pilot).
 
+## Fiscal host administration journeys
+
+`specs/host/` holds what a fiscal host's admins do and what Collectives do to
+reach a host: the public host profile, applying to a host (from its profile,
+signing in on the way, and from "accept financial contributions"), approving
+applications, creating Collectives with invited admins (the invitee follows
+the emailed link), un-hosting, adding funds, expected funds and their
+confirmation with fees and platform tip, paying an expense, the chart of
+accounts, host agreements and grant requests.
+
+```bash
+npm run e2e -- test/playwright/specs/host --workers 4
+```
+
+They use the `fiscal-host` recipe (a host with its admin and one hosted
+Collective, plus options for what each journey starts from) and `vendor-host`
+for grants. No journey uses a seeded Account. Two Cypress failures on `main`
+shaped them: "Create vendor" in the Add Funds source picker is disabled while
+the search runs (`createVendorInline` waits for it), and the expected funds
+confirmation can lose what was typed in "Amount received", so each confirmation
+value is checked, and the resulting amounts read in the dialog, before
+submitting.
+
 ## Collectives, organizations, events and tiers
 
 `specs/collectives/` holds the journeys of the admin of a Collective: its

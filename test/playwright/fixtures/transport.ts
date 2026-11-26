@@ -186,6 +186,27 @@ type Contracts = {
     scenario: ContributionScenario;
   };
   /**
+   * Actors `hostAdmin`, `collectiveAdmin`, optional `contributor`, `applicant` (no role anywhere). Accounts `host`,
+   * `collective` (admin: `collectiveAdmin`), optional `collective2` (admin: `hostAdmin`), `applicantCollective`
+   * (no host, admin: `applicant`). Expenses: optional `pending` ($10 invoice by `collectiveAdmin` on `collective`).
+   * URLs `hostProfile` and the host dashboard's `hostedCollectives`, `hostApplications`, `expectedFunds`,
+   * `chartOfAccounts`, `agreements`, `payDisbursements`.
+   */
+  'fiscal-host': {
+    inputs: {
+      openToApplications?: boolean;
+      /** Cents the host already added to `collective`. */
+      collectiveBalance?: number;
+      secondCollective?: boolean;
+      pendingExpense?: boolean;
+      /** Also lets the host record funds from any account, as trusted hosts may. */
+      contributor?: boolean;
+      applicant?: boolean;
+      applicantCollective?: boolean;
+    };
+    scenario: GraphScenario;
+  };
+  /**
    * Actors `admin`, `hostAdmin`. Accounts `host`, `collective` (hosted by `host`, administered by `admin`, with the
    * default tiers `backer` and `sponsor`), optional `organization` (unhosted, administered by `admin`).
    * URLs `collective`, `dashboard`, `info`, `tiers`, `advanced`, `newEvent`, `backerTier` (its tier page),
@@ -260,6 +281,7 @@ const schemas: Record<Recipe, z.ZodTypeAny> = {
   'expense-draft-invite': graphScenario,
   'expense-management': graphScenario,
   'vendor-host': graphScenario,
+  'fiscal-host': graphScenario,
   'recurring-contribution': contributionScenario,
   'collective-admin': collectiveScenario,
   individual: individualScenario,
