@@ -255,9 +255,9 @@ jobs:
       pdf-ref: ${{ needs.e2e-prepare.outputs.pdf-ref }}
     secrets: inherit
 
-  # Playwright pilot (ticket 04): observational only, not in required checks.
-  # Cypress above keeps protecting coverage; this job reports the smoke plus
-  # original-attempt evidence without masking failures.
+  # Playwright E2E (check `e2e-playwright / playwright`): all specs under
+  # test/playwright/specs, with original-attempt evidence. Intended to be a
+  # required check; see the header of e2e-playwright.yml for the rollback order.
   e2e-playwright:
     needs: [build, e2e-prepare]
     uses: ./.github/workflows/e2e-playwright.yml

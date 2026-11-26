@@ -2,8 +2,17 @@
 
 This is the canonical reproduction guide. Runner READMEs link here:
 
-- Playwright (pilot, Chromium): [`test/playwright/README.md`](../test/playwright/README.md)
-- Cypress (existing suite): [`test/cypress/README.md`](../test/cypress/README.md)
+- Playwright (Chromium): [`test/playwright/README.md`](../test/playwright/README.md)
+- Cypress (legacy): [`test/cypress/README.md`](../test/cypress/README.md)
+
+Write new E2E tests with Playwright, under `test/playwright/specs/`, with
+mutable prerequisites arranged through
+[fixtures](#authoring-independent-playwright-fixtures). The expense and vendor
+pilots are the reference examples: `specs/expenses/` (submission, invitations
+with owned mail, management, PDF download) and `specs/vendors/` (multi-party
+visibility, settings). Cypress is legacy: do not add Cypress specs; its
+remaining specs are migrated suite by suite
+(opencollective/opencollective#8948).
 
 ## Run a spec
 
@@ -262,33 +271,54 @@ Agents: use the exact launcher command above with explicit `--api-dir`,
 `--frontend-dir`, `--images-dir`, `--pdf-dir` when running from a worktree.
 See `test/playwright/README.md` for worktree paths and artifact locations.
 
-### Playwright CI (pilot, observational)
+### Playwright CI
 
-`CI / e2e-playwright / playwright smoke` runs the smoke, fixture contract checks,
-both independent Account journeys and the expense submission journeys (every
-`*.spec.ts` under `test/playwright/specs/`, including subdirectories) through the same
-shared launcher on every PR and main push, reusing the prepared
-same-revision builds. It is observational: Cypress checks stay required
-until pilot adoption, and the Playwright job reports real
-test/setup/interruption outcomes without masking failures. Duplicate pilot
-cost is not steady-state cost.
+`CI / e2e-playwright / playwright` runs every `*.spec.ts` under
+`test/playwright/specs/` (subdirectories included) through the same shared
+launcher on every PR and main push, reusing the prepared same-revision
+builds. The check name does not depend on the spec selection or the worker
+count, so adding specs or tuning workers does not change branch protection.
 
-- Workers share one E2E environment (`PLAYWRIGHT_WORKERS`, default 1; raise
-  only from measured CPU/memory/service capacity). Retries default to 0
-  locally and in benchmarks; routine CI allows at most 1
-  (`PLAYWRIGHT_RETRIES`; larger values are rejected) so first-attempt
-  failures, recoveries, and final failures stay distinguishable.
+- Workers share one E2E environment (`PLAYWRIGHT_WORKERS`, CI default 2).
+  The pilot evaluation (opencollective/opencollective#8969) measured 2
+  workers on the 4-vCPU CI runner with no first-attempt failure in 30 runs;
+  higher values are unmeasured there. Retries default to 0 locally and in
+  benchmarks; routine CI allows at most 1 (`PLAYWRIGHT_RETRIES`; larger
+  values are rejected) so first-attempt failures, recoveries, and final
+  failures stay distinguishable.
 - Every attempt uploads its run-specific `test/playwright/.artifacts/`
   directory (replay manifest, sanitized service logs, HTML/JSON/JUnit
   reports, original traces (without DOM snapshots or network log, see
   above)/screenshots/videos). Failure/recovery evidence
   is retained 14 days, successful evidence 7 days; expiry deletes only CI
   artifacts, never local scenario or provider records.
-- Later pilot journeys reuse the same job via its `spec`/`grep` inputs; no
-  new scheduling framework is needed. Live Stripe stays in Cypress.
+- Live Stripe stays in Cypress until a migration provides it.
 - Fork PRs run credential-free (this workflow uses no secrets) and report
-  that full live coverage is unavailable; reviewed trusted coverage on the
-  same revision is required before adoption or Cypress retirement.
+  that full live coverage is unavailable.
+
+### Required checks and rollback
+
+The Playwright check is meant to be required next to the Cypress shards
+(`e2e / e2e (N*.(js|ts))`). The Cypress shards stay required while they cover
+unmigrated specs; a shard's check is retired only once its last spec is
+migrated, by a maintainer, in branch protection.
+
+The pilot's Cypress specs (`test/cypress/integration/27-expenses.test.ts`,
+`41-vendor-visibility.test.ts`) and the support code only they used were
+deleted at adoption (opencollective/opencollective#8970). Baseline: the last
+main commit that has them is
+`c2ff077b9d938544f082cf8a62ecc9e70381338d`. To roll back, in this order:
+
+1. Re-require any Cypress shard checks that were removed.
+2. Restore the deleted Cypress coverage: revert the adoption commit, or check
+   out from the baseline the two specs, `test/cypress/fixtures/pdf/preview.pdf`
+   and the removed support commands (`createProject`,
+   `draftExpenseAndInviteUser`, `uploadFile`). Confirm the restored specs pass
+   in CI.
+3. Only then remove `e2e-playwright / playwright` from the required checks.
+
+Migrations that delete further Cypress specs record their own baseline the
+same way in their PR.
 
 ## Authoring independent Playwright fixtures
 
@@ -371,6 +401,9 @@ test.describe('paying Collective subject to VAT', () => {
 | `expense-management`   | `expense: { description, items, attachedPdf }`, `project`                                                                                                                           | `hostAdmin`, `admin` (Collective admin; submitter and payee of the expense)                             | `host`, `collective` (no expense policy), `project` (under `collective`, same host); expense `pending` (invoice by `admin` on `collective`, with a saved payout method); URLs `expenses`, `policies`, `projectNewExpense`                                                                                                                                                                         |
 | `vendor-host`          | `useVendorPolicy`, `grants`, `secondCollective`, `project`, `outsider`, `otherHost: { admin, collective }`, `vendors: [{ label, host, usableWith, useVendorPolicy, payoutMethod }]` | `hostAdmin`, `collectiveAdmin`, `outsider` (no role anywhere), `otherHostAdmin`, `otherCollectiveAdmin` | `host` (no vendor policy unless `useVendorPolicy`), `collective` (admin `collectiveAdmin`), `collective2` (admin `hostAdmin`), `project` (under `collective`), `otherHost` (unrelated host, administered by `hostAdmin` or `otherHostAdmin`), `otherCollective` (on `otherHost`); vendors by `label` in `scenario.vendors`; URLs `hostedCollectives`, `vendors`, `expectedFunds` (host dashboard) |
 | `fiscal-host`          | `openToApplications`, `collectiveBalance` (cents), `secondCollective`, `pendingExpense`, `contributor`, `applicant`, `applicantCollective`                                          | `hostAdmin`, `collectiveAdmin`, `contributor`, `applicant` (no role anywhere)                           | `host` (open to applications if asked), `collective` (admin `collectiveAdmin`, with `collectiveBalance`), `collective2` (admin `hostAdmin`), `applicantCollective` (no host, admin `applicant`); expense `pending` ($10 invoice); URLs `hostProfile`, `hostedCollectives`, `hostApplications`, `expectedFunds`, `chartOfAccounts`, `agreements`, `payDisbursements`                               |
+| `collective-admin`     | `currency` (`USD`, `EUR`), `socialLinks: [{ type, url }]`, `organization`, `history: { contribution, expense }` (cents)                                                             | `admin`, `hostAdmin`                                                                                    | `host`, `collective` (short slug, admin `admin`, tiers `backer`, `sponsor` in `scenario.tiers`), `organization` (unhosted, admin `admin`; `history`: it got an expense paid by `collective`, then contributed to it); URLs `collective`, `dashboard`, `info`, `tiers`, `advanced`, `newEvent`, `backerTier`, `userSecurity`, `organization`, `organizationAdvanced`                               |
+| `individual`           | `password`, `twoFactorSecret` (base32; the journey computes codes with `totpCode` from `helpers/auth.ts`), `otherUser`, `oauthApplication: { name, redirectUri }`, `loginTokens`    | `user` (no membership), `other`                                                                         | URLs `profile`, `info`, `advanced`, `userSecurity`, `forDevelopers`, `authorizedApps` of `user`; `scenario.application` (client credentials) and `scenario.loginTokens` (`valid`, `expired` sign-in link tokens) when asked                                                                                                                                                                       |
+| `user-profile`         | `adminSince`, `contributions` (EUR cents), `expenses` (descriptions) (all required)                                                                                                 | `user`, `hostAdmin`                                                                                     | `host`, `adminOf` (administered by `user` since `adminSince`), `backed` (contributed to and submitted expenses to by `user`); URL `profile`                                                                                                                                                                                                                                                       |
 
 Each request owns a new active fiscal host, so no journey adds Collectives or
 expenses to a seeded host. Recipes arrange starting state and prior history
@@ -593,8 +626,8 @@ rejection checks run normally with `npm run test -- test/server/routes/e2e-fixtu
 ## Expense submission journeys (Playwright pilot)
 
 `test/playwright/specs/expenses/` carries the submission part of the Cypress
-expense pilot (`test/cypress/integration/27-expenses.test.ts`), which stays
-unchanged and runnable. Nine Cypress tests map to nine journeys:
+expense pilot (`test/cypress/integration/27-expenses.test.ts`, deleted at
+adoption, see [rollback](#required-checks-and-rollback)). Nine Cypress tests map to nine journeys:
 
 | Cypress test                                                                                                                        | Playwright journey (`specs/expenses/`)                                                                                                     |
 | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -697,7 +730,7 @@ comparison for this group.
 
 `test/playwright/specs/expenses/invite-*.spec.ts` carries the invitation part
 of the Cypress expense pilot (`test/cypress/integration/27-expenses.test.ts`,
-`Invite` blocks), which stays unchanged and runnable. Six Cypress tests map to
+`Invite` blocks, deleted at adoption). Six Cypress tests map to
 six journeys:
 
 | Cypress test                                                                                                         | Playwright journey (`specs/expenses/`)                                                                                                                            |
@@ -836,8 +869,7 @@ workers on such a machine; the cap is not a property of the journeys.
 
 `test/playwright/specs/expenses/` also carries the rest of the Cypress expense
 pilot (`test/cypress/integration/27-expenses.test.ts`: `Actions on expense`,
-`Recurring`, `Duplicate` and `Edit` blocks), which stays unchanged and
-runnable. Fourteen Cypress tests map to fourteen journeys:
+`Recurring`, `Duplicate` and `Edit` blocks, deleted at adoption). Fourteen Cypress tests map to fourteen journeys:
 
 | Cypress test                                                                            | Playwright journey (`specs/expenses/`)                                                                                             |
 | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
@@ -1018,7 +1050,7 @@ three expense groups now cover with 28 Playwright journeys.
 `test/playwright/specs/vendors/` carries the picker half of the Cypress vendor
 pilot (`test/cypress/integration/41-vendor-visibility.test.ts`: `vendor picker
 on expense submission`, `vendor picker on grant submission` and `Add Funds
-source picker`), which stays unchanged and runnable. The `inline vendor
+source picker`, deleted at adoption). The `inline vendor
 creation defaults` and `vendor settings dashboard` blocks of that file are
 covered by the [next group](#vendor-creation-and-settings-journeys-playwright-pilot).
 Sixteen Cypress tests map to fifteen journeys:
@@ -1186,8 +1218,7 @@ covers all 23 tests of the original file, of which these journeys cover 16.
 `specs/vendors/vendor-creation.spec.ts` and `vendor-settings.spec.ts` carry the
 rest of the Cypress vendor pilot
 (`test/cypress/integration/41-vendor-visibility.test.ts`: `inline vendor
-creation defaults` and `vendor settings dashboard`), which stays unchanged and
-runnable. Seven Cypress tests map to seven journeys:
+creation defaults` and `vendor settings dashboard`, deleted at adoption). Seven Cypress tests map to seven journeys:
 
 | Cypress test                                                                                                              | Playwright journey (`specs/vendors/`)                                                                           |
 | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
@@ -1333,9 +1364,11 @@ journeys cover 16 of them and these journeys the other 7.
 Every `describe` and `it` of the two pilot Cypress files is accounted for by
 the journey tables above. "Actions on expense › Previews a PDF attachment",
 added to Cypress (opencollective/opencollective-frontend#12558) before the
-pilot merged, was first missed and is now carried. Both files are unchanged and
-still run with Cypress. `node test/playwright/evaluation/cli.ts inventory` checks
-this inventory against both sources (see `test/playwright/evaluation/README.md`).
+pilot merged, was first missed and is now carried. Both files were deleted at
+adoption; `node test/playwright/evaluation/cli.ts inventory` checks this
+inventory against their sources at the
+[rollback baseline](#required-checks-and-rollback) and the current Playwright
+specs (see `test/playwright/evaluation/README.md`).
 
 `27-expenses.test.ts` (29 tests):
 
@@ -1398,10 +1431,11 @@ account and smoke specs, the Playwright selection holds 57 tests. When it held
 Playwright time with three workers, 133 s with two and 217 s with one, after
 roughly 55 s of launcher startup on a fresh stack.
 
-## Cypress (existing suite)
+## Cypress (legacy suite)
 
-We use [Cypress](https://www.cypress.io/) for the existing E2E coverage, which
-remains required while migration proceeds.
+[Cypress](https://www.cypress.io/) runs the E2E specs not yet migrated to
+Playwright. Its shards remain required while they cover unmigrated behavior.
+Do not add new Cypress specs; write them with Playwright.
 
 ## Running the E2E tests in development environment
 

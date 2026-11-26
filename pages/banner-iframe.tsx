@@ -1,4 +1,5 @@
 import React from 'react';
+import type { ApolloError } from '@apollo/client';
 import { Query } from '@apollo/client/react/components';
 import { graphql } from '@apollo/client/react/hoc';
 import { partition } from 'lodash-es';
@@ -7,8 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { styled } from 'styled-components';
 
 import { CollectiveType } from '../lib/constants/collectives';
-import { API_V1_CONTEXT, gql } from '../lib/graphql/helpers';
-import { collectiveBannerIframeQuery } from '../lib/graphql/v1/queries';
+import { gql } from '../lib/graphql/helpers';
 import { getRequestIntl } from '../lib/i18n/request';
 import { parseToBoolean } from '../lib/utils';
 
@@ -46,6 +46,23 @@ const topContributorsQuery = gql`
             isIncognito
           }
         }
+      }
+    }
+  }
+`;
+
+const bannerIframeQuery = gql`
+  query BannerIframe($collectiveSlug: String!) {
+    account(slug: $collectiveSlug, throwIfMissing: false) {
+      id
+      name
+      slug
+      currency
+      individualBackers: members(role: [BACKER], accountType: [INDIVIDUAL], limit: 0) {
+        totalCount
+      }
+      organizationBackers: members(role: [BACKER], accountType: [ORGANIZATION, COLLECTIVE], limit: 0) {
+        totalCount
       }
     }
   }
@@ -215,14 +232,15 @@ type BannerAccount = {
   name?: string;
   currency?: Currency;
   contributors?: { totalCount?: number; nodes?: BannerContributor[] };
-  stats?: { backers?: { organizations?: number; collectives?: number; users?: number } };
+  individualBackers?: { totalCount?: number };
+  organizationBackers?: { totalCount?: number };
 };
 
 type BannerIframeProps = {
   collectiveSlug?: string;
   id?: string;
   style?: string;
-  data?: { loading?: boolean; account?: BannerAccount; Collective?: BannerAccount };
+  data?: { loading?: boolean; error?: ApolloError; account?: BannerAccount };
   useNewFormat?: boolean;
 };
 
@@ -361,7 +379,19 @@ class BannerIframe extends React.Component<BannerIframeProps> {
       );
     }
 
-    const collective = data.Collective;
+    if (data.error) {
+      return (
+        <div
+          ref={node => {
+            this.node = node;
+          }}
+        >
+          <MessageBoxGraphqlError error={data.error} />
+        </div>
+      );
+    }
+
+    const collective = data.account;
     if (!collective) {
       return (
         <div
@@ -374,7 +404,8 @@ class BannerIframe extends React.Component<BannerIframeProps> {
       );
     }
 
-    const { backers } = collective.stats;
+    const individuals = collective.individualBackers?.totalCount ?? 0;
+    const organizations = collective.organizationBackers?.totalCount ?? 0;
 
     return (
       <IFrameContainer
@@ -387,19 +418,19 @@ class BannerIframe extends React.Component<BannerIframeProps> {
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <title>{`${collectiveSlug} collectives`}</title>
         </Head>
-        {backers.organizations + backers.collectives + backers.users === 0 && (
+        {organizations + individuals === 0 && (
           <a target="_blank" rel="noopener noreferrer" href={`https://opencollective.com/${collectiveSlug}`}>
             <ContributeButton />
           </a>
         )}
 
-        {backers.organizations + backers.collectives > 0 && (
+        {organizations > 0 && (
           <section id="organizations" className="tier">
             <h2 style={style.h2}>
               <FormattedMessage
                 id="collective.section.backers.organizations.title"
                 values={{
-                  n: backers.organizations + backers.collectives,
+                  n: organizations,
                   collective: collective.name,
                 }}
                 defaultMessage="{n} {n, plural, one {organization is} other {organizations are}} supporting {collective}"
@@ -429,12 +460,12 @@ class BannerIframe extends React.Component<BannerIframeProps> {
           </section>
         )}
 
-        {backers.users > 0 && (
+        {individuals > 0 && (
           <section id="backers" className="tier">
             <h2 style={style.h2}>
               <FormattedMessage
                 id="collective.section.backers.users.title"
-                values={{ n: backers.users, collective: collective.name }}
+                values={{ n: individuals, collective: collective.name }}
                 defaultMessage="{n} {n, plural, one {individual is} other {individuals are}} supporting {collective}"
               />
             </h2>
@@ -469,12 +500,15 @@ class BannerIframe extends React.Component<BannerIframeProps> {
 
 const addCollectiveBannerIframeData = graphql<
   BannerIframeProps,
-  { loading?: boolean; account?: BannerAccount; Collective?: BannerAccount },
+  { loading?: boolean; account?: BannerAccount },
   { collectiveSlug?: string },
   { data?: BannerIframeProps['data'] }
->(collectiveBannerIframeQuery, {
+>(bannerIframeQuery, {
   options: (props: BannerIframeProps) => {
-    return { context: API_V1_CONTEXT, skip: !props.collectiveSlug || props.useNewFormat };
+    return {
+      variables: { collectiveSlug: props.collectiveSlug },
+      skip: !props.collectiveSlug || props.useNewFormat,
+    };
   },
 });
 
