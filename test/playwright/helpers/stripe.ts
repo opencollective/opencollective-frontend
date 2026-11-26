@@ -12,14 +12,25 @@ import { queryAs } from './api';
 export const stripeElement = (scope: Page | Locator): FrameLocator =>
   scope.locator('.__PrivateStripeElement iframe').first().contentFrame();
 
+/**
+ * Types into a Stripe field like a person and checks what Stripe kept: a field it is still formatting or
+ * focusing can drop keystrokes, so the field is typed again until it shows `expected`.
+ */
+async function typeInto(field: Locator, keys: string, expected: string) {
+  await expect(async () => {
+    await field.clear();
+    await field.pressSequentially(keys);
+    await expect(field).toHaveValue(expected, { timeout: 2_000 });
+  }).toPass({ timeout: 30_000 });
+}
+
 /** Stripe's test card that always succeeds without authentication. */
 export async function fillTestCard(element: FrameLocator) {
-  // Typed like a person: Stripe formats these fields as they change.
-  await element.locator('#payment-numberInput').pressSequentially('4242424242424242');
-  await element.locator('#payment-expiryInput').pressSequentially('1235');
-  await element.locator('#payment-cvcInput').pressSequentially('123');
+  await typeInto(element.locator('#payment-numberInput'), '4242424242424242', '4242 4242 4242 4242');
+  await typeInto(element.locator('#payment-expiryInput'), '1235', '12 / 35');
+  await typeInto(element.locator('#payment-cvcInput'), '123', '123');
   await element.locator('#payment-countryInput').selectOption('US');
-  await element.locator('#payment-postalCodeInput').pressSequentially('90210');
+  await typeInto(element.locator('#payment-postalCodeInput'), '90210', '90210');
 }
 
 /**
