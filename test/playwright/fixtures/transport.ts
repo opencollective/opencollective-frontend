@@ -61,6 +61,15 @@ const contributionScenario = graphScenario.extend({
   contribution: z.object({ legacyId: z.number(), id: z.string() }),
 });
 
+/**
+ * `individual`: the multi-party shape, plus the credentials the journey asked for. Neither field is copied
+ * into evidence (`scenarioEvidence` only copies named fields).
+ */
+const individualScenario = graphScenario.extend({
+  application: z.object({ name: z.string(), clientId: z.string(), clientSecret: z.string() }).optional(),
+  loginTokens: z.object({ valid: z.string(), expired: z.string() }).optional(),
+});
+
 // Written out rather than inferred: this project compiles without `strict`, where inference makes every field optional.
 type Envelope = {
   recipe: string;
@@ -84,6 +93,13 @@ export type GraphScenario = Envelope & {
 export type ContributionScenario = GraphScenario & {
   tiers: Record<'gold' | 'silver', { legacyId: number; name: string }>;
   contribution: { legacyId: number; id: string };
+};
+
+export type IndividualScenario = GraphScenario & {
+  /** The OAuth application the user owns, with its credentials. */
+  application?: { name: string; clientId: string; clientSecret: string };
+  /** Tokens of sign-in links (`/signin/<token>`) for the user: one valid, one expired. */
+  loginTokens?: { valid: string; expired: string };
 };
 
 type UseVendorPolicy = 'HOST_ADMINS' | 'HOST_AND_COLLECTIVE_ADMINS' | 'ALL_SUBMITTERS';
@@ -158,6 +174,33 @@ type Contracts = {
     };
     scenario: ContributionScenario;
   };
+  /**
+   * Actors `user` (no membership), optional `other` (an unrelated user). URLs `profile`, `info`, `advanced`,
+   * `userSecurity`, `forDevelopers`, `authorizedApps` (of `user`). Optional credentials: `application`,
+   * `loginTokens`.
+   */
+  individual: {
+    inputs: {
+      /** A password the user signs in with. */
+      password?: string;
+      /** Two-factor authentication with an authenticator app, from this base32 secret (the journey computes codes). */
+      twoFactorSecret?: string;
+      otherUser?: boolean;
+      /** An OAuth application owned by the user. */
+      oauthApplication?: { name: string; redirectUri: string };
+      loginTokens?: boolean;
+    };
+    scenario: IndividualScenario;
+  };
+  /**
+   * Actors `user`, `hostAdmin`. Accounts `adminOf` (Collective `user` administers since `adminSince`),
+   * `backed` (both EUR, hosted by `host`; `user` contributed `contributions` to it and submitted `expenses` to it).
+   * URL `profile` (of `user`).
+   */
+  'user-profile': {
+    inputs: { adminSince: string; contributions: number[]; expenses: string[] };
+    scenario: GraphScenario;
+  };
   'vendor-host': {
     inputs: {
       /** Who may use the host's vendors; omitted, the host has no policy (product default: host admins only). */
@@ -190,6 +233,8 @@ const schemas: Record<Recipe, z.ZodTypeAny> = {
   'expense-management': graphScenario,
   'vendor-host': graphScenario,
   'recurring-contribution': contributionScenario,
+  individual: individualScenario,
+  'user-profile': graphScenario,
 };
 
 type Recipe = keyof Contracts;
