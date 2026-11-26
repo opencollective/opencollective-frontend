@@ -9,9 +9,11 @@ name: E2E Playwright
 #
 # Security: Do not switch this workflow to `pull_request_target` to run on fork PRs with secrets.
 # Use `pull_request` (secrets blocked for forks by default) or trusted push/workflow_dispatch instead.
-# This workflow uses no Stripe/live credentials at all: the focused smoke
-# needs none, so fork runs are credential-free by construction and explicitly
-# report full live coverage unavailable.
+# Live Stripe: journeys tagged @stripe use STRIPE_WEBHOOK_KEY (as the Cypress
+# job does) to forward the test account's webhooks to this job's API. Fork PRs
+# get no secrets: they run with --without-stripe, which excludes those tests
+# and reports Stripe coverage unavailable. Trusted runs never exclude them, so
+# missing or broken credentials fail the job instead of skipping coverage.
 
 on:
   workflow_call:
@@ -78,6 +80,7 @@ env:
   # browser workers on this job. The launcher validates it and never starts or
   # shuts down a Redis it does not own.
   REDIS_URL: redis://localhost:6379
+  STRIPE_WEBHOOK_KEY: ${{ secrets.STRIPE_WEBHOOK_KEY }}
   FRONTEND_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend
   API_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-api
   IMAGES_FOLDER: /home/runner/work/opencollective-frontend/opencollective-frontend/opencollective-images
@@ -168,6 +171,28 @@ jobs:
 
       - name: Checkout (frontend)
         uses: actions/checkout@v7
+
+      # Same Stripe CLI as e2e.yml: the launcher runs `stripe listen` for @stripe journeys.
+      - name: Restore stripe-cli
+        uses: actions/cache@v6
+        id: stripe-cli
+        with:
+          path: ${{ github.workspace }}/.stripe-cli
+          key: ${{ runner.os }}-stripe-cli-1.13.9-linux-x86_64
+
+      - name: Install stripe-cli
+        if: steps.stripe-cli.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p "${GITHUB_WORKSPACE}/.stripe-cli"
+          curl -fsSL -o /tmp/stripe.tgz https://github.com/stripe/stripe-cli/releases/download/v1.13.9/stripe_1.13.9_linux_x86_64.tar.gz
+          tar -xzf /tmp/stripe.tgz -C /tmp
+          mv /tmp/stripe "${GITHUB_WORKSPACE}/.stripe-cli/stripe"
+          chmod +x "${GITHUB_WORKSPACE}/.stripe-cli/stripe"
+
+      - name: Add stripe-cli to PATH
+        run: |
+          chmod +x "${GITHUB_WORKSPACE}/.stripe-cli/stripe"
+          echo "${GITHUB_WORKSPACE}/.stripe-cli" >> "${GITHUB_PATH}"
 
       - name: Setup node
         uses: actions/setup-node@v7
@@ -297,13 +322,17 @@ jobs:
           test -f opencollective-pdf/dist/server/index.js
 
       - name: Report trusted/fork mode
+        env:
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
         run: |
-          if [ "${{ github.event.pull_request.head.repo.fork }}" = "true" ]; then
-            echo "Fork PR: credential-free Playwright smoke with no secrets."
-            echo "Full live coverage (including Stripe, which stays in Cypress) is unavailable on forks;"
-            echo "reviewed trusted coverage on the same revision is required for later adoption/retirement."
+          if [ -n "$HEAD_REPO" ] && [ "$HEAD_REPO" != "$GITHUB_REPOSITORY" ]; then
+            echo "Fork PR: credential-free run without secrets. Tests tagged @stripe are excluded and"
+            echo "reported unavailable (--without-stripe); reviewed trusted coverage on the same revision"
+            echo "is required for later adoption/retirement."
+            echo "PLAYWRIGHT_WITHOUT_STRIPE=1" >> "$GITHUB_ENV"
           else
-            echo "Trusted run: Playwright smoke against prepared same-revision builds."
+            echo "Trusted run: every journey, including live Stripe (@stripe), against prepared same-revision builds."
+            echo "Missing or broken Stripe credentials fail the run."
           fi
 
       # Seed DB, start services, verify readiness, and run the browser journey
@@ -330,12 +359,15 @@ jobs:
           fi
           echo "Manifest: $manifest"
           jq -r '"mode=\(.mode) status=\(.status) playwrightExitCode=\(.playwrightExitCode) runId=\(.runId)"' "$manifest"
+          jq -r '"stripe: mode=\(.stripe.mode // "unknown") selected=\(.stripe.selected // 0) probe=\(.stripe.probe // null | tojson)"' "$manifest"
           results="$(ls -t test/playwright/.artifacts/*/report/results.json 2>/dev/null | head -n 1 || true)"
           if [ -z "$results" ]; then
             echo "No Playwright results.json: browser execution never started (setup failure or interruption; see manifest status)."
             exit 0
           fi
           jq -r '"first-attempt: expected=\(.stats.expected) unexpected=\(.stats.unexpected) flaky=\(.stats.flaky) skipped=\(.stats.skipped)"' "$results"
+          # Live Stripe journeys by final outcome (status of their last attempt)
+          jq -r '[.. | objects | select(has("tests") and has("tags")) | select(any(.tags[]; . == "stripe")) | .tests[] | (.results[-1].status // "not-run")] | group_by(.) | map("\(.[0])=\(length)") | "stripe journeys: " + (if length == 0 then "none ran" else join(" ") end)' "$results"
           echo "Reading: unexpected=final failures, flaky=recovered on retry (original attempt kept in test-results/), expected=passed first attempt."
 
       # Every attempt keeps original traces, relevant screenshots, sanitized
