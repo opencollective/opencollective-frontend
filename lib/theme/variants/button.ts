@@ -142,20 +142,32 @@ const generateButtonVariant = ({
 /**
  * Similar to generateButtonVariant, but to generate secondary buttons
  */
-const generateSecondaryButtonVariant = ({
+const generateSecondaryButtonVariantBase = ({
   baseColor,
   baseTextColor,
   activeTextColor = '#FFFFFF',
   hoverColor,
   activeColor,
   activeBackgroundColor = activeColor,
-  focusColor = '#FFFFFF',
+  backgroundColor = '#FFFFFF',
+  focusColor = backgroundColor,
   disabledColor,
   disabledBorderColor = disabledColor,
+}: {
+  baseColor: string;
+  baseTextColor: string;
+  activeTextColor?: string;
+  hoverColor: string;
+  activeColor: string;
+  activeBackgroundColor?: string;
+  backgroundColor?: string;
+  focusColor?: string;
+  disabledColor: string;
+  disabledBorderColor?: string;
 }) => {
   return {
-    background: '#FFFFFF',
-    backgroundColor: '#FFFFFF', // Not all browsers support gradients, this is a fallback for them
+    background: backgroundColor,
+    backgroundColor, // Not all browsers support gradients, this is a fallback for them
     borderColor: baseColor,
     color: baseTextColor,
 
@@ -185,6 +197,10 @@ const generateSecondaryButtonVariant = ({
  * Generate buttons styles based on the colors defined in https://www.figma.com/file/1jyGC3MjtqI7uUsGf1447P/%5BDS%5D-01-Colors?node-id=1354%3A2
  */
 export const getButtonStyles = ({ colors }): Record<ButtonStyle, Record<string, any>> => {
+  // Secondary buttons use the theme surface as background, to adapt to dark mode
+  const generateSecondaryButtonVariant = (params: Parameters<typeof generateSecondaryButtonVariantBase>[0]) =>
+    generateSecondaryButtonVariantBase({ backgroundColor: colors.white.full, ...params });
+
   return {
     // Base
     standard: {

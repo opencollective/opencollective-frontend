@@ -4,6 +4,7 @@ import { cloneDeep, get, sortBy, startCase } from 'lodash-es';
 import { Plus, Trash } from 'lucide-react';
 import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
+import { styled } from 'styled-components';
 import { v4 as uuid } from 'uuid';
 
 import { FEATURES } from '@/lib/allowed-features';
@@ -15,7 +16,7 @@ import FeatureNotSupported from '@/components/FeatureNotSupported';
 
 import { Sections } from '../../collective-page/_constants';
 import Container from '../../Container';
-import GoalsCover from '../../GoalsCover';
+import GoalsCover, { getGoalsCoverBackground } from '../../GoalsCover';
 import { Box } from '../../Grid';
 import Link from '../../Link';
 import MessageBox from '../../MessageBox';
@@ -28,7 +29,11 @@ import StyledTextarea from '../../StyledTextarea';
 import { Button } from '../../ui/Button';
 import SettingsSubtitle from '../SettingsSubtitle';
 
-const BORDER = '1px solid #efefef';
+const BORDER = '1px solid var(--color-gray-100)';
+
+const GoalsCoverContainer = styled(Container)`
+  background: ${props => getGoalsCoverBackground(props.theme)};
+`;
 const getInterpolationOption = value => ({ label: startCase(value), value });
 const INTERPOLATION_OPTIONS = ['auto', 'logarithm', 'linear'].map(getInterpolationOption);
 type Goal = {
@@ -318,9 +323,9 @@ class CollectiveGoals extends React.Component<CollectiveGoalsProps, CollectiveGo
           />
         </Box>
         <Container textAlign="left">
-          <Container background="rgb(245, 247, 250)" pt={5} pb={40} px={3}>
+          <GoalsCoverContainer pt={5} pb={40} px={3}>
             <GoalsCover collective={{ ...collective, settings: { goals } }} interpolation={goalsInterpolation} />
-          </Container>
+          </GoalsCoverContainer>
           <Container borderTop={BORDER}>{goals.map(this.renderGoal)}</Container>
         </Container>
         <Container textAlign="center" py={4} mb={4} borderBottom={BORDER}>

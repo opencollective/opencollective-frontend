@@ -8,20 +8,20 @@ export const getSelectFilterStyles = (stylesFromProps = undefined) => ({
   control: (baseStyles, state) => {
     const styles = {
       ...baseStyles,
-      background: '#F7F8FA',
+      background: 'var(--color-gray-50)',
       borderRadius: 100,
       padding: '0 8px',
       fontWeight: 500,
-      borderColor: '#E8E9EB',
+      borderColor: 'var(--color-gray-200)',
       ...(stylesFromProps?.control || null),
       '&:hover': {
-        borderColor: '#C4C7CC',
+        borderColor: 'var(--color-gray-300)',
       },
     };
 
     if (state.isFocused) {
-      styles.background = 'white';
-      styles.boxShadow = '0 0 0 2px black';
+      styles.background = 'var(--color-white)';
+      styles.boxShadow = '0 0 0 2px var(--color-gray-900)';
     }
 
     return styles;
