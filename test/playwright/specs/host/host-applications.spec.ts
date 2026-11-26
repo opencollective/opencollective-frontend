@@ -79,3 +79,23 @@ test.describe('Collective without a host', () => {
     await expect(page.getByTestId('afc-success-host-settings-link')).toHaveCount(0);
   });
 });
+
+test.describe('Collective with an active host', () => {
+  test.use({ inputs: { openToApplications: true }, actor: 'collectiveAdmin' });
+
+  test('Collective admin is asked to leave the current host before applying to a new one', async ({
+    page,
+    scenario,
+  }) => {
+    const { host, collective } = scenario.accounts;
+    await page.goto(`/${collective.slug}/accept-financial-contributions/host`);
+    const alreadyHosted = page.getByTestId('afc-already-hosted');
+    await expect(alreadyHosted).toContainText(`This collective is already hosted by ${host.name}.`);
+    await expect(alreadyHosted).toContainText('you first need to leave your current one');
+    await expect(page.getByPlaceholder(/Search/)).toHaveCount(0);
+    await expect(alreadyHosted.getByRole('link', { name: 'Fiscal Host settings' })).toHaveAttribute(
+      'href',
+      `/dashboard/${collective.slug}/host`,
+    );
+  });
+});
