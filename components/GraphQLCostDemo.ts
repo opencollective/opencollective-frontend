@@ -10,7 +10,7 @@ export const graphQLCostDemoQuery = gql`
           nodes {
             id
             fromAccount {
-              members(limit: 100) {
+              members(limit: 1000) {
                 nodes {
                   id
                 }
