@@ -64,7 +64,7 @@ PLAYWRIGHT_WORKERS=2 PLAYWRIGHT_RETRIES=1 ./test/playwright/run-local.sh
 ```
 
 What the launcher does: preflights tools/checkouts/builds/infrastructure before
-changing state, restores the API development dump + migrations into the same
+changing state, restores the API blank dump (`npm run db:restore:blank`) + migrations into the same
 explicitly owned disposable database (refusing protected names), starts
 API/frontend/images/PDF with the CI runtime contract (`TZ=UTC OC_ENV=ci
 NODE_ENV=test E2E_TEST=1`), verifies semantic readiness (API status, GraphQL

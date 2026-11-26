@@ -208,8 +208,8 @@ cd opencollective-frontend
 What a fresh run does:
 
 - Preflights tools, checkouts, builds, and infrastructure before changing state.
-- Restores the selected API revision's development dump plus that revision's
-  migrations into the same explicitly owned disposable database (default
+- Restores the selected API revision's blank dump (`npm run db:restore:blank`,
+  the schema without data) plus that revision's migrations into the same explicitly owned disposable database (default
   `opencollective_pw_e2e`; custom names must use `opencollective_pw_e2e_<suffix>`;
   protected/developer/shared/staging/production names are rejected).
 - Starts services with the CI runtime contract (`TZ=UTC OC_ENV=ci NODE_ENV=test
