@@ -519,14 +519,14 @@ const Policies = ({ collective }) => {
                           disabled={isSettingPolicies}
                           currency={data?.account?.currency}
                           currencyDisplay="CODE"
-                          value={formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.legalName || 250e2}
+                          value={formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.legalName ?? 250e2}
                           onChange={value =>
-                            !isNil(value) &&
+                            Number.isFinite(value) &&
                             formik.setFieldValue('policies', {
                               ...formik.values.policies,
                               ['CONTRIBUTOR_INFO_THRESHOLDS']: {
                                 ...formik.values.policies?.['CONTRIBUTOR_INFO_THRESHOLDS'],
-                                legalName: value || 0,
+                                legalName: value,
                               },
                             })
                           }
@@ -571,13 +571,14 @@ const Policies = ({ collective }) => {
                           }
                           currency={data?.account?.currency}
                           currencyDisplay="CODE"
-                          value={formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address || 500e2}
+                          value={formik.values.policies?.CONTRIBUTOR_INFO_THRESHOLDS?.address ?? 500e2}
                           onChange={value =>
+                            Number.isFinite(value) &&
                             formik.setFieldValue('policies', {
                               ...formik.values.policies,
                               ['CONTRIBUTOR_INFO_THRESHOLDS']: {
                                 ...formik.values.policies?.['CONTRIBUTOR_INFO_THRESHOLDS'],
-                                address: value || 0,
+                                address: value,
                               },
                             })
                           }

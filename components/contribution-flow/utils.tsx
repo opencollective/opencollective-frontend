@@ -1,6 +1,6 @@
 import React from 'react';
 import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
-import { find, get, pick, sortBy, uniqBy } from 'lodash-es';
+import { find, get, isNil, pick, sortBy, uniqBy } from 'lodash-es';
 import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
@@ -391,8 +391,8 @@ export const getRequiredInformation = (stepProfile, stepDetails, collective, pro
     legalName:
       tier?.requireAddress ||
       tier?.type === TierTypes.TICKET ||
-      (thresholds?.legalName ? totalAmount >= thresholds?.legalName : false),
-    address: tier?.requireAddress || (thresholds?.address ? totalAmount >= thresholds?.address : false),
+      (!isNil(thresholds?.legalName) && totalAmount >= thresholds.legalName),
+    address: tier?.requireAddress || (!isNil(thresholds?.address) && totalAmount >= thresholds.address),
   };
 };
 
