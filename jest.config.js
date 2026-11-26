@@ -12,7 +12,7 @@ module.exports = async () => {
   // `(?:.+/)?` covers nested copies (e.g. sanitize-html → htmlparser2@12).
   nextConfig.transformIgnorePatterns = [
     '^.+\\.module\\.(css|sass|scss)$',
-    'node_modules/(?!(?:.+/)?(?:@scure|@otplib|@noble|uuid|react-intl|intl-messageformat|@formatjs|cookie|htmlparser2|domhandler|domutils|domelementtype|entities|dom-serializer)/)',
+    'node_modules/(?!(?:.+/)?(?:@scure|@otplib|@noble|uuid|react-intl|intl-messageformat|@formatjs|@tanstack|cookie|htmlparser2|domhandler|domutils|domelementtype|entities|dom-serializer)/)',
   ];
 
   // Map lodash-es to CJS lodash in the test environment to avoid ESM parse errors.

@@ -1,5 +1,4 @@
 import React from 'react';
-import type { ColumnDef } from '@tanstack/react-table';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage } from 'react-intl';
 
@@ -10,6 +9,7 @@ import { SubmitExpenseFlow } from '@/components/submit-expense/SubmitExpenseFlow
 
 import Avatar from '../../../Avatar';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
+import type { ColumnDef } from '../../../table/tableFeatures';
 import { Badge } from '../../../ui/Badge';
 import AddFundsModal from '../collectives/AddFundsModal';
 

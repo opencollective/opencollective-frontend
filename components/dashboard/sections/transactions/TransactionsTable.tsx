@@ -1,6 +1,4 @@
 import React from 'react';
-import type { ColumnDef, Row } from '@tanstack/react-table';
-import { createColumnHelper } from '@tanstack/react-table';
 import { clsx } from 'clsx';
 import { AlertTriangle, ArrowLeft, ArrowRight, Undo } from 'lucide-react';
 import { defineMessage, FormattedMessage } from 'react-intl';
@@ -20,6 +18,8 @@ import DateTime from '../../../DateTime';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import { ColumnHeader } from '../../../table/ColumnHeader';
 import { actionsColumn, DataTable } from '../../../table/DataTable';
+import type { ColumnDef, Row } from '../../../table/tableFeatures';
+import { createColumnHelper } from '../../../table/tableFeatures';
 import { Badge } from '../../../ui/Badge';
 import { Pagination } from '../../filters/Pagination';
 

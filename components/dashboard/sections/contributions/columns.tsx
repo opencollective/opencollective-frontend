@@ -1,6 +1,4 @@
 import React from 'react';
-import type { ColumnDef } from '@tanstack/react-table';
-import { createColumnHelper } from '@tanstack/react-table';
 import { Clock } from 'lucide-react';
 import { defineMessage, FormattedMessage } from 'react-intl';
 
@@ -21,6 +19,9 @@ import { PaymentMethodTypeLabel } from '@/components/PaymentMethodTypeWithIcon';
 import { ColumnHeader } from '@/components/table/ColumnHeader';
 import { actionsColumn } from '@/components/table/DataTable';
 import { Badge } from '@/components/ui/Badge';
+
+import type { ColumnDef } from '../../../table/tableFeatures';
+import { createColumnHelper } from '../../../table/tableFeatures';
 
 const columnHelper = createColumnHelper<ManagedOrderFieldsFragment>();
 

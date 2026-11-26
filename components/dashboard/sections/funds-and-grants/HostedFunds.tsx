@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useMemo } from 'react';
 import { gql, useQuery } from '@apollo/client';
-import type { ColumnDef } from '@tanstack/react-table';
 import { compact, isString, omit } from 'lodash-es';
 import { useRouter } from 'next/router';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -24,6 +23,7 @@ import { UpgradePlanCTA } from '@/components/platform-subscriptions/UpgradePlanC
 import { DataTable } from '@/components/table/DataTable';
 import { Button } from '@/components/ui/Button';
 
+import type { ColumnDef } from '../../../table/tableFeatures';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';
 import { EmptyResults } from '../../EmptyResults';

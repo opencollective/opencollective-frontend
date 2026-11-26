@@ -1,5 +1,4 @@
 import React from 'react';
-import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -13,6 +12,7 @@ import DateTime from '../../../DateTime';
 import StyledHr from '../../../StyledHr';
 import StyledLinkButton from '../../../StyledLinkButton';
 import { actionsColumn, DataTable } from '../../../table/DataTable';
+import type { ColumnDef, TableMeta } from '../../../table/tableFeatures';
 import { P } from '../../../Text';
 
 import { LegalDocumentServiceBadge } from './LegalDocumentServiceBadge';

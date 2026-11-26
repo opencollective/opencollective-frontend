@@ -1,5 +1,4 @@
 import React from 'react';
-import type { CellContext, ColumnDef } from '@tanstack/react-table';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -16,6 +15,7 @@ import VirtualCard, { ActionsButton } from '../edit-collective/VirtualCard';
 import { Grid } from '../Grid';
 import StyledTag from '../StyledTag';
 import { DataTable } from '../table/DataTable';
+import type { CellContext, ColumnDef } from '../table/tableFeatures';
 import { P } from '../Text';
 import { TableActionsButton } from '../ui/Table';
 import { toast } from '../ui/useToast';

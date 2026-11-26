@@ -1,5 +1,4 @@
 import React from 'react';
-import type { Row, Table } from '@tanstack/react-table';
 import { MoreHorizontal, PanelRightOpen } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
@@ -19,6 +18,8 @@ import {
   DropdownMenuTrigger,
 } from '../ui/DropdownMenu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/Tooltip';
+
+import type { Row, Table } from './tableFeatures';
 
 function DropdownActionItemContent({ action }: { action: Action }) {
   return (

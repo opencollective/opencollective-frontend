@@ -1,6 +1,4 @@
 import React from 'react';
-import type { ColumnDef } from '@tanstack/react-table';
-import { createColumnHelper } from '@tanstack/react-table';
 import { ArrowLeftRightIcon } from 'lucide-react';
 import { FormattedMessage } from 'react-intl';
 
@@ -21,6 +19,8 @@ import DateTime from '../DateTime';
 import FormattedMoneyAmount from '../FormattedMoneyAmount';
 import Link from '../Link';
 import { actionsColumn, DataTable } from '../table/DataTable';
+import type { ColumnDef } from '../table/tableFeatures';
+import { createColumnHelper } from '../table/tableFeatures';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 

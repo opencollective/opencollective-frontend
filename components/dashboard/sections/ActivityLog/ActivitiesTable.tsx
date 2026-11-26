@@ -1,5 +1,4 @@
 import React from 'react';
-import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
 
 import type { Activity } from '../../../../lib/graphql/types/v2/graphql';
@@ -10,6 +9,7 @@ import DateTime from '../../../DateTime';
 import StyledHr from '../../../StyledHr';
 import StyledLinkButton from '../../../StyledLinkButton';
 import { DataTable } from '../../../table/DataTable';
+import type { ColumnDef, TableMeta } from '../../../table/tableFeatures';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 import { TableActionsButton } from '../../../ui/Table';
 

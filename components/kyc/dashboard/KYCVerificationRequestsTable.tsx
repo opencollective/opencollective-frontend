@@ -1,5 +1,4 @@
 import React from 'react';
-import type { ColumnDef } from '@tanstack/react-table';
 import { useIntl } from 'react-intl';
 
 import type {
@@ -15,6 +14,7 @@ import Avatar from '@/components/Avatar';
 import DateTime from '@/components/DateTime';
 import { actionsColumn, DataTable } from '@/components/table/DataTable';
 
+import type { ColumnDef } from '../../table/tableFeatures';
 import { useKYCVerificationActions } from '../actions/useKYCVerificationActions';
 import { KYCVerificationDrawer } from '../drawer/KYCVerificationDrawer';
 import { KYCVerificationStatusBadge } from '../KYCVerificationStatusBadge';

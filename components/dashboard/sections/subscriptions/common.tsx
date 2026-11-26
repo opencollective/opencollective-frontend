@@ -1,5 +1,4 @@
 import React from 'react';
-import type { ColumnDef } from '@tanstack/react-table';
 import dayjs from 'dayjs';
 import { groupBy, mapValues, pick, toPairs } from 'lodash-es';
 import { Pencil } from 'lucide-react';
@@ -20,6 +19,7 @@ import type {
 import { AccountHoverCard } from '../../../AccountHoverCard';
 import Avatar from '../../../Avatar';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
+import type { ColumnDef } from '../../../table/tableFeatures';
 import { TableActionsButton } from '../../../ui/Table';
 import { accountTrustLevelFilter } from '../../filters/AccountTrustLevelFilter';
 import { buildAccountTypeFilter } from '../../filters/AccountTypeFilter';

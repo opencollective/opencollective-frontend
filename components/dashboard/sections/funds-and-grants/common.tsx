@@ -1,5 +1,4 @@
 import React from 'react';
-import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { includes } from 'lodash-es';
 import { Check, Copy, Filter, MinusCircle, MoreHorizontal, PanelRightOpen } from 'lucide-react';
 import { useRouter } from 'next/router';
@@ -32,6 +31,7 @@ import {
 } from '@/components/ui/DropdownMenu';
 import { TableActionsButton } from '@/components/ui/Table';
 
+import type { ColumnDef, TableMeta } from '../../../table/tableFeatures';
 import { DashboardContext } from '../../DashboardContext';
 
 export const grantColumns: Record<string, ColumnDef<any, any>> = {

@@ -1,5 +1,4 @@
 import React from 'react';
-import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
 
 import type { GetActions } from '../../lib/actions/types';
@@ -12,6 +11,7 @@ import { Box } from '../Grid';
 import StyledHr from '../StyledHr';
 import StyledLinkButton from '../StyledLinkButton';
 import { actionsColumn, DataTable } from '../table/DataTable';
+import type { ColumnDef, TableMeta } from '../table/tableFeatures';
 import { P } from '../Text';
 import UploadedFilePreview from '../UploadedFilePreview';
 

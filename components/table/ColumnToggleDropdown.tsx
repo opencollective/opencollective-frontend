@@ -1,5 +1,4 @@
 import React from 'react';
-import type { Table } from '@tanstack/react-table';
 import { clsx } from 'clsx';
 import { RotateCcw, Settings2 } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -14,6 +13,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/DropdownMenu';
+
+import type { Table } from './tableFeatures';
 
 export function ColumnToggleDropdown<TData>({ table }: { table: Table<TData> }) {
   const { hasDefaultColumnVisibility, setColumnVisibility, defaultColumnVisibility } = table.options.meta;

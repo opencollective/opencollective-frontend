@@ -1,5 +1,4 @@
 import React from 'react';
-import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
 
 import type {
@@ -15,6 +14,7 @@ import StyledHr from '../../../StyledHr';
 import StyledLinkButton from '../../../StyledLinkButton';
 import StyledTag from '../../../StyledTag';
 import { DataTable } from '../../../table/DataTable';
+import type { ColumnDef, TableMeta } from '../../../table/tableFeatures';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../../ui/DropdownMenu';
 import { TableActionsButton } from '../../../ui/Table';
 

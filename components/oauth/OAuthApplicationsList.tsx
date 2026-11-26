@@ -1,6 +1,5 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import type { ColumnDef } from '@tanstack/react-table';
 import { AppWindow, Plus } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -13,6 +12,7 @@ import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import CreateOauthApplicationModal from '../oauth/CreateOauthApplicationModal';
 import Pagination from '../Pagination';
 import { DataTable } from '../table/DataTable';
+import type { ColumnDef } from '../table/tableFeatures';
 import { Button } from '../ui/Button';
 
 type OAuthApplicationRow = { id: string; publicId: string; name: string; description?: string | null };

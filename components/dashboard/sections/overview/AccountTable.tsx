@@ -1,6 +1,5 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import type { Column, ColumnDef, Row, TableMeta } from '@tanstack/react-table';
 import { clsx } from 'clsx';
 import { isNil, omit } from 'lodash-es';
 import { ArrowDown10, ArrowDownZA, ArrowUp10, ArrowUpZA } from 'lucide-react';
@@ -20,6 +19,7 @@ import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
 import Link from '../../../Link';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { DataTable } from '../../../table/DataTable';
+import type { Column, ColumnDef, Row, TableMeta } from '../../../table/tableFeatures';
 import { Badge } from '../../../ui/Badge';
 import { Button } from '../../../ui/Button';
 import { Checkbox } from '../../../ui/Checkbox';
@@ -193,7 +193,7 @@ const columns: ColumnDef<AccountMetricsRow>[] = [
       const meta = table.options.meta as AccountMetricsMeta;
       return <SortableHeader align="right" column={column} label={meta.metric.label} />;
     },
-    sortingFn: (rowA: Row<AccountMetricsRow>, rowB: Row<AccountMetricsRow>): number => {
+    sortFn: (rowA: Row<AccountMetricsRow>, rowB: Row<AccountMetricsRow>): number => {
       const a = rowA.original.current;
       const b = rowB.original.current;
 
