@@ -1,12 +1,14 @@
 import { createClient } from 'redis';
 
 /**
- * The API counts sign-up requests per client IP (`signup_ip_${req.ip}` in `server/controllers/users.ts`), at most
- * `OTP_RATE_LIMIT_MAX_ATTEMPTS` (5) per 15 minutes, in its Redis cache, which survives `--fresh`. Every journey signs
- * up from this machine, under whichever form Express gives the loopback address, so a few runs in a row against a
- * running environment would be refused.
+ * The API counts sign-up requests and email verifications per client IP (`signup_ip_${req.ip}` and
+ * `verifyEmail_ip_${req.ip}` in `server/controllers/users.ts`), at most `OTP_RATE_LIMIT_MAX_ATTEMPTS` (5) each per
+ * 15 minutes, in its Redis cache, which survives `--fresh`. Every journey signs up from this machine, under whichever
+ * form Express gives the loopback address, so a few runs in a row against a running environment would be refused.
  */
-const SIGNUP_KEYS = ['::1', '127.0.0.1', '::ffff:127.0.0.1'].map(ip => `signup_ip_${ip}`);
+const SIGNUP_KEYS = ['signup_ip', 'verifyEmail_ip'].flatMap(bucket =>
+  ['::1', '127.0.0.1', '::ffff:127.0.0.1'].map(ip => `${bucket}_${ip}`),
+);
 
 const newClient = (url: string) => createClient({ url });
 
@@ -24,7 +26,10 @@ async function withRedis<T>(run: (client: ReturnType<typeof newClient>) => Promi
   }
 }
 
-/** Gives the next sign-up from this machine a fresh window. The product limit and the per-email limit stay in force. */
-export async function resetSignupRateLimit(): Promise<void> {
+/**
+ * Gives the next sign-up and its email verification from this machine a fresh window. The product limits, and the
+ * per-email ones, stay in force.
+ */
+export async function resetSignupRateLimits(): Promise<void> {
   await withRedis(client => client.del(SIGNUP_KEYS));
 }

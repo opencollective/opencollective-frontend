@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 
 import { expect, scenarioTest } from '../../fixtures';
 import { toast } from '../../helpers/notifications';
-import { resetSignupRateLimit } from '../../helpers/rate-limits';
+import { resetSignupRateLimits } from '../../helpers/rate-limits';
 
 /**
  * The profile step of the contribution flow, for a visitor who is not signed in: signing in, or creating an
@@ -48,7 +48,7 @@ test('visitor goes back to the guest form, then the sign-up form checks the emai
   ).toBeVisible();
 
   // The API refuses an address the browser accepts
-  await resetSignupRateLimit();
+  await resetSignupRateLimits();
   await email.fill('Incorrect@value');
   await content.locator('button[type=submit]').click();
   await expect(toast(page, 'Invalid email address.')).toBeVisible();

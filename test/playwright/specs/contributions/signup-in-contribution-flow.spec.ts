@@ -5,7 +5,7 @@ import type { Locator, Page, TestInfo } from '@playwright/test';
 import * as cheerio from 'cheerio';
 
 import { expect, scenarioTest } from '../../fixtures';
-import { resetSignupRateLimit } from '../../helpers/rate-limits';
+import { resetSignupRateLimits } from '../../helpers/rate-limits';
 
 // A Collective of its own to contribute to, for a visitor who is not signed in
 const test = scenarioTest('contribution-flow', { inputs: {}, actor: null });
@@ -64,7 +64,7 @@ test('visitor creates an account with an emailed code without leaving the contri
   await page.unroute('**/api/users/signup');
 
   // 4. The retry goes through: the code step replaces the form, still in the flow
-  await resetSignupRateLimit();
+  await resetSignupRateLimits();
   await content.locator('button[type=submit]').click();
   const codeForm = page.getByTestId('signup-code-form');
   await expect(codeForm).toContainText(`Enter the code sent to ${email}.`);
