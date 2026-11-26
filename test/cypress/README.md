@@ -31,7 +31,7 @@ Stop other servers on ports 3000, 3060, 3001, and 3002 first (`npx pm2 stop all`
 cd opencollective-frontend
 
 # First run (or when you need a fresh DB) - uses opencollective_e2e, not opencollective_dvl
-./test/cypress/run-local.sh --setup-db --spec "test/cypress/integration/00-i18n.test.js"
+./test/cypress/run-local.sh --setup-db --spec "test/cypress/integration/01-signup.test.ts"
 
 # Subsequent runs
 ./test/cypress/run-local.sh --spec "test/cypress/integration/0*.(js|ts)"
@@ -69,7 +69,7 @@ cd opencollective-frontend && npm run dev
 
 # Terminal 3 - Cypress
 cd opencollective-frontend
-npm run cypress:run -- --spec "test/cypress/integration/00-i18n.test.js"
+npm run cypress:run -- --spec "test/cypress/integration/01-signup.test.ts"
 ```
 
 ## CI locally

@@ -2,7 +2,7 @@
 # Run Cypress E2E tests against a local production-like stack (monorepo / devcontainer).
 #
 # Usage:
-#   ./test/cypress/run-local.sh --spec "test/cypress/integration/00-i18n.test.js"
+#   ./test/cypress/run-local.sh --spec "test/cypress/integration/01-signup.test.ts"
 #   ./test/cypress/run-local.sh --open
 #   ./test/cypress/run-local.sh --setup-db --spec "test/cypress/integration/0*.(js|ts)"
 #

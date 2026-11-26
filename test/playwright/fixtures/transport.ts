@@ -66,6 +66,20 @@ const contributionFlowScenario = graphScenario.extend({
   tiers: z.record(z.object({ legacyId: z.number(), name: z.string() })),
 });
 
+/** `collective-admin`: the multi-party shape, plus the default tiers of the Collective. */
+const collectiveScenario = graphScenario.extend({
+  tiers: z.record(z.object({ legacyId: z.number(), slug: z.string(), name: z.string() })),
+});
+
+/**
+ * `individual`: the multi-party shape, plus the credentials the journey asked for. Neither field is copied
+ * into evidence (`scenarioEvidence` only copies named fields).
+ */
+const individualScenario = graphScenario.extend({
+  application: z.object({ name: z.string(), clientId: z.string(), clientSecret: z.string() }).optional(),
+  loginTokens: z.object({ valid: z.string(), expired: z.string() }).optional(),
+});
+
 // Written out rather than inferred: this project compiles without `strict`, where inference makes every field optional.
 type Envelope = {
   recipe: string;
@@ -93,6 +107,17 @@ export type ContributionScenario = GraphScenario & {
 
 export type ContributionFlowScenario = GraphScenario & {
   tiers: Partial<Record<'open' | 'ticket', { legacyId: number; name: string }>>;
+};
+
+export type CollectiveScenario = GraphScenario & {
+  tiers: Record<'backer' | 'sponsor', { legacyId: number; slug: string; name: string }>;
+};
+
+export type IndividualScenario = GraphScenario & {
+  /** The OAuth application the user owns, with its credentials. */
+  application?: { name: string; clientId: string; clientSecret: string };
+  /** Tokens of sign-in links (`/signin/<token>`) for the user: one valid, one expired. */
+  loginTokens?: { valid: string; expired: string };
 };
 
 type UseVendorPolicy = 'HOST_ADMINS' | 'HOST_AND_COLLECTIVE_ADMINS' | 'ALL_SUBMITTERS';
@@ -123,7 +148,7 @@ type Contracts = {
   /**
    * Actors `hostAdmin`, `admin` (Collective admin; submitter and payee of the expense). Accounts `host`,
    * `collective` (no expense policy), optional `project` under it. Expenses: optional `pending` (invoice,
-   * optionally with a stored PDF attached file).
+   * optionally with a stored PDF attached file), plus optional unreturned `listedExpenses`.
    * URLs `expenses`, `policies`, optional `projectNewExpense`.
    */
   'expense-management': {
@@ -135,6 +160,8 @@ type Contracts = {
         attachedPdf?: { name: string; text: string };
       };
       project?: boolean;
+      /** This many more pending invoices by `admin` on `collective`, described `Listed expense <n> <tag>`. */
+      listedExpenses?: number;
     };
     scenario: GraphScenario;
   };
@@ -184,6 +211,88 @@ type Contracts = {
     };
     scenario: ContributionFlowScenario;
   };
+  /**
+   * Actors `contributor` (no payment method yet), `collectiveAdmin`. Accounts `host` (a seeded host whose
+   * Stripe test connection journeys share: `e2e-host`, USD, unless stated, or `e2e-eur-host`, EUR) and
+   * `collective`, hosted by it. URLs `donate`, `transactions`, `orders`. For `@stripe` journeys.
+   */
+  'stripe-contribution': {
+    inputs: { host?: 'e2e-host' | 'e2e-eur-host' };
+    scenario: GraphScenario;
+  };
+  /**
+   * Actor `hostAdmin`. Accounts `host` and `payee` (the seeded `ofitech`, paid through its shared Stripe
+   * connection). Expenses: `settlement` ($10, pending, owed by `host` to `payee`). URLs `expense`. For `@stripe` journeys.
+   */
+  'stripe-settlement-expense': {
+    inputs: Record<string, never>;
+    scenario: GraphScenario;
+  };
+  /**
+   * Actors `hostAdmin`, `collectiveAdmin`, optional `contributor`, `applicant` (no role anywhere). Accounts `host`,
+   * `collective` (admin: `collectiveAdmin`), optional `collective2` (admin: `hostAdmin`), `applicantCollective`
+   * (no host, admin: `applicant`). Expenses: optional `pending` ($10 invoice by `collectiveAdmin` on `collective`).
+   * URLs `hostProfile` and the host dashboard's `hostedCollectives`, `hostApplications`, `expectedFunds`,
+   * `chartOfAccounts`, `agreements`, `payDisbursements`.
+   */
+  'fiscal-host': {
+    inputs: {
+      openToApplications?: boolean;
+      /** Cents the host already added to `collective`. */
+      collectiveBalance?: number;
+      secondCollective?: boolean;
+      pendingExpense?: boolean;
+      /** Also lets the host record funds from any account, as trusted hosts may. */
+      contributor?: boolean;
+      applicant?: boolean;
+      applicantCollective?: boolean;
+    };
+    scenario: GraphScenario;
+  };
+  /**
+   * Actors `admin`, `hostAdmin`. Accounts `host`, `collective` (hosted by `host`, administered by `admin`, with the
+   * default tiers `backer` and `sponsor`), optional `organization` (unhosted, administered by `admin`).
+   * URLs `collective`, `dashboard`, `info`, `tiers`, `advanced`, `newEvent`, `backerTier` (its tier page),
+   * `userSecurity` (of `admin`), optional `organization`, `organizationAdvanced`.
+   */
+  'collective-admin': {
+    inputs: {
+      currency?: 'USD' | 'EUR';
+      /** Links shown in the Collective's hero, in this order. */
+      socialLinks?: Array<{ type: string; url: string }>;
+      organization?: boolean;
+      /** Cents moved by `organization`: a one-time contribution to `collective`, after an expense it was paid. */
+      history?: { contribution: number; expense: number };
+    };
+    scenario: CollectiveScenario;
+  };
+  /**
+   * Actors `user` (no membership), optional `other` (an unrelated user). URLs `profile`, `info`, `advanced`,
+   * `userSecurity`, `forDevelopers`, `authorizedApps` (of `user`). Optional credentials: `application`,
+   * `loginTokens`.
+   */
+  individual: {
+    inputs: {
+      /** A password the user signs in with. */
+      password?: string;
+      /** Two-factor authentication with an authenticator app, from this base32 secret (the journey computes codes). */
+      twoFactorSecret?: string;
+      otherUser?: boolean;
+      /** An OAuth application owned by the user. */
+      oauthApplication?: { name: string; redirectUri: string };
+      loginTokens?: boolean;
+    };
+    scenario: IndividualScenario;
+  };
+  /**
+   * Actors `user`, `hostAdmin`. Accounts `adminOf` (Collective `user` administers since `adminSince`),
+   * `backed` (both EUR, hosted by `host`; `user` contributed `contributions` to it and submitted `expenses` to it).
+   * URL `profile` (of `user`).
+   */
+  'user-profile': {
+    inputs: { adminSince: string; contributions: number[]; expenses: string[] };
+    scenario: GraphScenario;
+  };
   'vendor-host': {
     inputs: {
       /** Who may use the host's vendors; omitted, the host has no policy (product default: host admins only). */
@@ -215,8 +324,14 @@ const schemas: Record<Recipe, z.ZodTypeAny> = {
   'expense-draft-invite': graphScenario,
   'expense-management': graphScenario,
   'vendor-host': graphScenario,
+  'fiscal-host': graphScenario,
   'recurring-contribution': contributionScenario,
   'contribution-flow': contributionFlowScenario,
+  'stripe-contribution': graphScenario,
+  'stripe-settlement-expense': graphScenario,
+  'collective-admin': collectiveScenario,
+  individual: individualScenario,
+  'user-profile': graphScenario,
 };
 
 type Recipe = keyof Contracts;
@@ -285,6 +400,31 @@ export class FixtureRecipes {
       workerIndex: testInfo.workerIndex,
       nonce: randomUUID(),
     };
+  }
+
+  /**
+   * Value of the `oc_e2e_attempt` cookie a `@stripe` journey's browser carries: it names this attempt to the
+   * API, which records every Stripe object it creates for it and only lets webhooks about them through.
+   */
+  get stripeAttemptCookie(): string {
+    return Buffer.from(JSON.stringify(this.attempt)).toString('base64url');
+  }
+
+  /**
+   * Ends this attempt's ownership: later Stripe events about its objects are dropped. Returns what it owned
+   * and what became of its events (`server/e2e/stripe-ownership.ts` in the API), for the report.
+   */
+  async retireStripeAttempt(): Promise<unknown> {
+    const response = await fetch(`${process.env.API_URL}/e2e/stripe/attempts/retire`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${this.token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ attempt: this.attempt }),
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (!response.ok) {
+      throw new Error(`Retiring the Stripe attempt failed (${response.status}). Rebuild the companion API.`);
+    }
+    return response.json();
   }
 
   async request<R extends Recipe>(recipe: R, inputs: Inputs<R>, requestId: string = recipe) {
