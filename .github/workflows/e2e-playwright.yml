@@ -1,11 +1,15 @@
 name: E2E Playwright
 
-# Pilot: one observational Chromium job sharing the local launcher contract
-# (test/playwright/run-local.sh). This job is intentionally NOT in branch
-# protection required checks: Cypress (`e2e / e2e (...)`) keeps protecting
-# existing coverage until adoption (ticket 12). Report real Playwright
-# test/setup/interruption outcomes here without masking failures, and do not
-# treat duplicate pilot cost as steady-state cost.
+# Playwright E2E: one Chromium job running every spec under
+# test/playwright/specs through the local launcher contract
+# (test/playwright/run-local.sh). The check is `e2e-playwright / playwright`;
+# its name does not depend on the spec selection or the worker count, so it can
+# become a required check (opencollective/opencollective#8970). The Cypress
+# shards (`e2e / e2e (...)`) stay required while they cover unmigrated specs.
+#
+# Rollback, in this order: re-require the Cypress shards, restore the deleted
+# Cypress specs from the baseline commit recorded in docs/e2e.md ("Rollback"),
+# and only then remove `e2e-playwright / playwright` from the required checks.
 #
 # Security: Do not switch this workflow to `pull_request_target` to run on fork PRs with secrets.
 # Use `pull_request` (secrets blocked for forks by default) or trusted push/workflow_dispatch instead.
@@ -31,7 +35,7 @@ on:
         required: true
         type: string
       spec:
-        description: Playwright spec for this job; later pilot journeys reuse this job via this input
+        description: Playwright spec selection (CI runs the full test/playwright/specs; narrow it only for manual or benchmark runs)
         required: false
         default: test/playwright/specs
         type: string
@@ -43,7 +47,7 @@ on:
       workers:
         description: Browser workers sharing one services stack (tune from measured CPU/memory/service capacity)
         required: false
-        default: '1'
+        default: '2'
         type: string
       retries:
         description: Playwright retries; benchmarks use 0, routine CI permits at most 1
@@ -89,7 +93,7 @@ env:
 
 jobs:
   playwright:
-    name: playwright smoke
+    name: playwright
     runs-on: ubuntu-26.04
 
     timeout-minutes: 30
@@ -98,7 +102,10 @@ jobs:
       PLAYWRIGHT_SPEC: ${{ inputs.spec }}
       PLAYWRIGHT_GREP: ${{ inputs.grep }}
       # One shared services/persistent-state stack for all browser workers.
-      # Default 1; raise only from measured machine/service capacity.
+      # Default 2: the pilot evaluation (opencollective/opencollective#8969)
+      # measured 2 workers on this 4-vCPU runner (API, frontend, images, PDF
+      # and Postgres share it) with no first-attempt failure in 30 runs.
+      # Higher values are unmeasured here; raise only with new evidence.
       PLAYWRIGHT_WORKERS: ${{ inputs.workers }}
       # Benchmarks run with 0; routine CI permits at most 1. The launcher and
       # playwright.config.ts reject larger values so first-attempt failures,
@@ -338,7 +345,7 @@ jobs:
       # Seed DB, start services, verify readiness, and run the browser journey
       # through the shared launcher: the same contract as local runs.
 
-      - name: Run Playwright smoke via shared launcher
+      - name: Run Playwright specs via shared launcher
         run: ./test/playwright/run-local.sh
         env:
           # Run pg_restore & co from the postgres:16 image, matching the PostgreSQL 16 service whatever client the runner ships

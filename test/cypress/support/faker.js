@@ -21,7 +21,3 @@ export const randomGmailEmail = () => {
 export const randomSlug = () => {
   return uuid().split('-')[0];
 };
-
-export const randStr = () => {
-  return uuid().split('-')[0];
-};

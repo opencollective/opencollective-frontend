@@ -343,26 +343,6 @@ export const unhostAccountCollectivePickerSearchQuery = gqlV1 /* GraphQL */ `
   }
 `;
 
-export const collectiveBannerIframeQuery = gqlV1 /* GraphQL */ `
-  query CollectiveBannerIframe($collectiveSlug: String) {
-    Collective(slug: $collectiveSlug) {
-      id
-      name
-      slug
-      currency
-      stats {
-        id
-        backers {
-          id
-          users
-          organizations
-          collectives
-        }
-      }
-    }
-  }
-`;
-
 export const fromCollectiveSearchQuery = gqlV1 /* GraphQL */ `
   query FromCollectiveSearch(
     $term: String!

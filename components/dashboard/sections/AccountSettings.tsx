@@ -26,7 +26,10 @@ const AccountSettings = ({ account, section }) => {
   const { data, loading } = useQuery(editCollectivePageQuery, {
     variables: { slug: account.slug },
     fetchPolicy: 'network-only',
-    ssr: false,
+    // Keeps the query out of server-side rendering. Not in the browser: there, Apollo returns a frozen loading state
+    // to components rendered during `ssrForceFetchDelay` (see `lib/apollo-client.ts`), and nothing renders them again
+    // when the delay ends, which left the settings sections on their loader (opencollective/opencollective#9163).
+    ssr: typeof window !== 'undefined',
     skip: !LoggedInUser,
     context: API_V1_CONTEXT,
   });

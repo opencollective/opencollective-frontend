@@ -2,14 +2,14 @@ import React, { useEffect } from 'react';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { ExclamationCircle } from '@styled-icons/fa-solid/ExclamationCircle';
 import { useFormik } from 'formik';
-import { debounce } from 'lodash-es';
+import { debounce, isNil } from 'lodash-es';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import roles from '../../lib/constants/roles';
-import { graphqlAmountValueInCents } from '../../lib/currency-utils';
+import { formatCurrency, graphqlAmountValueInCents } from '../../lib/currency-utils';
 import { gql } from '../../lib/graphql/helpers';
 import type { Account, VirtualCard, VirtualCardRequest } from '../../lib/graphql/types/v2/graphql';
-import { VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
+import { Currency, VirtualCardLimitInterval } from '../../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../../lib/hooks/useLoggedInUser';
 import {
   VirtualCardLimitIntervalDescriptionsI18n,
@@ -184,6 +184,7 @@ export default function EditVirtualCardModal({
   modalProps,
   virtualCardRequest,
 }: EditVirtualCardModalProps) {
+  const intl = useIntl();
   const { toast } = useToast();
 
   const { data: policyData, loading: isLoadingPolicy } = useQuery(virtualCardPoliciesQuery, {
@@ -205,7 +206,7 @@ export default function EditVirtualCardModal({
   const isHostAdmin = LoggedInUser?.hasRole(roles.ADMIN, host);
 
   const canEditLimit = isHostAdmin && (!isEditing || virtualCard.provider === 'STRIPE');
-  const currency = virtualCard?.currency ?? host.currency ?? 'USD';
+  const currency = virtualCard?.currency ?? host.currency ?? Currency.USD;
 
   const formik = useFormik({
     initialValues: {
@@ -281,11 +282,11 @@ export default function EditVirtualCardModal({
         errors.limitAmount = 'Required';
       }
       if (values.limitInterval) {
-        const maximumLimitForInterval = graphqlAmountValueInCents(
-          MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL[values.limitInterval],
+        const maximumLimitForIntervalInCents = graphqlAmountValueInCents(
+          MAXIMUM_VIRTUAL_CARD_LIMIT_AMOUNT_FOR_INTERVAL?.[values.limitInterval],
         );
-        if (values.limitAmount > maximumLimitForInterval * 100) {
-          errors.limitAmount = `Limit for this interval should not exceed ${maximumLimitForInterval} ${currency}`;
+        if (!isNil(maximumLimitForIntervalInCents) && values.limitAmount > maximumLimitForIntervalInCents) {
+          errors.limitAmount = `Limit for this interval should not exceed ${formatCurrency(maximumLimitForIntervalInCents, currency, { locale: intl.locale })}`;
         }
       }
       return errors;
@@ -316,8 +317,6 @@ export default function EditVirtualCardModal({
       throttledCall(getCollectiveUsers, { slug: cardCollective.slug });
     }
   }, [cardCollective]);
-
-  const intl = useIntl();
 
   const handleClose = () => {
     onClose?.();
