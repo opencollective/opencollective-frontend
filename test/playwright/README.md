@@ -1,6 +1,6 @@
 # Playwright E2E
 
-Pilot runner for independent, reproducible E2E tests. The shared launcher owns
+Runner for independent, reproducible E2E tests; new E2E tests go here. The shared launcher owns
 the E2E environment; Playwright only runs browser journeys.
 
 Canonical guide: [`docs/e2e.md`](../../docs/e2e.md). This file holds
@@ -92,16 +92,16 @@ Run specs through `npm run e2e` rather than `npx playwright test`: the
 launcher exports these run-specific report paths, and without it specs that
 use fixtures fail ("Fixtures require an owned stack").
 
-## CI (pilot, observational)
+## CI
 
-`CI / e2e-playwright / playwright smoke` reuses this launcher with prepared
-same-revision builds; Cypress checks stay required. Later journeys reuse the
-same job via its `spec`/`grep` inputs. Fork runs are credential-free and
-report full live coverage unavailable. Failure/recovery evidence is kept
-14 days, successful evidence 7 days. See `docs/e2e.md`.
+`CI / e2e-playwright / playwright` runs every spec under
+`test/playwright/specs` through this launcher with prepared same-revision
+builds (2 workers, at most 1 retry). Fork runs are credential-free and report
+full live coverage unavailable. Failure/recovery evidence is kept 14 days,
+successful evidence 7 days. Required checks and rollback: see `docs/e2e.md`.
 
-Focused non-Stripe runs require no Stripe credentials. Existing Cypress
-coverage and live-integration boundaries are unchanged.
+Focused non-Stripe runs require no Stripe credentials. Live-integration
+boundaries are unchanged (live Stripe stays in Cypress).
 
 ## Building for upload journeys
 

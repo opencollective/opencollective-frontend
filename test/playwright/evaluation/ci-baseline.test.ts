@@ -19,7 +19,7 @@ describe('summarizeCiBaseline', () => {
         job('e2e / e2e (2*.(js|ts))', '10:04:00', '10:15:00', 'failure'),
         job('e2e / e2e (3*.(js|ts))', '10:05:00', '10:12:00'),
         job('e2e / e2e (4*.(js|ts))', '10:04:00', '10:14:00'),
-        job('e2e-playwright / playwright smoke', '10:04:00', '10:14:00'),
+        job('e2e-playwright / playwright', '10:04:00', '10:14:00'),
       ],
     },
     {
@@ -31,7 +31,7 @@ describe('summarizeCiBaseline', () => {
         job('e2e / e2e (2*.(js|ts))', '11:00:00', '11:11:00'),
         job('e2e / e2e (3*.(js|ts))', '11:00:00', '11:07:00'),
         job('e2e / e2e (4*.(js|ts))', '11:00:00', '11:09:00'),
-        job('e2e-playwright / playwright smoke', '11:00:00', '11:08:00', 'failure'),
+        job('e2e-playwright / playwright', '11:00:00', '11:08:00', 'failure'),
       ],
     },
     // Cancelled before the shards ran: not a baseline sample.
