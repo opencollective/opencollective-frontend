@@ -166,3 +166,21 @@ export async function memberInvitation(
   const url = new URL(href);
   return { text: $('body').text(), link: `${url.pathname}${url.search}${url.hash}` };
 }
+
+/** The link the product emails to `to` after they asked to reset their password, as a path relative to the site. */
+export async function emailedResetPasswordLink(mail: Mailbox, { to }: { to: string }): Promise<string> {
+  const message = await mail.waitForMessage({ to, subject: 'Reset Password' });
+  return linkIn(message, 'Reset your password now');
+}
+
+/**
+ * The message asking to confirm `newEmail` as the new address of an account, sent to that address, and its
+ * confirmation link as a path relative to the site.
+ */
+export async function emailChangeConfirmation(
+  mail: Mailbox,
+  { newEmail }: { newEmail: string },
+): Promise<{ text: string; link: string }> {
+  const message = await mail.waitForMessage({ to: newEmail, subject: `Confirm your email ${newEmail}` });
+  return { text: cheerio.load(message.html)('body').text(), link: linkIn(message, 'Confirm Email') };
+}

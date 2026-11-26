@@ -15,11 +15,12 @@ files directly.
 node test/playwright/evaluation/cli.ts inventory --markdown /tmp/inventory.md
 ```
 
-`pilot-inventory.ts` lists every test of `test/cypress/integration/27-expenses.test.ts`
+`pilot-inventory.ts` lists every test of the deleted `test/cypress/integration/27-expenses.test.ts`
 and `41-vendor-visibility.test.ts` with the Playwright journeys that carry it,
 an explicit consolidation or partial mapping (`note`), or an explicit `gap`.
-The command reads the Cypress `it(` titles from the sources (a `${...}`
-placeholder matches either expense type), lists the Playwright tests with
+The command reads the Cypress `it(` titles (a `${...}` placeholder matches
+either expense type) from the sources at the rollback baseline commit
+(`git show`, see `CYPRESS_PILOT_BASELINE` in `cli.ts`), lists the Playwright tests with
 `playwright test --list`, and exits non-zero when a Cypress test is not in the
 inventory, an entry names a test or journey that no longer exists, or a pilot
 journey is claimed by no entry. A recorded gap keeps the inventory complete

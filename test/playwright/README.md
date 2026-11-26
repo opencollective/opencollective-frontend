@@ -1,6 +1,6 @@
 # Playwright E2E
 
-Pilot runner for independent, reproducible E2E tests. The shared launcher owns
+Runner for independent, reproducible E2E tests; new E2E tests go here. The shared launcher owns
 the E2E environment; Playwright only runs browser journeys.
 
 Canonical guide: [`docs/e2e.md`](../../docs/e2e.md). This file holds
@@ -92,16 +92,16 @@ Run specs through `npm run e2e` rather than `npx playwright test`: the
 launcher exports these run-specific report paths, and without it specs that
 use fixtures fail ("Fixtures require an owned stack").
 
-## CI (pilot, observational)
+## CI
 
-`CI / e2e-playwright / playwright smoke` reuses this launcher with prepared
-same-revision builds; Cypress checks stay required. Later journeys reuse the
-same job via its `spec`/`grep` inputs. Fork runs are credential-free and
-report full live coverage unavailable. Failure/recovery evidence is kept
-14 days, successful evidence 7 days. See `docs/e2e.md`.
+`CI / e2e-playwright / playwright` runs every spec under
+`test/playwright/specs` through this launcher with prepared same-revision
+builds (2 workers, at most 1 retry). Fork runs are credential-free and report
+full live coverage unavailable. Failure/recovery evidence is kept 14 days,
+successful evidence 7 days. Required checks and rollback: see `docs/e2e.md`.
 
-Focused non-Stripe runs require no Stripe credentials. Existing Cypress
-coverage and live-integration boundaries are unchanged.
+Focused non-Stripe runs require no Stripe credentials. Live-integration
+boundaries are unchanged (live Stripe stays in Cypress).
 
 ## Building for upload journeys
 
@@ -247,3 +247,25 @@ which the GitHub application flow is built for. Contributing with a card
 before editing one's public message stays in Cypress
 (`test/cypress/integration/40-stripe-collective-contribution.test.js`) until
 the live Stripe journeys migrate.
+
+## Public pages and content journeys
+
+`specs/public/` holds the public pages: the docs search of the help page (the
+`/api/docs/search` route stays stubbed in the browser, as in Cypress), the
+not-found page, the search page, a Collective's transactions (indexing and the
+receipt PDF) and expenses list, and the contact form (its message is read from
+Mailpit). `specs/content/` holds what Collective admins and members write:
+updates, conversations, expense comments and reactions, and a new Collective
+completed through the onboarding modal. (`public/` rather than `pages/`: Jest's `pages` root pattern would
+pick up a `pages` directory.) Language switching is covered by
+`smoke.spec.ts`; publishing a conversation and its reply by
+`account-conversation.spec.ts`.
+
+```bash
+npm run e2e -- test/playwright/specs/public test/playwright/specs/content --workers 4
+```
+
+They reuse the existing recipes (`account-profile`, `account-conversation`,
+`expense-submission`, `expense-management` with `listedExpenses` for a list
+that spans pages, `recurring-contribution` for a Collective with a charged
+contribution) and arrange no seeded Account.
