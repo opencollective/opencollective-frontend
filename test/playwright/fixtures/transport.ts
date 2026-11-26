@@ -61,6 +61,11 @@ const contributionScenario = graphScenario.extend({
   contribution: z.object({ legacyId: z.number(), id: z.string() }),
 });
 
+/** `contribution-flow`: the multi-party shape, plus the tiers it arranged (possibly none). */
+const contributionFlowScenario = graphScenario.extend({
+  tiers: z.record(z.object({ legacyId: z.number(), name: z.string() })),
+});
+
 /** `collective-admin`: the multi-party shape, plus the default tiers of the Collective. */
 const collectiveScenario = graphScenario.extend({
   tiers: z.record(z.object({ legacyId: z.number(), slug: z.string(), name: z.string() })),
@@ -98,6 +103,10 @@ export type GraphScenario = Envelope & {
 export type ContributionScenario = GraphScenario & {
   tiers: Record<'gold' | 'silver', { legacyId: number; name: string }>;
   contribution: { legacyId: number; id: string };
+};
+
+export type ContributionFlowScenario = GraphScenario & {
+  tiers: Partial<Record<'open' | 'ticket', { legacyId: number; name: string }>>;
 };
 
 export type CollectiveScenario = GraphScenario & {
@@ -184,6 +193,23 @@ type Contracts = {
       pendingGoldTier?: boolean;
     };
     scenario: ContributionScenario;
+  };
+  /**
+   * Actors `hostAdmin`, `admin` (Collective admin), optional `contributor` (administers `organization` only).
+   * Accounts `host` (accepts bank transfers, no Stripe), `collective`, optional `organization`, `event`.
+   * Tiers: optional `open`, `ticket`. URLs `donate`, `contribute`, optional `event`, `eventTickets` (dashboard).
+   */
+  'contribution-flow': {
+    inputs: {
+      /** The Collective asks for a platform tip. */
+      platformTips?: boolean;
+      /** A one-time `Backer` tier, $5 by default, from $0. */
+      openTier?: boolean;
+      contributorOrganization?: boolean;
+      /** `upcoming`: in a week, without tickets. `past`: ended nine days ago, with a $10 ticket. */
+      event?: 'upcoming' | 'past';
+    };
+    scenario: ContributionFlowScenario;
   };
   /**
    * Actors `contributor` (no payment method yet), `collectiveAdmin`. Accounts `host` (a seeded host whose
@@ -300,6 +326,7 @@ const schemas: Record<Recipe, z.ZodTypeAny> = {
   'vendor-host': graphScenario,
   'fiscal-host': graphScenario,
   'recurring-contribution': contributionScenario,
+  'contribution-flow': contributionFlowScenario,
   'stripe-contribution': graphScenario,
   'stripe-settlement-expense': graphScenario,
   'collective-admin': collectiveScenario,

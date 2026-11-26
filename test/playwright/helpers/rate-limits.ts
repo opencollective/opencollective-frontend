@@ -9,6 +9,16 @@ import { createClient } from 'redis';
  */
 const CONFIRM_EMAIL_KEYS = ['::1', '127.0.0.1', '::ffff:127.0.0.1'].map(ip => `individual_confirm_email_ip_${ip}`);
 
+/**
+ * The API counts sign-up requests and email verifications per client IP (`signup_ip_${req.ip}` and
+ * `verifyEmail_ip_${req.ip}` in `server/controllers/users.ts`), at most `OTP_RATE_LIMIT_MAX_ATTEMPTS` (5) each per
+ * 15 minutes, in its Redis cache, which survives `--fresh`. Every journey signs up from this machine, under whichever
+ * form Express gives the loopback address, so a few runs in a row against a running environment would be refused.
+ */
+const SIGNUP_KEYS = ['signup_ip', 'verifyEmail_ip'].flatMap(bucket =>
+  ['::1', '127.0.0.1', '::ffff:127.0.0.1'].map(ip => `${bucket}_${ip}`),
+);
+
 const newClient = (url: string) => createClient({ url });
 
 /** Runs `run` with the API's Redis (`REDIS_URL`), touching only the keys it names: never scan, never flush. */
@@ -40,4 +50,12 @@ export async function expectConfirmEmailCounted(): Promise<void> {
     counts.some(count => Number(count) > 0),
     `The confirmation was not counted under any of ${CONFIRM_EMAIL_KEYS.join(', ')}: update the keys to the API's`,
   ).toBe(true);
+}
+
+/**
+ * Gives the next sign-up and its email verification from this machine a fresh window. The product limits, and the
+ * per-email ones, stay in force.
+ */
+export async function resetSignupRateLimits(): Promise<void> {
+  await withRedis(client => client.del(SIGNUP_KEYS));
 }
