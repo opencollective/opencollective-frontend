@@ -104,6 +104,8 @@ jobs:
       # playwright.config.ts reject larger values so first-attempt failures,
       # recovered attempts, and final failures stay distinguishable.
       PLAYWRIGHT_RETRIES: ${{ inputs.retries }}
+      # TEMPORARY (evidence run, reverted before review): fail first attempts after a real payment
+      PLAYWRIGHT_ISOLATION_PROBE: '1'
 
     services:
       redis:
