@@ -65,7 +65,6 @@ describe('getContributionBlocker', () => {
     // TODO: Must be tested with loggedInUser testPaymentMethod(GQLV2_PAYMENT_METHOD_LEGACY_TYPES.ACCOUNT_BALANCE, false);
     testPaymentMethod(GQLV2_PAYMENT_METHOD_LEGACY_TYPES.BANK_TRANSFER, false);
     testPaymentMethod(GQLV2_PAYMENT_METHOD_LEGACY_TYPES.CRYPTO, false);
-    testPaymentMethod(GQLV2_PAYMENT_METHOD_LEGACY_TYPES.ALIPAY, false);
 
     testPaymentMethod(GQLV2_PAYMENT_METHOD_LEGACY_TYPES.CREDIT_CARD, true);
     testPaymentMethod(GQLV2_PAYMENT_METHOD_LEGACY_TYPES.PAYPAL, true);

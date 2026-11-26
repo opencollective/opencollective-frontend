@@ -74,8 +74,6 @@ export const getPaymentMethodName = ({
     return 'PayPal';
   } else if (type === PAYMENT_METHOD_TYPE.MANUAL) {
     return 'Bank transfer';
-  } else if (type === PAYMENT_METHOD_TYPE.ALIPAY) {
-    return 'Alipay';
   } else if (!type || type === PAYMENT_METHOD_TYPE.PAYMENT_INTENT) {
     return '';
   } else if (type === PAYMENT_METHOD_TYPE.SEPA_DEBIT) {

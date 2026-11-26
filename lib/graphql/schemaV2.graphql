@@ -5625,7 +5625,6 @@ type TransactionCollection implements Collection {
 
 enum PaymentMethodType {
   default @deprecated(reason: "Please use uppercase values")
-  alipay @deprecated(reason: "Please use uppercase values")
   creditcard @deprecated(reason: "Please use uppercase values")
   prepaid @deprecated(reason: "Please use uppercase values")
   payment @deprecated(reason: "Please use uppercase values")
@@ -5647,7 +5646,6 @@ enum PaymentMethodType {
   virtual_card @deprecated(reason: "Please use uppercase values")
   swish @deprecated(reason: "Please use uppercase values")
   DEFAULT
-  ALIPAY
   CREDITCARD
   PREPAID
   PAYMENT
@@ -6871,7 +6869,6 @@ type PaymentMethod {
 }
 
 enum PaymentMethodLegacyType {
-  ALIPAY
   CREDIT_CARD
   GIFT_CARD
   PREPAID_BUDGET
@@ -7723,7 +7720,6 @@ type CollectiveFeatures {
   PAYPAL_DONATIONS: CollectiveFeatureStatus
   HOST_DASHBOARD: CollectiveFeatureStatus
   CONNECTED_ACCOUNTS: CollectiveFeatureStatus
-  ALIPAY: CollectiveFeatureStatus
   STRIPE_PAYMENT_INTENT: CollectiveFeatureStatus
   USE_PAYMENT_METHODS: CollectiveFeatureStatus
   EMAIL_NOTIFICATIONS_PANEL: CollectiveFeatureStatus
