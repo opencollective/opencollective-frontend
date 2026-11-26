@@ -123,6 +123,14 @@ export async function expenseInvitationLink(
   return link;
 }
 
+/** The verification code the product emails to someone signing up with their address `to`. */
+export async function emailedSignupCode(mail: Mailbox, { to }: { to: string }): Promise<string> {
+  const message = await mail.waitForMessage({ to, subject: 'Open Collective: Email Confirmation' });
+  const code = cheerio.load(message.html)('h3 > span').text().trim();
+  expect(code, 'The confirmation must carry a verification code').toMatch(/^[0-9A-Z]{6}$/);
+  return code;
+}
+
 /**
  * The one-click link the product emails to someone who asks to sign in with
  * their address `to`, as a path relative to the site.

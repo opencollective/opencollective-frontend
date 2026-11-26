@@ -716,6 +716,19 @@ EOF
 }
 
 # --- Preflight (before changing any state) ---
+use_recorded_redis() {
+  # Joining runs and restarted services use the Redis the environment's API was started with: journeys reset
+  # its rate-limit counters, so another Redis would leave the API's untouched. URLs are not printed (credentials).
+  local recorded
+  recorded="$(jq -r '.redisUrl // empty' "$RECORD_FILE")"
+  if [[ -n "${REDIS_URL:-}" && -n "$recorded" && "$REDIS_URL" != "$recorded" ]]; then
+    fail "REDIS_URL differs from the Redis the E2E environment '$PG_DATABASE' was started with. Unset it to join, or start a fresh environment."
+    exit 2
+  fi
+  REDIS_URL="${recorded:-${REDIS_URL:-}}"
+  [[ -z "$REDIS_URL" ]] || export REDIS_URL
+}
+
 redis_ping() {
   # redis-cli when installed, otherwise a raw RESP PING (only the client is optional).
   local url="$1" hostport host port
@@ -1645,6 +1658,8 @@ reuse_main() {
   fi
   # The owner's inbox: journeys read their own mail from it and never clear it.
   MAILPIT_URL="$(jq -r '.mailpitUrl // empty' "$RECORD_FILE")"
+  # The owner's Redis: journeys reset the rate-limit keys they name (helpers/redis.ts).
+  use_recorded_redis
   export WEBSITE_URL API_URL MAILPIT_URL
   export PLAYWRIGHT_FIXTURE_OWNER_FILE="$FIXTURE_OWNER_FILE"
   export PLAYWRIGHT_RUN_ID="$RUN_ID"
@@ -1783,6 +1798,8 @@ join_environment() {
   WEBSITE_URL="$(jq -r '.websiteUrl // empty' "$RECORD_FILE")"
   API_URL="$api"
   MAILPIT_URL="$(jq -r '.mailpitUrl // empty' "$RECORD_FILE")"
+  # Restarted services and journeys (helpers/redis.ts) need the Redis the E2E environment started with.
+  use_recorded_redis
   if [[ ! -r "$FIXTURE_OWNER_FILE" ]]; then
     fail "fixture ownership proof missing for the running E2E environment. Restart it with: npm run e2e -- --fresh$(db_flag) <spec>"
     exit 2
@@ -1797,9 +1814,6 @@ join_environment() {
       exit 2
     fi
     export_runtime_env
-    # Restarted services need the Redis the E2E environment started with.
-    REDIS_URL="${REDIS_URL:-$(jq -r '.redisUrl // empty' "$RECORD_FILE")}"
-    [[ -z "$REDIS_URL" ]] || export REDIS_URL
     build_services "${REBUILD_SERVICES[@]}"
     for svc in "${REBUILD_SERVICES[@]}"; do
       restart_service "$svc"

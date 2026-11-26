@@ -537,6 +537,19 @@ uploaded evidence; `redaction-status.json` identifies it. Other artifacts still
 get scrubbed, and an existing failure/cancellation exit code is preserved. Do not
 attach authentication handles or raw fixture responses to evidence.
 
+### Redis
+
+Some product limits live in the API's Redis rather than the database, and a
+running E2E environment keeps them between runs. Journeys reach that Redis
+through the `redis` fixture of `visitorTest`
+(`test/playwright/helpers/redis.ts`), connected to the `REDIS_URL` the
+launcher exports (restored from the environment record on `--reuse` and
+iteration). That Redis may be supplied infrastructure shared with a local
+development API, so a helper only reads, writes or deletes keys it names; it never
+scans for keys to delete and never flushes. Each reset is paired with a check
+that the product really counted the call under the key it clears, so a renamed
+key fails the journey instead of turning the reset into a silent no-op.
+
 ### What an attempt attaches
 
 - `scenario`: the references the recipe returned, assembled from named fields
@@ -1355,16 +1368,121 @@ roughly 55 s of launcher startup on a fresh stack. The Cypress timing supplied
 for the pilot (01:57) covers all 23 tests of the original file; the picker
 journeys cover 16 of them and these journeys the other 7.
 
+## Signup journeys (Playwright pilot)
+
+`specs/signup/signup.spec.ts` carries all 29 tests of
+`test/cypress/integration/01-signup.test.ts`, which stays unchanged and
+runnable, in 17 journeys. The three Cypress suites chain their steps across `it` blocks with
+`testIsolation: false`; here each signup is one journey from the email step to
+the dashboard, so the 18 tests of the `/signup` block map to six journeys:
+
+| Cypress tests (`/signup` ›)                                                                                                                                                                                  | Playwright journey (`specs/signup/signup.spec.ts`)                                                            |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| Create a new Individual Profile › all five tests                                                                                                                                                             | Signup of a new user › visitor signs up, is held on profile completion until done, then reaches the dashboard |
+| Create a new Individual and Organization Profile › completes individual profile, should send OTP through email, should complete profile, should create organization, should allow user to invite more admins | Signup of a new user › visitor signs up with a new Organization and invites an admin to it                    |
+| Create a new Individual and Collective Profile › completes individual profile, should send OTP through email, should complete profile, should create collective, should allow user to invite more admins     | Signup of a new user › visitor signs up with a new Collective and invites an admin to it                      |
+| Create a new Individual and Organization Profile › should create active organization                                                                                                                         | Signup flows of a signed-in user › signed-in user creates an Organization managing money from the signup flow |
+| Create a new Individual and Organization Profile › should create active fiscal host                                                                                                                          | Signup flows of a signed-in user › signed-in user creates a fiscal host from the signup flow                  |
+| Create a new Individual and Collective Profile › should create collective while logged-in                                                                                                                    | Signup flows of a signed-in user › signed-in user creates a Collective from the signup flow                   |
+
+The other eleven tests map one to one, all to `Signup failures and redirections ›`:
+
+| Cypress test                                                                                                         | Playwright journey                                                            | Real API state the journey sets up                                       |
+| -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| profile completion redirects › preserves a requested path and query after completing a profile                       | completing the profile leads to the page asked for before signing up          | A real signup from `/signup?next=…`                                      |
+| signup OTP failure and redirection flows › shows a retryable error and stays on the code step when the code is wrong | a wrong code shows a retryable error and keeps the code step                  | A real wrong code                                                        |
+| … › returns to the email step when the verification session expired or is unknown                                    | an expired verification session sends the user back to the email step         | The session deleted from Redis (`expireSignupSession`)                   |
+| … › invalidates the session after three wrong codes and lets the user start over                                     | three wrong codes end the session and the same email can start over           | Three real wrong codes; the API ends the session                         |
+| … › returns to the email step when resending a code for a dead session                                               | resending a code for an expired session sends the user back to the email step | The session deleted from Redis; `page.clock` skips the 30 s countdown    |
+| … › shows an error and stays on the email step when the account already exists                                       | an email that already has an account is refused on the email step             | The `account-profile` recipe's user                                      |
+| … › shows an error and stays on the email step when signup is rate limited                                           | a rate-limited signup is refused on the email step                            | The signup budget filled in Redis (`exhaustSignupRateLimit`), then reset |
+| … › shows an error and stays on the email step when an OTP challenge is already open                                 | requesting a second code while one is open is refused on the email step       | A real open challenge, then Go Back and the same email                   |
+| … › goes back to the email step from the code step and drops the session                                             | going back from the code step returns to the email step and drops the session | A real open challenge                                                    |
+| … › restores the code step when a verification URL is loaded directly                                                | a verification link loaded directly opens the code step                       | None: the page reads the step from the URL                               |
+| … › keeps the organization flow when the verification session dies                                                   | an expired verification session keeps the Organization flow                   | A real challenge from `/signup/organization`, its session deleted        |
+
+The visitor journeys use `visitorTest` (logged out, no recipe): the attempt's
+`mail.address()` mints the new user's and the invitee's addresses, the code is
+read from the real "Email Confirmation" message (`emailedSignupCode` in
+`helpers/mail.ts`) and the invitation from the real "Invitation to join"
+message. The signed-in journeys start as the user of the `account-profile`
+recipe, the "logged-in user" the Cypress tests reached by chaining. Slugs are
+`signup-org-<attempt tag>` and `signup-collective-<attempt tag>`.
+
+Differences from Cypress:
+
+- **No reCAPTCHA mock.** Captcha is disabled outside production in both the
+  API config and the frontend (`CAPTCHA_ENABLED`), so the Cypress
+  `mockRecaptcha` is not ported.
+- **OTP rate limits are reset, not raised.** The API allows 5 signups, 5
+  code verifications and 5 resends per client IP per 15 minutes
+  (`signup_ip_*`, `verifyEmail_ip_*`, `resendOTP_ip_*`), and every journey
+  comes from the loopback address. Each journey that requests a code calls
+  `resetSignupRateLimits` first, and checks after each step that the call was
+  counted under a key it clears (`expectSignupStepTracked`). Re-runs, retries
+  and `--reuse` against a running environment are then never refused, and the
+  product limits stay in force.
+- **Failure paths hit the real API.** Cypress stubs the OTP endpoints with
+  `cy.intercept` for these, because real wrong-code sequences would spend the
+  shared per-IP budget; the stubs restate the API's responses by hand. Here
+  the budget is reset instead, wrong codes and duplicate challenges are real,
+  and expiry is reproduced in the API's own session store, so the journeys
+  check the API contract and the form together.
+- **One file, one worker.** The rate-limit journey fills the shared loopback
+  budget, which would refuse a signup running at the same time. Every signup
+  journey stays in `signup.spec.ts`, which Playwright runs in a single worker
+  (`fullyParallel: false`); the journey gives the budget back even when it
+  fails. Runs joined to the same environment (`--reuse`, `npm run e2e`) share
+  its Redis, and so the budget: each journey using the `redis` fixture holds
+  a lock in that Redis (`lockSignupBudget`, key `playwright_e2e_signup_lock`),
+  so signup journeys of concurrent runs take turns instead of refusing or
+  resetting each other's signups. The lock expires after 90 s, so a killed
+  run frees it on its own.
+- **Each code waits for its answer.** `enterCode` waits for the
+  `verify-email` response, and each wrong-code toast is dismissed before the
+  next code (`dismissToast`): an earlier identical toast still on screen does
+  not prove the next code was handled, and waiting for it to close on its own
+  would depend on its lifetime.
+  Without this, a third code overlaps the second and the API answers the
+  overlapping request without counting it.
+
+Focused reproduction:
+
+```bash
+# The seventeen journeys, fresh (the CI contract: the environment stops afterwards)
+./test/playwright/run-local.sh --spec test/playwright/specs/signup
+
+# Start or join an environment that stays running, then run again against it
+# (exercises the rate-limit reset)
+npm run e2e -- test/playwright/specs/signup/signup.spec.ts
+./test/playwright/run-local.sh --reuse --spec test/playwright/specs/signup
+```
+
+The seventeen journeys take about 18 s of Playwright time with one worker,
+repeatedly against the same running environment; the six happy paths alone
+took 10-12 s.
+
 ## Pilot coverage reconciliation
 
-Every `describe` and `it` of the two pilot Cypress files is accounted for by
+Every `describe` and `it` of the three pilot Cypress files is accounted for by
 the journey tables above. "Actions on expense › Previews a PDF attachment",
 added to Cypress (opencollective/opencollective-frontend#12558) before the
-pilot merged, was first missed and is now carried. Both files were deleted at
-adoption; `node test/playwright/evaluation/cli.ts inventory` checks this
-inventory against their sources at the
+pilot merged, was first missed and is now carried. The expenses and vendor files
+were deleted at adoption; `01-signup.test.ts` stays in Cypress, unchanged since
+then. `node test/playwright/evaluation/cli.ts inventory` checks this
+inventory against the three sources at the
 [rollback baseline](#required-checks-and-rollback) and the current Playwright
 specs (see `test/playwright/evaluation/README.md`).
+
+`01-signup.test.ts` (29 tests):
+
+| Cypress block                                 | Tests | Journeys | Section               |
+| --------------------------------------------- | ----- | -------- | --------------------- |
+| /signup › Create a new Individual Profile     | 5     | 1        | Signup (consolidated) |
+| /signup › Individual and Organization Profile | 7     | 3        | Signup (consolidated) |
+| /signup › Individual and Collective Profile   | 6     | 2        | Signup (consolidated) |
+| profile completion redirects                  | 1     | 1        | Signup                |
+| signup OTP failure and redirection flows      | 10    | 10       | Signup                |
 
 `27-expenses.test.ts` (29 tests):
 
@@ -1400,7 +1518,8 @@ specs (see `test/playwright/evaluation/README.md`).
 | Expense management           | 14            | 14                  |
 | Vendor picker                | 16            | 15                  |
 | Vendor creation and settings | 7             | 7                   |
-| Total                        | 52            | 51                  |
+| Signup                       | 29            | 17                  |
+| Total                        | 81            | 68                  |
 
 One consolidation and one partial mapping are recorded, each explained in its
 section:
@@ -1421,9 +1540,9 @@ journeys check the saved recurrence.
 
 Nothing else is left out. Steps the journeys do not repeat because the source
 does not test them (no expense is paid, no funds are added, no expected funds
-are recorded) are listed in the sections. With the six tests of the fixture,
-account and smoke specs, the Playwright selection holds 57 tests. When it held
-56, on the 8-CPU Linux VM used throughout, with retries disabled, it took 110-123 s of
+are recorded) are listed in the sections. The Playwright selection holds 76
+tests: the 68 pilot journeys, plus the fixture, account, smoke and contribution
+specs. When it held 56, before the signup journeys, on the 8-CPU Linux VM used throughout, with retries disabled, it took 110-123 s of
 Playwright time with three workers, 133 s with two and 217 s with one, after
 roughly 55 s of launcher startup on a fresh stack.
 

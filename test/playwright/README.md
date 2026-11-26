@@ -103,6 +103,26 @@ successful evidence 7 days. Required checks and rollback: see `docs/e2e.md`.
 Focused non-Stripe runs require no Stripe credentials. Live-integration
 boundaries are unchanged (live Stripe stays in Cypress).
 
+## Signup journeys
+
+`specs/signup/signup.spec.ts` holds the signup pilot: a new individual, a new
+user with an Organization or a Collective (inviting an admin), a signed-in
+user creating an active Organization, a fiscal host or a Collective, and the
+OTP failure paths (wrong codes, expired sessions, existing accounts, rate
+limits) against the real API.
+
+```bash
+./test/playwright/run-local.sh --spec test/playwright/specs/signup
+npm run e2e -- test/playwright/specs/signup/signup.spec.ts --grep "Organization"
+```
+
+They use `visitorTest` (logged out, no recipe) with the `mail` fixture for the
+emailed code and invitation, and its `redis` fixture (`helpers/redis.ts`) to
+reset the API's per-IP OTP rate limits before each signup (so re-runs against
+a running environment are not refused) and to expire or exhaust them on
+purpose. Keep every signup journey in this one file. Coverage mapping and
+differences are in the canonical [guide](../../docs/e2e.md#signup-journeys-playwright-pilot).
+
 ## Building for upload journeys
 
 Build the frontend with the CI environment before running journeys that upload

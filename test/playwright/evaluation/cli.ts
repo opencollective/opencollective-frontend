@@ -20,10 +20,11 @@ import { checkInventory, extractCypressTests, listPlaywrightTests } from './inve
 import { pilotInventory } from './pilot-inventory.ts';
 
 const FRONTEND_DIR = path.resolve(import.meta.dirname, '../../..');
-const CYPRESS_PILOTS = ['27-expenses.test.ts', '41-vendor-visibility.test.ts'];
+const CYPRESS_PILOTS = ['01-signup.test.ts', '27-expenses.test.ts', '41-vendor-visibility.test.ts'];
+const isPilotJourney = (file: string) => /^(expenses|vendors|signup)\//.test(file);
 // The Cypress pilot specs were deleted at adoption (opencollective/opencollective#8970); the
 // inventory reads them from the last main commit that still has them (also the rollback baseline in
-// docs/e2e.md).
+// docs/e2e.md). 01-signup.test.ts is still in main and unchanged since that commit.
 const CYPRESS_PILOT_BASELINE = 'c2ff077b9d938544f082cf8a62ecc9e70381338d';
 
 const [command, ...rest] = process.argv.slice(2);
@@ -75,17 +76,18 @@ function inventory() {
     cypress,
     playwright,
     entries: pilotInventory,
-    isPilotJourney: file => /^(expenses|vendors)\//.test(file),
+    isPilotJourney,
   });
 
   const rows = pilotInventory.map(entry => {
     const status = entry.gap ? `**gap**: ${entry.gap}` : (entry.note ?? 'mapped');
     const journeys = entry.journeys.map(journey => `\`${journey.file}\` › ${journey.title}`).join('<br>') || '-';
-    return `| ${entry.group} | \`${entry.cypress.file}\` › ${entry.cypress.title} | ${journeys} | ${status} |`;
+    const suite = entry.cypress.suite ? `${entry.cypress.suite} › ` : '';
+    return `| ${entry.group} | \`${entry.cypress.file}\` › ${suite}${entry.cypress.title} | ${journeys} | ${status} |`;
   });
   const listed = (label: string, items: Array<{ file: string; title: string }>) =>
     items.length ? [`${label}:`, ...items.map(item => `- \`${item.file}\` › ${item.title}`), ''] : [];
-  const pilotJourneys = playwright.filter(test => /^(expenses|vendors)\//.test(test.file)).length;
+  const pilotJourneys = playwright.filter(test => isPilotJourney(test.file)).length;
   const markdown = [
     `Cypress pilot \`it(\` blocks: ${cypress.length}; Playwright pilot journeys: ${pilotJourneys}; inventory entries: ${pilotInventory.length}; recorded gaps: ${result.gaps.length}.`,
     `Every test accounted for: ${result.complete ? 'yes' : 'NO'}. Every core flow carried by a journey: ${result.coversAllCoreFlows ? 'yes' : 'NO'}.`,
@@ -94,6 +96,10 @@ function inventory() {
     ...listed(
       'Inventory entries naming a Cypress test that no longer exists',
       result.staleCypress.map(entry => entry.cypress),
+    ),
+    ...listed(
+      'Inventory entries matching several Cypress tests (name the `suite`)',
+      result.ambiguousCypress.map(entry => entry.cypress),
     ),
     ...listed('Inventory journeys that no longer exist', result.missingJourneys),
     ...listed('Pilot journeys no entry claims', result.unclaimedJourneys),
