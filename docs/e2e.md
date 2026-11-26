@@ -561,6 +561,7 @@ helper, or the same wait, in a new journey over the same form.
 | A working button sits in a list entry marked as disabled                                                                                   | Checks it is visible, then clicks without the enabled check          | `vendor-creation.spec.ts` (expected funds)         |
 | Stripe's bank search ignores a click on a bank while it is still initializing                                                              | Clicks the bank again until the Financial Connections overlay opens  | `ach.spec.ts`                                      |
 | A payment method saved by a webhook (bank account, SEPA mandate) only shows once Stripe's event has been handled                           | Opens the payment step again until it is listed                      | `ach.spec.ts`, `sepa.spec.ts`                      |
+| The Pay button of the expense payment modal moves while the Stripe form below it settles; a click at its old place lands in the form       | Scrolls the button into view, then clicks                            | `expense-settlement.spec.ts`                       |
 
 ### Independence and interruption checks
 

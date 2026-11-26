@@ -16,7 +16,11 @@ test.describe('Pay a settlement expense with Stripe', { tag: STRIPE_TAG }, () =>
     const modal = page.getByTestId('pay-expense-modal');
     await expect(modal).toContainText('Pay expense');
     await fillTestCard(stripeElement(modal));
-    await modal.getByRole('button', { name: 'Pay', exact: true }).click();
+    // The form below the card fields keeps growing while Stripe settles it: bring the button into view first,
+    // or the click lands on the card form where the button was a moment before.
+    const pay = modal.getByRole('button', { name: 'Pay', exact: true });
+    await pay.scrollIntoViewIfNeeded();
+    await pay.click();
     // The modal closes once Stripe confirmed the payment and the expense was marked as paid with Stripe
     await expect(modal).toBeHidden({ timeout: 60_000 });
 
