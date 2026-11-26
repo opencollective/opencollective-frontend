@@ -6,7 +6,7 @@ import { expect, scenarioTest, STRIPE_TAG } from '../../fixtures';
 import {
   chooseNewPaymentMethod,
   choosePaymentMethodType,
-  contributionOnSuccessPage,
+  contribute,
   expectContributionStatus,
   goToPaymentStep,
   stripeOverlayFrame,
@@ -54,8 +54,7 @@ test.describe('Contribute with a US bank account (ACH, Stripe Payment Element)',
   test('guest links a bank account and the contribution is processing or paid', async ({ page, scenario }) => {
     await goToPaymentStep(page, scenario.urls.donate, `guest-${randomUUID().slice(0, 12)}@guest.com`);
     await linkTestBankAccount(page, await chooseNewPaymentMethod(page), 'guest user');
-    await page.getByTestId('cf-next-step').click();
-    const contribution = await contributionOnSuccessPage(page);
+    const contribution = await contribute(page);
     await expectContributionStatus(scenario.actors.collectiveAdmin, contribution, /^(PROCESSING|PAID)$/);
   });
 
@@ -65,8 +64,7 @@ test.describe('Contribute with a US bank account (ACH, Stripe Payment Element)',
     test('user links a bank account, then contributes again with the account it saved', async ({ page, scenario }) => {
       await goToPaymentStep(page, scenario.urls.donate);
       await linkTestBankAccount(page, await chooseNewPaymentMethod(page));
-      await page.getByTestId('cf-next-step').click();
-      const first = await contributionOnSuccessPage(page);
+      const first = await contribute(page);
       await expectContributionStatus(scenario.actors.collectiveAdmin, first, /^(PROCESSING|PAID)$/);
 
       // The account is saved when Stripe reports it attached to the contributor (a webhook)
@@ -76,8 +74,7 @@ test.describe('Contribute with a US bank account (ACH, Stripe Payment Element)',
         await expect(saved).toBeVisible({ timeout: 5_000 });
       }).toPass({ timeout: 60_000 });
       await saved.click();
-      await page.getByTestId('cf-next-step').click();
-      await contributionOnSuccessPage(page);
+      await contribute(page);
     });
   });
 });

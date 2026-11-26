@@ -6,7 +6,7 @@ import { expect, scenarioTest, STRIPE_TAG } from '../../fixtures';
 import {
   chooseNewPaymentMethod,
   choosePaymentMethodType,
-  contributionOnSuccessPage,
+  contribute,
   expectContributionStatus,
   goToPaymentStep,
 } from '../../helpers/stripe';
@@ -20,10 +20,17 @@ async function fillSepaDebit(element: FrameLocator, name?: string) {
   if (name) {
     await element.locator('#payment-nameInput').fill(name);
   }
-  // Stripe may show the country twice (with the IBAN and in the billing address): both are France
-  for (const country of await element.locator('#payment-countryInput').filter({ visible: true }).all()) {
-    await country.selectOption('FR');
-  }
+  // Stripe may show the country twice (with the IBAN and in the billing address), and shows the second one
+  // depending on the first: France in every country field it shows, until they all hold
+  const countries = element.locator('#payment-countryInput').filter({ visible: true });
+  await expect(async () => {
+    for (const country of await countries.all()) {
+      await country.selectOption('FR', { timeout: 2_000 });
+    }
+    for (const country of await countries.all()) {
+      await expect(country).toHaveValue('FR', { timeout: 2_000 });
+    }
+  }).toPass({ timeout: 30_000 });
   await element.locator('#payment-addressLine1Input').fill('Street');
   await element.locator('#payment-postalCodeInput').fill('01562');
   await element.locator('#payment-localityInput').fill('Paris');
@@ -41,8 +48,7 @@ test.describe('Contribute with a SEPA debit (Stripe Payment Element)', { tag: ST
   test('guest pays by SEPA debit and the contribution is paid', async ({ page, scenario }) => {
     await goToPaymentStep(page, scenario.urls.donate, `guest-${randomUUID().slice(0, 12)}@guest.com`);
     await fillSepaDebit(await chooseNewPaymentMethod(page), 'guest user');
-    await page.getByTestId('cf-next-step').click();
-    const contribution = await contributionOnSuccessPage(page);
+    const contribution = await contribute(page);
     await expectContributionStatus(scenario.actors.collectiveAdmin, contribution, /^PAID$/);
     await expectPaidOnContributionsPage(page, scenario.urls.orders, scenario.accounts.collective.name);
   });
@@ -53,8 +59,7 @@ test.describe('Contribute with a SEPA debit (Stripe Payment Element)', { tag: ST
     test('user pays by SEPA debit, then contributes again with the saved mandate', async ({ page, scenario }) => {
       await goToPaymentStep(page, scenario.urls.donate);
       await fillSepaDebit(await chooseNewPaymentMethod(page));
-      await page.getByTestId('cf-next-step').click();
-      const first = await contributionOnSuccessPage(page);
+      const first = await contribute(page);
       await expectContributionStatus(scenario.actors.collectiveAdmin, first, /^PAID$/);
 
       // The debit is saved when Stripe reports it attached to the contributor (a webhook)
@@ -64,8 +69,7 @@ test.describe('Contribute with a SEPA debit (Stripe Payment Element)', { tag: ST
         await expect(saved).toBeVisible({ timeout: 5_000 });
       }).toPass({ timeout: 60_000 });
       await saved.click();
-      await page.getByTestId('cf-next-step').click();
-      await contributionOnSuccessPage(page);
+      await contribute(page);
     });
   });
 });

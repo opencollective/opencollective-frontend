@@ -80,6 +80,8 @@ const authored = base.extend<{
           'STRIPE_WEBHOOK_KEY and the Stripe CLI (docs/e2e.md, "Live Stripe journeys").',
       );
     }
+    // A live provider answers every step, and a webhook decides the outcome: give them twice the time
+    testInfo.setTimeout(testInfo.timeout * 2);
     const { hostname } = new URL(baseURL);
     await provide([
       {

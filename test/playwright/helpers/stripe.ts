@@ -99,11 +99,37 @@ export async function stripeOverlayFrame(page: Page, selector: string, timeout =
   return found;
 }
 
+/**
+ * Clicks the payment step's submit button ("Contribute") until `arrived` holds. The flow ignores a click made
+ * before the Payment Element reported the payment details complete (seen right after a bank account was linked,
+ * and under load): the button keeps its label instead of showing a spinner, and a person would click again.
+ * A button showing a spinner is busy and is left alone.
+ */
+export async function submitPaymentStep(page: Page, arrived: () => Promise<boolean>, timeout = 90_000) {
+  const submit = page.getByTestId('cf-next-step');
+  await expect(async () => {
+    if (await arrived()) {
+      return;
+    }
+    if ((await submit.isVisible()) && (await submit.innerText()).trim()) {
+      await submit.click({ timeout: 5_000 });
+    }
+    await expect.poll(arrived, { timeout: 15_000 }).toBe(true);
+  }).toPass({ timeout });
+}
+
 /** The contribution shown on the success page of the contribution flow, once it is there. */
 export async function contributionOnSuccessPage(page: Page): Promise<number> {
   await expect(page.getByTestId('order-success').first()).toContainText('Thank you!', { timeout: 60_000 });
   const id = await page.locator('[data-cy^="contribution-id-"]').first().getAttribute('data-cy');
   return Number(id.replace('contribution-id-', ''));
+}
+
+/** Submits the payment step and returns the contribution the success page shows. */
+export async function contribute(page: Page): Promise<number> {
+  const success = page.getByTestId('order-success').first();
+  await submitPaymentStep(page, () => success.isVisible());
+  return contributionOnSuccessPage(page);
 }
 
 /**

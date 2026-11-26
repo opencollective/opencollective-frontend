@@ -4,10 +4,11 @@ import { expect, scenarioTest, STRIPE_TAG } from '../../fixtures';
 import { isolationProbe } from '../../helpers/attempt';
 import {
   chooseNewPaymentMethod,
-  contributionOnSuccessPage,
+  contribute,
   expectContributionStatus,
   fillTestCard,
   goToPaymentStep,
+  submitPaymentStep,
 } from '../../helpers/stripe';
 
 const test = scenarioTest('stripe-contribution', { inputs: { host: 'e2e-host' }, actor: null });
@@ -19,9 +20,7 @@ test.describe('Contribute with a card (Stripe Payment Element)', { tag: STRIPE_T
   test('guest pays with a new card and the contribution is recorded as completed', async ({ page, scenario }) => {
     await goToPaymentStep(page, scenario.urls.donate, guestEmail());
     await fillTestCard(await chooseNewPaymentMethod(page));
-    await page.getByTestId('cf-next-step').click();
-
-    const contribution = await contributionOnSuccessPage(page);
+    const contribution = await contribute(page);
     await expectContributionStatus(scenario.actors.collectiveAdmin, contribution, /^PAID$/);
 
     await page.goto(scenario.urls.transactions);
@@ -41,8 +40,7 @@ test.describe('Contribute with a card (Stripe Payment Element)', { tag: STRIPE_T
     }, testInfo) => {
       await goToPaymentStep(page, scenario.urls.donate);
       await fillTestCard(await chooseNewPaymentMethod(page));
-      await page.getByTestId('cf-next-step').click();
-      await expectContributionStatus(scenario.actors.collectiveAdmin, await contributionOnSuccessPage(page), /^PAID$/);
+      await expectContributionStatus(scenario.actors.collectiveAdmin, await contribute(page), /^PAID$/);
       isolationProbe(
         testInfo,
         'leave a paid contribution, a Stripe customer and a saved card behind; the retry pays from a new contributor',
@@ -51,8 +49,7 @@ test.describe('Contribute with a card (Stripe Payment Element)', { tag: STRIPE_T
       const saved = page.getByTestId('PaymentMethodList').getByText('VISA **** 4242');
       await goToPaymentStep(page, scenario.urls.donate);
       await saved.click();
-      await page.getByTestId('cf-next-step').click();
-      await expectContributionStatus(scenario.actors.collectiveAdmin, await contributionOnSuccessPage(page), /^PAID$/);
+      await expectContributionStatus(scenario.actors.collectiveAdmin, await contribute(page), /^PAID$/);
 
       await page.goto(scenario.urls.orders);
       await expect(page.getByTestId('order-PAID')).toHaveCount(2);
@@ -75,15 +72,13 @@ test.describe('Redirect after a card contribution', { tag: STRIPE_TAG }, () => {
   test('goes to a trusted redirect URL once paid', async ({ page, scenario }) => {
     await goToPaymentStep(page, `${scenario.urls.donate}?redirect=https://opencollective.com`, guestEmail());
     await fillTestCard(await chooseNewPaymentMethod(page));
-    await page.getByTestId('cf-next-step').click();
-    await page.waitForURL(url => url.origin === 'https://opencollective.com', { timeout: 60_000 });
+    await submitPaymentStep(page, async () => new URL(page.url()).origin === 'https://opencollective.com');
   });
 
   test('warns before leaving for an untrusted redirect URL once paid', async ({ page, scenario, baseURL }) => {
     await goToPaymentStep(page, `${scenario.urls.donate}?redirect=https://google.com`, guestEmail());
     await fillTestCard(await chooseNewPaymentMethod(page));
-    await page.getByTestId('cf-next-step').click();
-    await page.waitForURL(url => url.pathname === '/external-redirect', { timeout: 60_000 });
+    await submitPaymentStep(page, async () => new URL(page.url()).pathname === '/external-redirect');
     expect(new URL(page.url()).origin).toBe(new URL(baseURL).origin);
     await expect(page.getByText('Your request is currently being redirected to https://google.com')).toBeVisible();
   });

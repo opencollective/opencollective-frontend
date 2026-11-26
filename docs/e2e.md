@@ -544,25 +544,26 @@ failure while the pilot was written. The journeys wait for a condition, or
 repeat a step the way a user would; none waits for time. Reuse the named
 helper, or the same wait, in a new journey over the same form.
 
-| Behaviour                                                                                                                                  | What the journey does                                                | Where                                              |
-| ------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- | -------------------------------------------------- |
-| The payee section preselects the user's own profile once it has loaded, even over a choice made just before                                | Waits for a checked option, then chooses and checks the choice holds | `openVendorPicker`, `choosePayee` (`helpers/`)     |
-| "Invite someone to submit an expense" sits in a picker entry marked as disabled, in a menu that is still positioning itself                | Clicks without the enabled check, again until the contact form opens | `choosePayee`                                      |
-| The currency list of a new payout method has closed by itself while still opening, leaving no selection (seen once, on an invitation form) | Opens the list again until the currency is chosen                    | `addPayoutMethod`                                  |
-| An expense type chosen right after a payout method was saved has not stayed chosen (seen once)                                             | Chooses it again until it holds                                      | `chooseExpenseType`                                |
-| The "Sign In" link of an invitation only carries its return address after the form has settled                                             | Waits for the link's target before clicking                          | `invite-organization-logged-out.spec.ts`           |
-| The grant form resets its items once after a beneficiary is picked                                                                         | Fills the items again until the summary opens                        | `grant-beneficiary.spec.ts`                        |
-| Two rich-text editors filled one straight after the other: the text for the second has landed in the first                                 | Types both again until each holds its own text, then saves           | `writeExpensePolicies` in `expense-policy.spec.ts` |
-| Saving an edited expense before the exchange rate of a converted item has arrived is refused without a message                             | Waits for the rate to be shown                                       | `edit-expense.spec.ts`                             |
-| The duplicate form asks for its options twice; submitting before the second answer is refused without a message                            | Waits for the second answer                                          | `duplicate-expense.spec.ts`                        |
-| An expense page reached through a link inside the app loads more data after showing its buttons and re-renders without an open dialog      | Opens the expense by its address                                     | `process-expense.spec.ts`                          |
-| A dashboard settings page opened by its address, in a browser that has already loaded the dashboard, can stay on its loading indicator     | Goes through the dashboard menu (Settings → Policies), like a user   | `vendor-settings.spec.ts`                          |
-| The expected funds dialog asks for the receiving Collective's details a moment after it is chosen                                          | Waits for that answer before choosing the source                     | `vendor-creation.spec.ts`                          |
-| A working button sits in a list entry marked as disabled                                                                                   | Checks it is visible, then clicks without the enabled check          | `vendor-creation.spec.ts` (expected funds)         |
-| A Stripe card field drops a keystroke now and then while it formats what was typed ("4242 4242 4242 42")                                   | Types the field again until it shows the whole value                 | `fillTestCard` (`helpers/stripe.ts`)               |
-| Stripe's bank search ignores a click on a bank while it is still initializing                                                              | Clicks the bank again until the Financial Connections overlay opens  | `ach.spec.ts`                                      |
-| A payment method saved by a webhook (bank account, SEPA mandate) only shows once Stripe's event has been handled                           | Opens the payment step again until it is listed                      | `ach.spec.ts`, `sepa.spec.ts`                      |
-| The Pay button of the expense payment modal moves while the Stripe form below it settles; a click at its old place lands in the form       | Scrolls the button into view, then clicks                            | `expense-settlement.spec.ts`                       |
+| Behaviour                                                                                                                                           | What the journey does                                                | Where                                                   |
+| --------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------- |
+| The payee section preselects the user's own profile once it has loaded, even over a choice made just before                                         | Waits for a checked option, then chooses and checks the choice holds | `openVendorPicker`, `choosePayee` (`helpers/`)          |
+| "Invite someone to submit an expense" sits in a picker entry marked as disabled, in a menu that is still positioning itself                         | Clicks without the enabled check, again until the contact form opens | `choosePayee`                                           |
+| The currency list of a new payout method has closed by itself while still opening, leaving no selection (seen once, on an invitation form)          | Opens the list again until the currency is chosen                    | `addPayoutMethod`                                       |
+| An expense type chosen right after a payout method was saved has not stayed chosen (seen once)                                                      | Chooses it again until it holds                                      | `chooseExpenseType`                                     |
+| The "Sign In" link of an invitation only carries its return address after the form has settled                                                      | Waits for the link's target before clicking                          | `invite-organization-logged-out.spec.ts`                |
+| The grant form resets its items once after a beneficiary is picked                                                                                  | Fills the items again until the summary opens                        | `grant-beneficiary.spec.ts`                             |
+| Two rich-text editors filled one straight after the other: the text for the second has landed in the first                                          | Types both again until each holds its own text, then saves           | `writeExpensePolicies` in `expense-policy.spec.ts`      |
+| Saving an edited expense before the exchange rate of a converted item has arrived is refused without a message                                      | Waits for the rate to be shown                                       | `edit-expense.spec.ts`                                  |
+| The duplicate form asks for its options twice; submitting before the second answer is refused without a message                                     | Waits for the second answer                                          | `duplicate-expense.spec.ts`                             |
+| An expense page reached through a link inside the app loads more data after showing its buttons and re-renders without an open dialog               | Opens the expense by its address                                     | `process-expense.spec.ts`                               |
+| A dashboard settings page opened by its address, in a browser that has already loaded the dashboard, can stay on its loading indicator              | Goes through the dashboard menu (Settings → Policies), like a user   | `vendor-settings.spec.ts`                               |
+| The expected funds dialog asks for the receiving Collective's details a moment after it is chosen                                                   | Waits for that answer before choosing the source                     | `vendor-creation.spec.ts`                               |
+| A working button sits in a list entry marked as disabled                                                                                            | Checks it is visible, then clicks without the enabled check          | `vendor-creation.spec.ts` (expected funds)              |
+| The contribution flow ignores "Contribute" while the Payment Element has not reported the details complete (right after linking a bank, under load) | Clicks again while the button shows its label, never while it spins  | `submitPaymentStep`, `contribute` (`helpers/stripe.ts`) |
+| A Stripe card field drops a keystroke now and then while it formats what was typed ("4242 4242 4242 42")                                            | Types the field again until it shows the whole value                 | `fillTestCard` (`helpers/stripe.ts`)                    |
+| Stripe's bank search ignores a click on a bank while it is still initializing                                                                       | Clicks the bank again until the Financial Connections overlay opens  | `ach.spec.ts`                                           |
+| A payment method saved by a webhook (bank account, SEPA mandate) only shows once Stripe's event has been handled                                    | Opens the payment step again until it is listed                      | `ach.spec.ts`, `sepa.spec.ts`                           |
+| The Pay button of the expense payment modal moves while the Stripe form below it settles; a click at its old place lands in the form                | Scrolls the button into view, then clicks                            | `expense-settlement.spec.ts`                            |
 
 ### Independence and interruption checks
 
@@ -758,14 +759,17 @@ npm run e2e -- --without-stripe test/playwright/specs          # everything else
 ```
 
 Stripe journeys run in parallel like any other: each attempt pays from its own
-contributor, Collective and customer. Waits on Stripe (the success page, a
+contributor, Collective and customer. A tagged test gets twice the usual test
+timeout, since a live provider answers every step. Waits on Stripe (the success page, a
 status reached through a webhook, a payment method saved by a webhook) are
 polls on a condition, up to 60 seconds.
 
 ### Helpers
 
 `test/playwright/helpers/stripe.ts`: `goToPaymentStep` (contribution flow up
-to the payment step, as a guest or signed in), `chooseNewPaymentMethod` and
+to the payment step, as a guest or signed in), `contribute` and
+`submitPaymentStep` (submit the payment step until it gets where it should),
+`chooseNewPaymentMethod` and
 `stripeElement` (the Payment Element as a frame locator),
 `choosePaymentMethodType` (tab or "more" menu, whichever Stripe shows),
 `fillTestCard`, `stripeOverlayFrame` (Stripe-hosted overlays such as Financial

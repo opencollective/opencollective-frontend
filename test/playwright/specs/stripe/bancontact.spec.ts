@@ -9,6 +9,7 @@ import {
   contributionOnSuccessPage,
   expectContributionStatus,
   goToPaymentStep,
+  submitPaymentStep,
 } from '../../helpers/stripe';
 
 const test = scenarioTest('stripe-contribution', { inputs: { host: 'e2e-eur-host' }, actor: null });
@@ -20,8 +21,9 @@ async function payWithBancontact(page: Page, name?: string) {
   if (name) {
     await element.locator('#payment-nameInput').fill(name);
   }
-  await page.getByTestId('cf-next-step').click();
-  await page.getByRole('link', { name: 'Authorize Test Payment' }).click();
+  const authorize = page.getByRole('link', { name: 'Authorize Test Payment' });
+  await submitPaymentStep(page, () => authorize.isVisible());
+  await authorize.click();
 }
 
 test.describe('Contribute with Bancontact (Stripe Payment Element)', { tag: STRIPE_TAG }, () => {
