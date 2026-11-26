@@ -20,6 +20,7 @@ STRIPE_SELECTED=0
 # not-selected | required | verified | excluded
 STRIPE_MODE="not-selected"
 STRIPE_PROBE_JSON="null"
+STRIPE_VERDICTS_JSON="null"
 STRIPE_LOG="$ARTIFACTS_DIR/stripe-listener.log"
 STRIPE_LISTENER_PID=0
 
@@ -155,6 +156,17 @@ stripe_readiness() {
   STRIPE_PROBE_JSON="$(jq -c '{account, customer, event, deliveredMs}' <<<"$body")"
   STRIPE_MODE="verified"
   echo "> Stripe ready: $(jq -r '"signed \(.event) for probe customer \(.customer) on \(.account) delivered in \(.deliveredMs) ms"' <<<"$body")"
+}
+
+# What the webhook gate decided during this E2E environment's life, by verdict:
+# `processed` (an attempt's own events), `unowned` (other stacks' events, or
+# events about nothing this stack created), `retired`, `ambiguous`, `failed`.
+stripe_summary() {
+  [[ "$STRIPE_MODE" == "verified" ]] || return 0
+  STRIPE_VERDICTS_JSON="$(PGPASSWORD="${PGPASSWORD:-postgres}" psql -h "${PG_HOST:-localhost}" -U postgres -d "$PG_DATABASE" -tAc \
+    "SELECT COALESCE(json_object_agg(\"verdict\", n), '{}') FROM (SELECT \"verdict\", count(*) AS n FROM \"E2EStripeEvents\" GROUP BY 1) v" 2>/dev/null || echo null)"
+  [[ -n "$STRIPE_VERDICTS_JSON" ]] || STRIPE_VERDICTS_JSON="null"
+  echo "> Stripe webhook gate verdicts for this E2E environment: $STRIPE_VERDICTS_JSON"
 }
 
 # Arguments run_playwright adds, and what the fixtures check.

@@ -628,7 +628,7 @@ fixtures). The tag is the whole declaration:
 import { expect, scenarioTest, STRIPE_TAG } from '../../fixtures';
 import {
   chooseNewPaymentMethod,
-  contributionOnSuccessPage,
+  contribute,
   expectContributionStatus,
   fillTestCard,
   goToPaymentStep,
@@ -640,8 +640,7 @@ test.describe('Contribute with a card', { tag: STRIPE_TAG }, () => {
   test('user pays with a new card', async ({ page, scenario }) => {
     await goToPaymentStep(page, scenario.urls.donate);
     await fillTestCard(await chooseNewPaymentMethod(page));
-    await page.getByTestId('cf-next-step').click();
-    await expectContributionStatus(scenario.actors.collectiveAdmin, await contributionOnSuccessPage(page), /^PAID$/);
+    await expectContributionStatus(scenario.actors.collectiveAdmin, await contribute(page), /^PAID$/);
   });
 });
 ```
@@ -708,7 +707,10 @@ including payment method attachment, mandate updates and issuing events:
 
 Every decision is recorded with the event in the disposable database
 (`E2EStripeEvents`, next to `E2EStripeAttempts` and `E2EStripeObjects`), and
-the attempt's share of it is attached to the test as `stripe-ownership`.
+the attempt's share of it is attached to the test as `stripe-ownership`. After
+the run, the launcher prints the count of each verdict and records it in the
+replay manifest (`stripe.gateVerdicts`): `unowned` counts the other stacks'
+events this one dropped.
 Outside an owned E2E environment the gate does not exist: Cypress, development
 and production servers handle events as before.
 

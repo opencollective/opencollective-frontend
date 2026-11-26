@@ -1448,7 +1448,7 @@ write_manifest() {
   "pdfDir": "$PDF_DIR",
   "artifactsDir": "$ARTIFACTS_DIR",
   "playwrightArgs": $(jq -cn '$ARGS.positional' --args -- ${PW_ARGS[@]+"${PW_ARGS[@]}"}),
-  "stripe": {"selected": ${STRIPE_SELECTED:-0}, "mode": "${STRIPE_MODE:-not-selected}", "probe": ${STRIPE_PROBE_JSON:-null}},
+  "stripe": {"selected": ${STRIPE_SELECTED:-0}, "mode": "${STRIPE_MODE:-not-selected}", "probe": ${STRIPE_PROBE_JSON:-null}, "gateVerdicts": ${STRIPE_VERDICTS_JSON:-null}},
   "buildStamps": $(build_stamps_json)
 }
 EOF
@@ -1587,6 +1587,7 @@ fresh_main() {
   set +e
   run_playwright
   pw_exit=$?
+  stripe_summary
   set -e
   if ! redact_artifacts; then
     [[ $pw_exit -ne 0 ]] || pw_exit=1
@@ -1683,6 +1684,7 @@ reuse_main() {
   set +e
   run_playwright
   pw_exit=$?
+  stripe_summary
   set -e
   if ! redact_artifacts; then
     [[ $pw_exit -ne 0 ]] || pw_exit=1
@@ -1926,6 +1928,7 @@ iterate_main() {
   set +e
   run_playwright
   pw_exit=$?
+  stripe_summary
   set -e
   if ! redact_artifacts; then
     [[ $pw_exit -ne 0 ]] || pw_exit=1

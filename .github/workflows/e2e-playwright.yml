@@ -359,7 +359,7 @@ jobs:
           fi
           echo "Manifest: $manifest"
           jq -r '"mode=\(.mode) status=\(.status) playwrightExitCode=\(.playwrightExitCode) runId=\(.runId)"' "$manifest"
-          jq -r '"stripe: mode=\(.stripe.mode // "unknown") selected=\(.stripe.selected // 0) probe=\(.stripe.probe // null | tojson)"' "$manifest"
+          jq -r '"stripe: mode=\(.stripe.mode // "unknown") selected=\(.stripe.selected // 0) probe=\(.stripe.probe // null | tojson) gateVerdicts=\(.stripe.gateVerdicts // null | tojson)"' "$manifest"
           results="$(ls -t test/playwright/.artifacts/*/report/results.json 2>/dev/null | head -n 1 || true)"
           if [ -z "$results" ]; then
             echo "No Playwright results.json: browser execution never started (setup failure or interruption; see manifest status)."
