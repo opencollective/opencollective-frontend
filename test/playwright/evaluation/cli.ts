@@ -21,6 +21,10 @@ import { pilotInventory } from './pilot-inventory.ts';
 
 const FRONTEND_DIR = path.resolve(import.meta.dirname, '../../..');
 const CYPRESS_PILOTS = ['27-expenses.test.ts', '41-vendor-visibility.test.ts'];
+// The Cypress pilot specs were deleted at adoption (opencollective/opencollective#8970); the
+// inventory reads them from the last main commit that still has them (also the rollback baseline in
+// docs/e2e.md).
+const CYPRESS_PILOT_BASELINE = 'c2ff077b9d938544f082cf8a62ecc9e70381338d';
 
 const [command, ...rest] = process.argv.slice(2);
 const option = (name: string) => {
@@ -52,7 +56,14 @@ const writeOrPrint = (file: string | undefined, text: string) => (file ? fs.writ
 
 function inventory() {
   const cypress = CYPRESS_PILOTS.flatMap(file =>
-    extractCypressTests(file, fs.readFileSync(path.join(FRONTEND_DIR, 'test/cypress/integration', file), 'utf8')),
+    extractCypressTests(
+      file,
+      execFileSync('git', ['show', `${CYPRESS_PILOT_BASELINE}:test/cypress/integration/${file}`], {
+        cwd: FRONTEND_DIR,
+        encoding: 'utf8',
+        maxBuffer: 64 * 1024 * 1024,
+      }),
+    ),
   );
   const list = execFileSync('npx', ['playwright', 'test', '--list', '--reporter=json'], {
     cwd: FRONTEND_DIR,

@@ -281,33 +281,6 @@ Cypress.Commands.add('createExpense', ({ userEmail = defaultTestUserEmail, accou
 });
 
 /**
- * Persist an expense as a draft and invite someone to edit and submit it. In E2E the
- * draft key is always `draft-key`, so the draft can be opened at
- * `/{collectiveSlug}/expenses/{legacyId}?key=draft-key`.
- */
-Cypress.Commands.add('draftExpenseAndInviteUser', ({ userEmail = defaultTestUserEmail, account, expense } = {}) => {
-  return signinRequestAndReturnToken({ email: userEmail }, null).then(token => {
-    return graphqlQueryV2(token, {
-      operationName: 'DraftExpenseAndInviteUser',
-      query: gql`
-        mutation DraftExpenseAndInviteUser($expense: ExpenseInviteDraftInput!, $account: AccountReferenceInput!) {
-          draftExpenseAndInviteUser(expense: $expense, account: $account) {
-            id
-            legacyId
-            status
-            currency
-          }
-        }
-      `,
-      variables: { expense, account },
-      failOnStatusCode: false,
-    }).then(({ body }) => {
-      return body.data.draftExpenseAndInviteUser;
-    });
-  });
-});
-
-/**
  * Create a collective hosted by the open source collective, approved right away.
  */
 Cypress.Commands.add(
@@ -316,35 +289,6 @@ Cypress.Commands.add(
     return cy.createHostedCollectiveV2({ email: userEmail, collective: { name }, skipApproval: true });
   },
 );
-
-Cypress.Commands.add('createProject', ({ userEmail = defaultTestUserEmail, collective } = {}) => {
-  const project = {
-    name: 'test-project',
-    slug: randomSlug(),
-    description: 'make the world a better place',
-  };
-
-  return signinRequest({ email: userEmail }, null).then(response => {
-    const token = getTokenFromRedirectUrl(response.body.redirect);
-    return graphqlQueryV2(token, {
-      operationName: 'CreateProjectForTest',
-      query: gql`
-        mutation CreateProjectForTest($project: ProjectCreateInput!, $parent: AccountReferenceInput) {
-          createProject(project: $project, parent: $parent) {
-            id
-            name
-            slug
-            description
-            __typename
-          }
-        }
-      `,
-      variables: { project, parent: { slug: collective.slug } },
-    }).then(({ body }) => {
-      return body.data.createProject;
-    });
-  });
-});
 
 Cypress.Commands.add('createHostOrganization', (userEmail, variables = {}) => {
   return signinRequest({ email: userEmail }, null).then(response => {

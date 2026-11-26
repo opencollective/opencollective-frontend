@@ -7,7 +7,7 @@ import { expect, test } from '@playwright/test';
  * No mutable prerequisites, no inbox cleanup, no shared session: safe to run
  * alone, in any order, and concurrently with future independent journeys.
  *
- * Mirrors the fastest Cypress coverage (00-i18n, ~2s) to prove the launcher,
+ * Carries the former Cypress 00-i18n coverage (its fastest spec, ~2s) to prove the launcher,
  * semantic readiness, and browser contract without importing Cypress helpers.
  */
 test.describe('Playwright smoke', () => {
