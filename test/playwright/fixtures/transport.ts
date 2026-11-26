@@ -61,6 +61,11 @@ const contributionScenario = graphScenario.extend({
   contribution: z.object({ legacyId: z.number(), id: z.string() }),
 });
 
+/** `stripe-contribution`: the multi-party shape, plus the tiers it arranged (possibly none). */
+const stripeContributionScenario = graphScenario.extend({
+  tiers: z.record(z.object({ legacyId: z.number(), name: z.string(), slug: z.string() })),
+});
+
 /** `contribution-flow`: the multi-party shape, plus the tiers it arranged (possibly none). */
 const contributionFlowScenario = graphScenario.extend({
   tiers: z.record(z.object({ legacyId: z.number(), name: z.string() })),
@@ -103,6 +108,10 @@ export type GraphScenario = Envelope & {
 export type ContributionScenario = GraphScenario & {
   tiers: Record<'gold' | 'silver', { legacyId: number; name: string }>;
   contribution: { legacyId: number; id: string };
+};
+
+export type StripeContributionScenario = GraphScenario & {
+  tiers: Partial<Record<'sponsors', { legacyId: number; name: string; slug: string }>>;
 };
 
 export type ContributionFlowScenario = GraphScenario & {
@@ -191,6 +200,8 @@ type Contracts = {
       amount?: number;
       /** The contributor already moved to `gold`, waiting for the next payment. */
       pendingGoldTier?: boolean;
+      /** The contribution adds a 15% platform tip to `amount`, which the contributor may change. */
+      platformTip?: boolean;
     };
     scenario: ContributionScenario;
   };
@@ -213,12 +224,23 @@ type Contracts = {
   };
   /**
    * Actors `contributor` (no payment method yet), `collectiveAdmin`. Accounts `host` (a seeded host whose
-   * Stripe test connection journeys share: `e2e-host`, USD, unless stated, or `e2e-eur-host`, EUR) and
-   * `collective`, hosted by it. URLs `donate`, `transactions`, `orders`. For `@stripe` journeys.
+   * Stripe test connection journeys share: `e2e-host`, USD, unless stated, `e2e-eur-host`, EUR, or `opensource`,
+   * USD, which shows Stripe's card element instead of the Payment Element) and `collective`, hosted by it;
+   * optional `organization` (administered by `contributor`), `event` (in a week, no tickets). Tiers: optional
+   * `sponsors`. URLs `collective`, `donate`, `contribute`, `transactions`, `orders`, optional `event`,
+   * `eventTickets` (dashboard). For `@stripe` journeys.
    */
   'stripe-contribution': {
-    inputs: { host?: 'e2e-host' | 'e2e-eur-host' };
-    scenario: GraphScenario;
+    inputs: {
+      host?: 'e2e-host' | 'e2e-eur-host' | 'opensource';
+      /** A monthly `Sponsors` tier from $100, with $100, $250 and $500 presets. */
+      sponsorsTier?: boolean;
+      contributorOrganization?: boolean;
+      event?: boolean;
+      /** The Collective is in Belgium and charges its own VAT. */
+      vat?: boolean;
+    };
+    scenario: StripeContributionScenario;
   };
   /**
    * Actor `hostAdmin`. Accounts `host` and `payee` (the seeded `ofitech`, paid through its shared Stripe
@@ -326,8 +348,8 @@ const schemas: Record<Recipe, z.ZodTypeAny> = {
   'vendor-host': graphScenario,
   'fiscal-host': graphScenario,
   'recurring-contribution': contributionScenario,
+  'stripe-contribution': stripeContributionScenario,
   'contribution-flow': contributionFlowScenario,
-  'stripe-contribution': graphScenario,
   'stripe-settlement-expense': graphScenario,
   'collective-admin': collectiveScenario,
   individual: individualScenario,

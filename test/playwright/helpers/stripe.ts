@@ -16,7 +16,7 @@ export const stripeElement = (scope: Page | Locator): FrameLocator =>
  * Types into a Stripe field like a person and checks what Stripe kept: a field it is still formatting or
  * focusing can drop keystrokes, so the field is typed again until it shows `expected`.
  */
-async function typeInto(field: Locator, keys: string, expected: string) {
+async function typeInto(field: Locator, keys: string, expected: string | RegExp) {
   await expect(async () => {
     await field.clear();
     await field.pressSequentially(keys);
@@ -31,6 +31,71 @@ export async function fillTestCard(element: FrameLocator) {
   await typeInto(element.locator('#payment-cvcInput'), '123', '123');
   await element.locator('#payment-countryInput').selectOption('US');
   await typeInto(element.locator('#payment-postalCodeInput'), '90210', '90210');
+}
+
+/** Stripe test card numbers (https://docs.stripe.com/testing#cards). */
+export const TEST_CARDS = {
+  /** Succeeds without authentication. */
+  valid: '4242424242424242',
+  /** Declined by the bank. */
+  declined: '4000000000000002',
+  /** Asks for 3D Secure 2 authentication on the first payment. */
+  threeDSecure: '4000000000003220',
+  /** Asks for 3D Secure authentication on every payment, including off-session ones. */
+  alwaysAuthenticate: '4000002760003184',
+} as const;
+
+/**
+ * Fills Stripe's card element, the card form of hosts that did not opt in to the Payment Element (and of the
+ * payment methods dashboard). `complete: false` types the number only, as someone who stopped there.
+ */
+export async function fillCardElement(
+  element: FrameLocator,
+  number: string = TEST_CARDS.valid,
+  { complete = true } = {},
+) {
+  const formatted = number.replace(/(\d{4})(?=\d)/g, '$1 ');
+  // While typing, Stripe may already show the separator that follows: compare the digits
+  await typeInto(element.locator('input[name="cardnumber"]'), number, new RegExp(`^${formatted}\\s?$`));
+  if (complete) {
+    await typeInto(element.locator('input[name="exp-date"]'), '1235', '12 / 35');
+    await typeInto(element.locator('input[name="cvc"]'), '123', '123');
+    // Stripe only asks for a ZIP code for cards issued where it is used
+    const postal = element.locator('input[name="postal"]');
+    if (await postal.isVisible()) {
+      await typeInto(postal, '90210', '90210');
+    }
+  }
+}
+
+/** The card element of the contribution flow's payment step, for a contributor without a saved payment method. */
+export async function newCardElement(page: Page): Promise<FrameLocator> {
+  await expect(page.getByTestId('PaymentMethodList').getByText('New credit/debit card')).toBeVisible();
+  return stripeElement(page.getByTestId('PaymentMethodList'));
+}
+
+/**
+ * Answers Stripe's 3D Secure test challenge, which Stripe opens in a frame over the page, with "Complete"
+ * (`approve`) or "Fail".
+ */
+export async function completeThreeDSecure(page: Page, approve: boolean) {
+  const selector = approve ? '#test-source-authorize-3ds' : '#test-source-fail-3ds';
+  const visibleButton = async () => {
+    for (const frame of page.frames()) {
+      const button = frame.locator(selector);
+      if (await button.isVisible().catch(() => false)) {
+        return button;
+      }
+    }
+    return null;
+  };
+  // The challenge page is nested in Stripe frames and may still be loading: answer until it closes
+  await expect(async () => {
+    const button = await visibleButton();
+    expect(button, `No visible 3D Secure challenge showing ${selector}`).not.toBeNull();
+    await button.click({ timeout: 5_000 });
+    await expect.poll(async () => (await visibleButton()) === null, { timeout: 10_000 }).toBe(true);
+  }).toPass({ timeout: 60_000 });
 }
 
 /**
