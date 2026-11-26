@@ -158,6 +158,27 @@ type Contracts = {
     };
     scenario: ContributionScenario;
   };
+  /**
+   * Actors `hostAdmin`, `collectiveAdmin`, optional `contributor`, `applicant` (no role anywhere). Accounts `host`,
+   * `collective` (admin: `collectiveAdmin`), optional `collective2` (admin: `hostAdmin`), `applicantCollective`
+   * (no host, admin: `applicant`). Expenses: optional `pending` ($10 invoice by `collectiveAdmin` on `collective`).
+   * URLs `hostProfile` and the host dashboard's `hostedCollectives`, `hostApplications`, `expectedFunds`,
+   * `chartOfAccounts`, `agreements`, `payDisbursements`.
+   */
+  'fiscal-host': {
+    inputs: {
+      openToApplications?: boolean;
+      /** Cents the host already added to `collective`. */
+      collectiveBalance?: number;
+      secondCollective?: boolean;
+      pendingExpense?: boolean;
+      /** Also lets the host record funds from any account, as trusted hosts may. */
+      contributor?: boolean;
+      applicant?: boolean;
+      applicantCollective?: boolean;
+    };
+    scenario: GraphScenario;
+  };
   'vendor-host': {
     inputs: {
       /** Who may use the host's vendors; omitted, the host has no policy (product default: host admins only). */
@@ -189,6 +210,7 @@ const schemas: Record<Recipe, z.ZodTypeAny> = {
   'expense-draft-invite': graphScenario,
   'expense-management': graphScenario,
   'vendor-host': graphScenario,
+  'fiscal-host': graphScenario,
   'recurring-contribution': contributionScenario,
 };
 
