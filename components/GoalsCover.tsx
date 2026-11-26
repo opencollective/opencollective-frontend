@@ -13,7 +13,9 @@ import Container from './Container';
 import { fadeIn } from './StyledKeyframes';
 
 const getProgressColor = theme => theme.colors.primary[600];
-const getEmptyProgressColor = () => '#e2e2e2';
+const getEmptyProgressColor = theme => (theme.isDark ? theme.colors.black[300] : '#e2e2e2');
+/** Background of the goals area, also used behind labels to hide the lines below them */
+export const getGoalsCoverBackground = theme => (theme.isDark ? theme.colors.black[50] : 'rgb(245, 247, 250)');
 const MAX_TITLE_LENGTH = 32;
 
 type Goal = {
@@ -41,7 +43,8 @@ const GoalContainer = styled.div<{ goal: Goal; index: number }>`
   transition: width 3s;
   height: 25px;
   color: ${props => props.theme.colors.black[700]};
-  border-right: 1px solid ${props => (props.goal.isReached ? getProgressColor(props.theme) : getEmptyProgressColor())};
+  border-right: 1px solid
+    ${props => (props.goal.isReached ? getProgressColor(props.theme) : getEmptyProgressColor(props.theme))};
   width: ${props => `${props.goal.progress * 100}%`};
   z-index: ${props => (['balance', 'yearlyBudget'].includes(props.goal.slug) ? 310 : (20 - props.index) * 10)};
   transition: ${props =>
@@ -57,7 +60,7 @@ const GoalContainer = styled.div<{ goal: Goal; index: number }>`
   }
 
   .label {
-    background: rgb(245, 247, 250);
+    background: ${props => getGoalsCoverBackground(props.theme)};
     padding: 0;
     line-height: 1.5;
     font-size: 13px;
@@ -71,7 +74,7 @@ const GoalContainer = styled.div<{ goal: Goal; index: number }>`
   }
 
   .interval {
-    color: #aaaeb3;
+    color: ${props => (props.theme.isDark ? props.theme.colors.black[500] : '#aaaeb3')};
     font-size: 10px;
     font-weight: normal;
   }
@@ -92,7 +95,7 @@ const GoalContainer = styled.div<{ goal: Goal; index: number }>`
   ${props =>
     props.goal.position === 'above' &&
     css`
-      border-bottom: 4px solid ${getEmptyProgressColor()};
+      border-bottom: 4px solid ${getEmptyProgressColor(props.theme)};
       top: auto;
       bottom: 76px;
 

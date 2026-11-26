@@ -37,7 +37,7 @@ export function ExpensePolicyContainer(props: ExpensePolicyContainerProps) {
     >
       <div
         ref={containerRef}
-        className="group scroll-mt-40 rounded-md border border-[#DCDDE0] p-4"
+        className="group scroll-mt-40 rounded-md border border-gray-200 p-4"
         data-cy={props['data-cy']}
       >
         <CollapsibleTrigger asChild>

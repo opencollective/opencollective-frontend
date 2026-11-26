@@ -10,11 +10,11 @@ import { CONTRIBUTE_CARD_BORDER_RADIUS, CONTRIBUTE_CARD_WIDTH } from './constant
 
 const CreateNewCard = styled(Link)`
   display: block;
-  background: white;
+  background: ${props => props.theme.colors.white.full};
   height: 100%;
   width: ${CONTRIBUTE_CARD_WIDTH}px;
   border-radius: ${CONTRIBUTE_CARD_BORDER_RADIUS}px;
-  border: 1px dashed #c0c5cc;
+  border: 1px dashed ${props => props.theme.colors.black[400]};
   padding: 32px;
   cursor: pointer;
 
