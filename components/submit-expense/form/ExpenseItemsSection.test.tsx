@@ -46,6 +46,36 @@ describe('ExpenseItemsForm', () => {
       // The form schema only accepts 0 and 0.15 for GST
       expect(taxCall[1].rate).toBe(0.15);
     });
+
+    it('shows the current GST rate as the selected option', () => {
+      render(
+        withRequiredProviders(
+          <Formik initialValues={{ hasTax: true, tax: { rate: 0.15 }, expenseItems: [] }} onSubmit={jest.fn()}>
+            <ExpenseItemsForm
+              {...({
+                setFieldValue: jest.fn(),
+                initialLoading: false,
+                isSubmitting: false,
+                expenseCurrency: 'NZD',
+                totalInvoicedInExpenseCurrency: 10000,
+                taxType: TaxType.GST,
+                lockedFields: [],
+                availableReferenceCurrencies: [],
+                tax: { rate: 0.15 },
+                hasTax: true,
+                expenseItems: [],
+                referenceCurrency: 'NZD',
+                expenseItemCount: 0,
+              } as any)}
+            />
+          </Formik>,
+        ),
+      );
+      fireEvent.keyDown(screen.getByLabelText('GST rate'), { key: 'ArrowDown' });
+      const selected = screen.getAllByRole('option').filter(option => option.getAttribute('aria-selected') === 'true');
+      expect(selected).toHaveLength(1);
+      expect(selected[0]).toHaveTextContent('15%');
+    });
   });
 
   describe('Add item', () => {
