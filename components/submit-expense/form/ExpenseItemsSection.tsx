@@ -196,7 +196,7 @@ export const ExpenseItemsForm = memoWithGetFormProps(function ExpenseItemsForm(
               {
                 key: uuid(),
                 description: '',
-                incurredAt: new Date().toISOString(),
+                incurredAt: dayjs().format('YYYY-MM-DD'),
                 attachment: null,
                 amount: {
                   valueInCents: 0,
@@ -741,7 +741,7 @@ const Taxes = React.memo(function Taxes(props: {
     (checked: CheckedState) => {
       setFieldValue('hasTax', Boolean(checked));
       if (props.taxType === TaxType.GST) {
-        setFieldValue('tax', { rate: GST_RATE_PERCENT, idNumber: '', ...props.tax });
+        setFieldValue('tax', { rate: GST_RATE_PERCENT / 100, idNumber: '', ...props.tax });
       } else if (props.taxType === TaxType.VAT) {
         setFieldValue('tax', { rate: null, idNumber: '', ...props.tax });
       }
@@ -794,11 +794,11 @@ const Taxes = React.memo(function Taxes(props: {
                   required={true}
                   minWidth={115}
                   value={{
-                    value: round(field.value * 100, 2),
+                    value: field.value,
                     label: i18nTaxRate(intl, props.taxType, field.value),
                   }}
                   onChange={({ value }) => props.setFieldValue('tax.rate', value)}
-                  options={[0, GST_RATE_PERCENT].map(rate => ({
+                  options={[0, GST_RATE_PERCENT / 100].map(rate => ({
                     value: rate,
                     label: i18nTaxRate(intl, props.taxType, rate),
                   }))}

@@ -4,12 +4,22 @@ import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+import { ExpenseType } from '../../../lib/graphql/types/v2/graphql';
 import { withRequiredProviders } from '../../../test/providers';
 
 import type { ExpenseForm } from '../useExpenseForm';
 import { RecurrenceFrequencyOption } from '../useExpenseForm';
 
-import { RecurrenceOptionBox } from './SummarySection';
+import { RecurrenceOptionBox, SummarySectionContent } from './SummarySection';
+
+const mockExchangeRates = { current: [] };
+jest.mock('@apollo/client', () => ({
+  ...jest.requireActual('@apollo/client'),
+  useQuery: (query, options) =>
+    query.definitions[0].name.value === 'PayoutMethodExchangeRateWarning' && !options?.skip
+      ? { data: { currencyExchangeRate: mockExchangeRates.current }, loading: false }
+      : { data: undefined, loading: false },
+}));
 
 // Replace Radix UI Select with a plain <select> for reliable jsdom interaction
 jest.mock('../../ui/Select', () => {
@@ -198,5 +208,104 @@ describe('RecurrenceOptionBox', () => {
     renderBox({ isSubmitting: true });
 
     expect(screen.getByRole('button', { name: 'Edit recurrence frequency' })).toBeDisabled();
+  });
+});
+
+const makeSummaryForm = (values: Record<string, unknown> = {}, options: Record<string, unknown> = {}) =>
+  ({
+    values: {
+      expenseTypeOption: ExpenseType.INVOICE,
+      expenseItems: [],
+      tags: [],
+      title: 'Test',
+      ...values,
+    },
+    options: {
+      expenseCurrency: 'EUR',
+      totalInvoicedInExpenseCurrency: 0,
+      payoutMethod: { data: { currency: 'EUR' }, type: 'BANK_ACCOUNT' },
+      ...options,
+    },
+    touched: {},
+    errors: {},
+    setFieldValue: jest.fn(),
+    setFieldTouched: jest.fn(),
+  }) as unknown as ExpenseForm;
+
+describe('SummarySectionContent', () => {
+  describe('item dates', () => {
+    // `npm test` forces TZ=UTC and changing process.env.TZ at runtime does not reach Intl in jest, so default
+    // Intl.DateTimeFormat to a timezone west of UTC, where a YYYY-MM-DD date (parsed as UTC midnight) falls on
+    // the previous local day.
+    const OriginalDateTimeFormat = Intl.DateTimeFormat;
+    beforeAll(() => {
+      const DateTimeFormatWestOfUTC = function (locales, options) {
+        return new OriginalDateTimeFormat(locales, {
+          ...options,
+          timeZone: options?.timeZone ?? 'America/Los_Angeles',
+        });
+      };
+      Object.assign(DateTimeFormatWestOfUTC, OriginalDateTimeFormat);
+      DateTimeFormatWestOfUTC.supportedLocalesOf = OriginalDateTimeFormat.supportedLocalesOf;
+      Intl.DateTimeFormat = DateTimeFormatWestOfUTC as unknown as typeof Intl.DateTimeFormat;
+    });
+    afterAll(() => {
+      Intl.DateTimeFormat = OriginalDateTimeFormat;
+    });
+
+    it('shows the item date as entered, whatever the local timezone', () => {
+      const form = makeSummaryForm(
+        {
+          expenseItems: [
+            { description: 'Item', amount: { valueInCents: 10000, currency: 'EUR' }, incurredAt: '2026-11-27' },
+          ],
+        },
+        { totalInvoicedInExpenseCurrency: 10000 },
+      );
+
+      render(withRequiredProviders(<SummarySectionContent form={form} />));
+
+      const item = screen.getByRole('listitem');
+      expect(item).toHaveTextContent('Nov 27, 2026');
+      expect(item).not.toHaveTextContent('Nov 26, 2026');
+    });
+  });
+
+  describe('payout method currency estimate', () => {
+    afterEach(() => {
+      mockExchangeRates.current = [];
+    });
+
+    it('includes the tax in the estimate', () => {
+      mockExchangeRates.current = [
+        {
+          value: 0.9,
+          source: 'OPENCOLLECTIVE',
+          fromCurrency: 'EUR',
+          toCurrency: 'USD',
+          date: new Date().toISOString(),
+        },
+      ];
+      const form = makeSummaryForm(
+        {
+          hasTax: true,
+          tax: { rate: 0.2 },
+          expenseItems: [
+            { description: 'Item', amount: { valueInCents: 10000, currency: 'EUR' }, incurredAt: '2026-11-01' },
+          ],
+        },
+        {
+          totalInvoicedInExpenseCurrency: 10000, // Subtotal before tax
+          taxType: 'VAT',
+          payoutMethod: { data: { currency: 'USD' }, type: 'BANK_ACCOUNT' },
+        },
+      );
+
+      render(withRequiredProviders(<SummarySectionContent form={form} />));
+
+      const warning = screen.getByText(/Amount in your payout method currency/);
+      // 100 EUR + 20% VAT = 120 EUR, at 0.9 = 108 USD
+      expect(warning.closest('[class*="mt-4"]').textContent).toContain('$108.00');
+    });
   });
 });

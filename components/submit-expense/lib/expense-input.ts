@@ -100,7 +100,12 @@ function getItemsInput(values: ExpenseFormValues): ExpenseCreateInput['items'] {
         : null,
     },
     // Grant items have no date field: new ones are dated at submission, existing ones keep their date
-    incurredAt: values.expenseTypeOption === ExpenseType.GRANT && !ei.incurredAt ? new Date() : new Date(ei.incurredAt),
+    // Other items without a date (e.g. a duplicated expense sent as an invite) are sent without one
+    incurredAt: ei.incurredAt
+      ? new Date(ei.incurredAt)
+      : values.expenseTypeOption === ExpenseType.GRANT
+        ? new Date()
+        : null,
     url: TYPES_WITH_ITEM_ATTACHMENTS.includes(values.expenseTypeOption)
       ? (getAttachmentUrl(ei.attachment) ?? null)
       : null,
