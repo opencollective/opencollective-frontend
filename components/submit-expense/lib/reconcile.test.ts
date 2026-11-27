@@ -304,6 +304,12 @@ describe('reconcileExpenseForm', () => {
       { accountingCategories: [] },
       { accountingCategoryId: null },
     ],
+    [
+      'the accounting category when the Host does not have it',
+      { accountingCategoryId: 'cat-1' },
+      { accountingCategories: [{ id: 'cat-other' }] },
+      { accountingCategoryId: null },
+    ],
     ['an unavailable reference currency', { referenceCurrency: Currency.GBP }, {}, { referenceCurrency: null }],
   ])('clears %s', (_, v, o, expected) => {
     expect(firstRun(v, o).patch).toEqual(expect.objectContaining(expected));

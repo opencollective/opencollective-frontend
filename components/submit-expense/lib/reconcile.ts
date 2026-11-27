@@ -453,7 +453,10 @@ const clearUnavailableCategory: Rule = {
     // Wait for the categories to load
     if (context.phase !== 'ready') {
       return;
-    } else if (values.accountingCategoryId && (options.accountingCategories || []).length === 0) {
+    } else if (
+      values.accountingCategoryId &&
+      !(options.accountingCategories || []).some(category => category.id === values.accountingCategoryId)
+    ) {
       return { values: { ...values, accountingCategoryId: null } };
     }
   },

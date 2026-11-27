@@ -8,6 +8,18 @@ describe('currency utils lib', () => {
     expect(utils.getCurrencySymbol(Currency.JPY)).toEqual('¥');
   });
 
+  describe('getCurrencyForCountry', () => {
+    it('returns the currency of the country', () => {
+      expect(utils.getCurrencyForCountry('FR')).toEqual(Currency.EUR);
+      expect(utils.getCurrencyForCountry('JP')).toEqual(Currency.JPY);
+    });
+
+    it('falls back to USD for unknown countries and unsupported currencies', () => {
+      expect(utils.getCurrencyForCountry('XX')).toEqual(Currency.USD);
+      expect(utils.getCurrencyForCountry('JO')).toEqual(Currency.USD); // JOD is not supported
+    });
+  });
+
   describe('roundCentsAmount', () => {
     it('leaves regular currency amounts unchanged', () => {
       expect(utils.roundCentsAmount(150, 'USD')).toBe(150); // $1.50

@@ -102,6 +102,10 @@ function NewOrganizationInviteeForm(props: {
 }) {
   const intl = useIntl();
   const { touched } = useFormikContext<ExpenseForm['values']>();
+  // The name field is a FastField, so its onChange closure is not refreshed when the slug gets touched.
+  // Read `touched` through a ref to always get the latest value.
+  const isSlugTouchedRef = React.useRef(false);
+  isSlugTouchedRef.current = Boolean(touched.inviteeNewOrganization?.organization?.slug);
   return (
     <fieldset className="flex flex-col gap-4">
       <FormField
@@ -117,7 +121,7 @@ function NewOrganizationInviteeForm(props: {
             onChange={e => {
               field.onChange(e);
               props.setFieldValue('inviteeNewOrganization.organization.name', e.target.value);
-              if (!touched.inviteeNewOrganization?.organization?.slug) {
+              if (!isSlugTouchedRef.current) {
                 props.setFieldValue('inviteeNewOrganization.organization.slug', suggestSlug(e.target.value));
               }
             }}
