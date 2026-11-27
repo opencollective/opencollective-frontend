@@ -1,6 +1,6 @@
 {
   "name": "Open Collective Frontend",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:24",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:26",
   "features": {},
   "customizations": {
     "vscode": {
