@@ -1,18 +1,15 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { create, Mode } from '@transferwise/approve-api-action-helpers';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 
-import { addAuthTokenToHeader } from '../../../../lib/api';
 import { gql } from '../../../../lib/graphql/helpers';
 import type { Host } from '../../../../lib/graphql/types/v2/graphql';
-import { getWebsiteUrl } from '../../../../lib/utils';
 
 import ConfirmationModal from '../../../ConfirmationModal';
-import { I18nSupportLink } from '../../../I18nFormatters';
 import Loading from '../../../Loading';
 import StyledButton from '../../../StyledButton';
-import { useToast } from '../../../ui/useToast';
+
+import { usePayWiseBatch } from './usePayWiseBatch';
 
 const scheduledExpensesQuery = gql`
   query ExpensesScheduledForPayment($hostSlug: String!) {
@@ -32,8 +29,7 @@ type PayExpensesScheduledForPaymentButtonProps = {
 };
 
 export default function PayExpensesScheduledForPaymentButton(props: PayExpensesScheduledForPaymentButtonProps) {
-  const { toast } = useToast();
-  const intl = useIntl();
+  const payWiseBatch = usePayWiseBatch();
   const [showConfirmationModal, setConfirmationModalDisplay] = React.useState(false);
 
   const scheduledExpenses = useQuery(scheduledExpensesQuery, {
@@ -43,43 +39,11 @@ export default function PayExpensesScheduledForPaymentButton(props: PayExpensesS
     skip: !showConfirmationModal,
   });
 
-  const request = create({ mode: process.env.WISE_ENVIRONMENT === 'production' ? Mode.PRODUCTION : Mode.SANDBOX });
   const handlePayBatch = async () => {
     const expenseIds = scheduledExpenses.data.expenses.nodes.map(e => e.id);
-    try {
-      await request(`${getWebsiteUrl()}/api/services/transferwise/pay-batch`, {
-        method: 'POST',
-        body: JSON.stringify({ expenseIds, hostId: props.host.id }),
-        headers: addAuthTokenToHeader(),
-      });
+    if (await payWiseBatch({ expenseIds, hostId: props.host.id })) {
       setConfirmationModalDisplay(false);
-      toast({
-        variant: 'success',
-        message: (
-          <FormattedMessage
-            id="expenses.scheduled.paybatch.success"
-            defaultMessage="Expenses paid! They're now being processed by Wise."
-          />
-        ),
-      });
       props.onSubmit?.();
-    } catch (e) {
-      const message = e?.response
-        ? await e.response.text()
-        : intl.formatMessage(
-            {
-              defaultMessage:
-                'There was an error trying to process this batch, please <SupportLink>contact support</SupportLink>',
-              id: 'MEB9ET',
-            },
-            { SupportLink: I18nSupportLink },
-          );
-
-      toast({
-        variant: 'error',
-        title: intl.formatMessage({ defaultMessage: 'Batch payment failed', id: 'HYFu3j' }),
-        message,
-      });
     }
   };
   return (
