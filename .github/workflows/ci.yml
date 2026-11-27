@@ -242,6 +242,116 @@ jobs:
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 
+  # Cost of the frontend operations against the API schema, with its weights and list sizes
+  # (opencollective/opencollective#9084): reports the operations over the maximum or close to it, and the cost changes
+  # compared to the base branch. Report only until the maximum is calibrated (opencollective/opencollective#9086).
+  graphql-cost:
+    name: GraphQL query cost
+    if: github.event_name == 'pull_request'
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 20
+    env:
+      # Skips the API postinstall DB restore, which needs Postgres
+      OC_ENV: ci
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup project
+        uses: ./.github/actions/setup-project
+        with:
+          CACHE_VERSION: ${{ secrets.CACHE_VERSION }}
+
+      - name: Get Node major version
+        id: node-major
+        run: echo "version=$(node -p 'process.versions.node.split(`.`)[0]')" >> "$GITHUB_OUTPUT"
+
+      # Same API revision as the E2E workflow: the branch with the same name, otherwise main
+      - name: Checkout API
+        id: checkout-stack
+        uses: ./.github/actions/checkout-e2e-stack
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check the API command
+        id: api-command
+        env:
+          API_REF: ${{ steps.checkout-stack.outputs.api-ref }}
+        run: |
+          if [ -f opencollective-api/scripts/graphql-cost.ts ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            message="The API revision ${API_REF} does not have the query cost command (scripts/graphql-cost.ts) yet, skipping the report."
+            echo "::notice title=GraphQL query cost::${message}"
+            echo "${message}" >> "$GITHUB_STEP_SUMMARY"
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Restore node_modules (api)
+        if: steps.api-command.outputs.available == 'true'
+        uses: actions/cache@v6
+        id: api-node-modules
+        with:
+          path: opencollective-api/node_modules
+          key: ${{ runner.os }}-node${{ steps.node-major.outputs.version }}-api-node-modules-${{ hashFiles('opencollective-api/package-lock.json') }}
+
+      - name: Install dependencies (api)
+        if: steps.api-command.outputs.available == 'true' && steps.api-node-modules.outputs.cache-hit != 'true'
+        working-directory: opencollective-api
+        env:
+          npm_config_engine_strict: 'false'
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Checkout base revision
+        if: steps.api-command.outputs.available == 'true'
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: frontend-base
+          persist-credentials: false
+
+      - name: Report
+        if: steps.api-command.outputs.available == 'true'
+        env:
+          API_REF: ${{ steps.checkout-stack.outputs.api-ref }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: |
+          set -euo pipefail
+          out="${RUNNER_TEMP}/graphql-cost"
+          mkdir -p "${out}"
+          npx tsx scripts/extract-graphql-operations.ts "${out}/operations"
+
+          # Baseline: the operations of the base branch, against the same API revision
+          baseline=()
+          compared_to="not computed"
+          if npx tsx scripts/extract-graphql-operations.ts "${out}/base-operations" frontend-base \
+            && (cd opencollective-api && npm run graphql:cost -- "${out}/base-operations" \
+              --variables "${out}/base-operations/variables.json" --json "${out}/base.json" --markdown /dev/null); then
+            baseline=(--baseline "${out}/base.json")
+            compared_to="compared to the operations of ${BASE_REF}"
+          else
+            echo "::warning title=GraphQL query cost::Could not compute the cost of the operations of ${BASE_REF}, the report does not compare costs"
+          fi
+
+          (cd opencollective-api && npm run graphql:cost -- "${out}/operations" \
+            --variables "${out}/operations/variables.json" "${baseline[@]}" \
+            --heading "GraphQL query cost" --json "${out}/report.json" --markdown "${out}/report.md")
+          {
+            cat "${out}/report.md"
+            echo ""
+            echo "API revision: opencollective/opencollective-api@${API_REF}. Cost changes: ${compared_to}."
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Upload report
+        if: ${{ !cancelled() && steps.api-command.outputs.available == 'true' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: graphql-cost
+          path: ${{ runner.temp }}/graphql-cost/*.json
+          if-no-files-found: ignore
+          retention-days: 14
+
   e2e-prepare:
     uses: ./.github/workflows/e2e-prepare.yml
     secrets: inherit
