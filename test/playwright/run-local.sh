@@ -72,6 +72,9 @@ CLEANUP_ONLY=false
 ITERATE_REQUESTED=false
 FRESH_REQUESTED=false
 REBUILD_SERVICES=()
+# Exclude @stripe tests (and say so) instead of failing without Stripe credentials: fork PRs only.
+WITHOUT_STRIPE=false
+if [[ "${PLAYWRIGHT_WITHOUT_STRIPE:-}" == "1" ]]; then WITHOUT_STRIPE=true; fi
 # Playwright arguments passed through verbatim in iteration (spec, -g, --ui, ...).
 PW_ARGS=()
 
@@ -119,6 +122,9 @@ usage() {
   echo "  --images-dir PATH      Explicit opencollective-images checkout"
   echo "  --pdf-dir PATH         Explicit opencollective-pdf checkout"
   echo "  --pg-database NAME     Disposable database (default: opencollective_pw_e2e)"
+  echo "  --without-stripe       Exclude tests tagged @stripe and report Stripe coverage unavailable"
+  echo "                         (PLAYWRIGHT_WITHOUT_STRIPE=1). Without it, @stripe tests need"
+  echo "                         STRIPE_WEBHOOK_KEY and the Stripe CLI, or the run fails."
   echo "  -h, --help             Show this help"
 }
 
@@ -153,6 +159,7 @@ if [[ "$ITERATE_REQUESTED" == true ]]; then
       --images-dir) require_value "$@"; IMAGES_DIR_INPUT="$2"; shift 2 ;;
       --pdf-dir) require_value "$@"; PDF_DIR_INPUT="$2"; shift 2 ;;
       --pg-database) require_value "$@"; PG_DATABASE_INPUT="$2"; shift 2 ;;
+      --without-stripe) WITHOUT_STRIPE=true; shift ;;
       --keep-on-failure|--replay|--reuse|--spec|--grep|--frontend-dir)
         echo "ERROR: $1 is not an iteration option. Pass the spec and Playwright options directly" >&2
         echo "(npm run e2e -- test/playwright/specs/smoke.spec.ts -g \"title\"), or use run-local.sh without --iterate." >&2
@@ -195,6 +202,8 @@ while [[ $# -gt 0 ]]; do
       require_value "$@"; PDF_DIR_INPUT="$2"; shift 2 ;;
     --pg-database)
       require_value "$@"; PG_DATABASE_INPUT="$2"; shift 2 ;;
+    --without-stripe)
+      WITHOUT_STRIPE=true; shift ;;
     -h|--help)
       usage; exit 0 ;;
     --)
@@ -381,6 +390,9 @@ fail() {
   echo "Evidence (if any): $ARTIFACTS_DIR" >&2
 }
 
+# shellcheck source=launcher/stripe.sh
+source "$SCRIPT_DIR/launcher/stripe.sh"
+
 # --- Environment registry: ownership + active users (lock-free) ---
 # One owner record per disposable database, plus one file per joined run in a
 # sibling directory. The key is the disposable database name: one live owned
@@ -471,6 +483,7 @@ write_owner_record() {
     --argjson frontendPid "${PIDS[1]:-0}" \
     --argjson imagesPid "${PIDS[2]:-0}" \
     --argjson pdfPid "${PIDS[3]:-0}" \
+    --argjson stripePid "${PIDS[4]:-0}" \
     --arg manifest "$MANIFEST" \
     --arg frontendDir "$FRONTEND_DIR" \
     --arg apiDir "$API_DIR" \
@@ -486,7 +499,7 @@ write_owner_record() {
       websiteUrl: $websiteUrl, apiUrl: $apiUrl, imagesUrl: $imagesUrl,
       pdfUrl: $pdfUrl, mailpitUrl: $mailpitUrl, s3Endpoint: $s3Endpoint,
       redisUrl: $redisUrl, redisOwned: $redisOwned, redisPort: $redisPort,
-      servicePids: {api: $apiPid, frontend: $frontendPid, images: $imagesPid, pdf: $pdfPid},
+      servicePids: {api: $apiPid, frontend: $frontendPid, images: $imagesPid, pdf: $pdfPid, stripe: $stripePid},
       manifest: $manifest,
       frontendDir: $frontendDir, apiDir: $apiDir, imagesDir: $imagesDir, pdfDir: $pdfDir,
       mode: $mode, restoredFrom: {apiRev: $apiRev, migrationsHash: $migrationsHash}, logsDir: $logsDir}' \
@@ -574,7 +587,7 @@ run_cleanup() {
       continue
     fi
     cmd="$(pid_cmdline "$pid")"
-    if [[ "$cmd" != *node* && "$cmd" != *npm* ]]; then
+    if [[ "$cmd" != *node* && "$cmd" != *npm* && "$cmd" != *stripe* ]]; then
       echo "WARNING: skipping pid $pid (no longer looks like a service: ${cmd:-<unreadable>})." | sanitize
       continue
     fi
@@ -585,7 +598,7 @@ run_cleanup() {
     [[ "$pid" == "0" ]] && continue
     if kill -0 "$pid" 2>/dev/null; then
       cmd="$(pid_cmdline "$pid")"
-      if [[ "$cmd" == *node* || "$cmd" == *npm* ]]; then
+      if [[ "$cmd" == *node* || "$cmd" == *npm* || "$cmd" == *stripe* ]]; then
         kill -9 "$pid" 2>/dev/null || rc=1
       fi
     fi
@@ -716,6 +729,19 @@ EOF
 }
 
 # --- Preflight (before changing any state) ---
+use_recorded_redis() {
+  # Joining runs and restarted services use the Redis the environment's API was started with: journeys reset
+  # its rate-limit counters, so another Redis would leave the API's untouched. URLs are not printed (credentials).
+  local recorded
+  recorded="$(jq -r '.redisUrl // empty' "$RECORD_FILE")"
+  if [[ -n "${REDIS_URL:-}" && -n "$recorded" && "$REDIS_URL" != "$recorded" ]]; then
+    fail "REDIS_URL differs from the Redis the E2E environment '$PG_DATABASE' was started with. Unset it to join, or start a fresh environment."
+    exit 2
+  fi
+  REDIS_URL="${recorded:-${REDIS_URL:-}}"
+  [[ -z "$REDIS_URL" ]] || export REDIS_URL
+}
+
 redis_ping() {
   # redis-cli when installed, otherwise a raw RESP PING (only the client is optional).
   local url="$1" hostport host port
@@ -1072,7 +1098,9 @@ start_service() {
 start_services() {
   export_runtime_env
   write_fixture_credentials
+  stripe_signing_secret
   start_service api "$API_LOG"
+  start_stripe_listener
   start_service frontend "$FRONTEND_LOG"
   start_service images "$IMAGES_LOG"
   start_service pdf "$PDF_LOG"
@@ -1433,6 +1461,7 @@ write_manifest() {
   "pdfDir": "$PDF_DIR",
   "artifactsDir": "$ARTIFACTS_DIR",
   "playwrightArgs": $(jq -cn '$ARGS.positional' --args -- ${PW_ARGS[@]+"${PW_ARGS[@]}"}),
+  "stripe": {"selected": ${STRIPE_SELECTED:-0}, "mode": "${STRIPE_MODE:-not-selected}", "probe": ${STRIPE_PROBE_JSON:-null}, "gateVerdicts": ${STRIPE_VERDICTS_JSON:-null}},
   "buildStamps": $(build_stamps_json)
 }
 EOF
@@ -1495,10 +1524,12 @@ run_playwright() {
   if [[ "$MODE" == "iterate" ]]; then
     # Iteration passes the engineer's arguments verbatim; workers and retries
     # come from playwright.config.ts (PLAYWRIGHT_WORKERS / PLAYWRIGHT_RETRIES).
-    echo "> Running: npx playwright test ${PW_ARGS[*]+${PW_ARGS[*]}}"
-    (cd "$FRONTEND_DIR" && npx playwright test ${PW_ARGS[@]+"${PW_ARGS[@]}"})
+    stripe_playwright_args
+    echo "> Running: npx playwright test ${PW_ARGS[*]+${PW_ARGS[*]}} ${STRIPE_PW_ARGS[*]-}"
+    (cd "$FRONTEND_DIR" && npx playwright test ${PW_ARGS[@]+"${PW_ARGS[@]}"} ${STRIPE_PW_ARGS[@]+"${STRIPE_PW_ARGS[@]}"})
     return
   fi
+  stripe_playwright_args
   echo "> Running Playwright: $SPEC (workers=$WORKERS retries=$RETRIES)"
   local args=("$SPEC")
   if [[ -n "$GREP" ]]; then
@@ -1508,6 +1539,7 @@ run_playwright() {
   if [[ "$HEADED" == true ]]; then
     args+=(--headed)
   fi
+  args+=(${STRIPE_PW_ARGS[@]+"${STRIPE_PW_ARGS[@]}"})
   (cd "$FRONTEND_DIR" && npx playwright test "${args[@]}")
 }
 
@@ -1521,6 +1553,8 @@ fresh_main() {
   if [[ -n "$REPLAY_MANIFEST" ]]; then
     apply_replay_manifest "$REPLAY_MANIFEST"
   fi
+  stripe_plan
+  stripe_require_credentials
   if [[ -f "$RECORD_FILE" ]]; then
     if registry_record_is_live; then
       live_env_refusal
@@ -1546,7 +1580,7 @@ fresh_main() {
   PHASE="readiness"
 
   local ready_failed=false
-  if ! semantic_readiness; then
+  if ! semantic_readiness || ! stripe_readiness; then
     ready_failed=true
   fi
 
@@ -1566,6 +1600,7 @@ fresh_main() {
   set +e
   run_playwright
   pw_exit=$?
+  stripe_summary
   set -e
   if ! redact_artifacts; then
     [[ $pw_exit -ne 0 ]] || pw_exit=1
@@ -1645,11 +1680,15 @@ reuse_main() {
   fi
   # The owner's inbox: journeys read their own mail from it and never clear it.
   MAILPIT_URL="$(jq -r '.mailpitUrl // empty' "$RECORD_FILE")"
+  # The owner's Redis: journeys reset the rate-limit keys they name (helpers/redis.ts).
+  use_recorded_redis
   export WEBSITE_URL API_URL MAILPIT_URL
   export PLAYWRIGHT_FIXTURE_OWNER_FILE="$FIXTURE_OWNER_FILE"
   export PLAYWRIGHT_RUN_ID="$RUN_ID"
   register_joiner
   JOINED=true
+  stripe_plan
+  stripe_readiness || exit 1
   echo "> Reuse mode: attached to live environment '$PG_DATABASE' (owner $owner)."
   echo "> Differences from fresh reproduction: no database restore, no service"
   echo "  startup, no readiness gate; database, cache, mail, and files are shared"
@@ -1660,6 +1699,7 @@ reuse_main() {
   set +e
   run_playwright
   pw_exit=$?
+  stripe_summary
   set -e
   if ! redact_artifacts; then
     [[ $pw_exit -ne 0 ]] || pw_exit=1
@@ -1783,6 +1823,8 @@ join_environment() {
   WEBSITE_URL="$(jq -r '.websiteUrl // empty' "$RECORD_FILE")"
   API_URL="$api"
   MAILPIT_URL="$(jq -r '.mailpitUrl // empty' "$RECORD_FILE")"
+  # Restarted services and journeys (helpers/redis.ts) need the Redis the E2E environment started with.
+  use_recorded_redis
   if [[ ! -r "$FIXTURE_OWNER_FILE" ]]; then
     fail "fixture ownership proof missing for the running E2E environment. Restart it with: npm run e2e -- --fresh$(db_flag) <spec>"
     exit 2
@@ -1797,10 +1839,9 @@ join_environment() {
       exit 2
     fi
     export_runtime_env
-    # Restarted services need the Redis the E2E environment started with.
-    REDIS_URL="${REDIS_URL:-$(jq -r '.redisUrl // empty' "$RECORD_FILE")}"
-    [[ -z "$REDIS_URL" ]] || export REDIS_URL
     build_services "${REBUILD_SERVICES[@]}"
+    # A restarted API needs the running listener's signing secret again.
+    stripe_signing_secret
     for svc in "${REBUILD_SERVICES[@]}"; do
       restart_service "$svc"
     done
@@ -1821,6 +1862,7 @@ join_environment() {
 start_environment() {
   local svc stale=()
   preflight_ports
+  stripe_require_credentials
   for svc in "${SERVICES[@]}"; do
     if [[ -n "${STALE_REASON[$svc]}" ]]; then
       stale+=("$svc")
@@ -1872,6 +1914,7 @@ iterate_main() {
   fi
   ensure_dependencies
   preflight_browser
+  stripe_plan
 
   compute_stamps
   if [[ -f "$RECORD_FILE" ]] && registry_record_is_live; then
@@ -1890,6 +1933,7 @@ iterate_main() {
     fi
     start_environment
   fi
+  stripe_readiness || exit 1
 
   update_record_phase "testing"
   echo "> Reached Playwright after $(( $(date +%s) - started ))s"
@@ -1898,6 +1942,7 @@ iterate_main() {
   set +e
   run_playwright
   pw_exit=$?
+  stripe_summary
   set -e
   if ! redact_artifacts; then
     [[ $pw_exit -ne 0 ]] || pw_exit=1

@@ -19,7 +19,6 @@ const StepPayment = ({
   collective,
   onChange,
   isSubmitting,
-  isEmbed,
   hideCreditCardPostalCode = false,
   onNewCardFormReady,
   disabledPaymentMethodTypes,
@@ -52,7 +51,6 @@ const StepPayment = ({
         stepDetails={stepDetails}
         stepPayment={stepPayment}
         stepProfile={stepProfile}
-        isEmbed={isEmbed}
         isSubmitting={isSubmitting}
         hideCreditCardPostalCode={hideCreditCardPostalCode}
         onNewCardFormReady={onNewCardFormReady}

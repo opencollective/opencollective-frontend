@@ -122,7 +122,6 @@ class ContributionFlowStepContainer extends React.Component<StepContainerProps> 
             stepPayment={stepPayment}
             onNewCardFormReady={this.props.onNewCardFormReady}
             isSubmitting={this.props.isSubmitting}
-            isEmbed={isEmbed}
             disabledPaymentMethodTypes={this.props.disabledPaymentMethodTypes}
             hideCreditCardPostalCode={
               this.props.hideCreditCardPostalCode || Boolean(collective.settings?.hideCreditCardPostalCode)

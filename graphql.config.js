@@ -13,7 +13,6 @@ module.exports = {
         'components/CollectivePickerAsync.tsx',
         'components/CreateCollectiveMiniForm.tsx',
         'components/edit-collective/sections/PaymentReceipts.tsx',
-        'components/MembersWithData.tsx',
         'components/SignInOrJoinFree.tsx',
         'components/tier-page/graphql/queries.ts',
         'lib/graphql/v1/fragments.ts',

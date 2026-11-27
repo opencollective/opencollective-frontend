@@ -15,6 +15,7 @@ import { NEW_PAYOUT_METHOD_ID } from '@/components/expenses/lib/constants';
 import type { PayPalSupportedCurrencies } from '@/lib/constants/currency';
 import useLoggedInUser from '@/lib/hooks/useLoggedInUser';
 import i18nPayoutMethodType from '@/lib/i18n/payout-method-type';
+import { areNamesMatching } from '@/lib/name-matching';
 import { objectKeys } from '@/lib/utils';
 
 import { ComboSelect } from '@/components/ComboSelect';
@@ -455,7 +456,7 @@ export const NewPayoutMethodOption = memoWithGetFormProps(function NewPayoutMeth
   const isLegalNameFuzzyMatched = React.useMemo(() => {
     const accountHolderName: string = (props.newPayoutMethod.data?.accountHolderName ?? '')?.trim();
     const payeeLegalName: string = props.payee?.legalName ?? props.payee?.name ?? '';
-    return !accountHolderName || accountHolderName.toLowerCase() === payeeLegalName.trim().toLowerCase();
+    return !accountHolderName || areNamesMatching(accountHolderName, payeeLegalName);
   }, [props.newPayoutMethod.data?.accountHolderName, props.payee?.legalName, props.payee?.name]);
 
   const hasLegalNameMismatch =
@@ -638,7 +639,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
   const isLegalNameFuzzyMatched = React.useMemo(() => {
     const accountHolderName: string = props.payoutMethod.data?.accountHolderName ?? '';
     const payeeLegalName: string = props.payee?.legalName ?? props.payee?.name ?? '';
-    return accountHolderName.trim().toLowerCase() === payeeLegalName.trim().toLowerCase();
+    return areNamesMatching(accountHolderName, payeeLegalName);
   }, [props.payoutMethod.data?.accountHolderName, props.payee?.legalName, props.payee?.name]);
 
   const hasLegalNameMismatch =

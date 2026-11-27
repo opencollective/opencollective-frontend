@@ -75,7 +75,7 @@ type MakeUrlParams = {
 
 const safeJoinString = (value: string[] | string) => (Array.isArray(value) ? value.join(',') : value);
 
-const makeUrl = ({
+export const makeUrl = ({
   account,
   isHostReport,
   queryFilter,
@@ -128,6 +128,21 @@ const makeUrl = ({
   const manualPaymentProvider = queryFilter.variables.manualPaymentProvider;
   if (Array.isArray(manualPaymentProvider) && manualPaymentProvider.length > 0) {
     url.searchParams.set('manualPaymentProvider', manualPaymentProvider.map(p => p.id).join(','));
+  }
+
+  const paymentMethod = queryFilter.variables.paymentMethod;
+  if (Array.isArray(paymentMethod) && paymentMethod.length > 0) {
+    url.searchParams.set('paymentMethod', paymentMethod.map(p => p.id).join(','));
+  }
+
+  const payoutMethod = queryFilter.variables.payoutMethod;
+  if (payoutMethod?.id) {
+    url.searchParams.set('payoutMethod', payoutMethod.id);
+  }
+
+  const virtualCard = queryFilter.variables.virtualCard;
+  if (Array.isArray(virtualCard) && virtualCard.length > 0) {
+    url.searchParams.set('virtualCard', virtualCard.map(v => v.id).join(','));
   }
 
   if (queryFilter.variables.type) {

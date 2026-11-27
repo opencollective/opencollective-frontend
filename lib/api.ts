@@ -272,47 +272,42 @@ export async function refreshToken(currentToken) {
   }
 }
 
+/**
+ * Posts to one of the REST sign-up endpoints. Never rejects: a network failure or a non-JSON answer
+ * comes back as `{ error }`, like the errors the API returns, so callers can always reset their state.
+ */
+async function postSignupRequest(url: string, body: Record<string, unknown>) {
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  } catch (e) {
+    return { error: { type: 'NETWORK', message: e?.message as string } };
+  }
+  try {
+    return await response.json();
+  } catch {
+    return { error: response.statusText };
+  }
+}
+
 export async function signup(body: {
   email?: string;
   password?: string;
   captcha?: { token?: string; provider?: string };
 }): Promise<{ success?: true; sessionId?: string; error?: any }> {
-  const response = await fetch('/api/users/signup', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  try {
-    return await response.json();
-  } catch {
-    return { error: response.statusText };
-  }
+  return postSignupRequest('/api/users/signup', body);
 }
 
 export async function resendOTP(body: { email: string; sessionId: string }) {
-  const response = await fetch('/api/users/resend-otp', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  try {
-    return await response.json();
-  } catch {
-    return { error: response.statusText };
-  }
+  return postSignupRequest('/api/users/resend-otp', body);
 }
 
 export async function verifyEmail(body: { email: string; otp: string; sessionId: string }) {
-  const response = await fetch('/api/users/verify-email', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  try {
-    return await response.json();
-  } catch {
-    return { error: response.statusText };
-  }
+  return postSignupRequest('/api/users/verify-email', body);
 }
 
 export async function refreshTokenWithTwoFactorCode(

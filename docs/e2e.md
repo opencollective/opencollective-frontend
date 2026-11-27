@@ -2,8 +2,17 @@
 
 This is the canonical reproduction guide. Runner READMEs link here:
 
-- Playwright (pilot, Chromium): [`test/playwright/README.md`](../test/playwright/README.md)
-- Cypress (existing suite): [`test/cypress/README.md`](../test/cypress/README.md)
+- Playwright (Chromium): [`test/playwright/README.md`](../test/playwright/README.md)
+- Cypress (legacy): [`test/cypress/README.md`](../test/cypress/README.md)
+
+Write new E2E tests with Playwright, under `test/playwright/specs/`, with
+mutable prerequisites arranged through
+[fixtures](#authoring-independent-playwright-fixtures). The expense and vendor
+pilots are the reference examples: `specs/expenses/` (submission, invitations
+with owned mail, management, PDF download) and `specs/vendors/` (multi-party
+visibility, settings). Cypress is legacy: do not add Cypress specs; its
+remaining specs are migrated suite by suite
+(opencollective/opencollective#8948).
 
 ## Run a spec
 
@@ -60,14 +69,15 @@ starts it.
 
 ### Launcher options
 
-| Option                                   | Effect                                                                                                                     |
-| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `--fresh`                                | Stop the E2E environment, restore the database and start it again (still left running).                                    |
-| `--rebuild <service>`                    | Rebuild one service (`frontend`, `api`, `images` or `pdf`) and restart only that service. Repeatable.                      |
-| `--stop`                                 | Stop the E2E environment (`npm run e2e:stop`). Refuses while another run uses it.                                          |
-| `--api-dir`, `--images-dir`, `--pdf-dir` | Explicit service checkout (same as the variables below).                                                                   |
-| `--pg-database <name>`                   | Disposable database, `opencollective_pw_e2e` (default) or `opencollective_pw_e2e_<suffix>`.                                |
-| anything else                            | Passed to `npx playwright test`: spec paths, `-g`, `--headed`, `--ui`, `--debug`, `--workers`, `--retries`, `--project`... |
+| Option                                   | Effect                                                                                                                         |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `--fresh`                                | Stop the E2E environment, restore the database and start it again (still left running).                                        |
+| `--rebuild <service>`                    | Rebuild one service (`frontend`, `api`, `images` or `pdf`) and restart only that service. Repeatable.                          |
+| `--stop`                                 | Stop the E2E environment (`npm run e2e:stop`). Refuses while another run uses it.                                              |
+| `--api-dir`, `--images-dir`, `--pdf-dir` | Explicit service checkout (same as the variables below).                                                                       |
+| `--pg-database <name>`                   | Disposable database, `opencollective_pw_e2e` (default) or `opencollective_pw_e2e_<suffix>`.                                    |
+| `--without-stripe`                       | Exclude the tests tagged `@stripe` and report Stripe coverage unavailable (see [Live Stripe journeys](#live-stripe-journeys)). |
+| anything else                            | Passed to `npx playwright test`: spec paths, `-g`, `--headed`, `--ui`, `--debug`, `--workers`, `--retries`, `--project`...     |
 
 ### Environment variables
 
@@ -79,6 +89,8 @@ starts it.
 | `REDIS_URL`                                               | Use this Redis instead of starting a disposable one on `REDIS_PORT` (default 6380).                 |
 | `READY_TIMEOUT`                                           | Seconds each service may take to become ready (default 300).                                        |
 | `WEBSITE_URL`, `API_URL`, `IMAGES_URL`, `PDF_SERVICE_URL` | Service URLs. The ports are fixed at 3000, 3060, 3001 and 3002.                                     |
+| `STRIPE_WEBHOOK_KEY`                                      | Stripe test-mode key the listener uses; needed to start an E2E environment for `@stripe` tests.     |
+| `PLAYWRIGHT_WITHOUT_STRIPE=1`                             | Same as `--without-stripe`.                                                                         |
 
 ### Service paths
 
@@ -262,22 +274,21 @@ Agents: use the exact launcher command above with explicit `--api-dir`,
 `--frontend-dir`, `--images-dir`, `--pdf-dir` when running from a worktree.
 See `test/playwright/README.md` for worktree paths and artifact locations.
 
-### Playwright CI (pilot, observational)
+### Playwright CI
 
-`CI / e2e-playwright / playwright smoke` runs the smoke, fixture contract checks,
-both independent Account journeys and the expense submission journeys (every
-`*.spec.ts` under `test/playwright/specs/`, including subdirectories) through the same
-shared launcher on every PR and main push, reusing the prepared
-same-revision builds. It is observational: Cypress checks stay required
-until pilot adoption, and the Playwright job reports real
-test/setup/interruption outcomes without masking failures. Duplicate pilot
-cost is not steady-state cost.
+`CI / e2e-playwright / playwright` runs every `*.spec.ts` under
+`test/playwright/specs/` (subdirectories included) through the same shared
+launcher on every PR and main push, reusing the prepared same-revision
+builds. The check name does not depend on the spec selection or the worker
+count, so adding specs or tuning workers does not change branch protection.
 
-- Workers share one E2E environment (`PLAYWRIGHT_WORKERS`, default 1; raise
-  only from measured CPU/memory/service capacity). Retries default to 0
-  locally and in benchmarks; routine CI allows at most 1
-  (`PLAYWRIGHT_RETRIES`; larger values are rejected) so first-attempt
-  failures, recoveries, and final failures stay distinguishable.
+- Workers share one E2E environment (`PLAYWRIGHT_WORKERS`, CI default 2).
+  The pilot evaluation (opencollective/opencollective#8969) measured 2
+  workers on the 4-vCPU CI runner with no first-attempt failure in 30 runs;
+  higher values are unmeasured there. Retries default to 0 locally and in
+  benchmarks; routine CI allows at most 1 (`PLAYWRIGHT_RETRIES`; larger
+  values are rejected) so first-attempt failures, recoveries, and final
+  failures stay distinguishable.
 - Every attempt uploads its run-specific `test/playwright/.artifacts/`
   directory (replay manifest, sanitized service logs, HTML/JSON/JUnit
   reports, original traces (without DOM snapshots or network log, see
@@ -285,10 +296,39 @@ cost is not steady-state cost.
   is retained 14 days, successful evidence 7 days; expiry deletes only CI
   artifacts, never local scenario or provider records.
 - Later pilot journeys reuse the same job via its `spec`/`grep` inputs; no
-  new scheduling framework is needed. Live Stripe stays in Cypress.
-- Fork PRs run credential-free (this workflow uses no secrets) and report
-  that full live coverage is unavailable; reviewed trusted coverage on the
-  same revision is required before adoption or Cypress retirement.
+  new scheduling framework is needed.
+- Live Stripe journeys (`@stripe`) run in the same job, with the
+  `STRIPE_WEBHOOK_KEY` secret the Cypress job uses. Trusted runs (pushes,
+  same-repository PRs) always run them: missing or broken credentials fail the
+  job. Fork PRs get no secrets and run with `--without-stripe`, which excludes
+  them and logs `STRIPE COVERAGE UNAVAILABLE`; reviewed trusted coverage on
+  the same revision is required before adoption or Cypress retirement. The
+  outcome step prints the Stripe mode, the probe and the Stripe journeys'
+  results.
+
+### Required checks and rollback
+
+The Playwright check is meant to be required next to the Cypress shards
+(`e2e / e2e (N*.(js|ts))`). The Cypress shards stay required while they cover
+unmigrated specs; a shard's check is retired only once its last spec is
+migrated, by a maintainer, in branch protection.
+
+The pilot's Cypress specs (`test/cypress/integration/27-expenses.test.ts`,
+`41-vendor-visibility.test.ts`) and the support code only they used were
+deleted at adoption (opencollective/opencollective#8970). Baseline: the last
+main commit that has them is
+`c2ff077b9d938544f082cf8a62ecc9e70381338d`. To roll back, in this order:
+
+1. Re-require any Cypress shard checks that were removed.
+2. Restore the deleted Cypress coverage: revert the adoption commit, or check
+   out from the baseline the two specs, `test/cypress/fixtures/pdf/preview.pdf`
+   and the removed support commands (`createProject`,
+   `draftExpenseAndInviteUser`, `uploadFile`). Confirm the restored specs pass
+   in CI.
+3. Only then remove `e2e-playwright / playwright` from the required checks.
+
+Migrations that delete further Cypress specs record their own baseline the
+same way in their PR.
 
 ## Authoring independent Playwright fixtures
 
@@ -364,15 +404,25 @@ test.describe('paying Collective subject to VAT', () => {
 });
 ```
 
-| Recipe                 | Options (all default to off)                                                                                                                                                        | Actors                                                                                                  | Accounts, expenses, URLs                                                                                                                                                                                                                                                                                                                                                                          |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `expense-submission`   | `collective: { country, vat }`, `secondCollective`, `payeeOrganization`, `priorExpense`, `priorExpenseType`, `invitee`, `inviteeOrganization`                                       | `hostAdmin`, `submitter` (administers nothing unless `payeeOrganization`), `invitee`, `inviteeAdmin`    | `host`, `collective`, `collective2`, `organization`, `inviteeOrganization` (administered by `inviteeAdmin` only); expense `prior` (pending, by the submitter on `collective`, with a saved payout method: an invoice, or with `priorExpenseType: 'RECEIPT'` a reimbursement whose item has a stored receipt); URLs `collective`, `newExpense`, `submittedExpenses`                                |
-| `expense-draft-invite` | `description`, `currency`, `items` (required)                                                                                                                                       | `hostAdmin`, `drafter` (Collective admin), `payeeAdmin`                                                 | `host`, `collective`, `payee` (Organization); expense `draft`; URL `draft` (the invitation link)                                                                                                                                                                                                                                                                                                  |
-| `expense-management`   | `expense: { description, items, attachedPdf }`, `project`                                                                                                                           | `hostAdmin`, `admin` (Collective admin; submitter and payee of the expense)                             | `host`, `collective` (no expense policy), `project` (under `collective`, same host); expense `pending` (invoice by `admin` on `collective`, with a saved payout method); URLs `expenses`, `policies`, `projectNewExpense`                                                                                                                                                                         |
-| `vendor-host`          | `useVendorPolicy`, `grants`, `secondCollective`, `project`, `outsider`, `otherHost: { admin, collective }`, `vendors: [{ label, host, usableWith, useVendorPolicy, payoutMethod }]` | `hostAdmin`, `collectiveAdmin`, `outsider` (no role anywhere), `otherHostAdmin`, `otherCollectiveAdmin` | `host` (no vendor policy unless `useVendorPolicy`), `collective` (admin `collectiveAdmin`), `collective2` (admin `hostAdmin`), `project` (under `collective`), `otherHost` (unrelated host, administered by `hostAdmin` or `otherHostAdmin`), `otherCollective` (on `otherHost`); vendors by `label` in `scenario.vendors`; URLs `hostedCollectives`, `vendors`, `expectedFunds` (host dashboard) |
+| Recipe                      | Options (all default to off)                                                                                                                                                                         | Actors                                                                                                  | Accounts, expenses, URLs                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `expense-submission`        | `collective: { country, vat }`, `secondCollective`, `payeeOrganization`, `priorExpense`, `priorExpenseType`, `invitee`, `inviteeOrganization`                                                        | `hostAdmin`, `submitter` (administers nothing unless `payeeOrganization`), `invitee`, `inviteeAdmin`    | `host`, `collective`, `collective2`, `organization`, `inviteeOrganization` (administered by `inviteeAdmin` only); expense `prior` (pending, by the submitter on `collective`, with a saved payout method: an invoice, or with `priorExpenseType: 'RECEIPT'` a reimbursement whose item has a stored receipt); URLs `collective`, `newExpense`, `submittedExpenses`                                                                               |
+| `expense-draft-invite`      | `description`, `currency`, `items` (required)                                                                                                                                                        | `hostAdmin`, `drafter` (Collective admin), `payeeAdmin`                                                 | `host`, `collective`, `payee` (Organization); expense `draft`; URL `draft` (the invitation link)                                                                                                                                                                                                                                                                                                                                                 |
+| `expense-management`        | `expense: { description, items, attachedPdf }`, `project`                                                                                                                                            | `hostAdmin`, `admin` (Collective admin; submitter and payee of the expense)                             | `host`, `collective` (no expense policy), `project` (under `collective`, same host); expense `pending` (invoice by `admin` on `collective`, with a saved payout method); URLs `expenses`, `policies`, `projectNewExpense`                                                                                                                                                                                                                        |
+| `vendor-host`               | `useVendorPolicy`, `grants`, `secondCollective`, `project`, `outsider`, `otherHost: { admin, collective }`, `vendors: [{ label, host, usableWith, useVendorPolicy, payoutMethod }]`                  | `hostAdmin`, `collectiveAdmin`, `outsider` (no role anywhere), `otherHostAdmin`, `otherCollectiveAdmin` | `host` (no vendor policy unless `useVendorPolicy`), `collective` (admin `collectiveAdmin`), `collective2` (admin `hostAdmin`), `project` (under `collective`), `otherHost` (unrelated host, administered by `hostAdmin` or `otherHostAdmin`), `otherCollective` (on `otherHost`); vendors by `label` in `scenario.vendors`; URLs `hostedCollectives`, `vendors`, `expectedFunds` (host dashboard)                                                |
+| `fiscal-host`               | `openToApplications`, `collectiveBalance` (cents), `secondCollective`, `pendingExpense`, `contributor`, `applicant`, `applicantCollective`                                                           | `hostAdmin`, `collectiveAdmin`, `contributor`, `applicant` (no role anywhere)                           | `host` (open to applications if asked), `collective` (admin `collectiveAdmin`, with `collectiveBalance`), `collective2` (admin `hostAdmin`), `applicantCollective` (no host, admin `applicant`); expense `pending` ($10 invoice); URLs `hostProfile`, `hostedCollectives`, `hostApplications`, `expectedFunds`, `chartOfAccounts`, `agreements`, `payDisbursements`                                                                              |
+| `collective-admin`          | `currency` (`USD`, `EUR`), `socialLinks: [{ type, url }]`, `organization`, `history: { contribution, expense }` (cents)                                                                              | `admin`, `hostAdmin`                                                                                    | `host`, `collective` (short slug, admin `admin`, tiers `backer`, `sponsor` in `scenario.tiers`), `organization` (unhosted, admin `admin`; `history`: it got an expense paid by `collective`, then contributed to it); URLs `collective`, `dashboard`, `info`, `tiers`, `advanced`, `newEvent`, `backerTier`, `userSecurity`, `organization`, `organizationAdvanced`                                                                              |
+| `individual`                | `password`, `twoFactorSecret` (base32; the journey computes codes with `totpCode` from `helpers/auth.ts`), `otherUser`, `oauthApplication: { name, redirectUri }`, `loginTokens`                     | `user` (no membership), `other`                                                                         | URLs `profile`, `info`, `advanced`, `userSecurity`, `forDevelopers`, `authorizedApps` of `user`; `scenario.application` (client credentials) and `scenario.loginTokens` (`valid`, `expired` sign-in link tokens) when asked                                                                                                                                                                                                                      |
+| `user-profile`              | `adminSince`, `contributions` (EUR cents), `expenses` (descriptions) (all required)                                                                                                                  | `user`, `hostAdmin`                                                                                     | `host`, `adminOf` (administered by `user` since `adminSince`), `backed` (contributed to and submitted expenses to by `user`); URL `profile`                                                                                                                                                                                                                                                                                                      |
+| `stripe-contribution`       | `host`: `'e2e-host'` (USD, default), `'e2e-eur-host'` (EUR) or `'opensource'` (USD, Stripe's card element instead of the Payment Element); `sponsorsTier`, `contributorOrganization`, `event`, `vat` | `contributor` (no payment method), `collectiveAdmin`                                                    | `host` (the seeded host, shared Stripe connection), `collective` (new, hosted by it; in Belgium with its own VAT if `vat`), `organization` (administered by `contributor`), `event` (in a week, no tickets); `scenario.tiers.sponsors` (monthly, from $100, presets $100/$250/$500); URLs `collective`, `donate`, `contribute`, `transactions`, `orders`, `event`, `eventTickets` (dashboard). See [Live Stripe journeys](#live-stripe-journeys) |
+| `stripe-settlement-expense` | none                                                                                                                                                                                                 | `hostAdmin`                                                                                             | `host` (new), `payee` (the seeded `ofitech`, paid through its shared Stripe connection); expense `settlement` ($10, pending, owed by `host`); URL `expense`                                                                                                                                                                                                                                                                                      |
+| `contribution-flow`         | `platformTips`, `openTier`, `contributorOrganization`, `event: 'upcoming' \| 'past'`                                                                                                                 | `hostAdmin`, `admin` (Collective admin), `contributor` (administers `organization` only)                | `host` (accepts bank transfers, no Stripe), `collective`, `organization`, `event` (under `collective`); `scenario.tiers`: `open` (one-time, $5 by default, from $0), `ticket` ($10, on a past `event`); URLs `donate`, `contribute`, `event`, `eventTickets` (dashboard)                                                                                                                                                                         |
+| `recurring-contribution`    | `amount` (cents, $1 by default), `pendingGoldTier`, `platformTip` (15% of `amount`, changeable)                                                                                                      | `contributor`, `hostAdmin`                                                                              | `host`, `collective` (renamed `Example Collective`; tiers `gold`: fixed $1,000/month, `silver`: from $100/month, presets $100/$250); a monthly contribution of `contributor`, charged once with a saved card that never reaches Stripe; URLs `outgoingContributions`, `contribution`, `collectiveContributors`                                                                                                                                   |
 
 Each request owns a new active fiscal host, so no journey adds Collectives or
-expenses to a seeded host. Recipes arrange starting state and prior history
+expenses to a seeded host, except the Stripe recipes: live payments need a
+Stripe connection, which only seeded hosts have (see
+[Live Stripe journeys](#live-stripe-journeys)). Recipes arrange starting state and prior history
 only, at model level inside the receipt transaction: they send no mail and run
 no mutation. Whatever a journey is about (submitting, creating a legal entity,
 tax, currency) goes through the browser. One prerequisite lives outside the
@@ -507,6 +557,19 @@ uploaded evidence; `redaction-status.json` identifies it. Other artifacts still
 get scrubbed, and an existing failure/cancellation exit code is preserved. Do not
 attach authentication handles or raw fixture responses to evidence.
 
+### Redis
+
+Some product limits live in the API's Redis rather than the database, and a
+running E2E environment keeps them between runs. Journeys reach that Redis
+through the `redis` fixture of `visitorTest`
+(`test/playwright/helpers/redis.ts`), connected to the `REDIS_URL` the
+launcher exports (restored from the environment record on `--reuse` and
+iteration). That Redis may be supplied infrastructure shared with a local
+development API, so a helper only reads, writes or deletes keys it names; it never
+scans for keys to delete and never flushes. Each reset is paired with a check
+that the product really counted the call under the key it clears, so a renamed
+key fails the journey instead of turning the reset into a silent no-op.
+
 ### What an attempt attaches
 
 - `scenario`: the references the recipe returned, assembled from named fields
@@ -521,6 +584,9 @@ attach authentication handles or raw fixture responses to evidence.
   from execution.
 - `mail-timings`: for each awaited message, the recipient, the subject
   searched for and the wait.
+- `stripe-ownership` (`@stripe` tests): the Stripe objects the attempt owned,
+  with their provider account and how each became owned, and every webhook
+  event about them with the gate's verdict.
 
 ### Product behaviours the journeys wait for
 
@@ -529,21 +595,26 @@ failure while the pilot was written. The journeys wait for a condition, or
 repeat a step the way a user would; none waits for time. Reuse the named
 helper, or the same wait, in a new journey over the same form.
 
-| Behaviour                                                                                                                                  | What the journey does                                                | Where                                              |
-| ------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- | -------------------------------------------------- |
-| The payee section preselects the user's own profile once it has loaded, even over a choice made just before                                | Waits for a checked option, then chooses and checks the choice holds | `openVendorPicker`, `choosePayee` (`helpers/`)     |
-| "Invite someone to submit an expense" sits in a picker entry marked as disabled, in a menu that is still positioning itself                | Clicks without the enabled check, again until the contact form opens | `choosePayee`                                      |
-| The currency list of a new payout method has closed by itself while still opening, leaving no selection (seen once, on an invitation form) | Opens the list again until the currency is chosen                    | `addPayoutMethod`                                  |
-| An expense type chosen right after a payout method was saved has not stayed chosen (seen once)                                             | Chooses it again until it holds                                      | `chooseExpenseType`                                |
-| The "Sign In" link of an invitation only carries its return address after the form has settled                                             | Waits for the link's target before clicking                          | `invite-organization-logged-out.spec.ts`           |
-| The grant form resets its items once after a beneficiary is picked                                                                         | Fills the items again until the summary opens                        | `grant-beneficiary.spec.ts`                        |
-| Two rich-text editors filled one straight after the other: the text for the second has landed in the first                                 | Types both again until each holds its own text, then saves           | `writeExpensePolicies` in `expense-policy.spec.ts` |
-| Saving an edited expense before the exchange rate of a converted item has arrived is refused without a message                             | Waits for the rate to be shown                                       | `edit-expense.spec.ts`                             |
-| The duplicate form asks for its options twice; submitting before the second answer is refused without a message                            | Waits for the second answer                                          | `duplicate-expense.spec.ts`                        |
-| An expense page reached through a link inside the app loads more data after showing its buttons and re-renders without an open dialog      | Opens the expense by its address                                     | `process-expense.spec.ts`                          |
-| A dashboard settings page opened by its address, in a browser that has already loaded the dashboard, can stay on its loading indicator     | Goes through the dashboard menu (Settings → Policies), like a user   | `vendor-settings.spec.ts`                          |
-| The expected funds dialog asks for the receiving Collective's details a moment after it is chosen                                          | Waits for that answer before choosing the source                     | `vendor-creation.spec.ts`                          |
-| A working button sits in a list entry marked as disabled                                                                                   | Checks it is visible, then clicks without the enabled check          | `vendor-creation.spec.ts` (expected funds)         |
+| Behaviour                                                                                                                                           | What the journey does                                                | Where                                                   |
+| --------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------- |
+| The payee section preselects the user's own profile once it has loaded, even over a choice made just before                                         | Waits for a checked option, then chooses and checks the choice holds | `openVendorPicker`, `choosePayee` (`helpers/`)          |
+| "Invite someone to submit an expense" sits in a picker entry marked as disabled, in a menu that is still positioning itself                         | Clicks without the enabled check, again until the contact form opens | `choosePayee`                                           |
+| The currency list of a new payout method has closed by itself while still opening, leaving no selection (seen once, on an invitation form)          | Opens the list again until the currency is chosen                    | `addPayoutMethod`                                       |
+| An expense type chosen right after a payout method was saved has not stayed chosen (seen once)                                                      | Chooses it again until it holds                                      | `chooseExpenseType`                                     |
+| The "Sign In" link of an invitation only carries its return address after the form has settled                                                      | Waits for the link's target before clicking                          | `invite-organization-logged-out.spec.ts`                |
+| The grant form resets its items once after a beneficiary is picked                                                                                  | Fills the items again until the summary opens                        | `grant-beneficiary.spec.ts`                             |
+| Two rich-text editors filled one straight after the other: the text for the second has landed in the first                                          | Types both again until each holds its own text, then saves           | `writeExpensePolicies` in `expense-policy.spec.ts`      |
+| Saving an edited expense before the exchange rate of a converted item has arrived is refused without a message                                      | Waits for the rate to be shown                                       | `edit-expense.spec.ts`                                  |
+| The duplicate form asks for its options twice; submitting before the second answer is refused without a message                                     | Waits for the second answer                                          | `duplicate-expense.spec.ts`                             |
+| An expense page reached through a link inside the app loads more data after showing its buttons and re-renders without an open dialog               | Opens the expense by its address                                     | `process-expense.spec.ts`                               |
+| A dashboard settings page opened by its address, in a browser that has already loaded the dashboard, can stay on its loading indicator              | Goes through the dashboard menu (Settings → Policies), like a user   | `vendor-settings.spec.ts`                               |
+| The expected funds dialog asks for the receiving Collective's details a moment after it is chosen                                                   | Waits for that answer before choosing the source                     | `vendor-creation.spec.ts`                               |
+| A working button sits in a list entry marked as disabled                                                                                            | Checks it is visible, then clicks without the enabled check          | `vendor-creation.spec.ts` (expected funds)              |
+| The contribution flow ignores "Contribute" while the Payment Element has not reported the details complete (right after linking a bank, under load) | Clicks again while the button shows its label, never while it spins  | `submitPaymentStep`, `contribute` (`helpers/stripe.ts`) |
+| A Stripe card field drops a keystroke now and then while it formats what was typed ("4242 4242 4242 42")                                            | Types the field again until it shows the whole value                 | `fillTestCard` (`helpers/stripe.ts`)                    |
+| Stripe's bank search ignores a click on a bank while it is still initializing                                                                       | Clicks the bank again until the Financial Connections overlay opens  | `ach.spec.ts`                                           |
+| A payment method saved by a webhook (bank account, SEPA mandate) only shows once Stripe's event has been handled                                    | Opens the payment step again until it is listed                      | `ach.spec.ts`, `sepa.spec.ts`                           |
+| The Pay button of the expense payment modal moves while the Stripe form below it settles; a click at its old place lands in the form                | Scrolls the button into view, then clicks                            | `expense-settlement.spec.ts`                            |
 
 ### Independence and interruption checks
 
@@ -589,11 +660,235 @@ explicit opt-in because the ordinary API test harness owns `opencollective_test`
 and must never run its reset hooks against a shared browser stack. Startup
 rejection checks run normally with `npm run test -- test/server/routes/e2e-fixtures.test.ts`.
 
+## Live Stripe journeys
+
+Journeys that pay through Stripe run against Stripe's test mode, live: the
+Payment Element, Financial Connections and redirect pages load from Stripe, and
+the API receives Stripe's genuine, signed webhooks. Nothing is mocked. Every E2E
+environment (yours, each CI job, the Cypress shards) receives the same test
+account's events, so the API of an E2E environment only lets an event reach its
+handlers when the event is about a Stripe object one of its own test attempts
+created. Stripe records are never deleted.
+
+### Declaring a Stripe journey
+
+Tag the journey, or its `describe`, with `@stripe` (`STRIPE_TAG` from the
+fixtures). The tag is the whole declaration:
+
+```ts
+import { expect, scenarioTest, STRIPE_TAG } from '../../fixtures';
+import {
+  chooseNewPaymentMethod,
+  contribute,
+  expectContributionStatus,
+  fillTestCard,
+  goToPaymentStep,
+} from '../../helpers/stripe';
+
+const test = scenarioTest('stripe-contribution', { inputs: { host: 'e2e-host' }, actor: 'contributor' });
+
+test.describe('Contribute with a card', { tag: STRIPE_TAG }, () => {
+  test('user pays with a new card', async ({ page, scenario }) => {
+    await goToPaymentStep(page, scenario.urls.donate);
+    await fillTestCard(await chooseNewPaymentMethod(page));
+    await expectContributionStatus(scenario.actors.collectiveAdmin, await contribute(page), /^PAID$/);
+  });
+});
+```
+
+- **The launcher** lists the selected tests (`playwright test --list`) and counts
+  the `@stripe` ones. With any selected, it requires the prerequisites below
+  and probes them before the first browser starts.
+- **The fixtures** give the browser of a tagged test an `oc_e2e_attempt` cookie
+  naming its attempt, and, once the test is over, retire the attempt and
+  attach `stripe-ownership` (what it owned, what became of its events). A
+  tagged test fails at once if the launcher did not verify Stripe, for example
+  when Playwright runs without the launcher.
+- **Untagged tests** run without any Stripe prerequisite. If one of them pays
+  through Stripe anyway, its webhooks are dropped as foreign and it fails
+  waiting for them: tag it.
+
+### Owned Stripe resources
+
+The journey creates its Stripe objects through the product, from its own
+browser: the API creates the customer and the payment intent while it serves
+a request carrying the attempt cookie, and records them as the attempt's
+(provider account, object ID, how). Payment methods and mandates that
+Stripe.js creates in the browser become the attempt's when a webhook about an
+owned object names them (a `payment_method.attached` for the attempt's
+customer, a `payment_intent.*` for its payment intent). A recipe therefore
+never creates Stripe objects; it arranges the local graph, with fresh
+identities per attempt:
+
+- `stripe-contribution` gives a new Collective hosted by a seeded host whose
+  Stripe test connection the journeys share (`e2e-host`, USD, or
+  `e2e-eur-host`, EUR, both showing the Payment Element; or `opensource`, USD,
+  which did not opt in to it and shows Stripe's card element, like most hosts),
+  a `contributor` with no payment method yet and a `collectiveAdmin`, who may
+  read the contributions' status. Options add a monthly tier, an Organization
+  of the contributor, an Event and VAT, all local.
+- `stripe-settlement-expense` gives a new host owing a settlement expense to
+  the seeded `ofitech`, paid through its shared Stripe connection.
+
+The shared connections are infrastructure: no journey changes their
+configuration or asserts their balances, and the recipes refuse to run
+(`INVALID_PREREQUISITE`) if a seeded host has no usable connection. They are
+the only seed data the Stripe journeys rely on, read-only. Never pay as a
+seeded user: a seeded Stripe customer is not the attempt's, so its events are
+dropped. A payment method saved by one journey may be reused within that
+journey (the card, ACH and SEPA journeys pay twice); another test or a retry
+starts from a new contributor.
+
+### What the API does with an event
+
+`server/e2e/stripe-ownership.ts` in the API, installed only with the guarded
+fixture route, sits between signature verification and every handler,
+including payment method attachment, mandate updates and issuing events:
+
+1. **Duplicates**: each event ID is handled once. A redelivery is ignored,
+   unless the first delivery failed or was dropped as unowned.
+2. **Ownership**: the event's object and the objects it points to (customer,
+   payment intent, payment method, setup intent, charge, mandate), on the
+   event's provider account, must belong to one attempt of this E2E
+   environment. Objects of several attempts are dropped as ambiguous.
+3. **Events before registration**: an event that names nothing known yet is
+   acknowledged and held for 15 seconds (`E2E_STRIPE_HOLD_MS` in the API's
+   environment), then handled if its object was registered meanwhile, or
+   dropped as foreign.
+4. **Retired attempts**: events of an attempt that ended, or whose retry has
+   started, are dropped. Retiring waits (up to 10 seconds) for the attempt's
+   events being handled.
+
+Every decision is recorded with the event in the disposable database
+(`E2EStripeEvents`, next to `E2EStripeAttempts` and `E2EStripeObjects`), and
+the attempt's share of it is attached to the test as `stripe-ownership`. After
+the run, the launcher prints the count of each verdict and records it in the
+replay manifest (`stripe.gateVerdicts`): `unowned` counts the other stacks'
+events this one dropped.
+Outside an owned E2E environment the gate does not exist: Cypress, development
+and production servers handle events as before.
+
+### Prerequisites
+
+The same as the Cypress CI job:
+
+- `STRIPE_WEBHOOK_KEY`: a test-mode restricted key with "Debugging tools" write
+  access (https://dashboard.stripe.com/test/apikeys), or another test key of
+  the account the API uses.
+- The Stripe CLI on `PATH` (https://docs.stripe.com/stripe-cli).
+
+When it starts an E2E environment, the launcher asks the CLI for the
+listener's signing secret, starts the API with it, and runs
+`stripe listen --forward-connect-to <api>/webhooks/stripe` as one of the E2E
+environment's services (`stripe-listener.log`). It does so whenever the
+credentials are present, so an E2E environment started for other tests can
+take Stripe journeys later. The key travels in the environment, never on a
+command line, and evidence is scrubbed of Stripe keys and signing secrets.
+
+Before running `@stripe` tests, the launcher probes the owned event path: the
+API checks it has a test-mode key and a signing secret, creates a customer on
+the shared connection of `e2e-host` as a probe attempt, and waits until
+Stripe's signed `customer.created` event for it went through the gate. The run
+prints `Stripe ready: signed evt_... for probe customer cus_... delivered in
+... ms`, and the replay manifest records it (`stripe`). Otherwise the run fails
+before any browser starts:
+
+| Missing                                                                        | Failure                                                                         |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| `STRIPE_WEBHOOK_KEY` or the CLI, starting an E2E environment                   | `Missing: STRIPE_WEBHOOK_KEY ...` with what to provide                          |
+| A key the CLI cannot use                                                       | `the Stripe CLI could not open a listener session`                              |
+| A running E2E environment without a listener                                   | `the running E2E environment has no Stripe listener`: restart it with `--fresh` |
+| No signing secret, no test key, no usable `e2e-host` connection                | `Stripe readiness failed (HTTP 412): STRIPE_...`                                |
+| No event delivered within 60 seconds (listener, signing secret or Stripe down) | `Stripe readiness failed (HTTP 504): STRIPE_WEBHOOK_UNDELIVERED`                |
+
+A provider outage or rate limit is a failure, with the probe or the journey's
+evidence, never a skip. Only `--without-stripe` (`PLAYWRIGHT_WITHOUT_STRIPE=1`)
+leaves the Stripe tests out, and the run says so:
+`STRIPE COVERAGE UNAVAILABLE: N selected @stripe test(s) excluded`. CI uses
+it for fork PRs only, which get no secrets.
+
+```bash
+export STRIPE_WEBHOOK_KEY=rk_test_...
+npm run e2e -- --fresh test/playwright/specs/stripe            # starts the listener, probes, runs
+npm run e2e -- test/playwright/specs/stripe/card.spec.ts      # joins it
+npm run e2e -- --without-stripe test/playwright/specs          # everything else, Stripe reported unavailable
+```
+
+Stripe journeys run in parallel like any other: each attempt pays from its own
+contributor, Collective and customer. A tagged test gets twice the usual test
+timeout, since a live provider answers every step. Waits on Stripe (the success page, a
+status reached through a webhook, a payment method saved by a webhook) are
+polls on a condition, up to 60 seconds.
+
+### Helpers
+
+`test/playwright/helpers/stripe.ts`: `goToPaymentStep` (contribution flow up
+to the payment step, as a guest or signed in), `contribute` and
+`submitPaymentStep` (submit the payment step until it gets where it should),
+`chooseNewPaymentMethod` and
+`stripeElement` (the Payment Element as a frame locator),
+`choosePaymentMethodType` (tab or "more" menu, whichever Stripe shows),
+`fillTestCard`, `stripeOverlayFrame` (Stripe-hosted overlays such as Financial
+Connections), `contributionOnSuccessPage` and `expectContributionStatus`. For
+Stripe's card element (host `opensource`, and the payment methods dashboard):
+`newCardElement`, `fillCardElement` (any of `TEST_CARDS`: valid, declined, 3D
+Secure) and `completeThreeDSecure` (answers Stripe's test challenge).
+
+### Stripe journeys
+
+| Spec                                             | Journeys                                                                                                                                                                                                                                                                                                                                       |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `stripe/card.spec.ts`                            | Guest pays by card, contribution paid and listed as a completed transaction; user pays by new card then by the saved card (two paid contributions, two transactions); trusted and untrusted redirect after paying                                                                                                                              |
+| `stripe/ach.spec.ts`                             | Guest links a US bank account (Financial Connections), contribution processing or paid; user links one, then pays again with the account saved by the attachment webhook                                                                                                                                                                       |
+| `stripe/sepa.spec.ts`                            | Guest pays by SEPA debit, contribution paid and listed; user pays by SEPA debit, then again with the saved mandate                                                                                                                                                                                                                             |
+| `stripe/bancontact.spec.ts`                      | Guest and user authorize a Bancontact payment on Stripe's test page, contribution paid and listed                                                                                                                                                                                                                                              |
+| `stripe/expense-settlement.spec.ts`              | Host admin approves a settlement expense owed to `ofitech` and pays it by card; it becomes paid (webhook)                                                                                                                                                                                                                                      |
+| `contributions/card-contribution.spec.ts`        | Card element (`opensource`): new user pays a custom yearly amount, then again with the saved card; contributes as an Organization created in the flow; declined card; 3D Secure failed then completed; 3D Secure completed on the confirmation page; monthly tier with address; Organization card saved in the dashboard, then used for a tier |
+| `contributions/guest-card-contribution.spec.ts`  | Guest with an existing user's address (thank-you email); guest who then joins (emailed code); one guest session with $10, $500 and $5,000 contributions and the details each needs                                                                                                                                                             |
+| `contributions/event-ticket-payment.spec.ts`     | Event admin creates a fixed, a flexible and a VAT-charged ticket and pays for them; VAT by country and VAT number                                                                                                                                                                                                                              |
+| `contributions/public-message.spec.ts`           | Public message posted on the success page, then edited from the Collective page                                                                                                                                                                                                                                                                |
+| `contributions/recurring-payment-method.spec.ts` | Monthly contribution by card, whose card is then replaced through the Payment Element of the dashboard                                                                                                                                                                                                                                         |
+
+They replace the Cypress files `40-stripe-element-card.test.js`,
+`40-stripe-element-ach.test.js`, `40-stripe-element-sepa.test.js`,
+`40-stripe-element-sepa.bancontact.test.js` and
+`40-stripe-element-expense-settlement.test.js`, one journey per Cypress test.
+Two Cypress details are not carried: the interception that rewrote
+`window.top.location.href` in Stripe.js (Cypress runs the site in a frame;
+Playwright does not) and the fixed waits. The redirect journeys answer
+`https://opencollective.com` and `https://google.com` locally instead of
+loading the real sites; they assert where the browser goes.
+
+The `contributions/` journeys replace the Stripe parts of the Cypress
+contribution flow files (`12-contributionFlow.donate`,
+`13-contributionFlow.contribute`, `14-contributionFlow.success`,
+`39-recurring-contributions`, `40-stripe-contribution-guest`,
+`40-stripe-contribution-event-tickets` and
+`40-stripe-collective-contribution`). Their steps without a payment run
+untagged: `contributions/contribution-details.spec.ts` (amounts, intervals and
+next charge dates on a fixed clock, the profile step, tier routes) and
+`contributions/recurring-contribution-update.spec.ts` (tier, amount, platform
+tip and cancellation of a monthly contribution arranged by
+`recurring-contribution`). The card element journeys are synchronous: the
+success page, not a webhook, decides their outcome.
+
+### Migrating another Stripe journey
+
+1. Tag it `@stripe`.
+2. Arrange with `stripe-contribution` or a new recipe that, like it, creates
+   fresh local identities and references a shared seeded connection read-only.
+   Do not create Stripe objects in a recipe, and do not pay as a seeded user.
+3. Pay through the browser with the helpers above. Wait for webhook outcomes
+   with `expectContributionStatus` or by reloading until the page shows them.
+4. Run it with the prerequisites, alone and with the other Stripe journeys in
+   parallel, then check the `stripe-ownership` attachment: the attempt's events
+   should be `processed`, none `unowned`.
+
 ## Expense submission journeys (Playwright pilot)
 
 `test/playwright/specs/expenses/` carries the submission part of the Cypress
-expense pilot (`test/cypress/integration/27-expenses.test.ts`), which stays
-unchanged and runnable. Nine Cypress tests map to nine journeys:
+expense pilot (`test/cypress/integration/27-expenses.test.ts`, deleted at
+adoption, see [rollback](#required-checks-and-rollback)). Nine Cypress tests map to nine journeys:
 
 | Cypress test                                                                                                                        | Playwright journey (`specs/expenses/`)                                                                                                     |
 | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -696,7 +991,7 @@ comparison for this group.
 
 `test/playwright/specs/expenses/invite-*.spec.ts` carries the invitation part
 of the Cypress expense pilot (`test/cypress/integration/27-expenses.test.ts`,
-`Invite` blocks), which stays unchanged and runnable. Six Cypress tests map to
+`Invite` blocks, deleted at adoption). Six Cypress tests map to
 six journeys:
 
 | Cypress test                                                                                                         | Playwright journey (`specs/expenses/`)                                                                                                                            |
@@ -835,8 +1130,7 @@ workers on such a machine; the cap is not a property of the journeys.
 
 `test/playwright/specs/expenses/` also carries the rest of the Cypress expense
 pilot (`test/cypress/integration/27-expenses.test.ts`: `Actions on expense`,
-`Recurring`, `Duplicate` and `Edit` blocks), which stays unchanged and
-runnable. Fourteen Cypress tests map to fourteen journeys:
+`Recurring`, `Duplicate` and `Edit` blocks, deleted at adoption). Fourteen Cypress tests map to fourteen journeys:
 
 | Cypress test                                                                            | Playwright journey (`specs/expenses/`)                                                                                             |
 | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
@@ -1017,7 +1311,7 @@ three expense groups now cover with 28 Playwright journeys.
 `test/playwright/specs/vendors/` carries the picker half of the Cypress vendor
 pilot (`test/cypress/integration/41-vendor-visibility.test.ts`: `vendor picker
 on expense submission`, `vendor picker on grant submission` and `Add Funds
-source picker`), which stays unchanged and runnable. The `inline vendor
+source picker`, deleted at adoption). The `inline vendor
 creation defaults` and `vendor settings dashboard` blocks of that file are
 covered by the [next group](#vendor-creation-and-settings-journeys-playwright-pilot).
 Sixteen Cypress tests map to fifteen journeys:
@@ -1185,8 +1479,7 @@ covers all 23 tests of the original file, of which these journeys cover 16.
 `specs/vendors/vendor-creation.spec.ts` and `vendor-settings.spec.ts` carry the
 rest of the Cypress vendor pilot
 (`test/cypress/integration/41-vendor-visibility.test.ts`: `inline vendor
-creation defaults` and `vendor settings dashboard`), which stays unchanged and
-runnable. Seven Cypress tests map to seven journeys:
+creation defaults` and `vendor settings dashboard`, deleted at adoption). Seven Cypress tests map to seven journeys:
 
 | Cypress test                                                                                                              | Playwright journey (`specs/vendors/`)                                                                           |
 | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
@@ -1327,14 +1620,121 @@ roughly 55 s of launcher startup on a fresh stack. The Cypress timing supplied
 for the pilot (01:57) covers all 23 tests of the original file; the picker
 journeys cover 16 of them and these journeys the other 7.
 
+## Signup journeys (Playwright pilot)
+
+`specs/signup/signup.spec.ts` carries all 29 tests of
+`test/cypress/integration/01-signup.test.ts`, which stays unchanged and
+runnable, in 17 journeys. The three Cypress suites chain their steps across `it` blocks with
+`testIsolation: false`; here each signup is one journey from the email step to
+the dashboard, so the 18 tests of the `/signup` block map to six journeys:
+
+| Cypress tests (`/signup` ›)                                                                                                                                                                                  | Playwright journey (`specs/signup/signup.spec.ts`)                                                            |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| Create a new Individual Profile › all five tests                                                                                                                                                             | Signup of a new user › visitor signs up, is held on profile completion until done, then reaches the dashboard |
+| Create a new Individual and Organization Profile › completes individual profile, should send OTP through email, should complete profile, should create organization, should allow user to invite more admins | Signup of a new user › visitor signs up with a new Organization and invites an admin to it                    |
+| Create a new Individual and Collective Profile › completes individual profile, should send OTP through email, should complete profile, should create collective, should allow user to invite more admins     | Signup of a new user › visitor signs up with a new Collective and invites an admin to it                      |
+| Create a new Individual and Organization Profile › should create active organization                                                                                                                         | Signup flows of a signed-in user › signed-in user creates an Organization managing money from the signup flow |
+| Create a new Individual and Organization Profile › should create active fiscal host                                                                                                                          | Signup flows of a signed-in user › signed-in user creates a fiscal host from the signup flow                  |
+| Create a new Individual and Collective Profile › should create collective while logged-in                                                                                                                    | Signup flows of a signed-in user › signed-in user creates a Collective from the signup flow                   |
+
+The other eleven tests map one to one, all to `Signup failures and redirections ›`:
+
+| Cypress test                                                                                                         | Playwright journey                                                            | Real API state the journey sets up                                       |
+| -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| profile completion redirects › preserves a requested path and query after completing a profile                       | completing the profile leads to the page asked for before signing up          | A real signup from `/signup?next=…`                                      |
+| signup OTP failure and redirection flows › shows a retryable error and stays on the code step when the code is wrong | a wrong code shows a retryable error and keeps the code step                  | A real wrong code                                                        |
+| … › returns to the email step when the verification session expired or is unknown                                    | an expired verification session sends the user back to the email step         | The session deleted from Redis (`expireSignupSession`)                   |
+| … › invalidates the session after three wrong codes and lets the user start over                                     | three wrong codes end the session and the same email can start over           | Three real wrong codes; the API ends the session                         |
+| … › returns to the email step when resending a code for a dead session                                               | resending a code for an expired session sends the user back to the email step | The session deleted from Redis; `page.clock` skips the 30 s countdown    |
+| … › shows an error and stays on the email step when the account already exists                                       | an email that already has an account is refused on the email step             | The `account-profile` recipe's user                                      |
+| … › shows an error and stays on the email step when signup is rate limited                                           | a rate-limited signup is refused on the email step                            | The signup budget filled in Redis (`exhaustSignupRateLimit`), then reset |
+| … › shows an error and stays on the email step when an OTP challenge is already open                                 | requesting a second code while one is open is refused on the email step       | A real open challenge, then Go Back and the same email                   |
+| … › goes back to the email step from the code step and drops the session                                             | going back from the code step returns to the email step and drops the session | A real open challenge                                                    |
+| … › restores the code step when a verification URL is loaded directly                                                | a verification link loaded directly opens the code step                       | None: the page reads the step from the URL                               |
+| … › keeps the organization flow when the verification session dies                                                   | an expired verification session keeps the Organization flow                   | A real challenge from `/signup/organization`, its session deleted        |
+
+The visitor journeys use `visitorTest` (logged out, no recipe): the attempt's
+`mail.address()` mints the new user's and the invitee's addresses, the code is
+read from the real "Email Confirmation" message (`emailedSignupCode` in
+`helpers/mail.ts`) and the invitation from the real "Invitation to join"
+message. The signed-in journeys start as the user of the `account-profile`
+recipe, the "logged-in user" the Cypress tests reached by chaining. Slugs are
+`signup-org-<attempt tag>` and `signup-collective-<attempt tag>`.
+
+Differences from Cypress:
+
+- **No reCAPTCHA mock.** Captcha is disabled outside production in both the
+  API config and the frontend (`CAPTCHA_ENABLED`), so the Cypress
+  `mockRecaptcha` is not ported.
+- **OTP rate limits are reset, not raised.** The API allows 5 signups, 5
+  code verifications and 5 resends per client IP per 15 minutes
+  (`signup_ip_*`, `verifyEmail_ip_*`, `resendOTP_ip_*`), and every journey
+  comes from the loopback address. Each journey that requests a code calls
+  `resetSignupRateLimits` first, and checks after each step that the call was
+  counted under a key it clears (`expectSignupStepTracked`). Re-runs, retries
+  and `--reuse` against a running environment are then never refused, and the
+  product limits stay in force.
+- **Failure paths hit the real API.** Cypress stubs the OTP endpoints with
+  `cy.intercept` for these, because real wrong-code sequences would spend the
+  shared per-IP budget; the stubs restate the API's responses by hand. Here
+  the budget is reset instead, wrong codes and duplicate challenges are real,
+  and expiry is reproduced in the API's own session store, so the journeys
+  check the API contract and the form together.
+- **One file, one worker.** The rate-limit journey fills the shared loopback
+  budget, which would refuse a signup running at the same time. Every signup
+  journey stays in `signup.spec.ts`, which Playwright runs in a single worker
+  (`fullyParallel: false`); the journey gives the budget back even when it
+  fails. Runs joined to the same environment (`--reuse`, `npm run e2e`) share
+  its Redis, and so the budget: each journey using the `redis` fixture holds
+  a lock in that Redis (`lockSignupBudget`, key `playwright_e2e_signup_lock`),
+  so signup journeys of concurrent runs take turns instead of refusing or
+  resetting each other's signups. The lock expires after 90 s, so a killed
+  run frees it on its own.
+- **Each code waits for its answer.** `enterCode` waits for the
+  `verify-email` response, and each wrong-code toast is dismissed before the
+  next code (`dismissToast`): an earlier identical toast still on screen does
+  not prove the next code was handled, and waiting for it to close on its own
+  would depend on its lifetime.
+  Without this, a third code overlaps the second and the API answers the
+  overlapping request without counting it.
+
+Focused reproduction:
+
+```bash
+# The seventeen journeys, fresh (the CI contract: the environment stops afterwards)
+./test/playwright/run-local.sh --spec test/playwright/specs/signup
+
+# Start or join an environment that stays running, then run again against it
+# (exercises the rate-limit reset)
+npm run e2e -- test/playwright/specs/signup/signup.spec.ts
+./test/playwright/run-local.sh --reuse --spec test/playwright/specs/signup
+```
+
+The seventeen journeys take about 18 s of Playwright time with one worker,
+repeatedly against the same running environment; the six happy paths alone
+took 10-12 s.
+
 ## Pilot coverage reconciliation
 
-Every `describe` and `it` of the two pilot Cypress files is accounted for by
+Every `describe` and `it` of the three pilot Cypress files is accounted for by
 the journey tables above. "Actions on expense › Previews a PDF attachment",
 added to Cypress (opencollective/opencollective-frontend#12558) before the
-pilot merged, was first missed and is now carried. Both files are unchanged and
-still run with Cypress. `node test/playwright/evaluation/cli.ts inventory` checks
-this inventory against both sources (see `test/playwright/evaluation/README.md`).
+pilot merged, was first missed and is now carried. The expenses and vendor files
+were deleted at adoption; `01-signup.test.ts` stays in Cypress, unchanged since
+then. `node test/playwright/evaluation/cli.ts inventory` checks this
+inventory against the three sources at the
+[rollback baseline](#required-checks-and-rollback) and the current Playwright
+specs (see `test/playwright/evaluation/README.md`).
+
+`01-signup.test.ts` (29 tests):
+
+| Cypress block                                 | Tests | Journeys | Section               |
+| --------------------------------------------- | ----- | -------- | --------------------- |
+| /signup › Create a new Individual Profile     | 5     | 1        | Signup (consolidated) |
+| /signup › Individual and Organization Profile | 7     | 3        | Signup (consolidated) |
+| /signup › Individual and Collective Profile   | 6     | 2        | Signup (consolidated) |
+| profile completion redirects                  | 1     | 1        | Signup                |
+| signup OTP failure and redirection flows      | 10    | 10       | Signup                |
 
 `27-expenses.test.ts` (29 tests):
 
@@ -1370,7 +1770,8 @@ this inventory against both sources (see `test/playwright/evaluation/README.md`)
 | Expense management           | 14            | 14                  |
 | Vendor picker                | 16            | 15                  |
 | Vendor creation and settings | 7             | 7                   |
-| Total                        | 52            | 51                  |
+| Signup                       | 29            | 17                  |
+| Total                        | 81            | 68                  |
 
 One consolidation and one partial mapping are recorded, each explained in its
 section:
@@ -1391,16 +1792,17 @@ journeys check the saved recurrence.
 
 Nothing else is left out. Steps the journeys do not repeat because the source
 does not test them (no expense is paid, no funds are added, no expected funds
-are recorded) are listed in the sections. With the six tests of the fixture,
-account and smoke specs, the Playwright selection holds 57 tests. When it held
-56, on the 8-CPU Linux VM used throughout, with retries disabled, it took 110-123 s of
+are recorded) are listed in the sections. The Playwright selection holds 76
+tests: the 68 pilot journeys, plus the fixture, account, smoke and contribution
+specs. When it held 56, before the signup journeys, on the 8-CPU Linux VM used throughout, with retries disabled, it took 110-123 s of
 Playwright time with three workers, 133 s with two and 217 s with one, after
 roughly 55 s of launcher startup on a fresh stack.
 
-## Cypress (existing suite)
+## Cypress (legacy suite)
 
-We use [Cypress](https://www.cypress.io/) for the existing E2E coverage, which
-remains required while migration proceeds.
+[Cypress](https://www.cypress.io/) runs the E2E specs not yet migrated to
+Playwright. Its shards remain required while they cover unmigrated behavior.
+Do not add new Cypress specs; write them with Playwright.
 
 ## Running the E2E tests in development environment
 

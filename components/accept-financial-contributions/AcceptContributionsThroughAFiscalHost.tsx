@@ -5,6 +5,11 @@ import { styled } from 'styled-components';
 import { Currency } from '../../lib/constants/currency';
 import type { Collective } from '../../lib/graphql/types/v2/graphql';
 import useDebounced from '../../lib/hooks/useDebounced';
+import { getDashboardRoute } from '@/lib/url-helpers';
+
+import Link from '@/components/Link';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/Alert';
+import { Button } from '@/components/ui/Button';
 
 import Container from '../Container';
 import HowToUseOpenCollective from '../fiscal-hosting/HowCanAFiscalHostHelpSection';
@@ -84,6 +89,11 @@ export default function AcceptContributionsThroughAFiscalHost(props: StartAccept
   const communityTags = selectedCommunityType.reduce((tags, community) => {
     return [...tags, ...CommunityTypesToTags[community]];
   }, []);
+
+  // An account can only have one active host: it must leave its current host before applying to a new one
+  if (props.collective.host && props.collective.isApproved) {
+    return <AlreadyHostedMessage collective={props.collective} />;
+  }
 
   return (
     <Flex px={2} my={5} alignItems="center" flexDirection="column">
@@ -204,3 +214,28 @@ export default function AcceptContributionsThroughAFiscalHost(props: StartAccept
     </Flex>
   );
 }
+
+const AlreadyHostedMessage = ({ collective }: { collective: Collective }) => (
+  <div className="mx-auto my-16 flex max-w-2xl flex-col gap-4 px-4" data-cy="afc-already-hosted">
+    <Alert>
+      <AlertTitle>
+        <FormattedMessage
+          defaultMessage="This collective is already hosted by {hostName}."
+          id="error.existingHost.description"
+          values={{ hostName: collective.host.name }}
+        />
+      </AlertTitle>
+      <AlertDescription>
+        <FormattedMessage
+          defaultMessage="To apply to a new Fiscal Host, you first need to leave your current one."
+          id="Rd3E0C"
+        />
+      </AlertDescription>
+    </Alert>
+    <Link href={getDashboardRoute(collective, 'host')} className="self-start">
+      <Button variant="outline">
+        <FormattedMessage defaultMessage="Fiscal Host settings" id="CYimbz" />
+      </Button>
+    </Link>
+  </div>
+);

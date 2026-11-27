@@ -58,6 +58,20 @@ export class Mailbox {
   }
 
   /**
+   * Waits until exactly `count` messages sent to `to` during this attempt have a subject containing
+   * `subject`, for a journey that asks the product to send the same message again.
+   */
+  async waitForMessageCount({ to, subject, count }: { to: string; subject: string; count: number }) {
+    await expect
+      .poll(async () => (await this.delivered(to, subject)).length, {
+        message: `Expected ${count} messages with a subject containing "${subject}" delivered to ${to}`,
+        timeout: 30_000,
+        intervals: [100, 250, 500],
+      })
+      .toBe(count);
+  }
+
+  /**
    * Waits for the one message sent to `to` during this attempt whose subject
    * contains `subject`. Pass the most specific subject the product sends
    * (it usually names an Account of the scenario).
@@ -123,6 +137,14 @@ export async function expenseInvitationLink(
   return link;
 }
 
+/** The verification code the product emails to someone signing up with their address `to`. */
+export async function emailedSignupCode(mail: Mailbox, { to }: { to: string }): Promise<string> {
+  const message = await mail.waitForMessage({ to, subject: 'Open Collective: Email Confirmation' });
+  const code = cheerio.load(message.html)('h3 > span').text().trim();
+  expect(code, 'The confirmation must carry a verification code').toMatch(/^[0-9A-Z]{6}$/);
+  return code;
+}
+
 /**
  * The one-click link the product emails to someone who asks to sign in with
  * their address `to`, as a path relative to the site.
@@ -130,4 +152,43 @@ export async function expenseInvitationLink(
 export async function emailedSignInLink(mail: Mailbox, { to }: { to: string }): Promise<string> {
   const message = await mail.waitForMessage({ to, subject: 'Open Collective: Sign In' });
   return linkIn(message, 'One-click Sign In');
+}
+
+/**
+ * The invitation to join `account`'s team the product emails to `to`: its text, and the link to the invitation
+ * (through sign-up for someone without an account) as a path relative to the site.
+ */
+export async function memberInvitation(
+  mail: Mailbox,
+  { to, account }: { to: string; account: { name: string } },
+): Promise<{ text: string; link: string }> {
+  const message = await mail.waitForMessage({ to, subject: `Invitation to join ${account.name} on Open Collective` });
+  const $ = cheerio.load(message.html);
+  const label = $('a').filter((_, link) =>
+    ['Sign up and view invitation', 'View invitation'].includes($(link).text().trim()),
+  );
+  const href = label.first().attr('href');
+  if (!href) {
+    throw new Error(`The message "${message.subject}" has no invitation link`);
+  }
+  const url = new URL(href);
+  return { text: $('body').text(), link: `${url.pathname}${url.search}${url.hash}` };
+}
+
+/** The link the product emails to `to` after they asked to reset their password, as a path relative to the site. */
+export async function emailedResetPasswordLink(mail: Mailbox, { to }: { to: string }): Promise<string> {
+  const message = await mail.waitForMessage({ to, subject: 'Reset Password' });
+  return linkIn(message, 'Reset your password now');
+}
+
+/**
+ * The message asking to confirm `newEmail` as the new address of an account, sent to that address, and its
+ * confirmation link as a path relative to the site.
+ */
+export async function emailChangeConfirmation(
+  mail: Mailbox,
+  { newEmail }: { newEmail: string },
+): Promise<{ text: string; link: string }> {
+  const message = await mail.waitForMessage({ to: newEmail, subject: `Confirm your email ${newEmail}` });
+  return { text: cheerio.load(message.html)('body').text(), link: linkIn(message, 'Confirm Email') };
 }

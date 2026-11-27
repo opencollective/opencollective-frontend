@@ -109,7 +109,6 @@ type PaymentMethodListProps = {
   stepSummary: object;
   stepDetails: { amount: number; currency: string; interval?: string };
   stepPayment: { key: string; isKeyOnly?: boolean; chargeAttempt: number };
-  isEmbed: boolean;
   isSubmitting: boolean;
   hideCreditCardPostalCode: boolean;
   onNewCardFormReady: () => void;
@@ -154,7 +153,6 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
       props.stepDetails,
       props.stepSummary,
       props.toAccount,
-      props.isEmbed,
       props.disabledPaymentMethodTypes,
       paymentIntent,
     ) as any[];
@@ -164,7 +162,6 @@ export default function PaymentMethodList(props: PaymentMethodListProps) {
     props.stepDetails,
     props.stepSummary,
     props.toAccount,
-    props.isEmbed,
     props.disabledPaymentMethodTypes,
     paymentIntent,
     intl,

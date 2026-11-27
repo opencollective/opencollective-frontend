@@ -4,6 +4,7 @@ import { LOCAL_STORAGE_KEYS } from '../../../lib/local-storage';
 
 import { attemptTag } from '../helpers/attempt';
 import { Mailbox } from '../helpers/mail';
+import { lockSignupBudget, RedisStore, SIGNUP_LOCK_WAIT_MS } from '../helpers/redis';
 
 import {
   FixtureRecipes,
@@ -32,15 +33,25 @@ const sessionCookies = (session: string, baseURL: string) => {
   ];
 };
 
+type Cookie = ReturnType<typeof sessionCookies>[number];
+
+/** Tag of journeys that pay through live Stripe test mode: see "Live Stripe journeys" in docs/e2e.md. */
+export const STRIPE_TAG = '@stripe';
+
 /** Browser storage of a visitor signed in with this session token, or of a logged-out visitor. */
-const storageFor = (session: string | null, baseURL: string) => ({
-  cookies: session ? sessionCookies(session, baseURL) : [],
+const storageFor = (session: string | null, baseURL: string, extraCookies: Cookie[] = []) => ({
+  cookies: [...(session ? sessionCookies(session, baseURL) : []), ...extraCookies],
   origins: session
     ? [{ origin: new URL(baseURL).origin, localStorage: [{ name: LOCAL_STORAGE_KEYS.ACCESS_TOKEN, value: session }] }]
     : [],
 });
 
-const authored = base.extend<{ recipes: FixtureRecipes; session: string | null; mail: Mailbox }>({
+const authored = base.extend<{
+  recipes: FixtureRecipes;
+  session: string | null;
+  mail: Mailbox;
+  stripeCookies: Cookie[];
+}>({
   // eslint-disable-next-line no-empty-pattern -- Playwright declares fixture dependencies through destructuring.
   recipes: async ({}, provide, testInfo) => {
     const recipes = new FixtureRecipes(testInfo);
@@ -53,8 +64,46 @@ const authored = base.extend<{ recipes: FixtureRecipes; session: string | null; 
   },
   /** Session token the browser starts with; `null` starts logged out. Derived by the test flavours below. */
   session: null,
-  storageState: async ({ session, baseURL }, provide) => {
-    await provide(storageFor(session, baseURL));
+  /**
+   * For tests tagged `@stripe`: the cookie that makes the Stripe objects the API creates for this attempt its
+   * own, so the webhooks about them reach the handlers. Retires the attempt afterwards (its late events are
+   * then dropped) and attaches what it owned. Fails when the launcher did not verify live Stripe.
+   */
+  stripeCookies: async ({ recipes, baseURL }, provide, testInfo) => {
+    if (!testInfo.tags.includes(STRIPE_TAG)) {
+      await provide([]);
+      return;
+    }
+    if (process.env.PLAYWRIGHT_STRIPE !== 'verified') {
+      throw new Error(
+        `${STRIPE_TAG} journeys need live Stripe test mode, which the launcher did not verify ` +
+          `(PLAYWRIGHT_STRIPE=${process.env.PLAYWRIGHT_STRIPE || 'unset'}). Run them through npm run e2e with ` +
+          'STRIPE_WEBHOOK_KEY and the Stripe CLI (docs/e2e.md, "Live Stripe journeys").',
+      );
+    }
+    // A live provider answers every step, and a webhook decides the outcome: give them twice the time
+    testInfo.setTimeout(testInfo.timeout * 2);
+    const { hostname } = new URL(baseURL);
+    await provide([
+      {
+        name: 'oc_e2e_attempt',
+        value: recipes.stripeAttemptCookie,
+        domain: hostname,
+        path: '/',
+        expires: -1,
+        httpOnly: true,
+        secure: false,
+        sameSite: 'Lax',
+      },
+    ]);
+    const ownership = await recipes.retireStripeAttempt();
+    await testInfo.attach('stripe-ownership', {
+      body: JSON.stringify(ownership, null, 2),
+      contentType: 'application/json',
+    });
+  },
+  storageState: async ({ session, baseURL, stripeCookies }, provide) => {
+    await provide(storageFor(session, baseURL, stripeCookies));
   },
   /** This attempt's view of the shared inbox: see `helpers/mail.ts`. */
   mail: async ({ recipes }, provide, testInfo) => {
@@ -65,6 +114,32 @@ const authored = base.extend<{ recipes: FixtureRecipes; session: string | null; 
       await testInfo.attach('mail-timings', { body: JSON.stringify(mail.timings), contentType: 'application/json' });
     }
   },
+});
+
+/**
+ * Journeys of a logged-out visitor that need no arranged data, such as signing up: the attempt's `mail`
+ * mints the addresses the journey owns, and `redis` reaches the API's rate-limit counters (`helpers/redis.ts`).
+ * A journey using `redis` holds the signup lock throughout, so signup journeys of runs joined to the same
+ * environment take turns; waiting for it has its own timeout, not the test's.
+ */
+export const visitorTest = authored.extend<{ redis: RedisStore }>({
+  redis: [
+    // eslint-disable-next-line no-empty-pattern -- Playwright declares fixture dependencies through destructuring.
+    async ({}, provide) => {
+      const redis = await RedisStore.connect();
+      try {
+        const unlock = await lockSignupBudget(redis);
+        try {
+          await provide(redis);
+        } finally {
+          await unlock();
+        }
+      } finally {
+        await redis.disconnect();
+      }
+    },
+    { timeout: SIGNUP_LOCK_WAIT_MS + 10_000 },
+  ],
 });
 
 /** Journeys of one user administering one unhosted Account; select the recipe with `test.use({ recipe })`. */
@@ -124,11 +199,11 @@ export const scenarioTest = <R extends GraphRecipe>(recipe: R, defaults: { input
     session: async ({ scenario, actor }, provide) => {
       await provide(sessionOf(recipe, scenario, actor));
     },
-    openBrowserAs: async ({ browser, scenario, baseURL }, provide) => {
+    openBrowserAs: async ({ browser, scenario, baseURL, stripeCookies }, provide) => {
       const contexts: BrowserContext[] = [];
       await provide(async actor => {
         const context = await browser.newContext({
-          storageState: storageFor(sessionOf(recipe, scenario, actor), baseURL),
+          storageState: storageFor(sessionOf(recipe, scenario, actor), baseURL, stripeCookies),
         });
         contexts.push(context);
         return context.newPage();

@@ -28,8 +28,8 @@ const StyledContributeCard = styled.div`
   flex: 0 0 ${CONTRIBUTE_CARD_WIDTH}px;
   height: 100%;
   border-radius: ${CONTRIBUTE_CARD_BORDER_RADIUS}px;
-  border: 1px solid #dcdee0;
-  background: white;
+  border: 1px solid ${props => props.theme.colors.black[300]};
+  background: ${props => props.theme.colors.white.full};
   transition:
     border-color 0.2s,
     box-shadow 0.2s,
@@ -82,8 +82,7 @@ const Description = styled.div`
   height: 100%;
   flex: 1 1;
 
-  /* Neutral Tints / 700 */
-  color: #4e5052;
+  color: ${props => props.theme.colors.black[700]};
 `;
 
 const MissingCTAExplanation = styled(Description)`
@@ -234,7 +233,7 @@ const ContributeCard = ({
           position="absolute"
           bottom="8px"
           left="16px"
-          background="white"
+          background="white.full"
           color="black.700"
           fontWeight="700"
           letterSpacing="0.06em"
@@ -283,7 +282,7 @@ const ContributeCard = ({
                   >
                     {getFooterHeading(type)}
                   </P>
-                  <StyledHr flex="1" borderStyle="solid" borderColor="#DCDEE0" />
+                  <StyledHr flex="1" borderStyle="solid" borderColor="black.300" />
                 </Flex>
               </React.Fragment>
               {totalContributors === 0 ? (

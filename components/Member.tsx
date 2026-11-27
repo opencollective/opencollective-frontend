@@ -46,6 +46,7 @@ type MemberAccount = {
   name?: string;
   description?: string;
   company?: string;
+  isIncognito?: boolean;
   user?: { email?: string };
   /** Present on member entries: the account of the member */
   member?: MemberAccount;
@@ -98,7 +99,11 @@ class Member extends React.Component<MemberProps> {
     const membership: MemberMembership = { ...this.props.member };
     membership.collective = collective;
     const { member, description } = membership;
-    const viewMode = this.props.viewMode || (get(member, 'type') === 'USER' ? 'USER' : 'ORGANIZATION');
+    // An anonymous member (hidden account) has no profile to link to: never render it as a linked card
+    const isAnonymous = Boolean(member.isIncognito && !member.slug);
+    const viewMode = isAnonymous
+      ? 'USER'
+      : this.props.viewMode || (get(member, 'type') === 'USER' ? 'USER' : 'ORGANIZATION');
     const user = member.user || {};
     const name =
       (member.name && member.name.match(/^null/) ? null : member.name) ||

@@ -33,7 +33,7 @@ import PayoutMethodData from './PayoutMethodData';
 import PayoutMethodTypeWithIcon from './PayoutMethodTypeWithIcon';
 
 const PrivateInfoColumn = styled(Box).attrs({ flexBasis: [0, '185px'] })`
-  background: #f9fafb;
+  background: var(--color-gray-50);
   border-radius: 8px;
   padding: 16px;
   flex: 1 1;

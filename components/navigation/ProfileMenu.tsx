@@ -67,7 +67,7 @@ const MenuItem = ({
     Icon = ProfileMenuIconsMap[Icon as keyof typeof ProfileMenuIconsMap];
   }
   const classes = cn(
-    'group mx-2 flex h-9 items-center justify-between gap-2 overflow-hidden rounded-md px-2 text-left text-sm hover:bg-primary-foreground',
+    'group mx-2 flex h-9 items-center justify-between gap-2 overflow-hidden rounded-md px-2 text-left text-sm hover:bg-accent',
     className,
   );
   const content = (

@@ -1,6 +1,6 @@
 import React from 'react';
 import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
-import { find, get, pick, sortBy, uniqBy } from 'lodash-es';
+import { find, get, isNil, pick, sortBy, uniqBy } from 'lodash-es';
 import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
@@ -60,7 +60,6 @@ export const generatePaymentMethodOptions = (
       manualPaymentProviders?: unknown[];
     };
   },
-  isEmbed: boolean,
   disabledPaymentMethodTypes: string[],
   paymentIntent?: {
     payment_method_types?: string[];
@@ -72,7 +71,6 @@ export const generatePaymentMethodOptions = (
   const hostHasPaypal = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.PAYPAL);
   const hostHasStripe = supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.CREDIT_CARD);
   const totalAmount = getTotalAmount(stepDetails, stepSummary);
-  const interval = get(stepDetails, 'interval', null);
 
   type PaymentMethodOption = {
     id?: string;
@@ -241,23 +239,6 @@ export const generatePaymentMethodOptions = (
       });
     }
 
-    if (
-      interval === INTERVALS.oneTime &&
-      !isEmbed &&
-      supportedPaymentMethods.includes(GQLV2_SUPPORTED_PAYMENT_METHOD_TYPES.ALIPAY) &&
-      !disabledPaymentMethodTypes?.includes(PAYMENT_METHOD_TYPE.ALIPAY)
-    ) {
-      uniquePMs.push({
-        key: 'alipay',
-        paymentMethod: {
-          service: PAYMENT_METHOD_SERVICE.STRIPE,
-          type: PAYMENT_METHOD_TYPE.ALIPAY,
-        },
-        title: 'Alipay',
-        icon: getPaymentMethodIcon({ service: PAYMENT_METHOD_SERVICE.STRIPE, type: PAYMENT_METHOD_TYPE.ALIPAY }),
-      });
-    }
-
     // Manual payment providers
     const manualPaymentProviders = get(collective, 'host.manualPaymentProviders', []) as Array<{
       id?: string;
@@ -410,8 +391,8 @@ export const getRequiredInformation = (stepProfile, stepDetails, collective, pro
     legalName:
       tier?.requireAddress ||
       tier?.type === TierTypes.TICKET ||
-      (thresholds?.legalName ? totalAmount >= thresholds?.legalName : false),
-    address: tier?.requireAddress || (thresholds?.address ? totalAmount >= thresholds?.address : false),
+      (!isNil(thresholds?.legalName) && totalAmount >= thresholds.legalName),
+    address: tier?.requireAddress || (!isNil(thresholds?.address) && totalAmount >= thresholds.address),
   };
 };
 

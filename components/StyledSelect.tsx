@@ -291,7 +291,9 @@ export const makeStyledSelect = (SelectComponent, { alwaysSearchable = false } =
 
           if (state.data.__background__) {
             // Ability to force background by setting a special option prop
-            customStyles.background = state.data.__background__;
+            // `white` is mapped to the theme surface so that it adapts to dark mode
+            customStyles.background =
+              state.data.__background__ === 'white' ? theme.colors.white.full : state.data.__background__;
             // Interactive content (e.g. create buttons) uses isDisabled to prevent selection
             // but should not inherit react-select's greyed-out disabled styling
             if (state.isDisabled) {

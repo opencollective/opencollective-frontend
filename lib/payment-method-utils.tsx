@@ -1,6 +1,5 @@
 import React from 'react';
 import { Bank } from '@styled-icons/boxicons-solid/Bank';
-import { Alipay } from '@styled-icons/fa-brands/Alipay';
 import { ApplePay } from '@styled-icons/fa-brands/ApplePay';
 import { GooglePay } from '@styled-icons/fa-brands/GooglePay';
 import { ExchangeAlt } from '@styled-icons/fa-solid/ExchangeAlt';
@@ -44,8 +43,6 @@ export const getPaymentMethodIcon = (pm, collective = undefined, size = undefine
     return <Avatar collective={collective} size={size || '3.6rem'} />;
   } else if (type === PAYMENT_METHOD_TYPE.MANUAL) {
     return <ExchangeAlt color="#c9ced4" size={size || '1.5em'} />;
-  } else if (type === PAYMENT_METHOD_TYPE.ALIPAY) {
-    return <Alipay width="26px" height="18px" color="#c9ced4" size={size || '1.5em'} />;
   } else if (
     [
       PAYMENT_METHOD_TYPE.US_BANK_ACCOUNT,
