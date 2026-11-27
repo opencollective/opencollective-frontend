@@ -28,7 +28,8 @@ function getCurrencySymbolFallback(currency: Currency): string {
 
 export function getCurrencyForCountry(countryISO: string): Currency {
   const country = CurrencyToCountry.find(c => c.countryISO === countryISO);
-  return country ? (country.currencyISO as Currency) : Currency.USD;
+  // Some countries use a currency the platform does not support (e.g. JOD); fall back to USD for those
+  return country && country.currencyISO in Currency ? (country.currencyISO as Currency) : Currency.USD;
 }
 
 export function getCurrencySymbol(currency: Currency): string {

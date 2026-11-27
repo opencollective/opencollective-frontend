@@ -9,7 +9,7 @@ import { withRequiredProviders } from '../../../test/providers';
 import type { ExpenseForm } from '../useExpenseForm';
 import { RecurrenceFrequencyOption } from '../useExpenseForm';
 
-import { RecurrenceOptionBox } from './SummarySection';
+import { RecurrenceOptionBox, SummarySectionContent } from './SummarySection';
 
 // Replace Radix UI Select with a plain <select> for reliable jsdom interaction
 jest.mock('../../ui/Select', () => {
@@ -198,5 +198,35 @@ describe('RecurrenceOptionBox', () => {
     renderBox({ isSubmitting: true });
 
     expect(screen.getByRole('button', { name: 'Edit recurrence frequency' })).toBeDisabled();
+  });
+});
+
+describe('SummarySectionContent invitee', () => {
+  const formWithInvitee = invitee =>
+    ({
+      values: { recurrenceFrequency: RecurrenceFrequencyOption.NONE, expenseItems: [], title: 'Some title' },
+      options: {
+        invitee,
+        payee: null,
+        expenseCurrency: 'USD',
+        totalInvoicedInExpenseCurrency: 0,
+        canSetupRecurrence: false,
+      },
+      touched: {},
+      errors: {},
+    }) as unknown as ExpenseForm;
+
+  it('shows the name of an invited organization', () => {
+    const invitee = { name: 'Jane', email: 'jane@acme.test', organization: { name: 'Acme', slug: 'acme' } };
+    render(withRequiredProviders(<SummarySectionContent form={formWithInvitee(invitee)} />));
+    expect(screen.getByText('Acme')).toBeInTheDocument();
+    expect(screen.getAllByText('Jane')).toHaveLength(1);
+  });
+
+  it('does not show an organization for an individual invitee', () => {
+    render(
+      withRequiredProviders(<SummarySectionContent form={formWithInvitee({ name: 'Jane', email: 'jane@x.test' })} />),
+    );
+    expect(screen.getAllByText('Jane')).toHaveLength(1);
   });
 });

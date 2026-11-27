@@ -459,7 +459,8 @@ const VendorOption = React.memo(function VendorOption(props: {
   const isVendorSelected =
     isPickingVendor ||
     props.vendorsForAccount.some(v => v.slug === props.payeeSlug) ||
-    selectedVendor?.slug === props.payeeSlug;
+    selectedVendor?.slug === props.payeeSlug ||
+    (props.payee?.type === CollectiveType.VENDOR && props.payee.slug === props.payeeSlug);
 
   return (
     <RadioGroupCard
@@ -480,7 +481,9 @@ const VendorOption = React.memo(function VendorOption(props: {
             includeVendorsForHostId={props.host.legacyId}
             disabled={props.isSubmitting}
             defaultCollectives={props.vendorsForAccount}
-            collective={isPickingVendor ? null : selectedVendor || props.payee}
+            collective={
+              isPickingVendor ? null : selectedVendor?.slug === props.payeeSlug ? selectedVendor : props.payee
+            }
             {...(isHostAdmin
               ? quickCreateVendorCollectivePickerOptions(createVendorFromSearch, { isBeneficiary })
               : {})}

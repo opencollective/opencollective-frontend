@@ -446,14 +446,21 @@ const clearUnavailableCategory: Rule = {
   name: 'clearUnavailableCategory',
   dependencies: ({ values, options, context }) => [
     options.accountingCategories,
+    options.host?.slug,
     values.accountingCategoryId,
     context.phase,
   ],
-  run: ({ values, options, context }) => {
+  run: ({ values, options, previousOptions, context }) => {
     // Wait for the categories to load
-    if (context.phase !== 'ready') {
+    if (context.phase !== 'ready' || !values.accountingCategoryId) {
       return;
-    } else if (values.accountingCategoryId && (options.accountingCategories || []).length === 0) {
+    }
+
+    // Only check the category against the list after a host change: the list leaves out the host-only
+    // categories for non-admins, so it may not have the category of an expense being edited
+    const categories = options.accountingCategories || [];
+    const hostChanged = Boolean(previousOptions?.host) && previousOptions.host.slug !== options.host?.slug;
+    if (!categories.length || (hostChanged && !categories.some(c => c.id === values.accountingCategoryId))) {
       return { values: { ...values, accountingCategoryId: null } };
     }
   },

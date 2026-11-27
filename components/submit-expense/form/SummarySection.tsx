@@ -517,9 +517,9 @@ const WhoIsGettingPaidSummarySection = React.memo(function WhoIsGettingPaidSumma
             <div className="mt-2 flex items-center gap-2">
               <Mail size={14} /> {props.invitee.email || <Skeleton className="h-3.5 w-full" />}
             </div>
-            {'name' in props.invitee && props.invitee.name && (
+            {'organization' in props.invitee && props.invitee.organization?.name && (
               <div className="mt-2 flex items-center gap-2">
-                <Building size={14} /> {props.invitee.name}
+                <Building size={14} /> {props.invitee.organization.name}
               </div>
             )}
             {'organization' in props.invitee && props.invitee.organization.slug && (

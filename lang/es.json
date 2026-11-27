@@ -4527,6 +4527,7 @@
   "uagR7O": "{entityType, select, expense{El gasto} contribution{La colaboración} other{La entidad}} en sí NO se eliminará ni se modificará.",
   "UAwtXh": "¿Dónde residen tus colaboradores financieros?",
   "ub/vNK": "<Individual></Individual> aprobó <Expense>{expenseDescription}</Expense>",
+  "ubxQF3": "This vendor doesn't have a saved payout method. Add one below and save it before submitting the expense.",
   "UCmj6i": "Cualquiera que no sea el Administrador del Anfitrión",
   "ucWzrM": "Si ya tienes una cuenta o quieres contribuir como organización, <SignInLink>inicia sesión</SignInLink>.",
   "ud3Qe6": "Próximo intento de carga",

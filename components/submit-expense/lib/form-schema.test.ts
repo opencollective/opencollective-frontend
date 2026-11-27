@@ -5,8 +5,8 @@ import { set } from 'lodash-es';
 import { createIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { Currency, ExpenseType } from '../../../lib/graphql/types/v2/graphql';
-import { PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_EXISTING_USER } from '../../expenses/lib/constants';
+import { Currency, ExpenseType, PayoutMethodType } from '../../../lib/graphql/types/v2/graphql';
+import { NEW_PAYOUT_METHOD_ID, PAYEE_SLUG_INVITE, PAYEE_SLUG_INVITE_EXISTING_USER } from '../../expenses/lib/constants';
 
 import { getCustomZodErrorMap } from '../../FormikZod';
 
@@ -131,6 +131,26 @@ describe('buildFormSchema', () => {
 
   it('rejects a payout method that is not one of the payee', () => {
     expect(errorsFor(options(), validInvoice({ payoutMethodId: 'pm-other' }))).toEqual({ payoutMethodId: 'Required' });
+  });
+
+  it('rejects an unsaved payout method for a vendor that has none, even for host admins', () => {
+    // The API does not use an unsaved payout method for a vendor: saving it first is required
+    const vendor = {
+      slug: 'vendor',
+      type: CollectiveType.VENDOR,
+      hasPayoutMethod: false,
+      payoutMethods: [],
+    } as unknown as ExpenseFormOptions['payee'];
+    const values = validInvoice({
+      payeeSlug: 'vendor',
+      payoutMethodId: NEW_PAYOUT_METHOD_ID,
+      newPayoutMethod: { type: PayoutMethodType.OTHER, data: { currency: 'USD', content: 'Pay by cheque' } },
+    });
+    for (const isHostAdmin of [true, false]) {
+      expect(errorsFor(options({ payee: vendor, isAdminOfPayee: false, isHostAdmin }), values)).toEqual({
+        payoutMethodId: 'Required',
+      });
+    }
   });
 
   describe('invitees', () => {

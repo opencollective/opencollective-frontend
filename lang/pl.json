@@ -4527,6 +4527,7 @@
   "uagR7O": "The {entityType, select, expense{expense} contribution{contribution} other{entity}} itself will NOT be deleted or modified.",
   "UAwtXh": "Gdzie są Twoi współpracownicy finansowi?",
   "ub/vNK": "<Individual></Individual> approved <Expense>{expenseDescription}</Expense>",
+  "ubxQF3": "This vendor doesn't have a saved payout method. Add one below and save it before submitting the expense.",
   "UCmj6i": "Każdy oprócz Administratora Gospodarza",
   "ucWzrM": "Jeśli masz już konto lub chcesz wnieść swój wkład jako organizacja, <SignInLink>Zaloguj się</SignInLink>.",
   "ud3Qe6": "Next charge attempt",
