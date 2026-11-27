@@ -29,6 +29,7 @@ import { setGuestToken } from '../../lib/guest-accounts';
 import type LoggedInUser from '../../lib/LoggedInUser';
 import { getStripe, stripeTokenToPaymentMethod } from '../../lib/stripe';
 import { confirmPayment } from '../../lib/stripe/confirm-payment';
+import { isPaymentIntentAwaitingMicrodepositVerification } from '../../lib/stripe/microdeposits';
 import { getDefaultInterval, getDefaultTierAmount, getTierMinAmount, isFixedContribution } from '../../lib/tier-utils';
 import { followOrderRedirectUrl, getCollectivePageRoute } from '../../lib/url-helpers';
 import { reportValidityHTML5 } from '../../lib/utils';
@@ -522,14 +523,22 @@ class ContributionFlow extends React.Component<ContributionFlowProps, Contributi
       }
 
       try {
-        await confirmPayment(stripeData?.stripe, stripeData?.paymentIntentClientSecret, {
+        const paymentIntent = await confirmPayment(stripeData?.stripe, stripeData?.paymentIntentClientSecret, {
           returnUrl: returnUrl.href,
           elements: stripeData?.elements,
           type: stepPayment.paymentMethod?.type as Parameters<typeof confirmPayment>[2]['type'],
           paymentMethodId: stepPayment.paymentMethod?.data?.stripePaymentMethodId,
         });
         this.setState({ isSubmitted: true, isSubmitting: false });
-        return this.handleSuccess(order);
+        // Confirming a bank account without a redirect can leave the payment waiting for microdeposit
+        // verification: pass the payment intent to the success page so it can show the instructions.
+        const pendingPaymentIntent = isPaymentIntentAwaitingMicrodepositVerification(paymentIntent)
+          ? {
+              clientSecret: stripeData?.paymentIntentClientSecret,
+              stripeAccount: (stripeData?.stripe as { stripeAccount?: string })?.stripeAccount,
+            }
+          : null;
+        return this.handleSuccess(order, pendingPaymentIntent);
       } catch (e) {
         this.setState({
           isSubmitting: false,
@@ -573,18 +582,32 @@ class ContributionFlow extends React.Component<ContributionFlowProps, Contributi
     }
   };
 
-  handleSuccess = async order => {
+  handleSuccess = async (
+    order,
+    pendingPaymentIntent: { clientSecret: string; stripeAccount?: string } | null = null,
+  ) => {
     this.setState({ isSubmitted: true, isSubmitting: false });
     this.props.refetchLoggedInUser(); // to update memberships
     const queryParams = this.getQueryParams();
     this.props.onSuccess?.(order);
-    if (isValidExternalRedirect(queryParams.redirect)) {
+    // While the bank account awaits verification, stay on the success page so the contributor sees the instructions.
+    if (!pendingPaymentIntent && isValidExternalRedirect(queryParams.redirect)) {
       followOrderRedirectUrl(this.props.router, this.props.collective, order, queryParams.redirect, {
         shouldRedirectParent: Boolean(queryParams.shouldRedirectParent),
       });
     } else {
       const email = this.state.stepProfile?.email;
-      return this.pushStepRoute('success', { replace: false, query: { OrderId: order.id, email } });
+      return this.pushStepRoute('success', {
+        replace: false,
+        query: {
+          OrderId: order.id,
+          email,
+          /* eslint-disable camelcase */
+          payment_intent_client_secret: pendingPaymentIntent?.clientSecret,
+          stripeAccount: pendingPaymentIntent?.stripeAccount,
+          /* eslint-enable camelcase */
+        },
+      });
     }
   };
 
