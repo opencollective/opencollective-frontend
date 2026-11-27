@@ -5853,6 +5853,11 @@ input PaymentMethodReferenceInput {
   The id assigned to the payment method (ie: pm_xxxxxxxx)
   """
   id: String
+
+  """
+  The internal id of the payment method (ie: 4242)
+  """
+  legacyId: Int
 }
 
 input PayoutMethodReferenceInput {
@@ -6049,6 +6054,7 @@ enum ActivityType {
   CONTRIBUTION_REJECTED
   CONTRIBUTION_REFUNDED
   CONTRIBUTOR_REMOVED_BY_HOST
+  CONTRIBUTOR_INFO_REQUESTED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CANCELED
   SUBSCRIPTION_PAUSED
@@ -8183,6 +8189,11 @@ type CommunityStats {
     """
     type: CommunityTransactionType!
   ): TimeSeriesAmount!
+
+  """
+  Legal name and address information requested by the host and not provided yet
+  """
+  pendingContributorInfoRequest: PendingContributorInfoRequest
   activities(
     """
     The number of results to fetch (default 10, max 1000)
@@ -8220,6 +8231,46 @@ enum CommunityTransactionType {
   CREDIT
   DEBIT
   REFUND_DEBIT
+}
+
+"""
+Information a fiscal host requested from an account that was not provided yet
+"""
+type PendingContributorInfoRequest {
+  """
+  Date of the latest request with pending information
+  """
+  requestedAt: DateTime!
+  fields: [ContributorInfoField!]!
+
+  """
+  The parts of the address still to correct. Empty when the whole address is pending.
+  """
+  addressFields: [ContributorInfoAddressField!]!
+}
+
+"""
+Information a fiscal host can request from a contributor
+"""
+enum ContributorInfoField {
+  LEGAL_NAME
+  ADDRESS
+}
+
+"""
+Part of an address a fiscal host can ask a contributor to correct
+"""
+enum ContributorInfoAddressField {
+  ADDRESS_LINE1
+  ADDRESS_LINE2
+  CITY
+  POSTAL_CODE
+
+  """
+  State, province or region
+  """
+  ZONE
+  COUNTRY
 }
 
 """
@@ -20541,7 +20592,7 @@ type Query {
     includeVendorsForHost: AccountReferenceInput
 
     """
-    Filter by the balance of the account and its children accounts (events and projects)
+    Filter by the balance of the account and its children accounts (events and projects), compared in USD: balances and bounds are converted from their currency
     """
     consolidatedBalance: AmountRangeInput
 
@@ -21826,6 +21877,16 @@ type Query {
   ): [OffPlatformTransactionsInstitution!]!
   loggedInAccount: Individual
   me: Individual
+
+  """
+  Get a payment method by reference. Returns null if it does not exist or if the logged in user is not an admin of the account that owns it. Scope: "orders".
+  """
+  paymentMethod(
+    """
+    Identifiers to retrieve the payment method
+    """
+    paymentMethod: PaymentMethodReferenceInput!
+  ): PaymentMethod
   platformSubscriptionTiers: [PlatformSubscriptionTier]
 }
 
@@ -23174,6 +23235,7 @@ enum ActivityAndClassesType {
   CONTRIBUTION_REJECTED
   CONTRIBUTION_REFUNDED
   CONTRIBUTOR_REMOVED_BY_HOST
+  CONTRIBUTOR_INFO_REQUESTED
   SUBSCRIPTION_ACTIVATED
   SUBSCRIPTION_CANCELED
   SUBSCRIPTION_PAUSED
@@ -28190,16 +28252,6 @@ type Mutation {
   ): PlaidConnectAccountResponse!
 
   """
-  Manually request a sync for Plaid account
-  """
-  syncPlaidAccount(
-    """
-    The connected account to refresh
-    """
-    connectedAccount: ConnectedAccountReferenceInput!
-  ): TransactionsImport! @deprecated(reason: "2025-07-23: Use `syncTransactionsImport` instead")
-
-  """
   Refresh the list of sub-accounts & other metadata by re-fetching the account info
   """
   refreshPlaidAccount(
@@ -29035,6 +29087,11 @@ type Mutation {
     """
     agreement: AgreementReferenceInput!
   ): Agreement!
+
+  """
+  Email an individual or organization to add or correct its legal name and/or address. Scope: "host".
+  """
+  requestContributorInfo(input: RequestContributorInfoInput!): Boolean!
 
   """
   Add or update a host-private note about an account. Scope: "host".
@@ -31871,6 +31928,33 @@ input AgreementReferenceInput {
   The internal id of the agreement (ie: 580)
   """
   legacyId: Int @deprecated(reason: "2026-02-25: use id")
+}
+
+input RequestContributorInfoInput {
+  """
+  The fiscal host requesting the information
+  """
+  host: AccountReferenceInput!
+
+  """
+  The individual or organization to request the information from
+  """
+  account: AccountReferenceInput!
+
+  """
+  The information to add or correct
+  """
+  fields: [ContributorInfoField!]!
+
+  """
+  With ADDRESS only: the parts of the address to correct. Empty for the whole address.
+  """
+  addressFields: [ContributorInfoAddressField!]
+
+  """
+  An optional plain text message included in the email
+  """
+  message: String
 }
 
 input SetFiscalHostNoteInput {
