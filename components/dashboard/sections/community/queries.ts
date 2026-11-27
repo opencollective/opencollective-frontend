@@ -221,6 +221,7 @@ export const communityAccountDetailQuery = gql`
         id
         country
         address
+        structured
       }
       isArchived
       spamExpenses: expenses(status: [SPAM], direction: SUBMITTED, host: { slug: $hostSlug }) {

@@ -16,6 +16,7 @@ import Link from '../../../Link';
 import StyledLink from '../../../StyledLink';
 import { Skeleton } from '../../../ui/Skeleton';
 import { getActivityVariables } from '../ActivityLog/ActivityDescription';
+import { ADDRESS_PARTS, RequestedContributorInfoList } from '../community/RequestContributorInfoModal';
 
 dayjs.extend(relativeTime);
 
@@ -32,8 +33,28 @@ const ActivityContent = ({
   contentKey,
 }: {
   activity: TimelineActivity;
-  contentKey?: 'conversation' | 'update' | 'fiscalHostNote';
+  contentKey?: 'conversation' | 'update' | 'fiscalHostNote' | 'contributorInfoRequest';
 }) => {
+  if (contentKey === 'contributorInfoRequest') {
+    // Only manual requests from the host expose their details (`sanitizeActivityData`)
+    const entry = (activity?.data?.hosts as { missingFields?: string[]; addressParts?: string[] }[])?.[0];
+    const message = activity?.data?.message as string | undefined;
+    if (!activity?.data?.isManual || !entry) {
+      return null;
+    }
+
+    const addressParts = ADDRESS_PARTS.filter(part => entry.addressParts?.includes(part.key));
+    return (
+      <div className="mt-4 space-y-2 rounded-xl bg-slate-50 p-4 text-sm">
+        <RequestedContributorInfoList
+          legalName={Boolean(entry.missingFields?.includes('legalName'))}
+          address={Boolean(entry.missingFields?.includes('address'))}
+          addressParts={addressParts}
+        />
+        {message && <p className="whitespace-pre-line text-muted-foreground">{message}</p>}
+      </div>
+    );
+  }
   if (contentKey === 'fiscalHostNote') {
     const note = activity?.data?.note as string | undefined;
     if (!note) {

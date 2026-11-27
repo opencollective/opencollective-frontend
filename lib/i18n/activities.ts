@@ -5,7 +5,7 @@ import type { ActivityTypes } from '../constants/activities';
 
 interface TimelineMessageDescriptor extends MessageDescriptor {
   avatar?: 'fromAccount' | 'account' | 'individual'; // Used to determine which avatar to display (default is Individual)
-  content?: 'update' | 'conversation' | 'fiscalHostNote'; // Used to determine which content card to display
+  content?: 'update' | 'conversation' | 'fiscalHostNote' | 'contributorInfoRequest'; // Used to determine which content card to display
 }
 
 export const ActivityTimelineMessageI18n = defineMessages<string, TimelineMessageDescriptor>({
@@ -224,6 +224,11 @@ export const ActivityTimelineMessageI18n = defineMessages<string, TimelineMessag
     defaultMessage: '<Individual></Individual> removed a fiscal host note on <FromAccount></FromAccount>',
     id: 'FiscalHostNote.Activity.Removed',
   },
+  CONTRIBUTOR_INFO_REQUESTED: {
+    defaultMessage: 'Information requested from <FromAccount></FromAccount>',
+    id: 'ContributorInfoRequested.Activity.Message',
+    content: 'contributorInfoRequest',
+  },
 });
 
 export const ActivityDescriptionI18n = defineMessages({
@@ -248,6 +253,10 @@ export const ActivityDescriptionI18n = defineMessages({
   FISCAL_HOST_NOTE_REMOVED: {
     defaultMessage: 'Fiscal host note removed from <FromAccount></FromAccount>',
     id: 'FiscalHostNote.Activity.RemovedDescription',
+  },
+  CONTRIBUTOR_INFO_REQUESTED: {
+    defaultMessage: 'Information requested from <FromAccount></FromAccount>',
+    id: 'ContributorInfoRequested.Activity.Message',
   },
   COLLECTIVE_CONVERTED_TO_ORGANIZATION: {
     defaultMessage: '<Account></Account> converted to Organization',
@@ -684,6 +693,10 @@ export const ActivityTypeI18n: ActivityTranslations = defineMessages({
   FISCAL_HOST_NOTE_REMOVED: {
     id: 'FiscalHostNote.Activity.TypeRemoved',
     defaultMessage: 'Fiscal host note removed',
+  },
+  CONTRIBUTOR_INFO_REQUESTED: {
+    id: 'ContributorInfoRequested.Activity.Type',
+    defaultMessage: 'Contributor information requested',
   },
   ACTIVITY_ALL: {
     id: 'WebhookEvents.All',

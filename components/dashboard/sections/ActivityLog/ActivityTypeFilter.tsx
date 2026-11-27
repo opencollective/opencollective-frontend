@@ -19,6 +19,7 @@ const ActivityCategories = {
       'COLLECTIVE_UNHOSTED',
       'FISCAL_HOST_NOTE_SET',
       'FISCAL_HOST_NOTE_REMOVED',
+      'CONTRIBUTOR_INFO_REQUESTED',
     ],
   },
   EXPENSES: {

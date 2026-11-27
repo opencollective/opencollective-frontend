@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { pick } from 'lodash-es';
-import { Archive, ArrowLeft, Flag, Pencil } from 'lucide-react';
+import { Archive, ArrowLeft, Flag, MailQuestionMark, Pencil } from 'lucide-react';
 import { useRouter } from 'next/router';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -78,6 +78,7 @@ import {
 } from './common';
 import { EditCollectiveSettingsModal } from './EditCollectiveSettingsModal';
 import { communityAccountDetailQuery } from './queries';
+import { RequestContributorInfoModal } from './RequestContributorInfoModal';
 
 const convertOrganizationMutation = gql`
   mutation ConvertOrganizationToVendor($organization: AccountReferenceInput!, $host: AccountReferenceInput!) {
@@ -159,6 +160,9 @@ export function AccountDetails(props: AccountDetailsProps) {
       AccountType.PROJECT,
       AccountType.EVENT,
     ].includes(account.type),
+  );
+  const canRequestContributorInfo = Boolean(
+    account && [AccountType.INDIVIDUAL, AccountType.ORGANIZATION].includes(account.type),
   );
   const isLoading = query.loading || !query.data;
   const refetch = () => query.refetch();
@@ -525,6 +529,28 @@ export function AccountDetails(props: AccountDetailsProps) {
               >
                 <Flag size={16} className="mr-1" />
                 <FormattedMessage defaultMessage="Flag account" id="FiscalHostNote.FlagAccount" />
+              </Button>
+            )}
+            {canRequestContributorInfo && (
+              <Button
+                variant="outline"
+                size="sm"
+                data-cy="request-contributor-info-btn"
+                onClick={() =>
+                  showModal(RequestContributorInfoModal, {
+                    host: { slug: dashboardAccount.slug },
+                    account: {
+                      id: account.id,
+                      name: account.name,
+                      legalName: account.legalName,
+                      location: account.location,
+                    },
+                    refetchQueries: ['CommunityAccountActivities'],
+                  })
+                }
+              >
+                <MailQuestionMark size={16} className="mr-1" />
+                <FormattedMessage defaultMessage="Request information" id="RequestContributorInfo.Title" />
               </Button>
             )}
             {account?.slug && !account.isPrivate && getCollectivePageRoute(account) && (

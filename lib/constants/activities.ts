@@ -63,6 +63,7 @@ export const ActivityTypes = {
   COLLECTIVE_VIRTUAL_CARD_SUSPENDED: 'collective.virtualcard.suspended',
   CONNECTED_ACCOUNT_CREATED: 'connected_account.created',
   CONTRIBUTION_REJECTED: 'contribution.rejected',
+  CONTRIBUTOR_INFO_REQUESTED: 'contributor.info.requested',
   CONVERSATION_COMMENT_CREATED: 'conversation.comment.created',
   DEACTIVATED_COLLECTIVE_AS_HOST: 'deactivated.collective.as.host',
   DEACTIVATED_HOSTING: 'deactivated.hosting',
