@@ -304,15 +304,36 @@ describe('reconcileExpenseForm', () => {
       { accountingCategories: [] },
       { accountingCategoryId: null },
     ],
-    [
-      'the accounting category when the Host does not have it',
-      { accountingCategoryId: 'cat-1' },
-      { accountingCategories: [{ id: 'cat-other' }] },
-      { accountingCategoryId: null },
-    ],
     ['an unavailable reference currency', { referenceCurrency: Currency.GBP }, {}, { referenceCurrency: null }],
   ])('clears %s', (_, v, o, expected) => {
     expect(firstRun(v, o).patch).toEqual(expect.objectContaining(expected));
+  });
+
+  describe('accounting category', () => {
+    it('clears the category when the new Host does not have it', () => {
+      const result = afterChange(
+        { values: { accountingCategoryId: 'cat-1' } },
+        {
+          values: { accountSlug: 'elsewhere' },
+          options: { host: { slug: 'host-two' }, accountingCategories: [{ id: 'cat-2' }] },
+        },
+      );
+      expect(result.patch.accountingCategoryId).toBeNull();
+    });
+
+    it('keeps the category of an expense being edited when the list does not have it', () => {
+      // Non-admins don't get the host-only categories, e.g. the one a host admin set on the expense
+      const expense = existingExpense({ accountingCategory: { id: 'cat-host-only' } });
+      const result = afterChange(
+        {
+          values: { payeeSlug: undefined },
+          options: { expense },
+          context: { phase: 'loading', startOptions: { expenseId: 555 } },
+        },
+        { context: { phase: 'ready', hydrated: true } },
+      );
+      expect(result.patch).not.toHaveProperty('accountingCategoryId');
+    });
   });
 
   describe('item currencies', () => {
