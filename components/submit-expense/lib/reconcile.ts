@@ -710,8 +710,9 @@ const exchangeRates: Rule = {
       values.expenseItems.filter(needsExchangeRate(expenseCurrency)).map(ei => ({
         fromCurrency: ei.amount.currency as Currency,
         toCurrency: expenseCurrency,
-        // Items without an incurredAt (e.g. a duplicated expense) give an Invalid Date here. It serializes to `null`,
-        // which the API reads as "now", and `needsExchangeRate` fetches again once a date is set.
+        // A `null` incurredAt (e.g. a duplicated expense) gives an Invalid Date here. It serializes to `null`, which the
+        // API reads as "now" (`undefined` already gives now). Once a date is set, `needsExchangeRate` asks for a new rate
+        // if the fetched one is more than 2 days off.
         date: dayjs.utc(ei.incurredAt).toDate(),
       })),
       ei => `${ei.fromCurrency}-${ei.toCurrency}-${ei.date}`,
