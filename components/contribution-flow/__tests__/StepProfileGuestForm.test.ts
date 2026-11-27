@@ -2,7 +2,7 @@
 jest.mock('../../StyledInputLocation', () => () => null);
 
 import { validateGuestProfile } from '../StepProfileGuestForm';
-import { LEGAL_NAME_PATTERN, locationHasAddress } from '../utils';
+import { isValidLegalName, LEGAL_NAME_PATTERN, locationHasAddress } from '../utils';
 
 const collective = {
   currency: 'USD',
@@ -62,5 +62,14 @@ describe('LEGAL_NAME_PATTERN', () => {
   it('requires 5 characters once trimmed', () => {
     expect(['Bob', ' Bob ', '  abcd  '].map(value => regex.test(value))).toEqual([false, false, false]);
     expect(['Bob S', 'a b c', ' Robert Smith '].map(value => regex.test(value))).toEqual([true, true, true]);
+  });
+
+  it('counts characters like isValidLegalName', () => {
+    // 𠮷 is one character but two UTF-16 units
+    for (const value of ['Bob', 'Wu Yi', '𠮷田太郎', '𠮷田太郎子', ' 𠮷田太郎 ']) {
+      expect(regex.test(value)).toBe(isValidLegalName(value));
+    }
+    expect(isValidLegalName('𠮷田太郎')).toBe(false);
+    expect(isValidLegalName('𠮷田太郎子')).toBe(true);
   });
 });

@@ -389,8 +389,9 @@ const LEGAL_NAME_MIN_LENGTH = 5;
 /** HTML `pattern` for `LEGAL_NAME_MIN_LENGTH` characters once trimmed. Unlike `minLength`, it also applies to prefilled values */
 export const LEGAL_NAME_PATTERN = `\\s*\\S.{${LEGAL_NAME_MIN_LENGTH - 2},}\\S\\s*`;
 
+/** Counts characters (code points), like `LEGAL_NAME_PATTERN` (compiled with the `v` flag) and the API, not UTF-16 units */
 export const isValidLegalName = (legalName: string | null | undefined): boolean =>
-  Boolean(legalName) && legalName.trim().length >= LEGAL_NAME_MIN_LENGTH;
+  Boolean(legalName) && Array.from(legalName.trim()).length >= LEGAL_NAME_MIN_LENGTH;
 
 export const getLegalNameMinLengthMessage = (intl: IntlShape): string =>
   intl.formatMessage(
