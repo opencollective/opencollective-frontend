@@ -322,9 +322,6 @@ const defaultPayee: Rule = {
       return;
     }
 
-    // A DRAFT only reaches this form for the invite holder (draftKey or canDeclineExpenseInvite, see
-    // ExpenseInviteWelcome in components/expenses/Expense.tsx), so a logged-in viewer of a new-user invite is the
-    // invitee and defaults to accepting it as their own profile.
     const personalProfile = options.payoutProfiles?.find(p => p.type === AccountType.INDIVIDUAL);
     const payeeSlug = getLastExpenseToMyProfiles(options)?.payee.slug ?? personalProfile?.slug;
     if (payeeSlug) {
