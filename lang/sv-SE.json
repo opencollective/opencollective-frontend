@@ -4527,6 +4527,7 @@
   "uagR7O": "The {entityType, select, expense{expense} contribution{contribution} other{entity}} itself will NOT be deleted or modified.",
   "UAwtXh": "Where are your financial contributors based?",
   "ub/vNK": "<Individual></Individual> approved <Expense>{expenseDescription}</Expense>",
+  "ubxQF3": "This vendor doesn't have a saved payout method. Add one below and save it before submitting the expense.",
   "UCmj6i": "Anyone but Host Admin",
   "ucWzrM": "Om du redan har ett konto eller vill bidra som en organisation, <SignInLink>Logga in</SignInLink>.",
   "ud3Qe6": "Next charge attempt",

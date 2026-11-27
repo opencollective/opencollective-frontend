@@ -167,6 +167,16 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
 
   return (
     <div>
+      {/* The API only pays a vendor with a saved payout method: host admins must save it before submitting */}
+      {isVendor && props.payee && props.payee.slug === props.payeeSlug && !props.payee['hasPayoutMethod'] && (
+        <MessageBox type="warning" mb={3} fontSize="12px">
+          <FormattedMessage
+            defaultMessage="This vendor doesn't have a saved payout method. Add one below and save it before submitting the expense."
+            id="ubxQF3"
+          />
+        </MessageBox>
+      )}
+
       {/* Cross-host scenario messages */}
       {payeeIsCollectiveFamilyType && !payeeIsSameHost && (
         <React.Fragment>

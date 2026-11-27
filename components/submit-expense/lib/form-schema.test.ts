@@ -133,7 +133,8 @@ describe('buildFormSchema', () => {
     expect(errorsFor(options(), validInvoice({ payoutMethodId: 'pm-other' }))).toEqual({ payoutMethodId: 'Required' });
   });
 
-  it('lets only host admins pay a vendor that has no payout method', () => {
+  it('rejects an unsaved payout method for a vendor that has none, even for host admins', () => {
+    // The API does not use an unsaved payout method for a vendor: saving it first is required
     const vendor = {
       slug: 'vendor',
       type: CollectiveType.VENDOR,
@@ -145,10 +146,11 @@ describe('buildFormSchema', () => {
       payoutMethodId: NEW_PAYOUT_METHOD_ID,
       newPayoutMethod: { type: PayoutMethodType.OTHER, data: { currency: 'USD', content: 'Pay by cheque' } },
     });
-    expect(errorsFor(options({ payee: vendor, isAdminOfPayee: false, isHostAdmin: true }), values)).toEqual({});
-    expect(errorsFor(options({ payee: vendor, isAdminOfPayee: false, isHostAdmin: false }), values)).toHaveProperty(
-      'payoutMethodId',
-    );
+    for (const isHostAdmin of [true, false]) {
+      expect(errorsFor(options({ payee: vendor, isAdminOfPayee: false, isHostAdmin }), values)).toEqual({
+        payoutMethodId: 'Required',
+      });
+    }
   });
 
   describe('invitees', () => {

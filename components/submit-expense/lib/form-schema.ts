@@ -135,12 +135,7 @@ function buildFieldsSchema(values: ExpenseFormValues, options: Omit<ExpenseFormO
           return true;
         }
 
-        // Only host admins can pick or create a payout method for a vendor that has none
-        if (
-          options.payee?.type === CollectiveType.VENDOR &&
-          !options.payee?.['hasPayoutMethod'] &&
-          !options.isHostAdmin
-        ) {
+        if (options.payee?.type === CollectiveType.VENDOR && !options.payee?.['hasPayoutMethod']) {
           return false;
         }
 

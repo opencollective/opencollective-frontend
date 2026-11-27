@@ -4527,6 +4527,7 @@
   "uagR7O": "Die {entityType, select, expense{Ausgabe} contribution{Beitrag} other{Entität}} selbst wird NICHT gelöscht oder geändert.",
   "UAwtXh": "Wo sind deine finanziellen Unterstützer ansässig?",
   "ub/vNK": "<Individual></Individual> hat <Expense>{expenseDescription}</Expense> genehmigt",
+  "ubxQF3": "This vendor doesn't have a saved payout method. Add one below and save it before submitting the expense.",
   "UCmj6i": "Alle außer Host-Admin",
   "ucWzrM": "Wenn du bereits ein Konto hast oder als Organisation beitragen möchtest, <SignInLink>melde dich an</SignInLink>.",
   "ud3Qe6": "Nächster Abbuchungsversuch",

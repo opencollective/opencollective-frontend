@@ -4527,6 +4527,7 @@
   "uagR7O": "{entityType, select, expense{A despesa} contribution{A contribuição} other{A entidade}} em si NÃO será excluída nem modificada.",
   "UAwtXh": "Onde estão seus contribuidores financeiros?",
   "ub/vNK": "<Individual></Individual> aprovou <Expense>{expenseDescription}</Expense>",
+  "ubxQF3": "This vendor doesn't have a saved payout method. Add one below and save it before submitting the expense.",
   "UCmj6i": "Qualquer um, exceto o administrador do host",
   "ucWzrM": "Se você já tem uma conta ou deseja contribuir como uma organização, <SignInLink>Entrar</SignInLink>.",
   "ud3Qe6": "Próxima tentativa de carga",
