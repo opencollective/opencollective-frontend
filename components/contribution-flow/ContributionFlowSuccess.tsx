@@ -228,6 +228,11 @@ class ContributionFlowSuccess extends React.Component<
 
     this.trackSuccess();
 
+    if (!this.state?.loaded) {
+      // Wait until the payment intent has been retrieved: redirecting earlier would ignore its status.
+      return;
+    }
+
     const paymentIntentResult = this.state?.paymentIntentResult;
     // A bank account waiting for microdeposit verification is pending, not failed: stay on this page
     // so the contributor sees the instructions instead of being sent back to the payment step.
