@@ -2,7 +2,8 @@ import type { Page } from '@playwright/test';
 import { test as visitorTest } from '@playwright/test';
 
 import { expect, scenarioTest } from '../../fixtures';
-import { emailChangeConfirmation } from '../../helpers/mail';
+import { expectSignedIn, submitSignInEmail } from '../../helpers/auth';
+import { emailChangeConfirmation, emailedSignInLink } from '../../helpers/mail';
 import { expectConfirmEmailCounted, resetConfirmEmailRateLimit } from '../../helpers/rate-limits';
 
 const test = scenarioTest('individual', { inputs: { otherUser: true }, actor: 'user' });
@@ -13,6 +14,7 @@ test('user changes their email from the advanced settings and confirms it from t
   page,
   scenario,
   mail,
+  openBrowserAs,
 }) => {
   const { user, other } = scenario.actors;
   const newEmail = mail.address('new-email');
@@ -37,9 +39,31 @@ test('user changes their email from the advanced settings and confirms it from t
   const message = await emailChangeConfirmation(mail, { newEmail });
   expect(message.text).toContain(`We need to verify that ${newEmail} is correct by clicking this button:`);
   await resetConfirmEmailRateLimit();
+  // Holds the confirmation until its loading state has been seen, so the check cannot race a fast API.
+  let releaseConfirmation: () => void;
+  const confirmationHeld = new Promise<void>(resolve => (releaseConfirmation = resolve));
+  await page.route('**/api/graphql/v2*', async route => {
+    if (route.request().postDataJSON()?.operationName === 'ConfirmEmail') {
+      await confirmationHeld;
+    }
+    await route.fallback();
+  });
   await page.goto(message.link);
+  await expect(page.getByText('Validating your email address...')).toBeVisible();
+  releaseConfirmation();
   await expect(page.getByText('Your email has been changed')).toBeVisible();
   await expectConfirmEmailCounted();
+
+  // The new address now signs the same user in, from a browser without their session: they land on their own
+  // advanced settings. Test addresses get the emailed link as the form's answer too, so the browser does not wait.
+  const visitor = await openBrowserAs(null);
+  await visitor.goto(`/signin?next=${scenario.urls.advanced}`);
+  await submitSignInEmail(visitor, newEmail);
+  await expect(visitor).toHaveURL(scenario.urls.advanced);
+  await expectSignedIn(visitor, newEmail);
+  await expect(emailForm(visitor).locator('input[name=email]')).toHaveValue(newEmail);
+  const signInLink = new URL(await emailedSignInLink(mail, { to: newEmail }), 'http://site');
+  expect(signInLink.searchParams.get('next')).toBe(scenario.urls.advanced);
 });
 
 test('user re-sends the confirmation of a new email', async ({ page, scenario, mail }) => {
