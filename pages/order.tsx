@@ -11,7 +11,6 @@ import { gql } from '../lib/graphql/helpers';
 import type { Account, AccountWithHost } from '../lib/graphql/types/v2/graphql';
 import useLoggedInUser from '../lib/hooks/useLoggedInUser';
 import { usePrevious } from '../lib/hooks/usePrevious';
-import { i18nPaymentMethodProviderType } from '../lib/i18n/payment-method-provider-type';
 import { i18nTaxType } from '../lib/i18n/taxes';
 import { getCollectivePageCanonicalURL } from '../lib/url-helpers';
 
@@ -28,10 +27,10 @@ import PrivateInfoIcon from '../components/icons/PrivateInfoIcon';
 import LinkCollective from '../components/LinkCollective';
 import Loading from '../components/Loading';
 import MessageBoxGraphqlError from '../components/MessageBoxGraphqlError';
+import OrderPaymentMethod from '../components/orders/OrderPaymentMethod';
 import OrderStatusTag from '../components/orders/OrderStatusTag';
 import ProcessOrderButtons, { hasProcessButtons } from '../components/orders/ProcessOrderButtons';
 import Page from '../components/Page';
-import PaymentMethodTypeWithIcon from '../components/PaymentMethodTypeWithIcon';
 import StyledButton from '../components/StyledButton';
 import StyledLink from '../components/StyledLink';
 import Tags from '../components/Tags';
@@ -438,24 +437,14 @@ export default function OrderPage(props) {
                         )}
                       </OrderDetails>
                     )}
-                    {order.paymentMethod ? (
-                      <OrderDetails>
+                    <OrderDetails>
+                      {order.paymentMethod ? (
                         <FormattedMessage id="PaidWith" defaultMessage="Paid With" />
-                        <PaymentMethodTypeWithIcon type={order.paymentMethod?.type} iconSize={16} />
-                      </OrderDetails>
-                    ) : (
-                      <OrderDetails>
+                      ) : (
                         <FormattedMessage id="paymentmethod.label" defaultMessage="Payment Method" />
-                        {order.manualPaymentProvider ? (
-                          order.manualPaymentProvider.name
-                        ) : order.pendingContributionData?.paymentMethod ? (
-                          i18nPaymentMethodProviderType(intl, order.pendingContributionData.paymentMethod)
-                        ) : (
-                          // The payment method may have been removed by its owner, or not be visible to the current user
-                          <FormattedMessage defaultMessage="Unknown" id="Unknown" />
-                        )}
-                      </OrderDetails>
-                    )}
+                      )}
+                      <OrderPaymentMethod order={order} />
+                    </OrderDetails>
 
                     {!isEmpty(order.pendingContributionData?.fromAccountInfo) && (
                       <OrderDetails>
