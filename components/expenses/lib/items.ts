@@ -1,6 +1,7 @@
 import { omit } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 
+import type { Currency } from '../../../lib/graphql/types/v2/graphql';
 import { ExpenseType } from '../../../lib/graphql/types/v2/graphql';
 
 import type { ExpenseItemFormValues } from '../types/FormValues';
@@ -25,7 +26,7 @@ export const getExpenseItemAmountV2FromNewAttrs = (
               value: attrs['expenseCurrencyFxRate'],
               source: attrs['expenseCurrencyFxRateSource'],
               fromCurrency: attrs['currency'],
-              toCurrency: attrs['currency'],
+              toCurrency: expenseCurrency as Currency,
               date: attrs['incurredAt'],
             }
           : null,

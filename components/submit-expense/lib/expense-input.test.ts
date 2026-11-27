@@ -241,6 +241,24 @@ describe('planExpenseSubmission', () => {
       }).items;
       expect(item.incurredAt.getTime()).toBeGreaterThanOrEqual(before);
     });
+
+    it.each([ExpenseType.INVOICE, ExpenseType.RECEIPT])(
+      'sends %s items without a date (e.g. a duplicated expense sent as an invite) without one',
+      expenseTypeOption => {
+        const p = plan(
+          {
+            payeeSlug: PAYEE_SLUG_INVITE,
+            inviteeNewIndividual: { name: 'N', email: 'n@e.x' },
+            expenseTypeOption,
+            expenseItems: [{ description: 'x', incurredAt: null, amount: { valueInCents: 1000, currency: 'USD' } }],
+          },
+          { payee: null, expense: { id: 'e1' } as any },
+          { expenseId: 1, duplicateExpense: true },
+        );
+        expect(p.kind).toBe('invite');
+        expect(p.variables.expenseInviteInput.items[0].incurredAt).toBeNull();
+      },
+    );
   });
 
   it('sends attachments as URLs', () => {

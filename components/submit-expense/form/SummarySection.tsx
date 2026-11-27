@@ -81,7 +81,12 @@ export function SummarySectionContent(props: { form: ExpenseForm }) {
             <PayoutMethodExchangeRateWarning
               expenseCurrency={props.form.options.expenseCurrency}
               payoutMethodCurrency={props.form.options.payoutMethod?.data?.currency}
-              totalInvoicedInExpenseCurrency={props.form.options.totalInvoicedInExpenseCurrency}
+              totalInvoicedInExpenseCurrency={
+                props.form.values.hasTax && props.form.values.tax && isTaxRateValid(props.form.values.tax.rate)
+                  ? props.form.options.totalInvoicedInExpenseCurrency +
+                    getTaxAmount(props.form.options.totalInvoicedInExpenseCurrency, props.form.values.tax)
+                  : props.form.options.totalInvoicedInExpenseCurrency
+              }
             />
           )}
       </div>
