@@ -481,7 +481,9 @@ const VendorOption = React.memo(function VendorOption(props: {
             includeVendorsForHostId={props.host.legacyId}
             disabled={props.isSubmitting}
             defaultCollectives={props.vendorsForAccount}
-            collective={isPickingVendor ? null : selectedVendor || props.payee}
+            collective={
+              isPickingVendor ? null : selectedVendor?.slug === props.payeeSlug ? selectedVendor : props.payee
+            }
             {...(isHostAdmin
               ? quickCreateVendorCollectivePickerOptions(createVendorFromSearch, { isBeneficiary })
               : {})}
