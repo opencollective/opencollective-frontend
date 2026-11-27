@@ -322,9 +322,9 @@ const defaultPayee: Rule = {
       return;
     }
 
-    // A DRAFT only reaches this form for the invite holder (draftKey or canDeclineExpenseInvite, see ExpenseInviteWelcome
-    // in components/expenses/Expense.tsx), so a logged-in viewer of a new-user invite is the invitee and defaults to
-    // accepting it as their own profile.
+    // A DRAFT only reaches this form for the invite holder (draftKey or canDeclineExpenseInvite, see
+    // ExpenseInviteWelcome in components/expenses/Expense.tsx), so a logged-in viewer of a new-user invite is the
+    // invitee and defaults to accepting it as their own profile.
     const personalProfile = options.payoutProfiles?.find(p => p.type === AccountType.INDIVIDUAL);
     const payeeSlug = getLastExpenseToMyProfiles(options)?.payee.slug ?? personalProfile?.slug;
     if (payeeSlug) {
@@ -710,9 +710,9 @@ const exchangeRates: Rule = {
       values.expenseItems.filter(needsExchangeRate(expenseCurrency)).map(ei => ({
         fromCurrency: ei.amount.currency as Currency,
         toCurrency: expenseCurrency,
-        // A `null` incurredAt (e.g. a duplicated expense) gives an Invalid Date here. It serializes to `null`, which the
-        // API reads as "now" (`undefined` already gives now). Once a date is set, `needsExchangeRate` asks for a new rate
-        // if the fetched one is more than 2 days off.
+        // A `null` incurredAt (e.g. a duplicated expense) gives an Invalid Date here. It serializes to `null`, which
+        // the API reads as "now" (`undefined` already gives now). Once a date is set, `needsExchangeRate` asks for a
+        // new rate if the fetched one is more than 2 days off.
         date: dayjs.utc(ei.incurredAt).toDate(),
       })),
       ei => `${ei.fromCurrency}-${ei.toCurrency}-${ei.date}`,
