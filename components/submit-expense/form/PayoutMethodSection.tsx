@@ -250,6 +250,7 @@ export const PayoutMethodFormContent = memoWithGetFormProps(function PayoutMetho
                 payoutMethod={p}
                 payeeSlug={props.payeeSlug}
                 payee={props.payee}
+                host={props.host}
                 isChecked={p.id === props.payoutMethodId}
                 isEditable
                 actions={props.actions}
@@ -762,13 +763,14 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
   return (
     <Formik
       onSubmit={onSaveClick}
+      enableReinitialize // Pick up resynced data for the same payout method
       initialValues={{
         editingPayoutMethod: {
           ...omit(props.payoutMethod, ['__typename']),
         },
       }}
     >
-      {({ setFieldTouched, setFieldValue, values, submitForm }) => (
+      {({ setFieldTouched, setFieldValue, values, submitForm, resetForm }) => (
         <CardComponent
           id={getPayoutMethodHTMLId(props.payoutMethod.id)}
           value={props.payoutMethod.id}
@@ -827,6 +829,7 @@ export const PayoutMethodRadioGroupItem = function PayoutMethodRadioGroupItem(pr
                     disabled={isLoadingEditPayoutMethod || props.isSubmitting}
                     variant="secondary"
                     onClick={() => {
+                      resetForm();
                       setIsEditingPayoutMethod(false);
                     }}
                   >

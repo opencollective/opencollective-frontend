@@ -17,15 +17,18 @@ import { Skeleton } from '../ui/Skeleton';
 
 import type { ExpenseForm } from './useExpenseForm';
 
-function flattenDetailsObject(details: any) {
+function flattenDetailsObject(details: any, parentKey?: string) {
   return Object.entries(details).reduce((acc, [key, value]) => {
-    if (typeof value === 'object') {
-      return [...acc, ...flattenDetailsObject(value)];
+    const id = parentKey ? `${parentKey}.${key}` : key;
+    if (value === null || value === undefined) {
+      return acc;
+    } else if (typeof value === 'object') {
+      return [...acc, ...flattenDetailsObject(value, id)];
     }
     return [
       ...acc,
       {
-        id: key,
+        id,
         label: startCase(key),
         value: value,
       },

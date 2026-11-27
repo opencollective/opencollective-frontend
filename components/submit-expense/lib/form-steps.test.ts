@@ -3,7 +3,8 @@ import { set } from 'lodash-es';
 import { createIntl } from 'react-intl';
 
 import { CollectiveType } from '../../../lib/constants/collectives';
-import { ExpenseType } from '../../../lib/graphql/types/v2/graphql';
+import { Currency, ExpenseType } from '../../../lib/graphql/types/v2/graphql';
+import { NEW_PAYOUT_METHOD_ID } from '../../expenses/lib/constants';
 
 import { buildFormSchema, getFormSchemaKeys } from './form-schema';
 import {
@@ -134,5 +135,37 @@ describe('form steps', () => {
       'newPayoutMethod',
       'payoutMethodId',
     ]);
+  });
+
+  it.each(['payee', 'draftPayoutMethod'])('validates a new payout method in the %s edit sub-form', key => {
+    const values = {
+      accountSlug: 'collective',
+      payeeSlug: 'jane',
+      payoutMethodId: NEW_PAYOUT_METHOD_ID,
+      newPayoutMethod: { data: {} },
+      expenseTypeOption: ExpenseType.INVOICE,
+      hasTax: false,
+      tax: null,
+      referenceCurrency: Currency.USD,
+      expenseItems: [
+        {
+          description: 'x',
+          incurredAt: '2025-03-01',
+          amount: { valueInCents: 100, currency: 'USD', exchangeRate: null },
+        },
+      ],
+    };
+    const options = {
+      account: { slug: 'collective', type: CollectiveType.COLLECTIVE },
+      payee: { slug: 'jane', type: CollectiveType.USER, payoutMethods: [{ id: 'pm-1' }] },
+      loggedInAccount: { slug: 'jane' },
+      isAdminOfPayee: true,
+      supportedExpenseTypes: [ExpenseType.INVOICE],
+      availableReferenceCurrencies: [Currency.USD],
+      expenseCurrency: Currency.USD,
+    } as any;
+    const result = buildFormSchema(options, intl, EDIT_EXPENSE_STEPS[key].fields).safeParse(values);
+    const errorPaths = result.success ? [] : result.error.issues.map(issue => issue.path.join('.'));
+    expect(errorPaths).toEqual(expect.arrayContaining(['newPayoutMethod.type', 'newPayoutMethod.data.currency']));
   });
 });
