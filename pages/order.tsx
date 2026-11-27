@@ -56,6 +56,10 @@ const orderPageQuery = gql`
         id
         type
       }
+      manualPaymentProvider {
+        id
+        name
+      }
       createdAt
       processedAt
       permissions {
@@ -442,9 +446,13 @@ export default function OrderPage(props) {
                     ) : (
                       <OrderDetails>
                         <FormattedMessage id="paymentmethod.label" defaultMessage="Payment Method" />
-                        {i18nPaymentMethodProviderType(
-                          intl,
-                          order.pendingContributionData?.paymentMethod || 'BANK_TRANSFER',
+                        {order.manualPaymentProvider ? (
+                          order.manualPaymentProvider.name
+                        ) : order.pendingContributionData?.paymentMethod ? (
+                          i18nPaymentMethodProviderType(intl, order.pendingContributionData.paymentMethod)
+                        ) : (
+                          // The payment method may have been removed by its owner, or not be visible to the current user
+                          <FormattedMessage defaultMessage="Unknown" id="Unknown" />
                         )}
                       </OrderDetails>
                     )}
