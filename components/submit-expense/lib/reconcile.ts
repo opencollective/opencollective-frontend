@@ -341,6 +341,8 @@ const keepPayeeConsistentWithHost: Rule = {
     const wasVendor =
       getPayeeChoice(values).kind === PayeeKind.VENDOR_PICKER ||
       previousOptions?.vendorsForAccount?.some(v => v.slug === values.payeeSlug);
+    // Clearing on purpose: defaultPayee then picks the last used or personal profile on the next run, the same default
+    // as on a new form, and the choice shows in "Who is getting paid".
     if (wasVendor && !options.vendorsForAccount?.some(v => v.slug === values.payeeSlug)) {
       return { values: { ...values, payeeSlug: null } };
     }
@@ -705,6 +707,9 @@ const exchangeRates: Rule = {
       values.expenseItems.filter(needsExchangeRate(expenseCurrency)).map(ei => ({
         fromCurrency: ei.amount.currency as Currency,
         toCurrency: expenseCurrency,
+        // A `null` incurredAt (e.g. a duplicated expense) gives an Invalid Date here. It serializes to `null`, which
+        // the API reads as "now" (`undefined` already gives now). Once a date is set, `needsExchangeRate` asks for a
+        // new rate if the fetched one is more than 2 days off.
         date: dayjs.utc(ei.incurredAt).toDate(),
       })),
       ei => `${ei.fromCurrency}-${ei.toCurrency}-${ei.date}`,
