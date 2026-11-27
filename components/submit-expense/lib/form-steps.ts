@@ -142,12 +142,12 @@ export function getGrantStepFields(id: GrantStep): readonly FormFieldPath[] {
 export const EDIT_EXPENSE_STEPS = {
   payee: {
     id: 'payee',
-    fields: ['accountSlug', 'payeeSlug', 'payoutMethodId', 'expenseItems', 'hasTax', 'tax'],
+    fields: ['accountSlug', 'payeeSlug', 'payoutMethodId', 'newPayoutMethod', 'expenseItems', 'hasTax', 'tax'],
     inputFields: ['payee', 'payeeLocation', 'currency', 'items', 'payoutMethod', 'tax'],
   },
   draftPayoutMethod: {
     id: 'draftPayoutMethod',
-    fields: ['payoutMethodId', 'expenseItems', 'hasTax', 'tax', 'referenceCurrency'],
+    fields: ['payoutMethodId', 'newPayoutMethod', 'expenseItems', 'hasTax', 'tax', 'referenceCurrency'],
     inputFields: ['payoutMethod', 'payee', 'payeeLocation', 'currency', 'items', 'tax'],
   },
   expenseDetails: {
