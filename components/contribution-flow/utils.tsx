@@ -1,6 +1,6 @@
 import React from 'react';
 import { CreditCard } from '@styled-icons/fa-solid/CreditCard';
-import { find, get, pick, sortBy, uniqBy } from 'lodash-es';
+import { find, get, isNil, isPlainObject, pick, sortBy, uniqBy } from 'lodash-es';
 import type { IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
@@ -382,6 +382,34 @@ const getTotalYearlyAmount = stepDetails => {
 };
 
 export const INCOGNITO_ID = 'incognito';
+
+/** Same rule as the API and the profile Info page: legal names must have at least 5 characters, trimmed */
+const LEGAL_NAME_MIN_LENGTH = 5;
+
+/** HTML `pattern` for `LEGAL_NAME_MIN_LENGTH` characters once trimmed. Unlike `minLength`, it also applies to prefilled values */
+export const LEGAL_NAME_PATTERN = `\\s*\\S.{${LEGAL_NAME_MIN_LENGTH - 2},}\\S\\s*`;
+
+export const isValidLegalName = (legalName: string | null | undefined): boolean =>
+  Boolean(legalName) && legalName.trim().length >= LEGAL_NAME_MIN_LENGTH;
+
+export const getLegalNameMinLengthMessage = (intl: IntlShape): string =>
+  intl.formatMessage(
+    { defaultMessage: 'Your legal name must have at least {count} characters.', id: '/JLbij' },
+    { count: LEGAL_NAME_MIN_LENGTH },
+  );
+
+/** A legal name was entered but is too short. Empty values are handled by `required`. */
+export const isLegalNameTooShort = (legalName: string | null | undefined): boolean =>
+  Boolean(legalName?.trim()) && !isValidLegalName(legalName);
+
+/**
+ * Same rule as the API (`locationHasAddress`): a non-blank formatted address, or at least one non-blank structured
+ * value. The country alone is not an address.
+ */
+export const locationHasAddress = (location): boolean =>
+  Boolean(location?.address?.trim()) ||
+  (isPlainObject(location?.structured) &&
+    Object.values(location.structured).some(value => !isNil(value) && String(value).trim() !== ''));
 
 /**
  * Get the required information for the current contribution based on Host policies and total contributed to host

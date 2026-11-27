@@ -56,6 +56,7 @@
   "/GQXtd": "Nie ty? <SignOutLink>Wyloguj się</SignOutLink>, aby zmienić profil.",
   "/gUYR+": "Źródło: {source}",
   "/iIQqg": "Dane konta, które mogą być wykorzystane do otrzymania płatności za zwroty, faktury i dotacje.",
+  "/JLbij": "Your legal name must have at least {count} characters.",
   "/lQgi5": "Ten raport jest obecnie dostępny tylko w UTC",
   "/Lrubf": "Twoje łączne wkłady w bieżącym roku podatkowym na rzecz {isSelfHosted, select, true {{collectiveName}} other {{hostLink} podmiotu prawnego świadczącego usługi finansowe dla {collectiveName}}} przekraczają {amount}. W związku z tym {hostName} wymaga podania Twojego adresu do celów podatkowych.",
   "/m71yT": "This restricts host actions (e.g. approving applications and paying expenses) until the account is unblocked.",

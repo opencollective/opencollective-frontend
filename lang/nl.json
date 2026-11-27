@@ -56,6 +56,7 @@
   "/GQXtd": "Not you? <SignOutLink>Sign out</SignOutLink> to switch profile.",
   "/gUYR+": "Bron: {source}",
   "/iIQqg": "Account details that can be used to get paid for reimbursements, invoices, and grants.",
+  "/JLbij": "Your legal name must have at least {count} characters.",
   "/lQgi5": "This report is currently only available in UTC",
   "/Lrubf": "Your total contributions in the current fiscal year to {isSelfHosted, select, true {{collectiveName}} other {{hostLink}, the legal entity that provides {collectiveName} with financial services,}} exceeds {amount}. Therefore, {hostName} requires your legal address.",
   "/m71yT": "This restricts host actions (e.g. approving applications and paying expenses) until the account is unblocked.",

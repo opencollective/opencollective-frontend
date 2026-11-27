@@ -56,6 +56,7 @@
   "/GQXtd": "Ce n'est pas vous ? <SignOutLink>Déconnectez-vous</SignOutLink> pour changer de profil.",
   "/gUYR+": "Source : {source}",
   "/iIQqg": "Coordonnées qui peuvent être utilisées pour vous payer les notes de frais, les factures et les subventions.",
+  "/JLbij": "Your legal name must have at least {count} characters.",
   "/lQgi5": "Ce rapport n'est actuellement disponible qu'en UTC",
   "/Lrubf": "La somme de vos contributions au cours de l'année fiscale à {isSelfHosted, select, true {{collectiveName}} other {{hostLink}, l'entité juridique qui fournit à {collectiveName} des services financiers,}} excède {amount}. Par conséquent, {hostName} exige votre adresse postale.",
   "/m71yT": "Cela restreint les actions de l'hôte (par exemple approuver les candidatures et payer les dépenses) jusqu'à ce que le compte soit débloqué.",

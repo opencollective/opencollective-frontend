@@ -56,6 +56,7 @@
   "/GQXtd": "不是你？<SignOutLink>登出</SignOutLink> 以切换账户。",
   "/gUYR+": "源文件：{source}",
   "/iIQqg": "可以用来获得偿还款、发票和赠款的帐户详情。",
+  "/JLbij": "Your legal name must have at least {count} characters.",
   "/lQgi5": "此报告目前仅在 UTC 中可用",
   "/Lrubf": "Your total contributions in the current fiscal year to {isSelfHosted, select, true {{collectiveName}} other {{hostLink}, the legal entity that provides {collectiveName} with financial services,}} exceeds {amount}. Therefore, {hostName} requires your legal address.",
   "/m71yT": "This restricts host actions (e.g. approving applications and paying expenses) until the account is unblocked.",

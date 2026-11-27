@@ -1,6 +1,6 @@
 import React from 'react';
 import { set } from 'lodash-es';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { isEmail } from 'validator';
 
 import { TierTypes } from '../../lib/constants/tiers-types';
@@ -18,20 +18,29 @@ import StyledInputField from '../StyledInputField';
 import StyledInputLocation from '../StyledInputLocation';
 import { P, Span } from '../Text';
 
-import { getRequiredInformation } from './utils';
+import {
+  getLegalNameMinLengthMessage,
+  getRequiredInformation,
+  isLegalNameTooShort,
+  isValidLegalName,
+  LEGAL_NAME_PATTERN,
+  locationHasAddress,
+} from './utils';
 
 export const validateGuestProfile = (stepProfile, stepDetails, tier, collective) => {
   const requiredInformation = getRequiredInformation(undefined, stepDetails, collective, undefined, tier);
   if (requiredInformation.address) {
     const location = stepProfile.location || {};
-    if (!location.country || !(location.address || location.structured)) {
+    if (!location.country || !locationHasAddress(location)) {
       return false;
     }
   }
-  if (requiredInformation.legalName) {
-    if (!stepProfile.name && !stepProfile.legalName) {
-      return false;
-    }
+  if (
+    requiredInformation.legalName
+      ? !isValidLegalName(stepProfile.legalName)
+      : isLegalNameTooShort(stepProfile.legalName)
+  ) {
+    return false;
   }
 
   if (isCaptchaEnabled() && !stepProfile.captcha) {
@@ -51,6 +60,8 @@ const getSignInLinkQueryParams = email => {
 };
 
 const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInClick, tier, collective }) => {
+  const intl = useIntl();
+  const legalNameTitle = getLegalNameMinLengthMessage(intl);
   const dispatchChange = (field, value) => onChange({ stepProfile: set({ ...data, isGuest: true }, field, value) });
   const dispatchGenericEvent = e => dispatchChange(e.target.name, e.target.value);
   const requiredInformation = React.useMemo(
@@ -202,6 +213,8 @@ const StepProfileGuestForm = ({ stepDetails, onChange, data, isEmbed, onSignInCl
             placeholder="Thomas A. Anderson"
             onChange={dispatchGenericEvent}
             maxLength="255"
+            pattern={LEGAL_NAME_PATTERN}
+            title={legalNameTitle}
           />
         )}
       </StyledInputField>

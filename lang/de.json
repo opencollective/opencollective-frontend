@@ -56,6 +56,7 @@
   "/GQXtd": "Nicht du? <SignOutLink>Abmelden</SignOutLink> um Profil zu wechseln.",
   "/gUYR+": "Quelle: {source}",
   "/iIQqg": "Kontodaten für die Auszahlung von Kostenerstattungen, Rechnungen und Förderungen.",
+  "/JLbij": "Your legal name must have at least {count} characters.",
   "/lQgi5": "Dieser Bericht ist derzeit nur in UTC verfügbar",
   "/Lrubf": "Deine Gesamtbeiträge im aktuellen Geschäftsjahr an {isSelfHosted, select, true {{collectiveName}} other {{hostLink}, die juristische Person, die {collectiveName} Finanzdienstleistungen bereitstellt,}} überschreiten {amount}. Daher benötigt {hostName} deine rechtliche Adresse.",
   "/m71yT": "Dadurch werden Host-Aktionen (z. B. das Annehmen von Bewerbungen und das Bezahlen von Ausgaben) eingeschränkt, bis das Konto wieder freigeschaltet ist.",

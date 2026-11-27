@@ -56,6 +56,7 @@
   "/GQXtd": "Nie ste to vy? <SignOutLink>Odhláste sa</SignOutLink> pre zmenu profilu.",
   "/gUYR+": "Zdroj: {source}",
   "/iIQqg": "Údaje o účte, ktoré možno použiť na získanie platieb za náhrady, faktúry a granty.",
+  "/JLbij": "Your legal name must have at least {count} characters.",
   "/lQgi5": "Táto správa je momentálne dostupná iba v UTC",
   "/Lrubf": "Vaše celkové príspevky v bežnom fiškálnom roku pre {isSelfHosted, select, true {{collectiveName}} other {{hostLink}, právnickej osoby, ktorá poskytuje pre {collectiveName} finančné služby,}} presahujú {amount}. Z tohto dôvodu {hostName} vyžaduje vašu oficiálnu adresu.",
   "/m71yT": "This restricts host actions (e.g. approving applications and paying expenses) until the account is unblocked.",

@@ -56,6 +56,7 @@
   "/GQXtd": "본인이 아니신가요? <SignOutLink>로그아웃</SignOutLink>을 클릭하여 프로필을 전환하세요.",
   "/gUYR+": "출처: {source}",
   "/iIQqg": "환급, 청구서 및 보조금을 지급받는 데 사용할 수 있는 계정 세부 정보입니다.",
+  "/JLbij": "Your legal name must have at least {count} characters.",
   "/lQgi5": "이 보고서는 현재 UTC 기준으로만 제공됩니다.",
   "/Lrubf": "현재 회계 연도에 {isSelfHosted, select, true {{collectiveName}} other {{hostLink}, {collectiveName}에 금융 서비스를 제공하는 법인,}}에 대한 귀하의 총 지원금이 {amount}를 초과했습니다. 따라서 {hostName}은 귀하의 법적 주소를 요구합니다.",
   "/m71yT": "This restricts host actions (e.g. approving applications and paying expenses) until the account is unblocked.",

@@ -56,6 +56,7 @@
   "/GQXtd": "Não é você? <SignOutLink>Entre de novo</SignOutLink> para trocar de perfil.",
   "/gUYR+": "Fonte: {source}",
   "/iIQqg": "Detalhes da conta que podem ser usados para receber reembolsos, faturas e bolsas.",
+  "/JLbij": "Your legal name must have at least {count} characters.",
   "/lQgi5": "Esse relatório só está disponível em UTC",
   "/Lrubf": "Seu total de contribuições no ano fiscal atual para {isSelfHosted, select, true {{collectiveName}} other {{hostLink}, a entidade jurídica que fornece {collectiveName} com serviços financeiros,}} excede {amount}. Por consequência, {hostName} requer o seu endereço legal.",
   "/m71yT": "Isso restringe as ações do anfitrião (por exemplo, aprovar candidaturas e pagar despesas) até que a conta seja desbloqueada.",

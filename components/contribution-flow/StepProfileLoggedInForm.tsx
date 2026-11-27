@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 
 import { TierTypes } from '../../lib/constants/tiers-types';
 import { formatCurrency } from '../../lib/currency-utils';
@@ -16,7 +16,7 @@ import StyledInputLocation from '../StyledInputLocation';
 import { P, Span } from '../Text';
 
 import ContributeProfilePicker from './ContributeProfilePicker';
-import { getRequiredInformation } from './utils';
+import { getLegalNameMinLengthMessage, getRequiredInformation, LEGAL_NAME_PATTERN } from './utils';
 
 const getProfileInfo = (stepProfile, profiles) => {
   if (stepProfile?.isIncognito) {
@@ -37,6 +37,7 @@ const getProfileInfo = (stepProfile, profiles) => {
 };
 
 const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, stepDetails }) => {
+  const intl = useIntl();
   const profileInfo = React.useMemo(() => getProfileInfo(data, profiles), [data, profiles]);
   const requiredInformation = React.useMemo(
     () => getRequiredInformation(data, stepDetails, collective, profiles, tier),
@@ -151,6 +152,8 @@ const StepProfileLoggedInForm = ({ profiles, onChange, collective, tier, data, s
                   placeholder={profileInfo.name}
                   onChange={e => onChange({ stepProfile: { ...data, legalName: e.target.value } })}
                   maxLength="255"
+                  pattern={LEGAL_NAME_PATTERN}
+                  title={getLegalNameMinLengthMessage(intl)}
                 />
               )}
             </StyledInputField>
