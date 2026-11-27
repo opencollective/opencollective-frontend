@@ -268,7 +268,8 @@ class ContributionFlowSuccess extends React.Component<
       }
     }
 
-    if (order && queryParams.redirect) {
+    // Keep the contributor on this page while the bank account awaits verification, so they see the instructions.
+    if (order && queryParams.redirect && !isAwaitingMicrodepositVerification) {
       if (isValidExternalRedirect(queryParams.redirect)) {
         followOrderRedirectUrl(this.props.router, this.props.collective, order, queryParams.redirect, {
           shouldRedirectParent: parseToBoolean(queryParams.shouldRedirectParent),
@@ -485,7 +486,7 @@ class ContributionFlowSuccess extends React.Component<
             <div className="mt-1 max-w-[672px]">
               <p className="text-center text-sm leading-5 font-normal">
                 <FormattedMessage
-                  defaultMessage="Your bank account could not be verified instantly. Stripe will send two small deposits to your account, which should arrive in 1-2 business days, and email you a link to confirm them. Your contribution will be processed once your bank account is verified. If it is not verified within 10 days, the payment will be canceled."
+                  defaultMessage="Your bank account could not be verified instantly. Stripe will send one or two small deposits to your bank account, which should arrive in 1-2 business days, and email you a link to verify them. Your contribution will be processed once your bank account is verified. If it is not verified within 10 days, the payment will be canceled."
                   id="ContributionFlow.Success.VerifyMicrodeposits.Description"
                 />
               </p>
