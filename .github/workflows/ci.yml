@@ -246,7 +246,12 @@ jobs:
     uses: ./.github/workflows/e2e-prepare.yml
     secrets: inherit
 
+  # Cypress E2E (checks `e2e / e2e (N*.(js|ts))`). Set the repository variable `DISABLE_CYPRESS` to `true`
+  # (Settings > Secrets and variables > Actions > Variables) to skip it while the specs stay in the repository.
+  # Remove the shard checks from the required checks first: a skipped matrix reports one unexpanded check, so the
+  # per-shard required checks would wait forever.
   e2e:
+    if: ${{ vars.DISABLE_CYPRESS != 'true' }}
     needs: [build, e2e-prepare]
     uses: ./.github/workflows/e2e.yml
     with:
