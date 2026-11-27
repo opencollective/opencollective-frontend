@@ -366,6 +366,8 @@ function SubmitGrantDialogContent(props: SubmitGrantDialogContentProps) {
     const errors = await validateForm();
     const stepErrors = pick(errors, steps.activeHeader.formValues);
     if (!isEmpty(stepErrors)) {
+      // `objectKeys` (lib/utils) returns nested leaf paths such as `expenseItems.0.description`, so this marks each
+      // nested field with an error as touched, not only the top-level keys.
       objectKeys(stepErrors).forEach(k => setFieldTouched(k, true));
       setNextClickCount(nextClickCount + 1);
       return;

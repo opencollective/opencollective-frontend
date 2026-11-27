@@ -322,6 +322,9 @@ const defaultPayee: Rule = {
       return;
     }
 
+    // A DRAFT only reaches this form for the invite holder (draftKey or canDeclineExpenseInvite, see ExpenseInviteWelcome
+    // in components/expenses/Expense.tsx), so a logged-in viewer of a new-user invite is the invitee and defaults to
+    // accepting it as their own profile.
     const personalProfile = options.payoutProfiles?.find(p => p.type === AccountType.INDIVIDUAL);
     const payeeSlug = getLastExpenseToMyProfiles(options)?.payee.slug ?? personalProfile?.slug;
     if (payeeSlug) {
@@ -341,6 +344,8 @@ const keepPayeeConsistentWithHost: Rule = {
     const wasVendor =
       getPayeeChoice(values).kind === PayeeKind.VENDOR_PICKER ||
       previousOptions?.vendorsForAccount?.some(v => v.slug === values.payeeSlug);
+    // Clearing on purpose: defaultPayee then picks the last used or personal profile on the next run, the same default
+    // as on a new form, and the choice shows in "Who is getting paid".
     if (wasVendor && !options.vendorsForAccount?.some(v => v.slug === values.payeeSlug)) {
       return { values: { ...values, payeeSlug: null } };
     }
@@ -705,6 +710,8 @@ const exchangeRates: Rule = {
       values.expenseItems.filter(needsExchangeRate(expenseCurrency)).map(ei => ({
         fromCurrency: ei.amount.currency as Currency,
         toCurrency: expenseCurrency,
+        // Items without an incurredAt (e.g. a duplicated expense) give an Invalid Date here. It serializes to `null`,
+        // which the API reads as "now", and `needsExchangeRate` fetches again once a date is set.
         date: dayjs.utc(ei.incurredAt).toDate(),
       })),
       ei => `${ei.fromCurrency}-${ei.toCurrency}-${ei.date}`,
