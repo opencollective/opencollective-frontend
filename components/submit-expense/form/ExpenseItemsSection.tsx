@@ -794,7 +794,7 @@ const Taxes = React.memo(function Taxes(props: {
                   required={true}
                   minWidth={115}
                   value={{
-                    value: round(field.value * 100, 2),
+                    value: field.value,
                     label: i18nTaxRate(intl, props.taxType, field.value),
                   }}
                   onChange={({ value }) => props.setFieldValue('tax.rate', value)}
