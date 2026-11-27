@@ -1,15 +1,6 @@
 import React from 'react';
-import type {
-  CellContext as TanCellContext,
-  ColumnDef,
-  OnChangeFn,
-  Row,
-  RowSelectionState,
-  SortingState,
-  TableMeta,
-  VisibilityState,
-} from '@tanstack/react-table';
-import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
+import type { ColumnVisibilityState, OnChangeFn, SortingState } from '@tanstack/react-table';
+import { flexRender, useTable } from '@tanstack/react-table';
 import { cva } from 'class-variance-authority';
 import { clsx } from 'clsx';
 import { isEqual, omitBy } from 'lodash-es';
@@ -24,6 +15,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 
 import { ColumnToggleDropdown } from './ColumnToggleDropdown';
 import { RowActionsMenu } from './RowActionsMenu';
+import type { CellContext as TanCellContext, ColumnDef, Row, TableMeta } from './tableFeatures';
+import { dataTableFeatures } from './tableFeatures';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -52,13 +45,13 @@ interface DataTableProps<TData, TValue> {
   getRowDataCy?: (row: Row<TData>) => string;
   getRowClassName?: (row: Row<TData>) => string;
   getRowId?: (data: TData) => string;
-  columnVisibility?: VisibilityState;
-  setColumnVisibility?: OnChangeFn<VisibilityState>;
-  defaultColumnVisibility?: VisibilityState;
+  columnVisibility?: ColumnVisibilityState;
+  setColumnVisibility?: OnChangeFn<ColumnVisibilityState>;
+  defaultColumnVisibility?: ColumnVisibilityState;
   queryFilter?: useQueryFilterReturnType<any, any>;
   getActions?: GetActions<TData>;
   rowSelection?: Record<string, boolean>;
-  setRowSelection?: OnChangeFn<RowSelectionState>;
+  setRowSelection?: OnChangeFn<Record<string, boolean>>;
   enableMultiRowSelection?: boolean;
   showQuickActions?: boolean;
 }
@@ -104,12 +97,11 @@ export function DataTable<TData, TValue>({
     omitBy(defaultColumnVisibility, v => v),
   );
 
-  const table = useReactTable<TData>({
+  const table = useTable({
+    features: dataTableFeatures,
     data: data || [],
     columns,
-    getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
     onRowSelectionChange: setRowSelectionFromProps ?? setRowSelection,
     enableMultiRowSelection,
     getRowId,

@@ -1,6 +1,5 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import type { ColumnDef } from '@tanstack/react-table';
 import { KeyRound, Plus } from 'lucide-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -12,6 +11,7 @@ import Link from '../Link';
 import MessageBoxGraphqlError from '../MessageBoxGraphqlError';
 import Pagination from '../Pagination';
 import { DataTable } from '../table/DataTable';
+import type { ColumnDef } from '../table/tableFeatures';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 

@@ -1,7 +1,5 @@
 import React, { useContext, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
-import type { ColumnDef } from '@tanstack/react-table';
-import { createColumnHelper } from '@tanstack/react-table';
 import { useRouter } from 'next/router';
 import type { IntlShape } from 'react-intl';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -33,6 +31,8 @@ import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { SubmitExpenseFlow } from '../../../submit-expense/SubmitExpenseFlow';
 import { ColumnHeader } from '../../../table/ColumnHeader';
 import { actionsColumn, DataTable } from '../../../table/DataTable';
+import type { ColumnDef } from '../../../table/tableFeatures';
+import { createColumnHelper } from '../../../table/tableFeatures';
 import { Button } from '../../../ui/Button';
 import { DashboardContext } from '../../DashboardContext';
 import DashboardHeader from '../../DashboardHeader';

@@ -1,6 +1,5 @@
 import React from 'react';
 import { useMutation } from '@apollo/client';
-import type { CellContext, ColumnDef } from '@tanstack/react-table';
 import type { IntlShape } from 'react-intl';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -19,6 +18,7 @@ import { Box, Flex } from '../Grid';
 import Loading from '../Loading';
 import StyledTag from '../StyledTag';
 import { DataTable } from '../table/DataTable';
+import type { CellContext, ColumnDef } from '../table/tableFeatures';
 import {
   DropdownMenu,
   DropdownMenuContent,

@@ -1,7 +1,5 @@
 import React, { useContext, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
-import type { ColumnDef } from '@tanstack/react-table';
-import { createColumnHelper } from '@tanstack/react-table';
 import { get, omit } from 'lodash-es';
 import type { IntlShape } from 'react-intl';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -41,6 +39,8 @@ import LinkCollective from '../../../../LinkCollective';
 import MessageBoxGraphqlError from '../../../../MessageBoxGraphqlError';
 import { ColumnHeader } from '../../../../table/ColumnHeader';
 import { actionsColumn, DataTable } from '../../../../table/DataTable';
+import type { ColumnDef } from '../../../../table/tableFeatures';
+import { createColumnHelper } from '../../../../table/tableFeatures';
 import { DashboardContext } from '../../../DashboardContext';
 import { EmptyResults } from '../../../EmptyResults';
 import { expenseKYCStatusFilter } from '../../../filters/ExpenseKYCStatusFilter';

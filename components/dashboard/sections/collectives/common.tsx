@@ -1,5 +1,4 @@
 import React from 'react';
-import type { ColumnDef, TableMeta } from '@tanstack/react-table';
 import { groupBy, isNil, mapValues, toPairs } from 'lodash-es';
 import {
   Banknote,
@@ -41,6 +40,7 @@ import AddAgreementModal from '../../../agreements/AddAgreementModal';
 import Avatar from '../../../Avatar';
 import ContactCollectiveModal from '../../../ContactCollectiveModal';
 import FormattedMoneyAmount from '../../../FormattedMoneyAmount';
+import type { ColumnDef, TableMeta } from '../../../table/tableFeatures';
 import { Badge } from '../../../ui/Badge';
 import {
   DropdownMenu,

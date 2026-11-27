@@ -1,6 +1,5 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import type { ColumnDef } from '@tanstack/react-table';
 import { FormattedMessage } from 'react-intl';
 import { z } from 'zod';
 
@@ -15,6 +14,7 @@ import Link from '@/components/Link';
 import MessageBoxGraphqlError from '@/components/MessageBoxGraphqlError';
 import { DataTable } from '@/components/table/DataTable';
 
+import type { ColumnDef } from '../../../../table/tableFeatures';
 import type { AccountDetailData } from '../queries';
 
 const UPDATES_LIMIT = 25;

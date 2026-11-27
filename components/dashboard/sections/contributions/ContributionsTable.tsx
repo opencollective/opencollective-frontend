@@ -1,6 +1,6 @@
 import React from 'react';
 import type { ApolloError } from '@apollo/client';
-import type { ColumnDef, VisibilityState } from '@tanstack/react-table';
+import type { ColumnVisibilityState } from '@tanstack/react-table';
 import { useRouter } from 'next/router';
 
 import type {
@@ -14,6 +14,7 @@ import type { EditOrderActions } from '../../../EditOrderModal';
 import EditOrderModal from '../../../EditOrderModal';
 import MessageBoxGraphqlError from '../../../MessageBoxGraphqlError';
 import { DataTable } from '../../../table/DataTable';
+import type { ColumnDef } from '../../../table/tableFeatures';
 import { EmptyResults } from '../../EmptyResults';
 import { Filterbar } from '../../filters/Filterbar';
 import { Pagination } from '../../filters/Pagination';
@@ -34,10 +35,10 @@ type ContributionsTableProps<FilterValues extends Record<string, unknown>> = {
   onlyExpectedFunds?: boolean;
   hostSlug?: string;
   columns?: ColumnDef<ManagedOrderFieldsFragment>[];
-  columnVisibility?: VisibilityState;
+  columnVisibility?: ColumnVisibilityState;
 };
 
-export const defaultVisibility: VisibilityState = {
+export const defaultVisibility: ColumnVisibilityState = {
   legacyId: false,
   expectedAt: false,
   createdAt: false,
