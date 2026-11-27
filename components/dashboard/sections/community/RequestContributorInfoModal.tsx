@@ -265,8 +265,17 @@ export function RequestContributorInfoModal(props: RequestContributorInfoModalPr
                 <span className="font-medium">
                   <FormattedMessage defaultMessage="Address" id="collective.address.label" />
                 </span>
-                {!hasStructuredAddress && (
+                {!hasStructuredAddress ? (
                   <CurrentValue value={[location?.address?.trim(), location?.country].filter(Boolean).join(', ')} />
+                ) : (
+                  // Each part is listed with its own checkbox once the address is selected
+                  !isAddressSelected && (
+                    <CurrentValue
+                      value={ADDRESS_PARTS.map(part => getPartValue(part.key))
+                        .filter(Boolean)
+                        .join(', ')}
+                    />
+                  )
                 )}
               </label>
             </div>
