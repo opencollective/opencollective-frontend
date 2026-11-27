@@ -4,6 +4,7 @@ import { LOCAL_STORAGE_KEYS } from '../../../lib/local-storage';
 
 import { attemptTag } from '../helpers/attempt';
 import { Mailbox } from '../helpers/mail';
+import { lockSignupBudget, RedisStore, SIGNUP_LOCK_WAIT_MS } from '../helpers/redis';
 
 import {
   FixtureRecipes,
@@ -113,6 +114,32 @@ const authored = base.extend<{
       await testInfo.attach('mail-timings', { body: JSON.stringify(mail.timings), contentType: 'application/json' });
     }
   },
+});
+
+/**
+ * Journeys of a logged-out visitor that need no arranged data, such as signing up: the attempt's `mail`
+ * mints the addresses the journey owns, and `redis` reaches the API's rate-limit counters (`helpers/redis.ts`).
+ * A journey using `redis` holds the signup lock throughout, so signup journeys of runs joined to the same
+ * environment take turns; waiting for it has its own timeout, not the test's.
+ */
+export const visitorTest = authored.extend<{ redis: RedisStore }>({
+  redis: [
+    // eslint-disable-next-line no-empty-pattern -- Playwright declares fixture dependencies through destructuring.
+    async ({}, provide) => {
+      const redis = await RedisStore.connect();
+      try {
+        const unlock = await lockSignupBudget(redis);
+        try {
+          await provide(redis);
+        } finally {
+          await unlock();
+        }
+      } finally {
+        await redis.disconnect();
+      }
+    },
+    { timeout: SIGNUP_LOCK_WAIT_MS + 10_000 },
+  ],
 });
 
 /** Journeys of one user administering one unhosted Account; select the recipe with `test.use({ recipe })`. */

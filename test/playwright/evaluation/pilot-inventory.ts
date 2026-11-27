@@ -1,10 +1,11 @@
 /**
- * Core-flow inventory of the two pilots: each test of the original Cypress
+ * Core-flow inventory of the pilots: each test of the original Cypress
  * files with the Playwright journeys that carry it. Checked against the
  * sources by `node test/playwright/evaluation/cli.ts inventory`.
  */
 import type { InventoryEntry } from './inventory.ts';
 
+const SIGNUP = '01-signup.test.ts';
 const EXPENSES = '27-expenses.test.ts';
 const VENDORS = '41-vendor-visibility.test.ts';
 
@@ -13,12 +14,13 @@ const entry = (
   file: string,
   cypressTitle: string,
   journeys: Array<[string, string]>,
-  extra: Pick<InventoryEntry, 'note' | 'gap'> = {},
+  extra: Pick<InventoryEntry, 'note' | 'gap'> & { suite?: string } = {},
 ): InventoryEntry => ({
   group,
-  cypress: { file, title: cypressTitle },
+  cypress: { file, title: cypressTitle, ...(extra.suite && { suite: extra.suite }) },
   journeys: journeys.map(([journeyFile, title]) => ({ file: journeyFile, title })),
-  ...extra,
+  ...(extra.note && { note: extra.note }),
+  ...(extra.gap && { gap: extra.gap }),
 });
 
 const bothTypes = (
@@ -32,10 +34,256 @@ const INVITATION = 'Expense invitation';
 const MANAGEMENT = 'Expense management';
 const PICKER = 'Vendor picker';
 const CREATION = 'Vendor creation and settings';
+const SIGNUP_GROUP = 'Signup';
 
 const a = (type: 'invoice' | 'reimbursement') => (type === 'invoice' ? 'an invoice' : 'a reimbursement');
 
 export const pilotInventory: InventoryEntry[] = [
+  // 01-signup.test.ts
+  entry(SIGNUP_GROUP, SIGNUP, 'should request email', [
+    [
+      'signup/signup.spec.ts',
+      'Signup of a new user › visitor signs up, is held on profile completion until done, then reaches the dashboard',
+    ],
+  ]),
+  entry(
+    SIGNUP_GROUP,
+    SIGNUP,
+    'should send OTP through email',
+    [
+      [
+        'signup/signup.spec.ts',
+        'Signup of a new user › visitor signs up, is held on profile completion until done, then reaches the dashboard',
+      ],
+    ],
+    {
+      suite: 'Create a new Individual Profile',
+    },
+  ),
+  entry(
+    SIGNUP_GROUP,
+    SIGNUP,
+    'should send OTP through email',
+    [
+      [
+        'signup/signup.spec.ts',
+        'Signup of a new user › visitor signs up with a new Organization and invites an admin to it',
+      ],
+    ],
+    {
+      suite: 'Create a new Individual and Organization Profile',
+    },
+  ),
+  entry(
+    SIGNUP_GROUP,
+    SIGNUP,
+    'should send OTP through email',
+    [
+      [
+        'signup/signup.spec.ts',
+        'Signup of a new user › visitor signs up with a new Collective and invites an admin to it',
+      ],
+    ],
+    {
+      suite: 'Create a new Individual and Collective Profile',
+    },
+  ),
+  entry(SIGNUP_GROUP, SIGNUP, 'should redirect to complete profile if user is signed in', [
+    [
+      'signup/signup.spec.ts',
+      'Signup of a new user › visitor signs up, is held on profile completion until done, then reaches the dashboard',
+    ],
+  ]),
+  entry(SIGNUP_GROUP, SIGNUP, 'should coerce user to complete their profile', [
+    [
+      'signup/signup.spec.ts',
+      'Signup of a new user › visitor signs up, is held on profile completion until done, then reaches the dashboard',
+    ],
+  ]),
+  entry(SIGNUP_GROUP, SIGNUP, 'should complete profile and redirect to dashboard', [
+    [
+      'signup/signup.spec.ts',
+      'Signup of a new user › visitor signs up, is held on profile completion until done, then reaches the dashboard',
+    ],
+  ]),
+  entry(
+    SIGNUP_GROUP,
+    SIGNUP,
+    'completes individual profile',
+    [
+      [
+        'signup/signup.spec.ts',
+        'Signup of a new user › visitor signs up with a new Organization and invites an admin to it',
+      ],
+    ],
+    {
+      suite: 'Create a new Individual and Organization Profile',
+    },
+  ),
+  entry(
+    SIGNUP_GROUP,
+    SIGNUP,
+    'completes individual profile',
+    [
+      [
+        'signup/signup.spec.ts',
+        'Signup of a new user › visitor signs up with a new Collective and invites an admin to it',
+      ],
+    ],
+    {
+      suite: 'Create a new Individual and Collective Profile',
+    },
+  ),
+  entry(
+    SIGNUP_GROUP,
+    SIGNUP,
+    'should complete profile',
+    [
+      [
+        'signup/signup.spec.ts',
+        'Signup of a new user › visitor signs up with a new Organization and invites an admin to it',
+      ],
+    ],
+    {
+      suite: 'Create a new Individual and Organization Profile',
+    },
+  ),
+  entry(
+    SIGNUP_GROUP,
+    SIGNUP,
+    'should complete profile',
+    [
+      [
+        'signup/signup.spec.ts',
+        'Signup of a new user › visitor signs up with a new Collective and invites an admin to it',
+      ],
+    ],
+    {
+      suite: 'Create a new Individual and Collective Profile',
+    },
+  ),
+  entry(SIGNUP_GROUP, SIGNUP, 'should create organization', [
+    [
+      'signup/signup.spec.ts',
+      'Signup of a new user › visitor signs up with a new Organization and invites an admin to it',
+    ],
+  ]),
+  entry(
+    SIGNUP_GROUP,
+    SIGNUP,
+    'should allow user to invite more admins',
+    [
+      [
+        'signup/signup.spec.ts',
+        'Signup of a new user › visitor signs up with a new Organization and invites an admin to it',
+      ],
+    ],
+    {
+      suite: 'Create a new Individual and Organization Profile',
+    },
+  ),
+  entry(
+    SIGNUP_GROUP,
+    SIGNUP,
+    'should allow user to invite more admins',
+    [
+      [
+        'signup/signup.spec.ts',
+        'Signup of a new user › visitor signs up with a new Collective and invites an admin to it',
+      ],
+    ],
+    {
+      suite: 'Create a new Individual and Collective Profile',
+    },
+  ),
+  entry(SIGNUP_GROUP, SIGNUP, 'should create active organization', [
+    [
+      'signup/signup.spec.ts',
+      'Signup flows of a signed-in user › signed-in user creates an Organization managing money from the signup flow',
+    ],
+  ]),
+  entry(SIGNUP_GROUP, SIGNUP, 'should create active fiscal host', [
+    [
+      'signup/signup.spec.ts',
+      'Signup flows of a signed-in user › signed-in user creates a fiscal host from the signup flow',
+    ],
+  ]),
+  entry(SIGNUP_GROUP, SIGNUP, 'should create collective', [
+    [
+      'signup/signup.spec.ts',
+      'Signup of a new user › visitor signs up with a new Collective and invites an admin to it',
+    ],
+  ]),
+  entry(SIGNUP_GROUP, SIGNUP, 'should create collective while logged-in', [
+    [
+      'signup/signup.spec.ts',
+      'Signup flows of a signed-in user › signed-in user creates a Collective from the signup flow',
+    ],
+  ]),
+  entry(SIGNUP_GROUP, SIGNUP, 'preserves a requested path and query after completing a profile', [
+    [
+      'signup/signup.spec.ts',
+      'Signup failures and redirections › completing the profile leads to the page asked for before signing up',
+    ],
+  ]),
+  entry(SIGNUP_GROUP, SIGNUP, 'shows a retryable error and stays on the code step when the code is wrong', [
+    [
+      'signup/signup.spec.ts',
+      'Signup failures and redirections › a wrong code shows a retryable error and keeps the code step',
+    ],
+  ]),
+  entry(SIGNUP_GROUP, SIGNUP, 'returns to the email step when the verification session expired or is unknown', [
+    [
+      'signup/signup.spec.ts',
+      'Signup failures and redirections › an expired verification session sends the user back to the email step',
+    ],
+  ]),
+  entry(SIGNUP_GROUP, SIGNUP, 'invalidates the session after three wrong codes and lets the user start over', [
+    [
+      'signup/signup.spec.ts',
+      'Signup failures and redirections › three wrong codes end the session and the same email can start over',
+    ],
+  ]),
+  entry(SIGNUP_GROUP, SIGNUP, 'returns to the email step when resending a code for a dead session', [
+    [
+      'signup/signup.spec.ts',
+      'Signup failures and redirections › resending a code for an expired session sends the user back to the email step',
+    ],
+  ]),
+  entry(SIGNUP_GROUP, SIGNUP, 'shows an error and stays on the email step when the account already exists', [
+    [
+      'signup/signup.spec.ts',
+      'Signup failures and redirections › an email that already has an account is refused on the email step',
+    ],
+  ]),
+  entry(SIGNUP_GROUP, SIGNUP, 'shows an error and stays on the email step when signup is rate limited', [
+    ['signup/signup.spec.ts', 'Signup failures and redirections › a rate-limited signup is refused on the email step'],
+  ]),
+  entry(SIGNUP_GROUP, SIGNUP, 'shows an error and stays on the email step when an OTP challenge is already open', [
+    [
+      'signup/signup.spec.ts',
+      'Signup failures and redirections › requesting a second code while one is open is refused on the email step',
+    ],
+  ]),
+  entry(SIGNUP_GROUP, SIGNUP, 'goes back to the email step from the code step and drops the session', [
+    [
+      'signup/signup.spec.ts',
+      'Signup failures and redirections › going back from the code step returns to the email step and drops the session',
+    ],
+  ]),
+  entry(SIGNUP_GROUP, SIGNUP, 'restores the code step when a verification URL is loaded directly', [
+    [
+      'signup/signup.spec.ts',
+      'Signup failures and redirections › a verification link loaded directly opens the code step',
+    ],
+  ]),
+  entry(SIGNUP_GROUP, SIGNUP, 'keeps the organization flow when the verification session dies', [
+    [
+      'signup/signup.spec.ts',
+      'Signup failures and redirections › an expired verification session keeps the Organization flow',
+    ],
+  ]),
+
   // 27-expenses.test.ts
   entry(SUBMISSION, EXPENSES, 'shows the login screen', [
     ['expenses/logged-out.spec.ts', 'logged-out visitor is asked to sign in before submitting an expense'],
