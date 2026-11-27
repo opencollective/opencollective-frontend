@@ -625,7 +625,7 @@ const PayoutBankInformationForm = ({
         0,
       );
       const minAmountForSelectedCurrency =
-        wiseHost?.transferwise?.availableCurrencies?.find(c => c.code === selectedCurrency)?.minInvoiceAmount * 100;
+        availableCurrencies.find(c => c.code === selectedCurrency)?.minInvoiceAmount * 100;
       if (invoiceTotalAmount < minAmountForSelectedCurrency) {
         return formatMessage(
           {
@@ -640,15 +640,7 @@ const PayoutBankInformationForm = ({
         );
       }
     }
-  }, [
-    availableCurrencies,
-    fixedCurrency,
-    formatMessage,
-    items,
-    selectedCurrency,
-    wiseHost?.currency,
-    wiseHost?.transferwise?.availableCurrencies,
-  ]);
+  }, [availableCurrencies, fixedCurrency, formatMessage, items, selectedCurrency, wiseHost?.currency]);
 
   // Display spinner if loading
   if (loading) {
