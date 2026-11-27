@@ -253,7 +253,9 @@ const ExpenseItemsSection = React.memo(function ExpenseItemSection(
                     </span>
                   )}
                 </div>
-                <div className="text-xs">{ei.incurredAt && <DateTime value={ei.incurredAt} dateStyle="medium" />}</div>
+                <div className="text-xs">
+                  {ei.incurredAt && <DateTime value={ei.incurredAt} dateStyle="medium" timeZone="UTC" />}
+                </div>
               </div>
               <div className="text-right">
                 <FormattedMoneyAmount
