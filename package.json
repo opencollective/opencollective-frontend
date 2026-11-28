@@ -228,7 +228,7 @@
     "@types/jscodeshift": "^17.3.0",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^24.0.0",
-    "@types/react": "19.3.0",
+    "@types/react": "19.3.2",
     "@types/react-dom": "19.3.0",
     "@types/styled-system": "^5.1.22",
     "@types/webpack-env": "^1.18.5",
@@ -322,7 +322,7 @@
     ]
   },
   "overrides": {
-    "@types/react": "19.3.0",
+    "@types/react": "19.3.2",
     "@types/react-dom": "19.3.0"
   },
   "allowScripts": {
